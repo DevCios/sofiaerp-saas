@@ -21,7 +21,8 @@ certbot certonly --standalone \
   --non-interactive
 
 echo ">>> 4. Habilitando configuración HTTPS en Nginx..."
-cp nginx/conf.d/default-ssl.conf nginx/conf.d/default.conf
+cp nginx/conf.d/default-ssl.conf.template nginx/conf.d/default.conf
+rm -f nginx/conf.d/default-ssl.conf
 
 echo ">>> 5. Levantando Nginx con HTTPS cifrado..."
 docker compose up -d edge-router
