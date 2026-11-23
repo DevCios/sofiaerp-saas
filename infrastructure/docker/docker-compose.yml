@@ -157,9 +157,9 @@ services:
     restart: unless-stopped
     environment:
       - HOST=pgbouncer
-      - PORT=6432
-      - USER=${ODOO_DB_USER}
-      - PASSWORD=${ODOO_DB_PASSWORD}
+      - PORT=5432
+      - USER=${POSTGRES_USER}
+      - PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro
