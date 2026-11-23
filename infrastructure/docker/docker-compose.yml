@@ -2,7 +2,6 @@
 # SOFIA ERP — Orquestación de Infraestructura Base (Docker Compose)
 # Modelo de Aislamiento de Redes y Servicios de Plataforma
 # ==============================================================================
-version: '3.8'
 
 networks:
   # Red perimetral pública (solo expone Nginx a Internet)
@@ -100,7 +99,7 @@ services:
   # 4. Connection Pooler (PgBouncer)
   # ----------------------------------------------------------------------------
   pgbouncer:
-    image: edoburu/pgbouncer:v1.22.1
+    image: edoburu/pgbouncer:latest
     container_name: sofia-pgbouncer
     restart: unless-stopped
     environment:

@@ -1,6 +1,6 @@
 # ==============================================================================
 # SOFIA ERP — Dockerfile para SOFIA Platform Backend (FastAPI)
-# Multi-stage build con usuario sin privilegios root
+# Multi-stage build con virtualenv y usuario sin privilegios root
 # ==============================================================================
 FROM python:3.11-slim as builder
 
@@ -11,8 +11,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Imagen final ligera y segura
 FROM python:3.11-slim
@@ -28,8 +31,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN addgroup --system --gid 1001 sofia && \
     adduser --system --uid 1001 --ingroup sofia --no-create-home sofia
 
-COPY --from=builder /root/.local /home/sofia/.local
-ENV PATH=/home/sofia/.local/bin:$PATH
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . /app
 
