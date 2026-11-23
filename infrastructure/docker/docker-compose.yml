@@ -38,7 +38,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - nginx_ssl_certs:/etc/letsencrypt:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     networks:
       - sofia-net-public
       - sofia-net-app
