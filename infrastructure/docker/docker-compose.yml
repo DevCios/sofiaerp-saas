@@ -85,6 +85,12 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/1
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/2
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - ODOO_DB_USER=${POSTGRES_USER}
     volumes:
       - sofia_filestores:/var/lib/sofia/filestores
       - sofia_backups:/var/lib/sofia/backups
@@ -156,6 +162,7 @@ services:
     image: odoo:20.0
     container_name: sofia-odoo-runtime-shared
     restart: unless-stopped
+    command: odoo --http-interface=0.0.0.0 --http-port=8069 -c /etc/odoo/odoo.conf
     environment:
       - HOST=pgbouncer
       - PORT=5432

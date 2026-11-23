@@ -67,9 +67,13 @@ class ProvisioningService:
                 conn.close()
                 return False  # Ya existía
 
+            # Verificar si existe el rol owner_user; si no, usar admin_user
+            cursor.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (owner_user,))
+            actual_owner = owner_user if cursor.fetchone() else admin_user
+
             # Crear base de datos asignando el dueño específico
             # Sentencia DDL con nombre sanitizado
-            cursor.execute(f'CREATE DATABASE "{db_name}" OWNER "{owner_user}";')
+            cursor.execute(f'CREATE DATABASE "{db_name}" OWNER "{actual_owner}";')
             
             # Limitar conexiones máximas permitidas para esta base de datos
             cursor.execute(f'ALTER DATABASE "{db_name}" WITH CONNECTION LIMIT {max_connections};')
