@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     APP_SECRET_KEY: str = "temporary_insecure_key_must_be_overridden_in_production"
     
     # Dominios y CORS
-    ALLOWED_HOSTS: str = "sofiaerp.com,*.sofiaerp.com,localhost,127.0.0.1"
+    ALLOWED_HOSTS: str = "*"
     
     @property
     def allowed_hosts_list(self) -> List[str]:
