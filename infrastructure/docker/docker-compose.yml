@@ -159,7 +159,10 @@ services:
   # 7. Odoo 20 Community Runtime Pool (Shared Protected)
   # ----------------------------------------------------------------------------
   odoo-runtime:
-    image: odoo:20.0
+    build:
+      context: ./odoo
+      dockerfile: Dockerfile
+    image: sofia-odoo-runtime:20.0
     container_name: sofia-odoo-runtime-shared
     restart: unless-stopped
     command: odoo --http-interface=0.0.0.0 --http-port=8069 -c /etc/odoo/odoo.conf

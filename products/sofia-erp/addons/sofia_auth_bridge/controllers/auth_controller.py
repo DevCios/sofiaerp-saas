@@ -2,7 +2,12 @@
 import json
 import logging
 from datetime import datetime
-import jwt
+
+try:
+    import jwt
+except ImportError:
+    jwt = None
+
 from odoo import http
 from odoo.http import request
 
@@ -19,6 +24,10 @@ class SofiaAuthController(http.Controller):
         """
         if not token:
             return request.redirect('/web/login?error=missing_token')
+
+        if jwt is None:
+            _logger.critical("Módulo 'jwt' (PyJWT) no está disponible en el entorno de Odoo.")
+            return request.redirect('/web/login?error=jwt_not_installed')
 
         try:
             # 1. Validación Criptográfica Local Offline Estricta (RS256 con Clave Pública Local)
