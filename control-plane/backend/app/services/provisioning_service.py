@@ -71,9 +71,20 @@ class ProvisioningService:
             cursor.execute("SELECT 1 FROM pg_roles WHERE rolname = %s", (owner_user,))
             actual_owner = owner_user if cursor.fetchone() else admin_user
 
-            # Crear base de datos asignando el dueño específico
-            # Sentencia DDL con nombre sanitizado
-            cursor.execute(f'CREATE DATABASE "{db_name}" OWNER "{actual_owner}";')
+            # Comprobar si existe la plantilla de oro sofia_template_db (con Odoo y es_PE pre-instalados)
+            cursor.execute("SELECT 1 FROM pg_database WHERE datname = 'sofia_template_db'")
+            has_template = cursor.fetchone()
+
+            if has_template:
+                # Terminar conexiones inactivas al template para permitir clonado seguro
+                cursor.execute("""
+                    SELECT pg_terminate_backend(pid)
+                    FROM pg_stat_activity
+                    WHERE datname = 'sofia_template_db' AND pid <> pg_backend_pid();
+                """)
+                cursor.execute(f'CREATE DATABASE "{db_name}" OWNER "{actual_owner}" TEMPLATE "sofia_template_db";')
+            else:
+                cursor.execute(f'CREATE DATABASE "{db_name}" OWNER "{actual_owner}";')
             
             # Limitar conexiones máximas permitidas para esta base de datos
             cursor.execute(f'ALTER DATABASE "{db_name}" WITH CONNECTION LIMIT {max_connections};')
