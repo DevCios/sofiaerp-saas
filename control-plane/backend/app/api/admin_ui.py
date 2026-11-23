@@ -1,6 +1,6 @@
 """
 Interfaz Gráfica Web para Administración de Clientes y Tenants de SOFIA Platform.
-Permite visualizar, registrar y gestionar empresas cliente mediante interfaz web intuitiva sin comandos de terminal.
+Incluye Pantalla de Login de Superadministrador con autenticación JWT y Argon2id.
 """
 from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
@@ -12,7 +12,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SOFIA ERP SaaS — Panel de Control de Clientes</title>
+  <title>SOFIA ERP SaaS — Control Plane de Administración</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -22,99 +22,165 @@ HTML_CONTENT = """<!DOCTYPE html>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-  <!-- Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+  <!-- ========================================================================= -->
+  <!-- VISTA 1: PANTALLA DE LOGIN SEGURO DE SUPERADMINISTRADOR                     -->
+  <!-- ========================================================================= -->
+  <div id="view-login" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-xl border border-slate-200">
+      
+      <!-- Logo y Encabezado -->
+      <div class="text-center mb-8">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white font-bold text-2xl flex items-center justify-center mx-auto shadow-md shadow-indigo-200">
           S
         </div>
+        <h1 class="text-xl font-bold text-slate-900 mt-4">Acceso de Superadministrador</h1>
+        <p class="text-xs text-slate-500 mt-1">SOFIA ERP SaaS Platform Control Plane</p>
+      </div>
+
+      <!-- Formulario de Login -->
+      <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
         <div>
-          <span class="font-bold text-slate-900 text-lg">SOFIA Platform</span>
-          <span class="text-xs text-slate-500 block -mt-0.5">Control Plane Multi-Tenant • Odoo 20 + SUNAT</span>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Correo Electrónico</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+              <i class="fa-solid fa-envelope text-xs"></i>
+            </span>
+            <input type="email" id="login-email" required value="admin@sofiaerp.com" placeholder="admin@sofiaerp.com" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Contraseña</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+              <i class="fa-solid fa-lock text-xs"></i>
+            </span>
+            <input type="password" id="login-pass" required placeholder="••••••••" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition">
+          </div>
+        </div>
+
+        <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700"></div>
+
+        <button type="submit" id="btn-login" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl transition shadow-sm shadow-indigo-200 flex items-center justify-center gap-2">
+          <span>Ingresar al Panel de Control</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <span class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-shield-halved text-emerald-500"></i> Cifrado Argon2id & RS256 JWT
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- VISTA 2: PANEL DE ADMINISTRACIÓN (PROTEGIDO)                              -->
+  <!-- ========================================================================= -->
+  <div id="view-dashboard" class="flex-1 flex flex-col hidden">
+    
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+            S
+          </div>
+          <div>
+            <span class="font-bold text-slate-900 text-lg">SOFIA Platform</span>
+            <span class="text-xs text-slate-500 block -mt-0.5">Control Plane Multi-Tenant • Odoo 20 + SUNAT</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-semibold text-indigo-800">
+            <i class="fa-solid fa-user-shield text-indigo-600"></i>
+            <span id="user-display">Superadmin</span>
+          </div>
+          <button onclick="handleLogout()" class="text-xs text-rose-600 hover:text-rose-700 border border-rose-200 hover:bg-rose-50 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión
+          </button>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <a href="/api/docs" target="_blank" class="text-xs text-slate-600 hover:text-indigo-600 border border-slate-200 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
-          <i class="fa-solid fa-code"></i> API Docs
-        </a>
-        <div class="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          Sistema Operativo
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+      <!-- Top Banner & Button -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Gestión de Clientes & Empresas</h1>
+          <p class="text-sm text-slate-500 mt-1">Crea nuevas instancias ERP para tus clientes en 2 segundos con base de datos aislada y localización fiscal.</p>
         </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-
-    <!-- Top Banner & Button -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-      <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Gestión de Clientes & Empresas</h1>
-        <p class="text-sm text-slate-500 mt-1">Crea nuevas instancias ERP para tus clientes en 2 segundos con base de datos aislada y localización fiscal.</p>
-      </div>
-      <button onclick="openModal()" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm shadow-indigo-200">
-        <i class="fa-solid fa-plus"></i> Crear Nuevo Cliente
-      </button>
-    </div>
-
-    <!-- Metrics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-      <div class="bg-white p-5 rounded-2xl border border-slate-200">
-        <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total de Clientes</div>
-        <div id="metric-tenants" class="text-3xl font-bold text-slate-900 mt-2">--</div>
-        <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Base de datos por tenant</div>
-      </div>
-      <div class="bg-white p-5 rounded-2xl border border-slate-200">
-        <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Motor Runtime</div>
-        <div class="text-3xl font-bold text-slate-900 mt-2">Odoo 20</div>
-        <div class="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-flag"></i> Español (Perú) Nativo</div>
-      </div>
-      <div class="bg-white p-5 rounded-2xl border border-slate-200">
-        <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Seguridad Perimetral</div>
-        <div class="text-3xl font-bold text-emerald-600 mt-2">Blindado</div>
-        <div class="text-xs text-slate-500 font-medium mt-1">Nginx + PgBouncer Tx Mode</div>
-      </div>
-    </div>
-
-    <!-- Tenants Table -->
-    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-      <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-        <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
-        <button onclick="loadTenants()" class="text-xs text-slate-500 hover:text-indigo-600 flex items-center gap-1 font-medium transition">
-          <i class="fa-solid fa-rotate-right"></i> Actualizar
+        <button onclick="openModal()" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition shadow-sm shadow-indigo-200">
+          <i class="fa-solid fa-plus"></i> Crear Nuevo Cliente
         </button>
       </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
-            <tr>
-              <th class="px-6 py-3.5">Empresa / Razón Social</th>
-              <th class="px-6 py-3.5">Subdominio & Acceso</th>
-              <th class="px-6 py-3.5">Base de Datos</th>
-              <th class="px-6 py-3.5">Estado</th>
-              <th class="px-6 py-3.5">Fecha Alta</th>
-              <th class="px-6 py-3.5 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tenants-body" class="divide-y divide-slate-100">
-            <tr>
-              <td colspan="6" class="px-6 py-10 text-center text-slate-400">
-                <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl mb-2 block"></i>
-                Cargando empresas cliente...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total de Clientes</div>
+          <div id="metric-tenants" class="text-3xl font-bold text-slate-900 mt-2">--</div>
+          <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Base de datos por tenant</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Motor Runtime</div>
+          <div class="text-3xl font-bold text-slate-900 mt-2">Odoo 20</div>
+          <div class="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-flag"></i> Español (Perú) Nativo</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Seguridad Perimetral</div>
+          <div class="text-3xl font-bold text-emerald-600 mt-2">Blindado</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Nginx HTTPS + PgBouncer Tx Mode</div>
+        </div>
       </div>
-    </div>
 
-  </main>
+      <!-- Tenants Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
+          <button onclick="loadTenants()" class="text-xs text-slate-500 hover:text-indigo-600 flex items-center gap-1 font-medium transition">
+            <i class="fa-solid fa-rotate-right"></i> Actualizar
+          </button>
+        </div>
 
-  <!-- Modal: Crear Nuevo Cliente -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
+              <tr>
+                <th class="px-6 py-3.5">Empresa / Razón Social</th>
+                <th class="px-6 py-3.5">Subdominio & Acceso</th>
+                <th class="px-6 py-3.5">Base de Datos</th>
+                <th class="px-6 py-3.5">Estado</th>
+                <th class="px-6 py-3.5">Fecha Alta</th>
+                <th class="px-6 py-3.5 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tenants-body" class="divide-y divide-slate-100">
+              <tr>
+                <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                  <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl mb-2 block"></i>
+                  Cargando empresas cliente...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CREAR NUEVO CLIENTE                                                -->
+  <!-- ========================================================================= -->
   <div id="modal-new-tenant" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
       <div class="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -171,7 +237,70 @@ HTML_CONTENT = """<!DOCTYPE html>
     </div>
   </div>
 
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT DE AUTENTICACIÓN Y GESTIÓN                                      -->
+  <!-- ========================================================================= -->
   <script>
+    const TOKEN_KEY = 'sofia_admin_token';
+    const EMAIL_KEY = 'sofia_admin_email';
+
+    function checkAuth() {
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      const email = sessionStorage.getItem(EMAIL_KEY);
+
+      if (!token) {
+        document.getElementById('view-login').classList.remove('hidden');
+        document.getElementById('view-dashboard').classList.add('hidden');
+      } else {
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-dashboard').classList.remove('hidden');
+        document.getElementById('user-display').innerText = email || 'Superadmin';
+        loadTenants();
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      const errBox = document.getElementById('login-error');
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-pass').value;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...`;
+      errBox.classList.add('hidden');
+
+      try {
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Credenciales incorrectas');
+        }
+
+        sessionStorage.setItem(TOKEN_KEY, data.access_token);
+        sessionStorage.setItem(EMAIL_KEY, email);
+        checkAuth();
+      } catch (err) {
+        errBox.innerText = err.message;
+        errBox.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span>Ingresar al Panel de Control</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(EMAIL_KEY);
+      checkAuth();
+    }
+
     function sanitizeSlug(input) {
       input.value = input.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
     }
@@ -188,10 +317,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     async function loadTenants() {
       const tbody = document.getElementById('tenants-body');
+      const token = sessionStorage.getItem(TOKEN_KEY);
+
       try {
-        const res = await fetch('/api/v1/tenants');
+        const res = await fetch('/api/v1/tenants', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.status === 401) {
+          handleLogout();
+          return;
+        }
+
         const tenants = await res.json();
-        
         document.getElementById('metric-tenants').innerText = tenants.length;
 
         if (tenants.length === 0) {
@@ -207,8 +345,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         }
 
         tbody.innerHTML = tenants.map(t => {
-          const domainUrl = 'http://' + t.slug + '.sofiaerp.com';
-          const isLive = t.status === 'ACTIVE' || t.status === 'PROVISIONING';
+          const domainUrl = 'https://' + t.slug + '.sofiaerp.com';
           const badgeClass = t.status === 'ACTIVE' 
             ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
             : 'bg-amber-50 text-amber-700 border-amber-200';
@@ -248,6 +385,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
       const errBox = document.getElementById('modal-error');
+      const token = sessionStorage.getItem(TOKEN_KEY);
       
       const payload = {
         name: document.getElementById('t-name').value.trim(),
@@ -264,7 +402,10 @@ HTML_CONTENT = """<!DOCTYPE html>
       try {
         const res = await fetch('/api/v1/tenants', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
           body: JSON.stringify(payload)
         });
 
@@ -284,7 +425,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadTenants);
+    document.addEventListener('DOMContentLoaded', checkAuth);
   </script>
 </body>
 </html>
@@ -292,5 +433,5 @@ HTML_CONTENT = """<!DOCTYPE html>
 
 @admin_ui_router.get("/admin", response_class=HTMLResponse, summary="Panel Gráfico de Administración SaaS")
 async def get_admin_dashboard():
-    """Retorna la interfaz web interactiva para administración de clientes."""
+    """Retorna la interfaz web interactiva protegida con login para administración de clientes."""
     return HTML_CONTENT

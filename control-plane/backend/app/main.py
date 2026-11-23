@@ -1,12 +1,13 @@
 """
 Punto de Entrada Principal de la Aplicación SOFIA Platform API.
 """
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.core.database import engine, Base
+from app.core.database import engine, Base, AsyncSessionLocal
 from app.api.v1.router import api_v1_router
 from app.api.admin_ui import admin_ui_router
 
@@ -17,6 +18,27 @@ async def lifespan(app: FastAPI):
     # Inicialización segura de tablas del Control Plane si no existen
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # Seed inicial seguro de Superadministrador SOFIA
+    async with AsyncSessionLocal() as session:
+        from sqlalchemy import select
+        from app.models.user import User
+        from app.core.security import get_password_hash
+        admin_email = os.getenv("SOFIA_SUPERADMIN_EMAIL", "admin@sofiaerp.com")
+        admin_pass = os.getenv("SOFIA_SUPERADMIN_PASSWORD", "SofiaAdmin2026!")
+        stmt = select(User).where(User.email == admin_email)
+        res = await session.execute(stmt)
+        if not res.scalar_one_or_none():
+            superadmin = User(
+                email=admin_email,
+                password_hash=get_password_hash(admin_pass),
+                full_name="Super Administrador SOFIA",
+                is_active=True,
+                is_superadmin=True,
+            )
+            session.add(superadmin)
+            await session.commit()
+
     yield
     # Cierre ordenado de conexiones
     await engine.dispose()
