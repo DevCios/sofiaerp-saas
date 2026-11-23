@@ -23,6 +23,11 @@ server {
         root /var/www/certbot;
     }
 
+    # Redirección amigable de /login hacia /web/login
+    location = /login {
+        return 301 /web/login;
+    }
+
     location / {
         return 301 https://$host$request_uri;
     }
@@ -58,6 +63,11 @@ server {
     }
 
     # Enrutamiento hacia Control Plane API y Dashboard Admin
+    # Redirección amigable de /login hacia /web/login
+    location = /login {
+        return 301 /web/login;
+    }
+
     location / {
         proxy_pass http://control_plane_backend;
         proxy_http_version 1.1;
@@ -86,6 +96,11 @@ server {
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
+
+    # Redirección amigable de /login hacia /web/login
+    location = /login {
+        return 301 /web/login;
+    }
 
     location / {
         proxy_pass http://odoo_backend;
@@ -143,6 +158,11 @@ server {
         proxy_pass_request_body off;
         proxy_set_header Content-Length "";
         proxy_set_header Host $host;
+    }
+
+    # Redirección amigable de /login hacia /web/login
+    location = /login {
+        return 301 /web/login;
     }
 
     location / {
