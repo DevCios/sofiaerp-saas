@@ -28,6 +28,10 @@ server {
         return 301 /web/login;
     }
 
+    # Manejo amigable de subdominios inexistentes o erróneos:
+    # Si el tenant no existe o hay error en subdominio, redirigir automáticamente al login central
+    error_page 401 403 404 500 =302 https://sofiaerp.com/login;
+
     location / {
         return 301 https://$host$request_uri;
     }
@@ -68,6 +72,10 @@ server {
         return 301 /web/login;
     }
 
+    # Manejo amigable de subdominios inexistentes o erróneos:
+    # Si el tenant no existe o hay error en subdominio, redirigir automáticamente al login central
+    error_page 401 403 404 500 =302 https://sofiaerp.com/login;
+
     location / {
         proxy_pass http://control_plane_backend;
         proxy_http_version 1.1;
@@ -101,6 +109,10 @@ server {
     location = /login {
         return 301 /web/login;
     }
+
+    # Manejo amigable de subdominios inexistentes o erróneos:
+    # Si el tenant no existe o hay error en subdominio, redirigir automáticamente al login central
+    error_page 401 403 404 500 =302 https://sofiaerp.com/login;
 
     location / {
         proxy_pass http://odoo_backend;
@@ -164,6 +176,10 @@ server {
     location = /login {
         return 301 /web/login;
     }
+
+    # Manejo amigable de subdominios inexistentes o erróneos:
+    # Si el tenant no existe o hay error en subdominio, redirigir automáticamente al login central
+    error_page 401 403 404 500 =302 https://sofiaerp.com/login;
 
     location / {
         auth_request /_sofia_resolve_tenant;
