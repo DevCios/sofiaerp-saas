@@ -1,0 +1,3 @@
+# Directorio para llaves RSA asimétricas del Control Plane (OIDC/JWKS)
+# jwt_private.pem (4096 bits)
+# jwt_public.pem

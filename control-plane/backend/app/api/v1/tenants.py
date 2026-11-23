@@ -3,7 +3,7 @@ Endpoints para Administración de Tenants, Dominios, Verificación DNS y Resoluc
 """
 from typing import List
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db_session
@@ -181,13 +181,16 @@ async def verify_domain(
 # Endpoint de Resolución Dinámica para Nginx / Edge Proxy
 # ------------------------------------------------------------------------------
 @router.get("/resolve/{host}", summary="Resolver tenant y dbfilter a partir del Host HTTP")
-async def resolve_host(host: str, db: AsyncSession = Depends(get_db_session)):
+async def resolve_host(host: str, response: Response, db: AsyncSession = Depends(get_db_session)):
     """
     Invocado por el Edge Proxy (Nginx) para determinar a qué base de datos y upstream
     debe enrutarse la solicitud, protegiendo contra Host Header Injection.
     """
     try:
         resolution = await DomainService.resolve_host(host, db)
+        response.headers["X-Odoo-dbfilter"] = resolution["odoo_dbfilter"]
+        response.headers["X-Sofia-Tenant-ID"] = resolution["tenant_id"]
+        response.headers["X-Sofia-Tenant-Slug"] = resolution["tenant_slug"]
         return resolution
     except TenantNotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

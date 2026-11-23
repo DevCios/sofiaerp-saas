@@ -21,16 +21,24 @@ class SofiaAuthController(http.Controller):
             return request.redirect('/web/login?error=missing_token')
 
         try:
-            # 1. Validación Criptográfica Local Offline
+            # 1. Validación Criptográfica Local Offline Estricta (RS256 con Clave Pública Local)
             # Odoo valida contra el archivo de clave pública /etc/sofia/keys/jwt_public.pem
+            key_path = '/etc/sofia/keys/jwt_public.pem'
             try:
-                with open('/etc/sofia/keys/jwt_public.pem', 'r') as f:
+                with open(key_path, 'r') as f:
                     pub_key = f.read()
+            except FileNotFoundError:
+                _logger.critical("Clave pública RSA no encontrada en '%s'. Imposible autenticar de forma segura.", key_path)
+                return request.redirect('/web/login?error=auth_infrastructure_error')
+
+            try:
                 payload = jwt.decode(token, pub_key, algorithms=['RS256'], audience='sofia-platform')
-            except Exception as e:
-                _logger.warning("Fallo al validar con clave RSA local: %s. Intentando fallback seguro...", str(e))
-                # Fallback de desarrollo
-                payload = jwt.decode(token, options={"verify_signature": False})
+            except jwt.ExpiredSignatureError:
+                _logger.warning("Intento de autenticación SSO con token JWT expirado.")
+                return request.redirect('/web/login?error=token_expired')
+            except jwt.InvalidTokenError as e:
+                _logger.error("Token JWT inválido o firma RS256 rechazada: %s", str(e))
+                return request.redirect('/web/login?error=invalid_token_signature')
 
             user_email = payload.get('email')
             sofia_user_id = payload.get('sub')

@@ -12,11 +12,10 @@ from app.api.v1.router import api_v1_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Ciclo de vida de la aplicación: inicialización de recursos."""
-    # En desarrollo inicializa las tablas si no existen (en producción se usa Alembic)
-    if settings.ENVIRONMENT == "development":
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+    """Ciclo de vida de la aplicación: inicialización de recursos y tablas."""
+    # Inicialización segura de tablas del Control Plane si no existen
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     yield
     # Cierre ordenado de conexiones
     await engine.dispose()

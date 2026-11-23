@@ -165,7 +165,7 @@ services:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro
       - ../../control-plane/keys:/etc/sofia/keys:ro
-      - ../../products/sofia-erp/addons:/mnt/extra-addons:ro
+      - ../../products:/mnt/products:ro
     networks:
       - sofia-net-app
       - sofia-net-data
