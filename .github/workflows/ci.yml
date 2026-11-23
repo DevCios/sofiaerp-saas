@@ -1,0 +1,61 @@
+name: SOFIA Platform CI
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test-control-plane:
+    name: Backend Lint & Unit Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sofia_admin
+          POSTGRES_PASSWORD: sofia_test_password
+          POSTGRES_DB: sofia_central_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Instalar Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r control-plane/backend/requirements.txt
+
+      - name: Ejecutar Pruebas Automatizadas (Pytest)
+        env:
+          DATABASE_URL: postgresql+asyncpg://sofia_admin:sofia_test_password@localhost:5432/sofia_central_test
+          REDIS_URL: redis://localhost:6379/0
+          ENVIRONMENT: test
+        run: |
+          cd control-plane/backend
+          pytest -v tests/

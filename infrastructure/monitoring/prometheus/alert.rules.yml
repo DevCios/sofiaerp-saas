@@ -1,0 +1,29 @@
+groups:
+  - name: sofia_alerts
+    rules:
+      - alert: TenantStorageCritical
+        expr: (sofia_tenant_storage_bytes / sofia_tenant_storage_limit_bytes) * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Tenant supera el 90% de almacenamiento contratado"
+          description: "El tenant {{ $labels.tenant_slug }} ha consumido el 90% de su cuota de disco."
+
+      - alert: PostgresHighConnections
+        expr: (pg_stat_database_numbackends / 250) * 100 > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Saturación de conexiones en PgBouncer / PostgreSQL"
+          description: "El pool de conexiones supera el 80% de utilización máxima."
+
+      - alert: BackupFailureDetected
+        expr: rate(sofia_backup_operations_total{status="failed"}[1h]) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Fallo en la sincronización de backups hacia Google Drive"
+          description: "La tarea de respaldo hacia Google Drive ha reportado errores."

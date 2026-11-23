@@ -1,0 +1,25 @@
+# Entornos virtuales Python
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Secretos y credenciales (Regla obligatoria: nunca en el repositorio)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+
+# Datos de desarrollo y filestores locales
+data/
+filestores/
+logs/
+*.log
+
+# Docker y temporales
+.docker/
+tmp/
+scratch/

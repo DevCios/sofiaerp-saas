@@ -1,0 +1,195 @@
+"""
+Endpoints para Administración de Tenants, Dominios, Verificación DNS y Resolución Dinámica.
+"""
+from typing import List
+from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.database import get_db_session
+from app.core.security import get_password_hash
+from app.models.tenant import Tenant, TenantDomain
+from app.models.user import User, UserTenantMembership
+from app.schemas.tenant import (
+    TenantCreate,
+    TenantResponse,
+    TenantDomainCreate,
+    TenantDomainResponse,
+)
+from app.services.domain_service import (
+    DomainService,
+    TenantNotFoundException,
+    TenantSuspendedException,
+)
+from app.tasks.provisioning import dispatch_tenant_provisioning
+
+router = APIRouter(prefix="/tenants", tags=["Tenants, Dominios & Resolución"])
+
+
+# ------------------------------------------------------------------------------
+# CRUD de Tenants
+# ------------------------------------------------------------------------------
+@router.post("", response_model=TenantResponse, status_code=status.HTTP_201_CREATED, summary="Registrar y aprovisionar un nuevo Tenant")
+async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db_session)):
+    existing_tenant = await db.execute(select(Tenant).where(Tenant.slug == payload.slug))
+    if existing_tenant.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"El identificador (slug) '{payload.slug}' ya se encuentra en uso.",
+        )
+
+    db_name = f"sofia_tenant_{payload.slug.replace('-', '_')}"
+    filestore_dir = f"/var/lib/sofia/filestores/{payload.slug}"
+
+    new_tenant = Tenant(
+        name=payload.name,
+        slug=payload.slug,
+        database_name=db_name,
+        filestore_path=filestore_dir,
+        status="PROVISIONING",
+        runtime_mode=payload.runtime_mode or "SHARED_PROTECTED",
+    )
+    db.add(new_tenant)
+    await db.flush()
+
+    user_stmt = select(User).where(User.email == payload.admin_email)
+    user_res = await db.execute(user_stmt)
+    admin_user = user_res.scalar_one_or_none()
+
+    if not admin_user:
+        admin_user = User(
+            email=payload.admin_email,
+            password_hash=get_password_hash(payload.admin_password),
+            full_name=f"Admin {payload.name}",
+            is_active=True,
+        )
+        db.add(admin_user)
+        await db.flush()
+
+    membership = UserTenantMembership(
+        user_id=admin_user.id,
+        tenant_id=new_tenant.id,
+        role="TENANT_ADMIN",
+        is_enabled=True,
+    )
+    db.add(membership)
+    await db.commit()
+    await db.refresh(new_tenant)
+
+    # Despachar tarea en Celery
+    dispatch_tenant_provisioning(str(new_tenant.id), new_tenant.database_name, new_tenant.filestore_path)
+
+    return new_tenant
+
+
+@router.get("", response_model=List[TenantResponse], summary="Listar todos los tenants")
+async def list_tenants(db: AsyncSession = Depends(get_db_session)):
+    stmt = select(Tenant).order_by(Tenant.created_at.desc())
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+@router.get("/{tenant_id}", response_model=TenantResponse, summary="Obtener detalle de un tenant")
+async def get_tenant(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+    stmt = select(Tenant).where(Tenant.id == tenant_id)
+    result = await db.execute(stmt)
+    tenant = result.scalar_one_or_none()
+    if not tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
+    return tenant
+
+
+# ------------------------------------------------------------------------------
+# Gestión de Dominios Personalizados y Validación DNS
+# ------------------------------------------------------------------------------
+@router.post("/{tenant_id}/domains", response_model=TenantDomainResponse, status_code=status.HTTP_201_CREATED, summary="Registrar un dominio personalizado para el tenant")
+async def register_domain(
+    tenant_id: UUID,
+    payload: TenantDomainCreate,
+    db: AsyncSession = Depends(get_db_session),
+):
+    # Verificar que el tenant exista
+    tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
+    if not tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
+
+    clean_domain = payload.domain.strip().lower()
+
+    # Comprobar unicidad global del dominio
+    existing = (await db.execute(select(TenantDomain).where(TenantDomain.domain == clean_domain))).scalar_one_or_none()
+    if existing:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El dominio ya está registrado por otra empresa.")
+
+    token = DomainService.generate_verification_token()
+    domain_record = TenantDomain(
+        tenant_id=tenant_id,
+        domain=clean_domain,
+        is_primary=payload.is_primary,
+        verification_token=token,
+        status="PENDING_DNS",
+    )
+    db.add(domain_record)
+    await db.commit()
+    await db.refresh(domain_record)
+    return domain_record
+
+
+@router.get("/{tenant_id}/domains", response_model=List[TenantDomainResponse], summary="Listar dominios del tenant")
+async def list_domains(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+    stmt = select(TenantDomain).where(TenantDomain.tenant_id == tenant_id)
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+@router.post("/{tenant_id}/domains/{domain_id}/verify", summary="Verificar registro DNS TXT del dominio")
+async def verify_domain(
+    tenant_id: UUID,
+    domain_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+):
+    stmt = select(TenantDomain).where(
+        TenantDomain.id == domain_id,
+        TenantDomain.tenant_id == tenant_id,
+    )
+    domain_record = (await db.execute(stmt)).scalar_one_or_none()
+    if not domain_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dominio no encontrado.")
+
+    # Validar DNS TXT
+    is_valid = await DomainService.verify_dns_txt_record(
+        domain=domain_record.domain,
+        expected_token=domain_record.verification_token,
+    )
+
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Verificación DNS fallida. Asegúrese de haber creado un registro TXT en '_sofia-challenge.{domain_record.domain}' con el valor '{domain_record.verification_token}'.",
+        )
+
+    domain_record.status = "VERIFIED"
+    await db.commit()
+
+    return {
+        "status": "VERIFIED",
+        "domain": domain_record.domain,
+        "message": "Dominio verificado exitosamente. Listo para emisión de SSL.",
+    }
+
+
+# ------------------------------------------------------------------------------
+# Endpoint de Resolución Dinámica para Nginx / Edge Proxy
+# ------------------------------------------------------------------------------
+@router.get("/resolve/{host}", summary="Resolver tenant y dbfilter a partir del Host HTTP")
+async def resolve_host(host: str, db: AsyncSession = Depends(get_db_session)):
+    """
+    Invocado por el Edge Proxy (Nginx) para determinar a qué base de datos y upstream
+    debe enrutarse la solicitud, protegiendo contra Host Header Injection.
+    """
+    try:
+        resolution = await DomainService.resolve_host(host, db)
+        return resolution
+    except TenantNotFoundException as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+    except TenantSuspendedException as e:
+        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=str(e))
