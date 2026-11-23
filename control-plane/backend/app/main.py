@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.api.v1.router import api_v1_router
+from app.api.admin_ui import admin_ui_router
 
 
 @asynccontextmanager
@@ -51,8 +52,9 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 
-# Inclusión de Routers de API
+# Inclusión de Routers de API y Panel Gráfico de Administración
 app.include_router(api_v1_router, prefix="/api")
+app.include_router(admin_ui_router)
 
 
 @app.get("/", tags=["Root"])
