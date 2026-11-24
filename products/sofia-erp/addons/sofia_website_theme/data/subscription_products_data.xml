@@ -7,6 +7,9 @@
         <field name="type">service</field>
         <field name="list_price">9.90</field>
         <field name="invoice_policy">order</field>
+        <field name="sale_ok">True</field>
+        <field name="is_published">True</field>
+        <field name="publish_date">2026-01-01 00:00:00</field>
         <field name="description_sale">Suscripción SaaS Plan Emprendedor por usuario al mes. Incluye Facturación y Boletas Electrónicas SUNAT Ilimitadas, Notas de Crédito/Débito y POS mostrador.</field>
     </record>
 
@@ -17,6 +20,9 @@
         <field name="type">service</field>
         <field name="list_price">14.90</field>
         <field name="invoice_policy">order</field>
+        <field name="sale_ok">True</field>
+        <field name="is_published">True</field>
+        <field name="publish_date">2026-01-01 00:00:00</field>
         <field name="description_sale">Suscripción SaaS Plan Pyme Pro por usuario al mes. Incluye Guías GRE 09/31, Kardex Valorizado, Multi-Almacén, Compras, Dominio propio y 20 GB de almacenamiento.</field>
     </record>
 
@@ -27,6 +33,9 @@
         <field name="type">service</field>
         <field name="list_price">19.90</field>
         <field name="invoice_policy">order</field>
+        <field name="sale_ok">True</field>
+        <field name="is_published">True</field>
+        <field name="publish_date">2026-01-01 00:00:00</field>
         <field name="description_sale">Suscripción SaaS Plan Corporativo por usuario al mes. Incluye Contabilidad Completa, SIRE SUNAT, Manufactura &amp; Costeo, 50 GB de almacenamiento y soporte 24/7.</field>
     </record>
 
@@ -37,6 +46,9 @@
         <field name="type">service</field>
         <field name="list_price">150.00</field>
         <field name="invoice_policy">order</field>
+        <field name="sale_ok">True</field>
+        <field name="is_published">True</field>
+        <field name="publish_date">2026-01-01 00:00:00</field>
         <field name="description_sale">2 sesiones virtuales 1 a 1 para carga de catálogo Excel de productos, clientes y configuración de certificado digital SUNAT.</field>
     </record>
 
@@ -47,6 +59,9 @@
         <field name="type">service</field>
         <field name="list_price">350.00</field>
         <field name="invoice_policy">order</field>
+        <field name="sale_ok">True</field>
+        <field name="is_published">True</field>
+        <field name="publish_date">2026-01-01 00:00:00</field>
         <field name="description_sale">Parametrización completa de almacenes, rutas de despacho, capacitación para todo el equipo y soporte en marcha blanca.</field>
     </record>
 </odoo>
