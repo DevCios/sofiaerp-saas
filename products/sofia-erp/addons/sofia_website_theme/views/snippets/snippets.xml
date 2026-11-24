@@ -392,11 +392,10 @@
 
                     <a href="/login" class="app-tile-card" data-category="contabilidad">
                         <div class="app-tile-squircle">
-                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-            <path d="M28 8L34 14C37 17 37 22 34 25L24 35C21 38 16 38 13 35L8 30L20 18C23 15 25 11 28 8Z" fill="#0284C7"/>
-            <path d="M16 36L10 30C7 27 7 22 10 19L20 9C23 6 28 6 31 9L36 14L24 26C21 29 19 33 16 36Z" fill="#7D1A6A"/>
-            <circle cx="22" cy="22" r="3.5" fill="#FFFFFF" opacity="0.95"/>
-        </svg>
+                            <svg width="44" height="44" viewBox="0 0 100 100" fill="none">
+                                <path d="M52 10C54 8 57 8 59 10L88 39C91 42 91 46 88 49L72 65C70 67 66 67 64 64C61 59 55 52 42 50C31 48 30 38 31 34C31 31 33 28 35 27L52 10Z" fill="#A60038"/>
+                                <path d="M48 90C46 92 43 92 41 90L12 61C9 58 9 54 12 51L28 35C30 33 34 33 36 36C39 41 45 48 58 50C69 52 70 62 69 66C69 69 67 72 65 73L48 90Z" fill="#005CA9"/>
+                            </svg>
                         </div>
                         <div class="app-tile-title">Registros Electrónicos SIRE</div>
                         <div class="app-tile-tag tag-contabilidad">RVIE &amp; RCE</div>
@@ -1064,32 +1063,102 @@
         </section>
     </template>
 
-    <!-- 3. Snippet: Pilares de Confianza -->
+    <!-- 3. Snippet: Pilares de Confianza (Estilo Squircle 3D Uniforme) -->
     <template id="s_sofia_features" name="Pilares de Valor">
-        <section class="py-5 bg-light border-top border-bottom">
+        <section class="py-5 border-top border-bottom" style="background: radial-gradient(circle at 50% -10%, #ECE6F8 0%, #E3EAF4 45%, #E9EFF6 100%);">
+            <style>
+                .feature-pilar-card {
+                    background: #FFFFFF;
+                    border: 1px solid #CBD5E1;
+                    border-radius: 20px;
+                    padding: 2.25rem 1.75rem;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    text-align: center;
+                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.05);
+                }
+                .feature-pilar-card:hover {
+                    transform: translateY(-5px);
+                    border-color: #94A3B8;
+                    box-shadow: 0 14px 28px rgba(125, 26, 106, 0.12), 0 4px 8px rgba(0, 0, 0, 0.04);
+                }
+                .feature-squircle {
+                    width: 76px;
+                    height: 76px;
+                    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+                    border-radius: 20px;
+                    border: 1px solid #CBD5E1;
+                    box-shadow: 
+                        0 2px 4px rgba(15, 23, 42, 0.04),
+                        0 6px 16px rgba(15, 23, 42, 0.08),
+                        inset 0 1.5px 0.5px #FFFFFF,
+                        inset 0 -1.5px 1px rgba(15, 23, 42, 0.04);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .feature-pilar-card:hover .feature-squircle {
+                    transform: scale(1.06);
+                    border-color: #7D1A6A;
+                    box-shadow: 0 8px 20px rgba(125, 26, 106, 0.18), inset 0 1.5px 0.5px #FFFFFF;
+                }
+            </style>
             <div class="container py-lg-4">
                 <div class="row g-4 text-center">
+                    
+                    <!-- 1. SUNAT UBL 2.1 Ilimitado -->
                     <div class="col-lg-4">
-                        <div class="bento-card h-100 text-center">
-                            <span class="fs-1 d-block mb-3">🇵🇪</span>
+                        <div class="feature-pilar-card">
+                            <div class="feature-squircle mb-3 mx-auto">
+                                <!-- Logo Oficial de SUNAT Vectorial -->
+                                <svg width="46" height="46" viewBox="0 0 100 100" fill="none">
+                                    <path d="M52 10C54 8 57 8 59 10L88 39C91 42 91 46 88 49L72 65C70 67 66 67 64 64C61 59 55 52 42 50C31 48 30 38 31 34C31 31 33 28 35 27L52 10Z" fill="#A60038"/>
+                                    <path d="M48 90C46 92 43 92 41 90L12 61C9 58 9 54 12 51L28 35C30 33 34 33 36 36C39 41 45 48 58 50C69 52 70 62 69 66C69 69 67 72 65 73L48 90Z" fill="#005CA9"/>
+                                </svg>
+                            </div>
                             <h4 class="fw-bold mb-2 text-dark">SUNAT UBL 2.1 Ilimitado</h4>
                             <p class="text-muted small mb-0">Facturación y Guías GRE sin costos adicionales por comprobante emitido.</p>
                         </div>
                     </div>
+
+                    <!-- 2. Base de Datos Dedicada -->
                     <div class="col-lg-4">
-                        <div class="bento-card h-100 text-center">
-                            <span class="fs-1 d-block mb-3">🛡️</span>
+                        <div class="feature-pilar-card">
+                            <div class="feature-squircle mb-3 mx-auto">
+                                <!-- Escudo de Seguridad y Aislamiento SOFIA -->
+                                <svg width="42" height="42" viewBox="0 0 44 44" fill="none">
+                                    <path d="M22 4L34 9V20C34 27.5 28.5 34.5 22 38C15.5 34.5 10 27.5 10 20V9L22 4Z" fill="#7D1A6A"/>
+                                    <path d="M22 4V38C28.5 34.5 34 27.5 34 20V9L22 4Z" fill="#6C5B7B"/>
+                                    <circle cx="22" cy="19" r="4.5" fill="#FBBF24"/>
+                                    <path d="M19.5 24H24.5V28H19.5V24Z" fill="#FFFFFF"/>
+                                </svg>
+                            </div>
                             <h4 class="fw-bold mb-2 text-dark">Base de Datos Dedicada</h4>
                             <p class="text-muted small mb-0">Aislamiento físico estricto por cliente. Tu información es exclusivamente tuya.</p>
                         </div>
                     </div>
+
+                    <!-- 3. Respaldo Google Drive -->
                     <div class="col-lg-4">
-                        <div class="bento-card h-100 text-center">
-                            <span class="fs-1 d-block mb-3">☁️</span>
+                        <div class="feature-pilar-card">
+                            <div class="feature-squircle mb-3 mx-auto">
+                                <!-- Logo Oficial de Google Drive Ribbon -->
+                                <svg width="42" height="42" viewBox="0 0 44 44" fill="none">
+                                    <path d="M28 8L39 27H29L18 8H28Z" fill="#0F9D58"/>
+                                    <path d="M13 36L8 27H29L34 36H13Z" fill="#4285F4"/>
+                                    <path d="M8 27L18 8L23 17L13 36L8 27Z" fill="#F4B400"/>
+                                </svg>
+                            </div>
                             <h4 class="fw-bold mb-2 text-dark">Respaldo Google Drive</h4>
                             <p class="text-muted small mb-0">Copia de seguridad diaria automatizada directo a tu cuenta de Google Drive.</p>
                         </div>
                     </div>
+
                 </div>
             </div>
         </section>
