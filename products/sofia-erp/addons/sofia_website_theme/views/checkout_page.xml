@@ -835,7 +835,7 @@
                             });
                         }
 
-                        // Finalizar Compra
+                        // Finalizar Compra con integración a Mercado Pago
                         if (btnFinalizePurchase) {
                             btnFinalizePurchase.addEventListener('click', function () {
                                 var form = document.getElementById('formCheckoutBilling');
@@ -843,9 +843,52 @@
                                     form.reportValidity();
                                     return;
                                 }
-                                var email = document.getElementById('inputClientEmail').value;
-                                var subdomain = document.getElementById('inputSubdomain').value || 'miempresa';
-                                alert('¡Excelente! Datos validados correctamente.\n\nProcediendo a la pasarela de pago seguro para activar https://' + subdomain + '.sofiaerp.com\nCredenciales enviadas a: ' + email);
+
+                                var originalText = btnFinalizePurchase.innerHTML;
+                                btnFinalizePurchase.disabled = true;
+                                btnFinalizePurchase.innerHTML = '&lt;i class="fa fa-spinner fa-spin me-2"&gt;&lt;/i&gt; Conectando con Mercado Pago...';
+
+                                var payload = {
+                                    plan: currentPlan,
+                                    billing: isMonthly ? 'mensual' : 'anual',
+                                    users: usersCount,
+                                    impl_cost: implCost,
+                                    client_name: document.getElementById('inputClientName').value,
+                                    email: document.getElementById('inputClientEmail').value,
+                                    phone: document.getElementById('inputClientPhone').value,
+                                    company_name: document.getElementById('inputCompanyName').value,
+                                    fiscal_id: document.getElementById('inputFiscalId').value,
+                                    subdomain: document.getElementById('inputSubdomain').value,
+                                    address: document.getElementById('inputAddress').value,
+                                    city: document.getElementById('inputCity').value,
+                                    region: document.getElementById('selectRegion').value,
+                                    amount_total: parseFloat(document.getElementById('step2GrandTotal').textContent.replace('S/ ', '')) || 0
+                                };
+
+                                fetch('/checkout/process_payment', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ params: payload })
+                                })
+                                .then(function (res) { return res.json(); })
+                                .then(function (data) {
+                                    var result = data.result || data;
+                                    if (result.status === 'success' || result.status === 'demo_success') {
+                                        window.location.href = result.redirect_url;
+                                    } else {
+                                        alert(result.message || 'Ocurrió un error al procesar el pago. Por favor intente nuevamente.');
+                                        btnFinalizePurchase.disabled = false;
+                                        btnFinalizePurchase.innerHTML = originalText;
+                                    }
+                                })
+                                .catch(function (err) {
+                                    console.error('Error:', err);
+                                    btnFinalizePurchase.disabled = false;
+                                    btnFinalizePurchase.innerHTML = originalText;
+                                    alert('Error de conexión al procesar el pago. Intente nuevamente.');
+                                });
                             });
                         }
 
@@ -854,6 +897,78 @@
                     });
                 </script>
 
+            </div>
+        </t>
+    </template>
+
+    <!-- Plantilla de Confirmación de Pago Exitoso (/checkout/success) -->
+    <template id="checkout_success_page" name="Pago Exitoso - SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white text-center" style="min-height: calc(100vh - 200px); display: flex; align-items: center;">
+                    <div class="container py-5" style="max-width: 680px;">
+                        <div class="mb-4">
+                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);">
+                                <i class="fa fa-check"></i>
+                            </div>
+                        </div>
+                        <h1 class="display-5 fw-bold text-dark mb-3">¡Bienvenido a SOFIA ERP!</h1>
+                        <p class="fs-5 text-secondary mb-4">
+                            Tu pago ha sido confirmado correctamente mediante <strong class="text-dark">Mercado Pago</strong>.
+                        </p>
+                        
+                        <div class="p-4 bg-light rounded-4 border text-start mb-4">
+                            <h6 class="fw-bold text-dark mb-2"><i class="fa fa-server text-primary me-2"></i> Aprovisionamiento de tu Instancia:</h6>
+                            <p class="small text-secondary mb-2">
+                                Estamos creando tu base de datos dedicada y desplegando tu entorno ERP seguro en:
+                            </p>
+                            <div class="p-2 bg-white rounded border fw-bold text-dark text-center fs-5 mb-2">
+                                https://<span t-esc="subdomain"/> .sofiaerp.com
+                            </div>
+                            <p class="small text-muted mb-0">
+                                <i class="fa fa-envelope-o me-1"></i> Hemos enviado tus credenciales de acceso inicial y comprobante electrónico a tu correo registrado.
+                            </p>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/login" class="btn btn-primary px-4 py-2.5 fw-bold" style="background-color: #7D1A6A; border-color: #7D1A6A; border-radius: 12px;">
+                                Ir a Iniciar Sesión →
+                            </a>
+                            <a href="/" class="btn btn-outline-secondary px-4 py-2.5 fw-bold" style="border-radius: 12px;">
+                                Volver al Inicio
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- Plantilla de Fallo en Pago (/checkout/failure) -->
+    <template id="checkout_failure_page" name="Pago No Completado - SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white text-center" style="min-height: calc(100vh - 200px); display: flex; align-items: center;">
+                    <div class="container py-5" style="max-width: 600px;">
+                        <div class="mb-4">
+                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);">
+                                <i class="fa fa-times"></i>
+                            </div>
+                        </div>
+                        <h2 class="display-6 fw-bold text-dark mb-3">No se pudo completar el pago</h2>
+                        <p class="text-secondary mb-4">
+                            La transacción fue rechazada o cancelada en Mercado Pago. No se ha realizado ningún cobro a tu tarjeta.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/checkout" class="btn btn-primary px-4 py-2.5 fw-bold" style="background-color: #7D1A6A; border-color: #7D1A6A; border-radius: 12px;">
+                                Reintentar Pago
+                            </a>
+                            <a href="/soporte" class="btn btn-outline-secondary px-4 py-2.5 fw-bold" style="border-radius: 12px;">
+                                Hablar con Soporte
+                            </a>
+                        </div>
+                    </div>
+                </section>
             </div>
         </t>
     </template>
