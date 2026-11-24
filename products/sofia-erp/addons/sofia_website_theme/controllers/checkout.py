@@ -133,11 +133,13 @@ class SofiaCheckoutController(http.Controller):
 
             if 'payment.provider' in request.env:
                 mp_provider = request.env['payment.provider'].sudo().search([
-                    ('code', '=', 'mercadopago'),
-                    ('state', 'in', ['enabled', 'test'])
+                    ('code', 'in', ['mercadopago', 'mercado_pago']),
                 ], limit=1)
                 if mp_provider:
-                    access_token = getattr(mp_provider, 'mercadopago_access_token', None) or getattr(mp_provider, 'mp_access_token', None)
+                    access_token = (
+                        getattr(mp_provider, 'mercadopago_access_token', None)
+                        or getattr(mp_provider, 'mp_access_token', None)
+                    )
                     is_sandbox = (mp_provider.state != 'enabled')
 
             # Si no está en el provider, buscar en Parámetros del Sistema o Variable de Entorno
