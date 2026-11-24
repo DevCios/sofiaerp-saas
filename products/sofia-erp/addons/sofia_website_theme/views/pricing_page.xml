@@ -257,7 +257,7 @@
                                         <div class="mb-4">
                                             <span class="odoo-price-currency">S/</span>
                                             <span class="odoo-price-amount">9.90</span>
-                                            <span class="odoo-price-period">/ mes</span>
+                                            <span class="odoo-price-period">/ usuario al mes</span>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
@@ -283,18 +283,18 @@
                                     </div>
                                     <div>
                                         <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
-                                            <h4 class="odoo-plan-name" style="color: #714B67;">Pyme Pro</h4>
-                                            <span class="badge text-white px-2.5 py-1" style="background-color: #714B67;">Recomendado</span>
+                                            <h4 class="odoo-plan-name" style="color: #7D1A6A;">Pyme Pro</h4>
+                                            <span class="badge text-white px-2.5 py-1" style="background-color: #7D1A6A;">Recomendado</span>
                                         </div>
                                         <p class="odoo-plan-desc">Para ferreterías, retail, restaurantes y distribuidoras en plena expansión.</p>
                                         <div class="mb-4">
                                             <span class="odoo-price-currency">S/</span>
-                                            <span class="odoo-price-amount" style="color: #714B67;">169</span>
-                                            <span class="odoo-price-period">/ mes</span>
+                                            <span class="odoo-price-amount" style="color: #7D1A6A;">14.90</span>
+                                            <span class="odoo-price-period">/ usuario al mes</span>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
-                                            <li><i class="fa fa-check"></i> <span><strong>Hasta 5 Usuarios</strong> incluidos</span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>Multiusuario</strong> escalable</span></li>
                                             <li><i class="fa fa-check"></i> <span>Facturación SUNAT <strong>Ilimitada</strong></span></li>
                                             <li><i class="fa fa-check"></i> <span><strong>Guías de Remisión (GRE 09/31)</strong></span></li>
                                             <li><i class="fa fa-check"></i> <span>Kardex Valorizado y Multi-Almacén</span></li>
@@ -318,15 +318,15 @@
                                             <h4 class="odoo-plan-name">Corporativo</h4>
                                             <span class="badge bg-light text-dark border px-2.5 py-1">Enterprise</span>
                                         </div>
-                                        <p class="odoo-plan-desc">Para medianas empresas, industrias, cadenas y operaciones avanzadas.</p>
+                                        <p class="odoo-plan-desc">Para medianas empresas, manufactura, cadenas y operaciones avanzadas.</p>
                                         <div class="mb-4">
                                             <span class="odoo-price-currency">S/</span>
-                                            <span class="odoo-price-amount">349</span>
-                                            <span class="odoo-price-period">/ mes</span>
+                                            <span class="odoo-price-amount">19.90</span>
+                                            <span class="odoo-price-period">/ usuario al mes</span>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
-                                            <li><i class="fa fa-check"></i> <span><strong>Usuarios Ilimitados</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>Multiusuario avanzado</strong> y permisos por rol</span></li>
                                             <li><i class="fa fa-check"></i> <span>Facturación SUNAT &amp; GRE <strong>Ilimitada</strong></span></li>
                                             <li><i class="fa fa-check"></i> <span>Contabilidad Completa &amp; SIRE SUNAT</span></li>
                                             <li><i class="fa fa-check"></i> <span>Manufactura y Costeo de Recetas</span></li>
