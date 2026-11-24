@@ -167,4 +167,12 @@
             </div>
         </t>
     </template>
+
+    <record id="pricing_website_page" model="website.page">
+        <field name="name">Precios y Planes</field>
+        <field name="url">/precios</field>
+        <field name="view_id" ref="pricing_page"/>
+        <field name="is_published">True</field>
+        <field name="website_indexed">True</field>
+    </record>
 </odoo>

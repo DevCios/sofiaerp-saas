@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Registro de Snippets en la barra de edición de Odoo Website Builder -->
-    <template id="snippets" inherit_id="website.snippets" name="SOFIA ERP Building Blocks">
-        <xpath expr="//div[@id='snippet_structure']" position="inside">
-            <t t-snippet="sofia_website_theme.s_sofia_hero" string="SOFIA: Hero Principal" t-thumbnail="/website/static/src/img/snippets_thumbs/s_banner.svg"/>
-            <t t-snippet="sofia_website_theme.s_sofia_verticales_grid" string="SOFIA: Grilla de Verticales" t-thumbnail="/website/static/src/img/snippets_thumbs/s_features_grid.svg"/>
-            <t t-snippet="sofia_website_theme.s_sofia_features" string="SOFIA: Pilares de Valor" t-thumbnail="/website/static/src/img/snippets_thumbs/s_three_columns.svg"/>
-            <t t-snippet="sofia_website_theme.s_sofia_cta" string="SOFIA: Llamada a la Acción" t-thumbnail="/website/static/src/img/snippets_thumbs/s_call_to_action.svg"/>
-        </xpath>
-    </template>
-
     <!-- 1. Snippet: Hero Principal SaaS -->
     <template id="s_sofia_hero" name="Hero Principal SaaS">
         <section class="s_sofia_hero py-5 position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, rgba(248, 250, 252, 0) 70%);">
