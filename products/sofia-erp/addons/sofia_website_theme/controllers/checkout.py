@@ -137,7 +137,8 @@ class SofiaCheckoutController(http.Controller):
                 ], limit=1)
                 if mp_provider:
                     access_token = (
-                        getattr(mp_provider, 'mercadopago_access_token', None)
+                        getattr(mp_provider, 'mercado_pago_access_token', None)
+                        or getattr(mp_provider, 'mercadopago_access_token', None)
                         or getattr(mp_provider, 'mp_access_token', None)
                     )
                     is_sandbox = (mp_provider.state != 'enabled')
