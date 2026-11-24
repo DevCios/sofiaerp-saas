@@ -23,13 +23,15 @@
                         display: inline-flex;
                         align-items: center;
                         justify-content: center;
-                        color: #475569;
+                        color: #334155;
                         text-decoration: none;
                         transition: all 0.2s ease;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
                     }
                     .back-btn-pill:hover {
                         background: #F1F5F9;
                         color: #0F172A;
+                        border-color: #CBD5E1;
                         transform: translateX(-3px);
                     }
                     .checkout-main-title {
@@ -298,8 +300,10 @@
                         <div id="stepConfigPlan">
                             <!-- Barra Superior con Botón Atrás y Título -->
                             <div class="d-flex align-items-center gap-3 mb-5">
-                                <a href="/precios" class="back-btn-pill" title="Volver a la tabla de precios">
-                                    <i class="fa fa-chevron-left"></i>
+                                <a href="/precios" class="back-btn-pill" title="Volver a la tabla de precios" aria-label="Volver">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
                                 </a>
                                 <h1 class="checkout-main-title mb-0">
                                     PLAN <span id="planTitleDisplay" class="plan-highlight-name">PYME PRO</span>
@@ -425,7 +429,7 @@
 
                                         <div class="mt-4 text-center">
                                             <span class="text-muted small">
-                                                <i class="fa fa-lock text-success me-1"></i> Aprovisionamiento automático inmediato
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Aprovisionamiento automático inmediato
                                             </span>
                                         </div>
 
@@ -442,10 +446,10 @@
                             
                             <!-- Breadcrumb Superior de Pasos -->
                             <div class="checkout-breadcrumbs">
-                                <span class="breadcrumb-item-done" id="crumbStep1"><i class="fa fa-check-circle me-1"></i> Orden</span>
-                                <i class="fa fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                                <span class="breadcrumb-item-done" id="crumbStep1">Orden</span>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 <span class="breadcrumb-item-active">Dirección &amp; Facturación</span>
-                                <i class="fa fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                                 <span>Pago</span>
                             </div>
 
@@ -554,7 +558,10 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3">
                                             <div class="d-flex align-items-center gap-3">
                                                 <div class="cart-item-avatar">
-                                                    <i class="fa fa-user"></i>
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                        <circle cx="12" cy="7" r="4"></circle>
+                                                    </svg>
                                                     <span class="cart-item-badge" id="badgeStep2Users">1</span>
                                                 </div>
                                                 <div>
@@ -569,7 +576,11 @@
                                         <div class="d-flex align-items-center justify-content-between mb-3" id="step2RowDiscount">
                                             <div class="d-flex align-items-center gap-3">
                                                 <div class="cart-item-avatar bg-success">
-                                                    <i class="fa fa-percent"></i>
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                        <line x1="19" y1="5" x2="5" y2="19"></line>
+                                                        <circle cx="6.5" cy="6.5" r="2.5"></circle>
+                                                        <circle cx="17.5" cy="17.5" r="2.5"></circle>
+                                                    </svg>
                                                     <span class="cart-item-badge">1</span>
                                                 </div>
                                                 <div>
@@ -908,8 +919,8 @@
                 <section class="py-5 bg-white text-center" style="min-height: calc(100vh - 200px); display: flex; align-items: center;">
                     <div class="container py-5" style="max-width: 680px;">
                         <div class="mb-4">
-                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);">
-                                <i class="fa fa-check"></i>
+                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #DCFCE7; color: #16A34A; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.2);">
+                                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </div>
                         </div>
                         <h1 class="display-5 fw-bold text-dark mb-3">¡Bienvenido a SOFIA ERP!</h1>
@@ -918,7 +929,7 @@
                         </p>
                         
                         <div class="p-4 bg-light rounded-4 border text-start mb-4">
-                            <h6 class="fw-bold text-dark mb-2"><i class="fa fa-server text-primary me-2"></i> Aprovisionamiento de tu Instancia:</h6>
+                            <h6 class="fw-bold text-dark mb-2">Aprovisionamiento de tu Instancia:</h6>
                             <p class="small text-secondary mb-2">
                                 Estamos creando tu base de datos dedicada y desplegando tu entorno ERP seguro en:
                             </p>
@@ -926,7 +937,7 @@
                                 https://<span t-esc="subdomain"/> .sofiaerp.com
                             </div>
                             <p class="small text-muted mb-0">
-                                <i class="fa fa-envelope-o me-1"></i> Hemos enviado tus credenciales de acceso inicial y comprobante electrónico a tu correo registrado.
+                                Hemos enviado tus credenciales de acceso inicial y comprobante electrónico a tu correo registrado.
                             </p>
                         </div>
 
@@ -951,8 +962,8 @@
                 <section class="py-5 bg-white text-center" style="min-height: calc(100vh - 200px); display: flex; align-items: center;">
                     <div class="container py-5" style="max-width: 600px;">
                         <div class="mb-4">
-                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);">
-                                <i class="fa fa-times"></i>
+                            <div style="width: 84px; height: 84px; border-radius: 50%; background: #FEE2E2; color: #DC2626; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                             </div>
                         </div>
                         <h2 class="display-6 fw-bold text-dark mb-3">No se pudo completar el pago</h2>
