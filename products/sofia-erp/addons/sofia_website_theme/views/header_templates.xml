@@ -183,7 +183,7 @@
                     }
 
                     .odoo-mega-container {
-                        max-width: 1250px;
+                        max-width: 1320px;
                         margin: 0 auto;
                     }
 
@@ -194,6 +194,18 @@
                         column-gap: 3rem;
                         row-gap: 2rem;
                         text-align: left;
+                    }
+                    .odoo-mega-grid-5 {
+                        display: grid;
+                        grid-template-columns: repeat(5, 1fr);
+                        column-gap: 2rem;
+                        row-gap: 2rem;
+                        text-align: left;
+                    }
+                    @media (max-width: 1200px) {
+                        .odoo-mega-grid-5 {
+                            grid-template-columns: repeat(3, 1fr);
+                        }
                     }
 
                     /* Encabezados de Columna Estilo Odoo con Línea Inferior Temática */
@@ -223,6 +235,10 @@
                     .color-finanzas { color: #008784; border-color: #008784; }
                     .color-rrhh { color: #714B67; border-color: #714B67; }
                     .color-otros { color: #6B7280; border-color: #9CA3AF; }
+                    .color-contabilidad { color: #008784; border-color: #008784; }
+                    .color-ventas { color: #E55A5A; border-color: #E55A5A; }
+                    .color-suministro { color: #007791; border-color: #007791; }
+                    .color-manufactura { color: #6C5B7B; border-color: #6C5B7B; }
 
                     /* Enlaces Limpios SIN NINGUNA VIÑETA (Cero Bullets) */
                     .odoo-style-header ul,
@@ -309,52 +325,70 @@
                             </a>
                             <div class="odoo-megamenu-panel">
                                 <div class="odoo-mega-container">
-                                    <div class="odoo-mega-grid">
-                                        <!-- Finanzas -->
+                                    <div class="odoo-mega-grid-5">
+                                        <!-- 1. Contabilidad -->
                                         <div class="odoo-col-group">
-                                            <div class="odoo-category-header color-finanzas">Finanzas</div>
+                                            <div class="odoo-category-header color-contabilidad">Contabilidad</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT UBL 2.1</a></li>
-                                                <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE</a></li>
-                                                <li><a href="/aplicaciones/facturacion-electronica">Boletas &amp; Facturas</a></li>
-                                                <li><a href="/aplicaciones/facturacion-electronica">Notas de Crédito &amp; Débito</a></li>
-                                                <li><a href="/precios">Cobros Mercado Pago</a></li>
+                                                <li><a href="/aplicaciones/facturacion-electronica">Facturación electrónica</a></li>
+                                                <li><a href="/verticales/contabilidad">Registros Electrónicos SIRE</a></li>
+                                                <li><a href="/aplicaciones/gastos">Gestión de gastos</a></li>
+                                                <li><a href="/verticales/contabilidad">Cuentas por cobrar</a></li>
+                                                <li><a href="/verticales/contabilidad">Cuentas por pagar</a></li>
+                                                <li><a href="/verticales/contabilidad">Caja y bancos</a></li>
                                             </ul>
                                         </div>
 
-                                        <!-- Ventas -->
+                                        <!-- 2. Ventas -->
                                         <div class="odoo-col-group">
-                                            <div class="odoo-category-header color-salud">Ventas &amp; CRM</div>
+                                            <div class="odoo-category-header color-ventas">Ventas</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/aplicaciones/ventas">CRM de Clientes</a></li>
-                                                <li><a href="/aplicaciones/ventas">Ventas &amp; Cotizaciones</a></li>
-                                                <li><a href="/precios">Suscripciones Recurrentes</a></li>
-                                                <li><a href="/aplicaciones/punto-de-venta">PdV para Tiendas y Mostrador</a></li>
-                                                <li><a href="/verticales/restaurante">PdV para Restaurantes</a></li>
+                                                <li><a href="/aplicaciones/ventas">CRM</a></li>
+                                                <li><a href="/aplicaciones/ventas">Ventas y cotizaciones</a></li>
+                                                <li><a href="/verticales/comercio-electronico">Comercio electrónico</a></li>
+                                                <li><a href="/precios">Suscripciones recurrentes</a></li>
+                                                <li><a href="/verticales/bodegas">POS para bodegas</a></li>
+                                                <li><a href="/verticales/restaurante">POS para restaurantes</a></li>
+                                                <li><a href="/aplicaciones/ventas">Fuerza de ventas</a></li>
                                             </ul>
                                         </div>
 
-                                        <!-- Cadena de Suministro -->
+                                        <!-- 3. Cadena de suministro -->
                                         <div class="odoo-col-group">
-                                            <div class="odoo-category-header color-alimentos">Cadena de Suministro</div>
+                                            <div class="odoo-category-header color-suministro">Cadena de suministro</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex Valorizado</a></li>
-                                                <li><a href="/verticales/industria">Manufactura &amp; Producción</a></li>
-                                                <li><a href="/aplicaciones/guias-remision">Guías de Remisión GRE 09/31</a></li>
-                                                <li><a href="/aplicaciones/compras">Compras &amp; Gastos</a></li>
-                                                <li><a href="/aplicaciones/inventario">Múltiples Almacenes</a></li>
+                                                <li><a href="/aplicaciones/inventario">Gestión de inventario</a></li>
+                                                <li><a href="/aplicaciones/inventario">Kardex valorizado</a></li>
+                                                <li><a href="/aplicaciones/guias-remision">Guías de remisión electrónicas GRE</a></li>
+                                                <li><a href="/aplicaciones/compras">Compras</a></li>
+                                                <li><a href="/aplicaciones/inventario">Múltiples almacenes</a></li>
+                                                <li><a href="/aplicaciones/inventario">Trazabilidad de productos</a></li>
                                             </ul>
                                         </div>
 
-                                        <!-- Servicios & RRHH -->
+                                        <!-- 4. Manufactura -->
                                         <div class="odoo-col-group">
-                                            <div class="odoo-category-header color-servicios">Servicios &amp; RRHH</div>
+                                            <div class="odoo-category-header color-manufactura">Manufactura</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/verticales/servicios">Gestión de Proyectos</a></li>
-                                                <li><a href="/verticales/servicios">Control de Horas &amp; Asistencia</a></li>
-                                                <li><a href="/verticales/recursos-humanos">Recursos Humanos (RRHH)</a></li>
-                                                <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas</a></li>
-                                                <li><a href="/soporte">Mesa de Ayuda (Soporte)</a></li>
+                                                <li><a href="/verticales/industria">MRP</a></li>
+                                                <li><a href="/verticales/industria">Listas de materiales (BOM)</a></li>
+                                                <li><a href="/verticales/industria">Control de calidad</a></li>
+                                                <li><a href="/verticales/industria">KPIs de producción</a></li>
+                                                <li><a href="/verticales/industria">OEE – Eficiencia global de equipos</a></li>
+                                                <li><a href="/verticales/industria">Mantenimiento preventivo</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- 5. Servicios -->
+                                        <div class="odoo-col-group">
+                                            <div class="odoo-category-header color-servicios">Servicios</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/servicios">Gestión de servicios</a></li>
+                                                <li><a href="/verticales/servicios">Gestión de proyectos</a></li>
+                                                <li><a href="/verticales/servicios">Planificación de actividades</a></li>
+                                                <li><a href="/verticales/servicios">Gestión de tareas</a></li>
+                                                <li><a href="/verticales/servicios">Contratos de servicios</a></li>
+                                                <li><a href="/verticales/servicios">Partes de trabajo</a></li>
                                             </ul>
                                         </div>
                                     </div>
