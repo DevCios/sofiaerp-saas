@@ -1,21 +1,183 @@
 // ==============================================================================
-// SOFIA ERP — Estilos Corporativos Oficiales (Inspirado en Odoo.com)
+// SOFIA ERP — Estilos Corporativos Oficiales (Sistema de Diseño SaaS)
 // ==============================================================================
 
 :root {
-    --odoo-purple: #714B67;
-    --odoo-purple-dark: #58394F;
-    --odoo-teal: #008784;
-    --odoo-dark: #1E293B;
+    /* Identidad Oficial SOFIA ERP */
+    --sofia-purple: #7D1A6A;
+    --sofia-purple-hover: #631454;
+    --sofia-purple-light: #FAF5FF;
+    --sofia-dark: #0F172A;
+    --sofia-slate: #475569;
+    --sofia-gray: #64748B;
+    --sofia-light-gray: #F8FAFC;
+    --sofia-border: #E2E8F0;
+
+    /* Compatibilidad con variables previas */
+    --odoo-purple: #7D1A6A;
+    --odoo-purple-dark: #631454;
+    --odoo-teal: #00A09D;
+    --odoo-dark: #0F172A;
     --odoo-gray: #4B5563;
     --odoo-light-gray: #F8FAFC;
-    --odoo-border: #E5E7EB;
+    --odoo-border: #E2E8F0;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1F2937;
+    color: var(--sofia-dark);
     background-color: #FFFFFF;
+}
+
+// ------------------------------------------------------------------------------
+// Componentes Globales del Sistema de Diseño Unificado SOFIA ERP
+// ------------------------------------------------------------------------------
+
+/* Resaltador Púrpura Oficial SOFIA ERP */
+.hero-badge-purple {
+    background-color: var(--sofia-purple);
+    color: #FFFFFF !important;
+    padding: 0.12em 0.55em;
+    border-radius: 9999px;
+    display: inline-block;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25);
+    line-height: 1.2;
+}
+
+/* Botones de Acción Estilizados */
+.sofia-btn-primary,
+.odoo-btn-primary {
+    background-color: var(--sofia-purple) !important;
+    color: #FFFFFF !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    padding: 0.8rem 2.25rem !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.3) !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+
+    &:hover {
+        background-color: var(--sofia-purple-hover) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(125, 26, 106, 0.4) !important;
+        color: #FFFFFF !important;
+    }
+}
+
+.sofia-btn-secondary {
+    background-color: #FFFFFF !important;
+    color: var(--sofia-dark) !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    padding: 0.8rem 2.25rem !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    border: 1.5px solid var(--sofia-purple) !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+        background-color: var(--sofia-purple-light) !important;
+        color: var(--sofia-purple) !important;
+        transform: translateY(-2px) !important;
+    }
+}
+
+/* Hero Estándar para Páginas Interiores */
+.sofia-page-hero {
+    background: #FFFFFF;
+    padding-top: 4.5rem !important;
+    padding-bottom: 3.5rem !important;
+    text-align: center;
+    position: relative;
+}
+
+.sofia-page-title {
+    font-size: clamp(2.35rem, 5vw, 3.85rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    color: var(--sofia-dark);
+    max-width: 950px;
+    margin: 0 auto 1.25rem auto;
+}
+
+.sofia-page-subtitle {
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-weight: 600;
+    color: var(--sofia-slate);
+    max-width: 720px;
+    margin: 0 auto 2.25rem auto;
+    line-height: 1.4;
+}
+
+/* Franja de Confianza / Beneficios */
+.hero-benefits-strip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.25rem;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+
+    .hero-benefit-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--sofia-dark);
+    }
+
+    .hero-benefit-icon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    .hero-benefit-divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--sofia-border);
+        display: inline-block;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-benefits-strip {
+        gap: 1.25rem;
+        .hero-benefit-divider {
+            display: none;
+        }
+    }
+}
+
+/* Tarjetas y Bento Grids Estilizados */
+.sofia-card {
+    background: #FFFFFF;
+    border: 1px solid var(--sofia-border);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+
+    &:hover {
+        transform: translateY(-4px);
+        border-color: #CBD5E1;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    &.sofia-card-featured {
+        border: 2px solid var(--sofia-purple) !important;
+        box-shadow: 0 10px 25px rgba(125, 26, 106, 0.12) !important;
+        position: relative;
+    }
 }
 
 // ------------------------------------------------------------------------------

@@ -6,68 +6,22 @@
             <div id="wrap" class="oe_structure oe_empty">
                 
                 <style>
-                    .odoo-vert-hero {
-                        background: #FFFFFF;
-                        padding-top: 4.5rem !important;
-                        padding-bottom: 3.5rem !important;
-                        text-align: center;
-                    }
-                    .odoo-vert-title {
-                        font-size: clamp(2.2rem, 4.5vw, 3.75rem);
-                        font-weight: 800;
-                        letter-spacing: -0.04em;
-                        line-height: 1.2;
-                        color: #1F2937;
-                        max-width: 900px;
-                        margin: 0 auto 1.25rem auto;
-                    }
-                    .highlight-badge-yellow {
-                        background-color: #FBBF24;
-                        color: #1F2937;
-                        padding: 0.12em 0.45em;
-                        border-radius: 9999px;
-                        display: inline-block;
-                        transform: rotate(-1deg);
-                        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
-                    }
-                    .highlight-underline-blue {
-                        position: relative;
-                        display: inline-block;
-                    }
-                    .highlight-underline-blue::after {
-                        content: "";
-                        position: absolute;
-                        left: -2%;
-                        bottom: -6px;
-                        width: 104%;
-                        height: 8px;
-                        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
-                        background-size: 100% 100%;
-                    }
-                    .odoo-vert-subtitle {
-                        font-size: clamp(1.1rem, 1.8vw, 1.35rem);
-                        font-weight: 500;
-                        color: #4B5563;
-                        max-width: 720px;
-                        margin: 0 auto 2rem auto;
-                        line-height: 1.5;
-                    }
                     .vert-card {
                         background: #FFFFFF;
-                        border: 1px solid #E5E7EB;
-                        border-radius: 14px;
-                        padding: 1.75rem;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 16px;
+                        padding: 1.85rem;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         justify-content: space-between;
                         text-decoration: none;
-                        transition: all 0.2s ease;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+                        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
                     }
                     .vert-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.07);
+                        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
                         border-color: #CBD5E1;
                     }
                     .vert-icon {
@@ -75,17 +29,52 @@
                         margin-bottom: 0.85rem;
                         display: inline-block;
                     }
+                    .vert-action-link {
+                        color: #7D1A6A !important;
+                        font-weight: 700;
+                        font-size: 0.85rem;
+                        transition: transform 0.15s ease;
+                        display: inline-block;
+                    }
+                    .vert-card:hover .vert-action-link {
+                        transform: translateX(4px);
+                    }
                 </style>
 
                 <!-- Hero Verticales -->
-                <section class="odoo-vert-hero border-bottom">
+                <section class="sofia-page-hero border-bottom">
                     <div class="container">
-                        <h1 class="odoo-vert-title">
-                            Soluciones diseñadas para <span class="highlight-badge-yellow">tu sector</span>
+                        <h1 class="sofia-page-title">
+                            Soluciones diseñadas para tu <span class="hero-badge-purple">sector</span>
                         </h1>
-                        <p class="odoo-vert-subtitle">
-                            Configuraciones predeterminadas para las normativas y los <span class="highlight-underline-blue">flujos reales</span> de tu negocio en el Perú.
+                        <p class="sofia-page-subtitle">
+                            ¡Flujos de trabajo preconfigurados para empezar a operar en minutos en el Perú!
                         </p>
+
+                        <!-- Barra de Beneficios / Confianza -->
+                        <div class="hero-benefits-strip">
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                                <span>Listo para usar</span>
+                            </div>
+                            <div class="hero-benefit-divider"></div>
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                                </svg>
+                                <span>SUNAT &amp; GRE nativo</span>
+                            </div>
+                            <div class="hero-benefit-divider"></div>
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <polyline points="9 12 11 14 15 10"></polyline>
+                                </svg>
+                                <span>Soporte en Perú</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -103,7 +92,7 @@
                                         <p class="text-secondary small mb-0">Venta ágil por mostrador, lector de código de barras, caja chica y boletas electrónicas rápidas.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -117,7 +106,7 @@
                                         <p class="text-secondary small mb-0">Unidades fraccionadas (metros, kilos, bolsas), control de perfiles y emisión de Guías GRE 09/31.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -131,7 +120,7 @@
                                         <p class="text-secondary small mb-0">Gestión de variantes por talla y color, promociones automáticas por volumen y etiquetas térmicas.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -145,7 +134,7 @@
                                         <p class="text-secondary small mb-0">Lista de materiales (BOM), órdenes de producción, control de mermas y costeo real de fabricación.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -159,7 +148,7 @@
                                         <p class="text-secondary small mb-0">Historias clínicas odontológicas, agenda médica de citas, boletas y control de insumos por tratamiento.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -173,7 +162,7 @@
                                         <p class="text-secondary small mb-0">Facturación recurrente mensual, seguimiento de hitos, partes de horas y rentabilidad por cliente.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -187,7 +176,7 @@
                                         <p class="text-secondary small mb-0">Comandera para cocina y barra, gestión gráfica de mesas, recetas y división de cuentas por comensal.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -201,7 +190,7 @@
                                         <p class="text-secondary small mb-0">Tienda online sincronizada en tiempo real con inventario, pasarela Mercado Pago y facturación SUNAT.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -215,7 +204,7 @@
                                         <p class="text-secondary small mb-0">Control de kilometraje, choferes, mantenimientos mecánicos, consumo de combustible y Guías GRE.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -229,7 +218,7 @@
                                         <p class="text-secondary small mb-0">Marcación de asistencia, expedientes de colaboradores, boletas de pago y cálculo de adelantos.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>
@@ -243,7 +232,7 @@
                                         <p class="text-secondary small mb-0">Plan Contable General Empresarial (PCGE), asientos automáticos, conciliación bancaria y libros SIRE.</p>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver detalles →</span>
                                     </div>
                                 </a>
                             </div>

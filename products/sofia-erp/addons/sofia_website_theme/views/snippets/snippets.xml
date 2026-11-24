@@ -426,109 +426,131 @@
             <div class="container py-lg-4">
                 <div class="text-center max-w-2xl mx-auto mb-5">
                     <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.08em;">SOLUCIONES A TU MEDIDA</span>
-                    <h2 class="display-6 fw-bold text-dark mt-1 mb-2">Verticales Diseñadas para tu Rubro</h2>
+                    <h2 class="display-6 fw-bold text-dark mt-2 mb-2">Verticales diseñadas para tu <span class="hero-badge-purple">rubro</span></h2>
                     <p class="text-secondary fs-6">
-                        Configuración predeterminada con los flujos de trabajo de tu industria.
+                        Configuración predeterminada con los flujos de trabajo de tu industria en el Perú.
                     </p>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/bodegas" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🏪</span>
-                                <h6 class="fw-bold mb-1">Bodegas &amp; Minimarkets</h6>
-                                <p class="text-muted small mb-0">Venta ágil por mostrador, código de barras y arqueo de caja.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🏪</span>
+                                    <h5 class="fw-bold mb-1">Bodegas &amp; Minimarkets</h5>
+                                    <p class="text-muted small mb-0">Venta ágil por mostrador, código de barras y arqueo de caja.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/ferreterias" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🔧</span>
-                                <h6 class="fw-bold mb-1">Ferreterías &amp; Construcción</h6>
-                                <p class="text-muted small mb-0">Unidades de medida fraccionadas, perfiles y despachos GRE.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🔧</span>
+                                    <h5 class="fw-bold mb-1">Ferreterías &amp; Construcción</h5>
+                                    <p class="text-muted small mb-0">Unidades de medida fraccionadas, perfiles y despachos GRE.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/retail" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🏷️</span>
-                                <h6 class="fw-bold mb-1">Retail &amp; Calzado/Moda</h6>
-                                <p class="text-muted small mb-0">Control de tallas, colores, temporadas y promociones por volumen.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🏷️</span>
+                                    <h5 class="fw-bold mb-1">Retail &amp; Calzado/Moda</h5>
+                                    <p class="text-muted small mb-0">Control de tallas, colores, temporadas y promociones por volumen.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/industria" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">⚙️</span>
-                                <h6 class="fw-bold mb-1">Industria &amp; Manufactura</h6>
-                                <p class="text-muted small mb-0">Órdenes de producción, recetas, mermas y costeo real.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">⚙️</span>
+                                    <h5 class="fw-bold mb-1">Industria &amp; Manufactura</h5>
+                                    <p class="text-muted small mb-0">Órdenes de producción, recetas, mermas y costeo real.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/odontologia" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🦷</span>
-                                <h6 class="fw-bold mb-1">Odontología &amp; Salud</h6>
-                                <p class="text-muted small mb-0">Historias odontológicas, citas, boletas y control de insumos.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🦷</span>
+                                    <h5 class="fw-bold mb-1">Odontología &amp; Salud</h5>
+                                    <p class="text-muted small mb-0">Historias odontológicas, citas, boletas y control de insumos.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/servicios" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">💼</span>
-                                <h6 class="fw-bold mb-1">Servicios &amp; Consultoría</h6>
-                                <p class="text-muted small mb-0">Facturación recurrente mensual, proyectos y asignación de horas.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">💼</span>
+                                    <h5 class="fw-bold mb-1">Servicios &amp; Consultoría</h5>
+                                    <p class="text-muted small mb-0">Facturación recurrente mensual, proyectos y asignación de horas.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/restaurante" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🍽️</span>
-                                <h6 class="fw-bold mb-1">Restaurantes &amp; Gastronomía</h6>
-                                <p class="text-muted small mb-0">Comanderas táctiles, mesas, recetas y división de cuentas.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🍽️</span>
+                                    <h5 class="fw-bold mb-1">Restaurantes &amp; Gastronomía</h5>
+                                    <p class="text-muted small mb-0">Comanderas táctiles, mesas, recetas y división de cuentas.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/comercio-electronico" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🌐</span>
-                                <h6 class="fw-bold mb-1">Comercio Electrónico</h6>
-                                <p class="text-muted small mb-0">Tienda web integrada, cobros con Mercado Pago y stock en vivo.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🌐</span>
+                                    <h5 class="fw-bold mb-1">Comercio Electrónico</h5>
+                                    <p class="text-muted small mb-0">Tienda web integrada, cobros con Mercado Pago y stock en vivo.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/gestion-de-flotas" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">🚛</span>
-                                <h6 class="fw-bold mb-1">Gestión de Flotas</h6>
-                                <p class="text-muted small mb-0">Kilometraje, choferes, mantenimientos y Guías GRE transportista.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">🚛</span>
+                                    <h5 class="fw-bold mb-1">Gestión de Flotas</h5>
+                                    <p class="text-muted small mb-0">Kilometraje, choferes, mantenimientos y Guías GRE transportista.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/recursos-humanos" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">👥</span>
-                                <h6 class="fw-bold mb-1">Recursos Humanos</h6>
-                                <p class="text-muted small mb-0">Control de asistencia, planillas, boletas de pago y adelantos.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">👥</span>
+                                    <h5 class="fw-bold mb-1">Recursos Humanos</h5>
+                                    <p class="text-muted small mb-0">Control de asistencia, planillas, boletas de pago y adelantos.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
                         <a href="/verticales/contabilidad" class="text-decoration-none">
-                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
-                                <span class="fs-3 d-block mb-2">📚</span>
-                                <h6 class="fw-bold mb-1">Contabilidad &amp; SIRE</h6>
-                                <p class="text-muted small mb-0">Plan contable general empresarial y generación de archivos SIRE.</p>
+                            <div class="bento-card text-dark">
+                                <div>
+                                    <span class="fs-2 d-block mb-2">📚</span>
+                                    <h5 class="fw-bold mb-1">Contabilidad &amp; SIRE</h5>
+                                    <p class="text-muted small mb-0">Plan contable general empresarial y generación de archivos SIRE.</p>
+                                </div>
                             </div>
                         </a>
                     </div>
@@ -543,23 +565,23 @@
             <div class="container py-lg-4">
                 <div class="row g-4 text-center">
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-3 border h-100">
-                            <span class="fs-2 d-block mb-2">🇵🇪</span>
-                            <h5 class="fw-bold mb-2">SUNAT UBL 2.1 Ilimitado</h5>
+                        <div class="bento-card h-100 text-center">
+                            <span class="fs-1 d-block mb-3">🇵🇪</span>
+                            <h4 class="fw-bold mb-2 text-dark">SUNAT UBL 2.1 Ilimitado</h4>
                             <p class="text-muted small mb-0">Facturación y Guías GRE sin costos adicionales por comprobante emitido.</p>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-3 border h-100">
-                            <span class="fs-2 d-block mb-2">🛡️</span>
-                            <h5 class="fw-bold mb-2">Base de Datos Dedicada</h5>
+                        <div class="bento-card h-100 text-center">
+                            <span class="fs-1 d-block mb-3">🛡️</span>
+                            <h4 class="fw-bold mb-2 text-dark">Base de Datos Dedicada</h4>
                             <p class="text-muted small mb-0">Aislamiento físico estricto por cliente. Tu información es exclusivamente tuya.</p>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-3 border h-100">
-                            <span class="fs-2 d-block mb-2">☁️</span>
-                            <h5 class="fw-bold mb-2">Respaldo Google Drive</h5>
+                        <div class="bento-card h-100 text-center">
+                            <span class="fs-1 d-block mb-3">☁️</span>
+                            <h4 class="fw-bold mb-2 text-dark">Respaldo Google Drive</h4>
                             <p class="text-muted small mb-0">Copia de seguridad diaria automatizada directo a tu cuenta de Google Drive.</p>
                         </div>
                     </div>
@@ -572,12 +594,14 @@
     <template id="s_sofia_cta" name="Llamada a la Acción">
         <section class="py-5 bg-white text-center">
             <div class="container py-lg-5">
-                <h2 class="display-6 fw-bold mb-3">Únete a las empresas que crecen con SOFIA ERP</h2>
+                <h2 class="display-6 fw-bold mb-3 text-dark">
+                    Únete a las empresas que crecen con <span class="hero-badge-purple">SOFIA ERP</span>
+                </h2>
                 <p class="lead text-muted mb-4 mx-auto" style="max-width: 600px;">
                     Comienza hoy mismo con tu periodo de prueba gratis. Sin contratos forzosos.
                 </p>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="/precios" class="odoo-btn-primary">
+                    <a href="/precios" class="sofia-btn-primary">
                         Comienza ahora desde S/ 9.90
                     </a>
                 </div>

@@ -6,69 +6,22 @@
             <div id="wrap" class="oe_structure oe_empty">
                 
                 <style>
-                    .odoo-support-hero {
-                        background: #FFFFFF;
-                        padding-top: 4.5rem !important;
-                        padding-bottom: 3.5rem !important;
-                        text-align: center;
-                    }
-                    .odoo-support-title {
-                        font-size: clamp(2.2rem, 4.5vw, 3.75rem);
-                        font-weight: 800;
-                        letter-spacing: -0.04em;
-                        line-height: 1.2;
-                        color: #1F2937;
-                        max-width: 900px;
-                        margin: 0 auto 1.25rem auto;
-                    }
-                    .highlight-badge-yellow {
-                        background-color: #FBBF24;
-                        color: #1F2937;
-                        padding: 0.12em 0.45em;
-                        border-radius: 9999px;
-                        display: inline-block;
-                        transform: rotate(-1deg);
-                        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
-                    }
-                    .highlight-underline-blue {
-                        position: relative;
-                        display: inline-block;
-                    }
-                    .highlight-underline-blue::after {
-                        content: "";
-                        position: absolute;
-                        left: -2%;
-                        bottom: -6px;
-                        width: 104%;
-                        height: 8px;
-                        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
-                        background-size: 100% 100%;
-                    }
-                    .odoo-support-subtitle {
-                        font-size: clamp(1.1rem, 1.8vw, 1.35rem);
-                        font-weight: 500;
-                        color: #4B5563;
-                        max-width: 720px;
-                        margin: 0 auto 2rem auto;
-                        line-height: 1.5;
-                    }
-
                     .odoo-support-card {
                         background: #FFFFFF;
-                        border: 1px solid #E5E7EB;
+                        border: 1px solid #E2E8F0;
                         border-radius: 16px;
                         padding: 2.25rem 2rem;
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         justify-content: space-between;
-                        transition: all 0.2s ease;
-                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
                     }
                     .odoo-support-card:hover {
                         transform: translateY(-4px);
-                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-                        border-color: #D1D5DB;
+                        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+                        border-color: #CBD5E1;
                     }
                     .support-icon-box {
                         width: 56px;
@@ -80,17 +33,75 @@
                         font-size: 1.75rem;
                         margin-bottom: 1.25rem;
                     }
+                    .btn-support-whatsapp {
+                        background-color: #15803D !important;
+                        color: #FFFFFF !important;
+                        font-weight: 700 !important;
+                        border-radius: 12px !important;
+                        padding: 0.8rem 1.25rem !important;
+                        display: block !important;
+                        text-align: center !important;
+                        text-decoration: none !important;
+                        transition: all 0.2s ease !important;
+                        box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25) !important;
+                    }
+                    .btn-support-whatsapp:hover {
+                        background-color: #166534 !important;
+                        transform: translateY(-2px) !important;
+                    }
+                    .btn-support-outline {
+                        background-color: #FFFFFF !important;
+                        color: #0F172A !important;
+                        font-weight: 700 !important;
+                        border-radius: 12px !important;
+                        padding: 0.8rem 1.25rem !important;
+                        display: block !important;
+                        text-align: center !important;
+                        text-decoration: none !important;
+                        border: 1.5px solid #7D1A6A !important;
+                        transition: all 0.2s ease !important;
+                    }
+                    .btn-support-outline:hover {
+                        background-color: #FAF5FF !important;
+                        color: #7D1A6A !important;
+                        transform: translateY(-2px) !important;
+                    }
                 </style>
 
                 <!-- Hero Soporte -->
-                <section class="odoo-support-hero border-bottom">
+                <section class="sofia-page-hero border-bottom">
                     <div class="container">
-                        <h1 class="odoo-support-title">
-                            Centro de Ayuda &amp; <span class="highlight-badge-yellow">Soporte Técnico</span>
+                        <h1 class="sofia-page-title">
+                            Centro de Ayuda y <span class="hero-badge-purple">Soporte Técnico</span>
                         </h1>
-                        <p class="odoo-support-subtitle">
-                            Estamos aquí para acompañarte en todo momento. Respuestas rápidas y <span class="highlight-underline-blue">asistencia especializada</span> en Perú.
+                        <p class="sofia-page-subtitle">
+                            ¡Estamos aquí para acompañarte en todo momento con asistencia especializada en Perú!
                         </p>
+
+                        <!-- Barra de Beneficios / Confianza -->
+                        <div class="hero-benefits-strip">
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                                <span>Respuesta en minutos</span>
+                            </div>
+                            <div class="hero-benefit-divider"></div>
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                                </svg>
+                                <span>Especialistas SUNAT</span>
+                            </div>
+                            <div class="hero-benefit-divider"></div>
+                            <div class="hero-benefit-item">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <polyline points="9 12 11 14 15 10"></polyline>
+                                </svg>
+                                <span>Soporte en Perú</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -109,7 +120,7 @@
                                         <p class="small text-secondary mb-0"><strong>Horario:</strong> Lunes a Sábado de 8:00 AM a 8:00 PM</p>
                                     </div>
                                     <div class="mt-4">
-                                        <a href="https://wa.me/51999999999?text=Hola%20SOFIA%20ERP%2C%20necesito%20soporte%20t%C3%A9cnico" target="_blank" class="odoo-btn-plan-primary" style="background-color: #15803D !important;">
+                                        <a href="https://wa.me/51999999999?text=Hola%20SOFIA%20ERP%2C%20necesito%20soporte%20t%C3%A9cnico" target="_blank" class="btn-support-whatsapp">
                                             Iniciar Chat de WhatsApp →
                                         </a>
                                     </div>
@@ -126,7 +137,7 @@
                                         <p class="small text-secondary mb-0"><strong>Respuesta promedio:</strong> Menos de 2 horas hábiles</p>
                                     </div>
                                     <div class="mt-4">
-                                        <a href="mailto:soporte@sofiaerp.com" class="odoo-btn-plan-secondary">
+                                        <a href="mailto:soporte@sofiaerp.com" class="btn-support-outline">
                                             soporte@sofiaerp.com
                                         </a>
                                     </div>
@@ -143,7 +154,7 @@
                                         <p class="small text-secondary mb-0"><strong>Disponible:</strong> Acceso libre 24 horas al día</p>
                                     </div>
                                     <div class="mt-4">
-                                        <a href="/precios" class="odoo-btn-plan-secondary">
+                                        <a href="/precios" class="btn-support-outline">
                                             Explorar Tutoriales →
                                         </a>
                                     </div>

@@ -6,57 +6,35 @@
             <div id="wrap" class="oe_structure oe_empty">
                 
                 <style>
-                    .odoo-libro-hero {
-                        background: #FFFFFF;
-                        padding-top: 4.5rem !important;
-                        padding-bottom: 3rem !important;
-                        text-align: center;
-                    }
-                    .odoo-libro-title {
-                        font-size: clamp(2rem, 4vw, 3.25rem);
-                        font-weight: 800;
-                        letter-spacing: -0.04em;
-                        color: #1F2937;
-                        max-width: 850px;
-                        margin: 0 auto 1.25rem auto;
-                    }
-                    .highlight-badge-yellow {
-                        background-color: #FBBF24;
-                        color: #1F2937;
-                        padding: 0.12em 0.45em;
-                        border-radius: 9999px;
-                        display: inline-block;
-                        transform: rotate(-1deg);
-                    }
                     .libro-form-card {
                         background: #FFFFFF;
-                        border: 1px solid #E5E7EB;
+                        border: 1px solid #E2E8F0;
                         border-radius: 16px;
                         padding: 2.5rem;
-                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+                        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
                     }
                     .form-section-title {
                         font-size: 0.95rem;
                         font-weight: 700;
                         text-transform: uppercase;
                         letter-spacing: 0.05em;
-                        color: #111827;
-                        border-bottom: 2px solid #E5E7EB;
+                        color: #0F172A;
+                        border-bottom: 2px solid #E2E8F0;
                         padding-bottom: 0.5rem;
                         margin-bottom: 1.5rem;
                     }
                 </style>
 
                 <!-- Hero -->
-                <section class="odoo-libro-hero border-bottom">
+                <section class="sofia-page-hero border-bottom">
                     <div class="container">
                         <span class="badge bg-light text-dark border px-3 py-1.5 rounded-pill fw-bold mb-3">
                             <i class="fa fa-book text-success me-1"></i> Ley N° 29571 • Indecopi Perú
                         </span>
-                        <h1 class="odoo-libro-title">
-                            Libro de Reclamaciones <span class="highlight-badge-yellow">Virtual</span>
+                        <h1 class="sofia-page-title">
+                            Libro de Reclamaciones <span class="hero-badge-purple">Virtual</span>
                         </h1>
-                        <p class="text-secondary small max-w-2xl mx-auto">
+                        <p class="sofia-page-subtitle">
                             Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, ponemos a tu disposición nuestro Libro de Reclamaciones Virtual.
                         </p>
                     </div>
