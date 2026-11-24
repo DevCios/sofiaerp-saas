@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import logging
+import os
 import requests
 from werkzeug.exceptions import NotFound
 
@@ -125,19 +126,28 @@ class SofiaCheckoutController(http.Controller):
                 except Exception as ex:
                     _logger.warning("No se pudo registrar lead en CRM: %s", ex)
 
-            # 4. Consultar proveedor de pago Mercado Pago en Odoo
+            # 4. Consultar credenciales de Mercado Pago (desde Odoo payment.provider, ir.config_parameter o ENV)
             base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url', 'https://sofiaerp.com').rstrip('/')
-            mp_provider = None
+            access_token = None
+            is_sandbox = False
+
             if 'payment.provider' in request.env:
                 mp_provider = request.env['payment.provider'].sudo().search([
                     ('code', '=', 'mercadopago'),
                     ('state', 'in', ['enabled', 'test'])
                 ], limit=1)
+                if mp_provider:
+                    access_token = getattr(mp_provider, 'mercadopago_access_token', None) or getattr(mp_provider, 'mp_access_token', None)
+                    is_sandbox = (mp_provider.state != 'enabled')
 
-            # 4. Generar preferencia real en Mercado Pago si tiene credenciales configuradas
-            if mp_provider and hasattr(mp_provider, 'mercadopago_access_token') and mp_provider.mercadopago_access_token:
-                access_token = mp_provider.mercadopago_access_token
-                is_sandbox = mp_provider.state != 'enabled'
+            # Si no está en el provider, buscar en Parámetros del Sistema o Variable de Entorno
+            if not access_token:
+                access_token = request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+                if access_token and (access_token.startswith('TEST-') or request.env['ir.config_parameter'].sudo().get_param('mercadopago.sandbox', '').lower() in ['true', '1']):
+                    is_sandbox = True
+
+            # Generar preferencia real en Mercado Pago si tiene credenciales configuradas
+            if access_token:
 
                 preference_payload = {
                     "items": [
