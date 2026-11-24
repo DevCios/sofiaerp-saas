@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sofia_homepage" inherit_id="website.homepage" name="SOFIA ERP Homepage">
+        <xpath expr="//div[@id='wrap']" position="replace">
+            <div id="wrap" class="oe_structure oe_empty">
+                <t t-call="sofia_website_theme.s_sofia_hero"/>
+                <t t-call="sofia_website_theme.s_sofia_verticales_grid"/>
+                <t t-call="sofia_website_theme.s_sofia_features"/>
+                <t t-call="sofia_website_theme.s_sofia_cta"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>
