@@ -247,7 +247,7 @@
             <div class="container">
                 <!-- Título Heroico Principal -->
                 <h1 class="odoo-hero-title">
-                    Gestiona tu negocio desde<br class="d-none d-md-inline"/> un solo <span class="highlight-badge-yellow">software</span>.
+                    Gestiona tu negocio desde<br class="d-none d-md-inline"/> un solo <span class="highlight-badge-yellow">software</span>
                 </h1>
 
                 <!-- Subtítulo Expresivo -->
@@ -541,7 +541,7 @@
                 </p>
                 <div class="d-flex justify-content-center gap-3">
                     <a href="/precios" class="odoo-btn-primary">
-                        Comienza ahora, es gratis
+                        Comienza ahora desde S/ 9.90
                     </a>
                 </div>
             </div>
