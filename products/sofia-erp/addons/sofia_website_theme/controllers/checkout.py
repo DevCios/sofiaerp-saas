@@ -67,7 +67,50 @@ class SofiaCheckoutController(http.Controller):
             else:
                 partner = Partner.create(partner_vals)
 
-            # 2. Registrar Lead de Suscripción en CRM si el módulo está instalado
+            # 2. Registrar Orden de Venta en Odoo para Control de Suscripciones y Facturación
+            sale_order = None
+            if 'sale.order' in request.env:
+                try:
+                    product_code_map = {
+                        'emprendedor': 'SOFIA-PLAN-EMP',
+                        'pyme-pro': 'SOFIA-PLAN-PRO',
+                        'corporativo': 'SOFIA-PLAN-CORP',
+                    }
+                    product_code = product_code_map.get(plan, 'SOFIA-PLAN-PRO')
+                    product = request.env['product.product'].sudo().search([('default_code', '=', product_code)], limit=1)
+                    
+                    if product:
+                        unit_rate = (14.90 if plan == 'pyme-pro' else (9.90 if plan == 'emprendedor' else 19.90)) if billing == 'anual' else (16.90 if plan == 'pyme-pro' else (11.90 if plan == 'emprendedor' else 21.90))
+                        order_lines = [
+                            (0, 0, {
+                                'product_id': product.id,
+                                'name': f"{product.name} ({users} usuario{'s' if users > 1 else ''} — Facturación {billing.capitalize()})",
+                                'product_uom_qty': users * (12 if billing == 'anual' else 1),
+                                'price_unit': unit_rate,
+                            })
+                        ]
+                        if impl_cost > 0:
+                            impl_code = 'SOFIA-SRV-ACOMP' if impl_cost == 150 else 'SOFIA-SRV-CONSULT'
+                            impl_prod = request.env['product.product'].sudo().search([('default_code', '=', impl_code)], limit=1)
+                            if impl_prod:
+                                order_lines.append((0, 0, {
+                                    'product_id': impl_prod.id,
+                                    'name': impl_prod.name,
+                                    'product_uom_qty': 1,
+                                    'price_unit': impl_cost,
+                                }))
+
+                        sale_order = request.env['sale.order'].sudo().create({
+                            'partner_id': partner.id,
+                            'client_order_ref': f"SUB-{subdomain.upper()}",
+                            'note': f"Suscripción SaaS SOFIA ERP | Subdominio: https://{subdomain}.sofiaerp.com | Plan: {plan} | Modalidad: {billing}",
+                            'order_line': order_lines,
+                        })
+                        _logger.info("Orden de Venta creada exitosamente: %s para partner %s", sale_order.name, partner.name)
+                except Exception as ex:
+                    _logger.warning("No se pudo crear sale.order: %s", ex)
+
+            # 3. Registrar Lead en CRM si el módulo está instalado
             if 'crm.lead' in request.env:
                 try:
                     request.env['crm.lead'].sudo().create({
@@ -77,12 +120,12 @@ class SofiaCheckoutController(http.Controller):
                         'email_from': email,
                         'phone': phone,
                         'expected_revenue': amount_total,
-                        'description': f"Subdominio: {subdomain}.sofiaerp.com\nPlan: {plan}\nModalidad: {billing}\nUsuarios: {users}\nTotal: S/ {amount_total:.2f}"
+                        'description': f"Subdominio: {subdomain}.sofiaerp.com\nPlan: {plan}\nModalidad: {billing}\nUsuarios: {users}\nTotal: S/ {amount_total:.2f}\nOrden de Venta: {sale_order.name if sale_order else 'N/A'}"
                     })
                 except Exception as ex:
                     _logger.warning("No se pudo registrar lead en CRM: %s", ex)
 
-            # 3. Consultar proveedor de pago Mercado Pago en Odoo
+            # 4. Consultar proveedor de pago Mercado Pago en Odoo
             base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url', 'https://sofiaerp.com').rstrip('/')
             mp_provider = None
             if 'payment.provider' in request.env:

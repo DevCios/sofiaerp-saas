@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- 1. Plan Emprendedor -->
+    <record id="product_plan_emprendedor" model="product.template">
+        <field name="name">Suscripción SOFIA ERP — Plan Emprendedor</field>
+        <field name="default_code">SOFIA-PLAN-EMP</field>
+        <field name="type">service</field>
+        <field name="list_price">9.90</field>
+        <field name="invoice_policy">order</field>
+        <field name="description_sale">Suscripción SaaS Plan Emprendedor por usuario al mes. Incluye Facturación y Boletas Electrónicas SUNAT Ilimitadas, Notas de Crédito/Débito y POS mostrador.</field>
+    </record>
+
+    <!-- 2. Plan Pyme Pro (Más Elegido) -->
+    <record id="product_plan_pyme_pro" model="product.template">
+        <field name="name">Suscripción SOFIA ERP — Plan Pyme Pro</field>
+        <field name="default_code">SOFIA-PLAN-PRO</field>
+        <field name="type">service</field>
+        <field name="list_price">14.90</field>
+        <field name="invoice_policy">order</field>
+        <field name="description_sale">Suscripción SaaS Plan Pyme Pro por usuario al mes. Incluye Guías GRE 09/31, Kardex Valorizado, Multi-Almacén, Compras, Dominio propio y 20 GB de almacenamiento.</field>
+    </record>
+
+    <!-- 3. Plan Corporativo -->
+    <record id="product_plan_corporativo" model="product.template">
+        <field name="name">Suscripción SOFIA ERP — Plan Corporativo</field>
+        <field name="default_code">SOFIA-PLAN-CORP</field>
+        <field name="type">service</field>
+        <field name="list_price">19.90</field>
+        <field name="invoice_policy">order</field>
+        <field name="description_sale">Suscripción SaaS Plan Corporativo por usuario al mes. Incluye Contabilidad Completa, SIRE SUNAT, Manufactura &amp; Costeo, 50 GB de almacenamiento y soporte 24/7.</field>
+    </record>
+
+    <!-- 4. Servicio de Acompañamiento Inicial Asistido -->
+    <record id="product_service_acompanamiento" model="product.template">
+        <field name="name">Servicio de Acompañamiento Inicial Asistido</field>
+        <field name="default_code">SOFIA-SRV-ACOMP</field>
+        <field name="type">service</field>
+        <field name="list_price">150.00</field>
+        <field name="invoice_policy">order</field>
+        <field name="description_sale">2 sesiones virtuales 1 a 1 para carga de catálogo Excel de productos, clientes y configuración de certificado digital SUNAT.</field>
+    </record>
+
+    <!-- 5. Servicio de Consultoría e Implementación a Medida -->
+    <record id="product_service_consultoria" model="product.template">
+        <field name="name">Servicio de Consultoría e Implementación Especializada</field>
+        <field name="default_code">SOFIA-SRV-CONSULT</field>
+        <field name="type">service</field>
+        <field name="list_price">350.00</field>
+        <field name="invoice_policy">order</field>
+        <field name="description_sale">Parametrización completa de almacenes, rutas de despacho, capacitación para todo el equipo y soporte en marcha blanca.</field>
+    </record>
+</odoo>
