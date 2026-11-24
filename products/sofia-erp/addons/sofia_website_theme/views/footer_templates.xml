@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pie de Página (Footer) Corporativo con Libro de Reclamaciones -->
+    <template id="sofia_footer" inherit_id="website.footer_custom" name="SOFIA ERP Footer Corporativo">
+        <xpath expr="//div[@id='footer']" position="replace">
+            <footer id="footer" class="sofia-footer">
+                <div class="container px-lg-5">
+                    <div class="row g-4">
+                        <!-- Columna 1: Marca y Propuesta de Valor -->
+                        <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                            <a class="d-inline-flex align-items-center text-white text-decoration-none fw-bold fs-4 mb-3" href="/">
+                                <span class="fs-4 me-2">⚡</span>
+                                <span>SOFIA<span class="text-primary">ERP</span></span>
+                            </a>
+                            <p class="text-secondary small mb-4 pe-lg-4">
+                                Plataforma SaaS ERP de alto rendimiento con Facturación Electrónica SUNAT UBL 2.1 y Guías de Remisión GRE 09/31 integradas. Diseñada para hacer crecer a las empresas del Perú.
+                            </p>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5 small">
+                                    <i class="fa fa-shield text-success me-1"></i> SSL 256-Bit
+                                </span>
+                                <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5 small">
+                                    <i class="fa fa-cloud text-info me-1"></i> 99.9% Uptime
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Aplicaciones -->
+                        <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                            <h6>Aplicaciones</h6>
+                            <ul class="footer-links">
+                                <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT</a></li>
+                                <li><a href="/aplicaciones/guias-remision">Guías GRE 09/31</a></li>
+                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex</a></li>
+                                <li><a href="/aplicaciones/ventas">Ventas &amp; CRM</a></li>
+                                <li><a href="/aplicaciones/compras">Compras &amp; Gastos</a></li>
+                                <li><a href="/aplicaciones/punto-de-venta">Punto de Venta (POS)</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Columna 3: Verticales -->
+                        <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                            <h6>Verticales de Negocio</h6>
+                            <ul class="footer-links">
+                                <li><a href="/verticales/bodegas">Bodegas &amp; Minimarkets</a></li>
+                                <li><a href="/verticales/ferreterias">Ferreterías &amp; Construcción</a></li>
+                                <li><a href="/verticales/retail">Retail &amp; Calzado/Moda</a></li>
+                                <li><a href="/verticales/odontologia">Odontología &amp; Salud</a></li>
+                                <li><a href="/verticales/restaurante">Restaurantes &amp; Gastronomía</a></li>
+                                <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas &amp; Logística</a></li>
+                                <li><a href="/verticales/contabilidad">Estudios Contables &amp; SIRE</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Columna 4: Cumplimiento Legal y Libro de Reclamaciones -->
+                        <div class="col-lg-3 col-md-6">
+                            <h6>Legal &amp; Transparencia</h6>
+                            <ul class="footer-links mb-4">
+                                <li><a href="/terminos">Términos del Servicio</a></li>
+                                <li><a href="/privacidad">Política de Privacidad (Ley 29733)</a></li>
+                                <li><a href="/sla">Acuerdo de Nivel de Servicio (SLA)</a></li>
+                            </ul>
+
+                            <!-- Libro de Reclamaciones Virtual Conforme a Ley Peruana -->
+                            <a href="/libro-de-reclamaciones" class="libro-reclamaciones-box">
+                                <div class="libro-icon">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div class="libro-text">
+                                    <strong>Libro de Reclamaciones</strong>
+                                    <span>Conforme al Código de Protección y Defensa del Consumidor</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Barra Inferior -->
+                    <div class="footer-bottom text-muted">
+                        <div>
+                            © <t t-esc="datetime.datetime.now().year"/> SOFIA ERP. Todos los derechos reservados.
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
+                            <span>Hecho con <span class="text-danger">❤</span> en Perú</span>
+                            <span>•</span>
+                            <a href="https://api.sofiaerp.com/admin" class="text-muted text-decoration-none small">
+                                <i class="fa fa-lock me-1"></i> Admin Portal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </xpath>
+    </template>
+</odoo>

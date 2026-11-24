@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Personalización de la Cabecera Corporativa de SOFIA ERP -->
+    <template id="sofia_header" inherit_id="website.template_header_default" name="SOFIA ERP Header SaaS">
+        <xpath expr="//header//nav" position="replace">
+            <nav class="navbar navbar-expand-lg sofia-navbar py-2">
+                <div class="container-fluid px-lg-5">
+                    <!-- Brand Logo -->
+                    <a class="navbar-brand d-flex align-items-center" href="/">
+                        <span class="fs-4 me-2">⚡</span>
+                        <span>SOFIA<span class="brand-accent">ERP</span></span>
+                    </a>
+
+                    <!-- Toggle Mobile -->
+                    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#sofiaNavMenu" aria-controls="sofiaNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <!-- Nav Items -->
+                    <div class="collapse navbar-collapse" id="sofiaNavMenu">
+                        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
+                            
+                            <!-- 1. Mega-Menú: Aplicaciones -->
+                            <li class="nav-item dropdown sofia-dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="menuApps" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Aplicaciones
+                                </a>
+                                <div class="dropdown-menu sofia-megamenu" aria-labelledby="menuApps">
+                                    <div class="row g-3">
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/facturacion-electronica" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-file-text-o"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Facturación Electrónica SUNAT</span>
+                                                    <span class="menu-desc">UBL 2.1, Boletas, Facturas y notas con firma digital automática.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/guias-remision" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-truck"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Guías de Remisión (GRE)</span>
+                                                    <span class="menu-desc">Emisión electrónica obligatoria GRE Remitente y Transportista.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/inventario" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-cubes"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Inventario &amp; Kardex</span>
+                                                    <span class="menu-desc">Kardex valorizado en soles, múltiples almacenes y lotes.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/ventas" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-line-chart"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Ventas &amp; CRM</span>
+                                                    <span class="menu-desc">Cotizaciones instantáneas, seguimiento y listas de precios.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/compras" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-shopping-cart"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Compras &amp; Proveedores</span>
+                                                    <span class="menu-desc">Órdenes de compra y control de recepción de mercadería.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <a href="/aplicaciones/punto-de-venta" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-calculator"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Punto de Venta (POS)</span>
+                                                    <span class="menu-desc">Cobro rápido en mostrador con impresora de tickets.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- 2. Mega-Menú: Verticales (11 Ítems Solicitados) -->
+                            <li class="nav-item dropdown sofia-dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="menuVerticales" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Verticales
+                                </a>
+                                <div class="dropdown-menu sofia-megamenu" aria-labelledby="menuVerticales">
+                                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                        <span class="badge-saas">Soluciones Especializadas por Sector</span>
+                                        <small class="text-muted">Optimizadas para normativas peruanas</small>
+                                    </div>
+                                    <div class="row g-2">
+                                        <!-- Columna 1 -->
+                                        <div class="col-lg-4">
+                                            <a href="/verticales/bodegas" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-shopping-basket"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Bodegas</span>
+                                                    <span class="menu-desc">Venta ágil de abarrotes, vuelto rápido y stock diario.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/ferreterias" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-wrench"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Ferreterías</span>
+                                                    <span class="menu-desc">Unidades fraccionadas, listas de precios y despachos.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/retail" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-tags"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Retail</span>
+                                                    <span class="menu-desc">Moda, calzado, tallas, colores y código de barras.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/industria" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-cogs"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Industria</span>
+                                                    <span class="menu-desc">Manufactura, órdenes de producción y materias primas.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- Columna 2 -->
+                                        <div class="col-lg-4">
+                                            <a href="/verticales/odontologia" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-user-md"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Odontología</span>
+                                                    <span class="menu-desc">Historias clínicas, insumos y boletas por honorarios.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/servicios" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-briefcase"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Servicios</span>
+                                                    <span class="menu-desc">Facturación recurrente, contratos y horas de consultoría.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/restaurante" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-cutlery"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Restaurante</span>
+                                                    <span class="menu-desc">Comanderas, mesas, recetas y propinas.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/comercio-electronico" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-globe"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Comercio electrónico</span>
+                                                    <span class="menu-desc">Integración web, pasarelas de pago y sincronización de stock.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- Columna 3 -->
+                                        <div class="col-lg-4">
+                                            <a href="/verticales/gestion-de-flotas" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-car"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Gestión de flotas</span>
+                                                    <span class="menu-desc">Vehículos, combustible, SOAT y despachos GRE.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/recursos-humanos" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-users"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Recursos humanos</span>
+                                                    <span class="menu-desc">Planillas, control de asistencia, boletas y contratos.</span>
+                                                </div>
+                                            </a>
+                                            <a href="/verticales/contabilidad" class="sofia-menu-item">
+                                                <div class="menu-icon"><i class="fa fa-book"></i></div>
+                                                <div class="menu-content">
+                                                    <span class="menu-title">Contabilidad</span>
+                                                    <span class="menu-desc">Plan contable general empresarial, Sire y PLE SUNAT.</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- 3. Menú: Comunidad -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="menuComunidad" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Comunidad
+                                </a>
+                                <ul class="dropdown-menu border-0 shadow-lg p-2 rounded-3" aria-labelledby="menuComunidad">
+                                    <li><a class="dropdown-item py-2 rounded-2 fw-semibold" href="/blog"><i class="fa fa-newspaper-o me-2 text-primary"></i> Blog &amp; Noticias SUNAT</a></li>
+                                    <li><a class="dropdown-item py-2 rounded-2 fw-semibold" href="/casos-de-exito"><i class="fa fa-star-o me-2 text-warning"></i> Casos de Éxito</a></li>
+                                    <li><a class="dropdown-item py-2 rounded-2 fw-semibold" href="/documentacion"><i class="fa fa-book me-2 text-info"></i> Guías &amp; Tutoriales</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- 4. Menú: Precios -->
+                            <li class="nav-item">
+                                <a class="nav-link fw-semibold" href="/precios">Precios</a>
+                            </li>
+
+                            <!-- 5. Menú: Soporte -->
+                            <li class="nav-item">
+                                <a class="nav-link fw-semibold" href="/soporte">Soporte</a>
+                            </li>
+                        </ul>
+
+                        <!-- Acciones Derecha: Iniciar sesión y CTA -->
+                        <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                            <a href="/login" class="btn btn-sofia-outline">
+                                Iniciar sesión
+                            </a>
+                            <a href="/precios" class="btn btn-sofia-primary">
+                                Probar Gratis →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </xpath>
+    </template>
+</odoo>

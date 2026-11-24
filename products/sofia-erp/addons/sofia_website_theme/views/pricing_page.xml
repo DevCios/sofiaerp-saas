@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla de la Página Pública de Precios (/precios) -->
+    <template id="pricing_page" name="Precios y Planes SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <!-- Header Precios -->
+                <section class="py-5 bg-light border-bottom text-center">
+                    <div class="container py-lg-4">
+                        <span class="badge-saas mb-2">Precios Sin Sorpresas</span>
+                        <h1 class="display-5 fw-extrabold text-dark mb-3">Elige el Plan Ideal para tu Empresa</h1>
+                        <p class="lead text-secondary mx-auto" style="max-width: 650px;">
+                            Sin costos ocultos ni cobros por factura emitida. Todos los planes incluyen comprobantes ilimitados ante SUNAT y respaldo automático en la nube.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Cards de Planes -->
+                <section class="py-5 bg-white">
+                    <div class="container py-lg-4">
+                        <div class="row g-4 align-items-stretch">
+                            <!-- Plan 1: Emprendedor -->
+                            <div class="col-lg-4">
+                                <div class="p-4 p-xl-5 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="fw-bold text-dark mb-0">Emprendedor</h4>
+                                            <span class="badge bg-light text-dark border">Básico</span>
+                                        </div>
+                                        <p class="text-muted small mb-4">Para pequeños negocios, bodegas y profesionales independientes.</p>
+                                        <div class="mb-4">
+                                            <span class="fs-4 text-muted">S/</span>
+                                            <span class="display-4 fw-extrabold text-dark">89</span>
+                                            <span class="text-muted">/ mes</span>
+                                        </div>
+                                        <hr class="my-4"/>
+                                        <ul class="list-unstyled mb-4 small">
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>1 a 2 Usuarios</strong> del sistema</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación Electrónica SUNAT <strong>Ilimitada</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Boletas, Facturas y Notas</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Control de Stock &amp; Inventario básico</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>5 GB</strong> almacenamiento seguro</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Subdominio seguro <code>tuempresa.sofiaerp.com</code></li>
+                                        </ul>
+                                    </div>
+                                    <a href="/login" class="btn btn-sofia-outline w-100 py-2.5 fw-bold">
+                                        Elegir Plan Emprendedor
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Plan 2: Pyme (Destacado) -->
+                            <div class="col-lg-4">
+                                <div class="p-4 p-xl-5 rounded-4 border border-2 border-primary bg-white h-100 d-flex flex-column justify-content-between shadow-lg position-relative" style="background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FF 100%);">
+                                    <div class="position-absolute top-0 start-50 translate-middle">
+                                        <span class="badge bg-primary px-3 py-1.5 rounded-pill text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                            ⭐ Más Elegido en Perú
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
+                                            <h4 class="fw-bold text-dark mb-0">Pyme Pro</h4>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Recomendado</span>
+                                        </div>
+                                        <p class="text-muted small mb-4">Para empresas comerciales, ferreterías, retail y distribuidoras en crecimiento.</p>
+                                        <div class="mb-4">
+                                            <span class="fs-4 text-muted">S/</span>
+                                            <span class="display-4 fw-extrabold text-primary">169</span>
+                                            <span class="text-muted">/ mes</span>
+                                        </div>
+                                        <hr class="my-4"/>
+                                        <ul class="list-unstyled mb-4 small">
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Hasta 5 Usuarios</strong> incluidos</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación SUNAT <strong>Ilimitada</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Guías de Remisión (GRE 09/31)</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Multi-Almacén y Kardex valorizado</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Ventas, Compras y Punto de Venta (POS)</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>20 GB</strong> almacenamiento</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Soporte para Dominio Propio</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Respaldo diario en Google Drive</li>
+                                        </ul>
+                                    </div>
+                                    <a href="/login" class="btn btn-sofia-primary w-100 py-2.5 fw-bold shadow">
+                                        Elegir Plan Pyme Pro →
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Plan 3: Corporativo -->
+                            <div class="col-lg-4">
+                                <div class="p-4 p-xl-5 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h4 class="fw-bold text-dark mb-0">Corporativo</h4>
+                                            <span class="badge bg-light text-dark border">Enterprise</span>
+                                        </div>
+                                        <p class="text-muted small mb-4">Para medianas empresas, industrias, cadenas y operaciones complejas.</p>
+                                        <div class="mb-4">
+                                            <span class="fs-4 text-muted">S/</span>
+                                            <span class="display-4 fw-extrabold text-dark">349</span>
+                                            <span class="text-muted">/ mes</span>
+                                        </div>
+                                        <hr class="my-4"/>
+                                        <ul class="list-unstyled mb-4 small">
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Usuarios Ilimitados</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación SUNAT &amp; GRE <strong>Ilimitada</strong></li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Contabilidad Completa &amp; SIRE SUNAT</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Manufactura y Control de Costos</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>50 GB</strong> almacenamiento</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Pasarela Mercado Pago Integrada</li>
+                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Soporte prioritario 24/7 vía WhatsApp</li>
+                                        </ul>
+                                    </div>
+                                    <a href="/login" class="btn btn-sofia-outline w-100 py-2.5 fw-bold">
+                                        Elegir Plan Corporativo
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Preguntas Frecuentes -->
+                <section class="py-5 bg-light border-top">
+                    <div class="container py-lg-4" style="max-width: 850px;">
+                        <h3 class="fw-bold text-center text-dark mb-4">Preguntas Frecuentes</h3>
+                        <div class="accordion border-0 shadow-sm rounded-4 overflow-hidden" id="faqAccordion">
+                            <div class="accordion-item border-0 border-bottom">
+                                <h2 class="accordion-header" id="faq1">
+                                    <button class="accordion-button fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                                        ¿Cómo se conecta SOFIA ERP con la SUNAT?
+                                    </button>
+                                </h2>
+                                <div id="collapse1" class="accordion-collapse collapse show" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary small">
+                                        SOFIA ERP emite los comprobantes directamente en formato UBL 2.1 estándar y los firma con tu propio certificado digital (.pfx), comunicándose de manera nativa con los servidores de SUNAT y obteniendo el CDR (Constancia de Recepción) en segundos.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item border-0 border-bottom">
+                                <h2 class="accordion-header" id="faq2">
+                                    <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                                        ¿Puedo cambiar de plan más adelante?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary small">
+                                        Sí, en cualquier momento puedes subir de plan para agregar más usuarios o módulos especializados. El cambio es instantáneo y se ajusta automáticamente el prorrateo de tu facturación.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item border-0">
+                                <h2 class="accordion-header" id="faq3">
+                                    <button class="accordion-button collapsed fw-bold text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                                        ¿Cómo se procesan los pagos de mi suscripción?
+                                    </button>
+                                </h2>
+                                <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary small">
+                                        Los pagos se procesan de forma 100% segura mediante Mercado Pago con tarjeta de crédito, débito o Yape, generándote automáticamente tu comprobante electrónico mensual.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

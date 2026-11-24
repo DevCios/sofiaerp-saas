@@ -1,0 +1,333 @@
+// ==============================================================================
+// SOFIA ERP SaaS — Sistema de Diseño y Estilos Globales (SCSS)
+// ==============================================================================
+
+:root {
+    --sofia-primary: #4F46E5;
+    --sofia-primary-hover: #4338CA;
+    --sofia-primary-light: #EEF2FF;
+    --sofia-secondary: #06B6D4;
+    --sofia-accent: #7C3AED;
+    --sofia-dark: #0B0F19;
+    --sofia-slate-900: #0F172A;
+    --sofia-slate-800: #1E293B;
+    --sofia-slate-600: #475569;
+    --sofia-slate-500: #64748B;
+    --sofia-slate-200: #E2E8F0;
+    --sofia-slate-100: #F1F5F9;
+    --sofia-slate-50: #F8FAFC;
+    --sofia-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #06B6D4 100%);
+    --sofia-glow: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+}
+
+// ------------------------------------------------------------------------------
+// Tipografía y Base
+// ------------------------------------------------------------------------------
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--sofia-slate-900);
+    background-color: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--sofia-slate-900);
+}
+
+// ------------------------------------------------------------------------------
+// Header y Navegación Flotante
+// ------------------------------------------------------------------------------
+#top_menu_container {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.sofia-navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    transition: all 0.3s ease;
+
+    .navbar-brand {
+        font-weight: 800;
+        font-size: 1.35rem;
+        letter-spacing: -0.03em;
+        color: var(--sofia-slate-900);
+
+        span.brand-accent {
+            background: var(--sofia-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    }
+
+    .nav-link {
+        font-size: 0.925rem;
+        font-weight: 600;
+        color: var(--sofia-slate-600) !important;
+        padding: 0.5rem 0.9rem !important;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover, &.active {
+            color: var(--sofia-primary) !important;
+            background-color: var(--sofia-primary-light);
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Mega-Menú Desplegable (Verticales y Aplicaciones)
+// ------------------------------------------------------------------------------
+.sofia-dropdown {
+    position: static !important;
+
+    .dropdown-menu.sofia-megamenu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90vw;
+        max-width: 1100px;
+        padding: 1.75rem;
+        border: 1px solid var(--sofia-slate-200);
+        border-radius: 20px;
+        background: #FFFFFF;
+        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.03);
+        margin-top: 0.5rem;
+        display: none;
+        animation: sofiaMenuFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+        &.show {
+            display: block;
+        }
+    }
+
+    &:hover .dropdown-menu.sofia-megamenu {
+        display: block;
+    }
+}
+
+@keyframes sofiaMenuFade {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.sofia-menu-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    .menu-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        margin-right: 0.85rem;
+        flex-shrink: 0;
+        background: var(--sofia-slate-100);
+        color: var(--sofia-primary);
+        transition: all 0.2s ease;
+    }
+
+    .menu-content {
+        .menu-title {
+            font-size: 0.925rem;
+            font-weight: 700;
+            color: var(--sofia-slate-900);
+            margin-bottom: 0.15rem;
+            display: block;
+        }
+        .menu-desc {
+            font-size: 0.775rem;
+            color: var(--sofia-slate-500);
+            line-height: 1.35;
+            display: block;
+        }
+    }
+
+    &:hover {
+        background-color: var(--sofia-slate-50);
+        transform: translateY(-1px);
+
+        .menu-icon {
+            background-color: var(--sofia-primary);
+            color: #FFFFFF;
+            transform: scale(1.05);
+        }
+
+        .menu-title {
+            color: var(--sofia-primary);
+        }
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Botones de Acción (CTAs)
+// ------------------------------------------------------------------------------
+.btn-sofia-primary {
+    background: var(--sofia-primary);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    font-size: 0.925rem;
+    padding: 0.6rem 1.35rem;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--sofia-primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+    }
+}
+
+.btn-sofia-outline {
+    background: transparent;
+    color: var(--sofia-slate-800) !important;
+    font-weight: 600;
+    font-size: 0.925rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 12px;
+    border: 1px solid var(--sofia-slate-200);
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: var(--sofia-slate-100);
+        border-color: var(--sofia-slate-400);
+    }
+}
+
+// ------------------------------------------------------------------------------
+// Badges y Pastillas de SUNAT
+// ------------------------------------------------------------------------------
+.badge-sunat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.badge-saas {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--sofia-primary-light);
+    color: var(--sofia-primary);
+    border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+// ------------------------------------------------------------------------------
+// Pie de Página (Footer) Corporativo
+// ------------------------------------------------------------------------------
+.sofia-footer {
+    background-color: var(--sofia-dark);
+    color: #94A3B8;
+    padding: 4.5rem 0 2.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+    h6 {
+        color: #FFFFFF;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 1.25rem;
+    }
+
+    ul.footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            margin-bottom: 0.75rem;
+
+            a {
+                color: #94A3B8;
+                text-decoration: none;
+                font-size: 0.885rem;
+                transition: color 0.2s ease;
+
+                &:hover {
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+
+    .libro-reclamaciones-box {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 1.15rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.85rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+
+        .libro-icon {
+            font-size: 1.75rem;
+            color: #FBBF24;
+        }
+
+        .libro-text {
+            font-size: 0.8rem;
+            color: #E2E8F0;
+            line-height: 1.3;
+
+            strong {
+                display: block;
+                color: #FFFFFF;
+                font-size: 0.85rem;
+            }
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+    }
+
+    .footer-bottom {
+        margin-top: 3.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.825rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
