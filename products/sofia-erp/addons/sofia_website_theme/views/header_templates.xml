@@ -369,12 +369,12 @@
                                         <div class="odoo-col-group">
                                             <div class="odoo-category-header color-manufactura">Manufactura</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/verticales/industria">MRP</a></li>
-                                                <li><a href="/verticales/industria">Listas de materiales (BOM)</a></li>
-                                                <li><a href="/verticales/industria">Control de calidad</a></li>
-                                                <li><a href="/verticales/industria">KPIs de producción</a></li>
-                                                <li><a href="/verticales/industria">OEE</a></li>
-                                                <li><a href="/verticales/industria">Mantenimiento preventivo</a></li>
+                                                <li><a href="/verticales/manufactura">MRP</a></li>
+                                                <li><a href="/verticales/manufactura">Listas de materiales (BOM)</a></li>
+                                                <li><a href="/verticales/manufactura">Control de calidad</a></li>
+                                                <li><a href="/verticales/manufactura">KPIs de producción</a></li>
+                                                <li><a href="/verticales/manufactura">OEE</a></li>
+                                                <li><a href="/verticales/manufactura">Mantenimiento preventivo</a></li>
                                             </ul>
                                         </div>
 

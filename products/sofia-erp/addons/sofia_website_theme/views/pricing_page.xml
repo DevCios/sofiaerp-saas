@@ -213,27 +213,24 @@
                             ¡Sin cobros por factura emitida y con todo incluido en la nube!
                         </p>
                         
-                        <!-- Barra de Beneficios / Confianza -->
+                        <!-- Barra de Beneficios / Confianza Unificada -->
                         <div class="hero-benefits-strip">
                             <div class="hero-benefit-item">
-                                <svg width="22" height="22" viewBox="0 0 100 100" fill="none" style="width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important; display: inline-block !important;">
-                                    <path d="M52 10C54 8 57 8 59 10L88 39C91 42 91 46 88 49L72 65C70 67 66 67 64 64C61 59 55 52 42 50C31 48 30 38 31 34C31 31 33 28 35 27L52 10Z" fill="#A60038"/>
-                                    <path d="M48 90C46 92 43 92 41 90L12 61C9 58 9 54 12 51L28 35C30 33 34 33 36 36C39 41 45 48 58 50C69 52 70 62 69 66C69 69 67 72 65 73L48 90Z" fill="#005CA9"/>
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                                 </svg>
-                                <span>SUNAT UBL 2.1 Ilimitado</span>
+                                <span>Rápido de implementar</span>
                             </div>
                             <div class="hero-benefit-divider"></div>
                             <div class="hero-benefit-item">
-                                <svg width="22" height="22" viewBox="0 0 44 44" fill="none" style="width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important; display: inline-block !important;">
-                                    <path d="M28 8L39 27H29L18 8H28Z" fill="#0F9D58"/>
-                                    <path d="M13 36L8 27H29L34 36H13Z" fill="#4285F4"/>
-                                    <path d="M8 27L18 8L23 17L13 36L8 27Z" fill="#F4B400"/>
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
+                                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
                                 </svg>
-                                <span>Copia en Google Drive</span>
+                                <span>Todo en la nube</span>
                             </div>
                             <div class="hero-benefit-divider"></div>
                             <div class="hero-benefit-item">
-                                <svg class="hero-benefit-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px !important; height: 22px !important; min-width: 22px !important; max-width: 22px !important; display: inline-block !important;">
+                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                     <polyline points="9 12 11 14 15 10"></polyline>
                                 </svg>
