@@ -14,7 +14,7 @@ MP_PREFERENCE_API = "https://api.mercadopago.com/checkout/preferences"
 
 class SofiaCheckoutController(http.Controller):
 
-    @http.route('/checkout/process_payment', type='json', auth='public', methods=['POST'], csrf=False)
+    @http.route('/checkout/process_payment', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def checkout_process_payment(self, **post):
         """
         Recibe la orden de suscripción configurada desde el frontend,
