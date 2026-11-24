@@ -341,7 +341,7 @@
                                             <li><i class="fa fa-check"></i> <span>Subdominio seguro <code>tuempresa.sofiaerp.com</code></span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="odoo-btn-plan-secondary">
+                                    <a href="/checkout?plan=emprendedor" class="odoo-btn-plan-secondary btn-plan-action" data-plan="emprendedor">
                                         Elegir Plan Emprendedor
                                     </a>
                                 </div>
@@ -380,7 +380,7 @@
                                             <li><i class="fa fa-check"></i> <span>Respaldo diario en Google Drive</span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="odoo-btn-plan-primary">
+                                    <a href="/checkout?plan=pyme-pro" class="odoo-btn-plan-primary btn-plan-action" data-plan="pyme-pro">
                                         Elegir Plan Pyme Pro →
                                     </a>
                                 </div>
@@ -415,7 +415,7 @@
                                             <li><i class="fa fa-check"></i> <span>Soporte prioritario 24/7 vía WhatsApp</span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="odoo-btn-plan-secondary">
+                                    <a href="/checkout?plan=corporativo" class="odoo-btn-plan-secondary btn-plan-action" data-plan="corporativo">
                                         Elegir Plan Corporativo
                                     </a>
                                 </div>
@@ -488,6 +488,12 @@
 
                         function updatePricing(monthly) {
                             isMonthly = monthly;
+                            var cycleParam = isMonthly ? 'mensual' : 'anual';
+                            document.querySelectorAll('.btn-plan-action').forEach(function(btn) {
+                                var p = btn.getAttribute('data-plan') || 'pyme-pro';
+                                btn.setAttribute('href', '/checkout?plan=' + p + '&amp;billing=' + cycleParam);
+                            });
+
                             if (isMonthly) {
                                 switchContainer.classList.add('monthly');
                                 if (optMensual) optMensual.classList.add('active');

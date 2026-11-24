@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla de Proceso de Compra y Configuración de Suscripción (/checkout) Estilo Odoo.com -->
+    <template id="checkout_page" name="Configuración de Plan y Contratación SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                
+                <style>
+                    /* Estilos Generales Checkout */
+                    .sofia-checkout-wrapper {
+                        background-color: #FFFFFF;
+                        min-height: calc(100vh - 150px);
+                        padding-top: 2.5rem;
+                        padding-bottom: 5rem;
+                        color: #1E293B;
+                    }
+                    .back-btn-pill {
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 12px;
+                        background: #F8FAFC;
+                        border: 1px solid #E2E8F0;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #475569;
+                        text-decoration: none;
+                        transition: all 0.2s ease;
+                    }
+                    .back-btn-pill:hover {
+                        background: #F1F5F9;
+                        color: #0F172A;
+                        transform: translateX(-3px);
+                    }
+                    .checkout-main-title {
+                        font-size: clamp(2rem, 4vw, 3.25rem);
+                        font-weight: 900;
+                        letter-spacing: -0.03em;
+                        color: #0F172A;
+                    }
+                    .plan-highlight-name {
+                        color: #E55A5A;
+                        text-transform: uppercase;
+                    }
+
+                    /* Resumen Lateral Flotante (Sticky Sidebar) */
+                    .checkout-summary-card {
+                        background: #FFFFFF;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 16px;
+                        padding: 1.85rem;
+                        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+                        position: sticky;
+                        top: 90px;
+                    }
+
+                    /* Selector Switch Anual / Mensual */
+                    .summary-billing-switch {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #F8FAFC;
+                        border: 1px solid #E2E8F0;
+                        border-radius: 9999px;
+                        padding: 0.25rem 0.75rem;
+                        gap: 0.75rem;
+                        cursor: pointer;
+                        user-select: none;
+                        width: 100%;
+                        margin-bottom: 1.5rem;
+                    }
+                    .summary-billing-opt {
+                        font-size: 0.925rem;
+                        font-weight: 600;
+                        color: #64748B;
+                        transition: color 0.2s ease;
+                    }
+                    .summary-billing-opt.active {
+                        color: #0F172A;
+                        font-weight: 800;
+                    }
+                    .summary-switch-track {
+                        width: 38px;
+                        height: 20px;
+                        background-color: #7D1A6A;
+                        border-radius: 9999px;
+                        position: relative;
+                        transition: background-color 0.25s ease;
+                    }
+                    .summary-switch-thumb {
+                        width: 14px;
+                        height: 14px;
+                        background-color: #FFFFFF;
+                        border-radius: 50%;
+                        position: absolute;
+                        top: 3px;
+                        left: 3px;
+                        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        box-shadow: 0 1px 2px rgba(0,0,0,0.25);
+                    }
+                    .summary-billing-switch.monthly .summary-switch-thumb {
+                        transform: translateX(18px);
+                    }
+                    .summary-billing-switch.monthly .summary-switch-track {
+                        background-color: #64748B;
+                    }
+
+                    /* Stepper y Controles de Formulario */
+                    .users-count-input-group {
+                        max-width: 180px;
+                        display: inline-flex;
+                        align-items: center;
+                    }
+                    .btn-step-counter {
+                        width: 42px;
+                        height: 42px;
+                        background: #F8FAFC;
+                        border: 1px solid #CBD5E1;
+                        font-weight: 700;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        color: #334155;
+                        transition: all 0.15s ease;
+                    }
+                    .btn-step-counter:hover {
+                        background: #F1F5F9;
+                        color: #0F172A;
+                    }
+                    .input-users-val {
+                        width: 70px;
+                        height: 42px;
+                        text-align: center;
+                        font-weight: 800;
+                        font-size: 1.15rem;
+                        border-top: 1px solid #CBD5E1;
+                        border-bottom: 1px solid #CBD5E1;
+                        border-left: none;
+                        border-right: none;
+                        color: #0F172A;
+                    }
+
+                    /* Radio Cards de Implementación */
+                    .impl-option-card {
+                        border: 1px solid #E2E8F0;
+                        border-radius: 12px;
+                        padding: 1.15rem;
+                        margin-bottom: 0.85rem;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 1rem;
+                    }
+                    .impl-option-card:hover {
+                        border-color: #CBD5E1;
+                        background-color: #FAFAFA;
+                    }
+                    .impl-option-card.selected {
+                        border-color: #7D1A6A;
+                        background-color: #FDF4FA;
+                    }
+                    .impl-radio-indicator {
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        border: 2px solid #CBD5E1;
+                        margin-top: 2px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                        transition: all 0.2s ease;
+                    }
+                    .impl-option-card.selected .impl-radio-indicator {
+                        border-color: #7D1A6A;
+                        background-color: #7D1A6A;
+                    }
+                    .impl-option-card.selected .impl-radio-indicator::after {
+                        content: '';
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background-color: #FFFFFF;
+                    }
+
+                    /* Botones de Acción Estilo Odoo */
+                    .btn-odoo-checkout {
+                        background-color: #7D1A6A !important;
+                        color: #FFFFFF !important;
+                        font-weight: 700 !important;
+                        padding: 0.95rem 1.5rem !important;
+                        border-radius: 12px !important;
+                        font-size: 1.05rem !important;
+                        border: none !important;
+                        display: block !important;
+                        width: 100% !important;
+                        text-align: center !important;
+                        text-decoration: none !important;
+                        box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25) !important;
+                        transition: all 0.2s ease !important;
+                    }
+                    .btn-odoo-checkout:hover {
+                        background-color: #631454 !important;
+                        transform: translateY(-2px);
+                    }
+                    .btn-odoo-quote {
+                        background-color: #F8FAFC !important;
+                        color: #475569 !important;
+                        font-weight: 600 !important;
+                        padding: 0.75rem 1.5rem !important;
+                        border-radius: 12px !important;
+                        font-size: 0.925rem !important;
+                        border: 1px solid #E2E8F0 !important;
+                        display: block !important;
+                        width: 100% !important;
+                        text-align: center !important;
+                        text-decoration: none !important;
+                        margin-top: 0.75rem !important;
+                        transition: all 0.2s ease !important;
+                    }
+                    .btn-odoo-quote:hover {
+                        background-color: #F1F5F9 !important;
+                        color: #0F172A !important;
+                    }
+
+                    /* Breadcrumb Paso a Paso (Paso 2) */
+                    .checkout-breadcrumbs {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.65rem;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        color: #94A3B8;
+                        margin-bottom: 2rem;
+                    }
+                    .breadcrumb-item-active {
+                        color: #0F172A;
+                        font-weight: 700;
+                    }
+                    .breadcrumb-item-done {
+                        color: #7D1A6A;
+                        cursor: pointer;
+                    }
+
+                    /* Íconos de Carrito Paso 2 */
+                    .cart-item-avatar {
+                        width: 44px;
+                        height: 44px;
+                        border-radius: 12px;
+                        background-color: #059669;
+                        color: #FFFFFF;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.25rem;
+                        position: relative;
+                        flex-shrink: 0;
+                    }
+                    .cart-item-badge {
+                        position: absolute;
+                        top: -5px;
+                        right: -5px;
+                        background: #0F172A;
+                        color: #FFFFFF;
+                        font-size: 0.7rem;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 800;
+                    }
+
+                    .form-control-sofia {
+                        border: 1px solid #CBD5E1;
+                        border-radius: 8px;
+                        padding: 0.65rem 0.95rem;
+                        font-size: 0.95rem;
+                        color: #0F172A;
+                        transition: all 0.2s ease;
+                    }
+                    .form-control-sofia:focus {
+                        border-color: #7D1A6A;
+                        box-shadow: 0 0 0 3px rgba(125, 26, 106, 0.15);
+                        outline: none;
+                    }
+                </style>
+
+                <div class="sofia-checkout-wrapper">
+                    <div class="container">
+                        
+                        <!-- ========================================== -->
+                        <!-- PASO 1: CONFIGURACIÓN DE PLAN (SCREEN 1)    -->
+                        <!-- ========================================== -->
+                        <div id="stepConfigPlan">
+                            <!-- Barra Superior con Botón Atrás y Título -->
+                            <div class="d-flex align-items-center gap-3 mb-5">
+                                <a href="/precios" class="back-btn-pill" title="Volver a la tabla de precios">
+                                    <i class="fa fa-chevron-left"></i>
+                                </a>
+                                <h1 class="checkout-main-title mb-0">
+                                    PLAN <span id="planTitleDisplay" class="plan-highlight-name">PYME PRO</span>
+                                </h1>
+                            </div>
+
+                            <div class="row g-5">
+                                <!-- Columna Izquierda: Parámetros del Servicio -->
+                                <div class="col-lg-7">
+                                    
+                                    <!-- 1. Número de usuarios -->
+                                    <div class="mb-5">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <h4 class="fw-bold mb-1">Número de usuarios regulares</h4>
+                                                <p class="text-secondary small mb-0">Colaboradores que accederán a emitir facturas, POS, inventarios o contabilidad.</p>
+                                            </div>
+                                            <div class="users-count-input-group">
+                                                <button type="button" class="btn-step-counter rounded-start" id="btnMinusUser">−</button>
+                                                <input type="number" id="inputUsersCount" class="input-users-val" value="1" min="1" max="500"/>
+                                                <button type="button" class="btn-step-counter rounded-end" id="btnPlusUser">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-4 text-muted opacity-25"/>
+
+                                    <!-- 2. Servicio de implementación -->
+                                    <div class="mb-4">
+                                        <h4 class="fw-bold mb-3">Servicio de implementación</h4>
+                                        
+                                        <!-- Opción A: Autoservicio -->
+                                        <div class="impl-option-card selected" id="optImplSelf" data-cost="0">
+                                            <div class="impl-radio-indicator"></div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span class="fw-bold text-dark">Autoservicio</span>
+                                                    <span class="badge bg-light text-success border border-success">Gratis</span>
+                                                </div>
+                                                <p class="text-secondary small mb-0">Puesta en marcha guiada mediante la documentación interactiva, manuales en video y plantillas Excel de importación.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Opción B: Acompañamiento asistido -->
+                                        <div class="impl-option-card" id="optImplAssisted" data-cost="150">
+                                            <div class="impl-radio-indicator"></div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span class="fw-bold text-dark">Acompañamiento inicial asistido <span class="text-muted fw-normal small">(recomendado para &lt; 20 usuarios)</span></span>
+                                                    <span class="fw-bold text-dark">S/ 150.00</span>
+                                                </div>
+                                                <p class="text-secondary small mb-0">2 sesiones virtuales 1 a 1 con un especialista: carga inicial de catálogo de productos, carga de clientes y configuración de certificado digital SUNAT.</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Opción C: Consultoría e implementación a medida -->
+                                        <div class="impl-option-card" id="optImplCustom" data-cost="350">
+                                            <div class="impl-radio-indicator"></div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <span class="fw-bold text-dark">Con un consultor especializado <span class="text-muted fw-normal small">(recomendado para &gt; 20 usuarios)</span></span>
+                                                    <span class="fw-bold text-dark">S/ 350.00</span>
+                                                </div>
+                                                <p class="text-secondary small mb-0">Parametrización completa de almacenes, listas de precios, rutas de despacho, capacitación para todo tu equipo y soporte en marcha blanca.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!-- Columna Derecha: Resumen de Cotización / Suscripción -->
+                                <div class="col-lg-5">
+                                    <div class="checkout-summary-card">
+                                        
+                                        <!-- Selector Switch Anual / Mensual -->
+                                        <div class="summary-billing-switch" id="summaryBillingSwitch" role="button" title="Alternar periodicidad de facturación">
+                                            <span class="summary-billing-opt active" id="sumBtnAnual">Anual</span>
+                                            <div class="summary-switch-track">
+                                                <div class="summary-switch-thumb"></div>
+                                            </div>
+                                            <span class="summary-billing-opt" id="sumBtnMensual">Mensual</span>
+                                        </div>
+
+                                        <!-- Desglose de Precios -->
+                                        <div class="py-2">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <span class="fw-bold text-dark"><span id="sumUsersCount">1</span> usuario(s), todas las aplicaciones</span>
+                                                    <div class="text-muted small" id="sumPlanBaseRate">Tarifa regular S/ 16.90 c/u</div>
+                                                </div>
+                                                <span class="fw-bold text-dark" id="sumBaseTotal">S/ 16.90</span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mb-2" id="rowAnnualDiscount">
+                                                <span class="text-muted small">Descuento de suscripción anual</span>
+                                                <span class="text-success fw-bold small" id="sumDiscountVal">S/ -2.00</span>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center mb-2" id="rowImplService" style="display: none !important;">
+                                                <span class="text-muted small" id="sumImplName">Servicio de implementación</span>
+                                                <span class="fw-bold text-dark small" id="sumImplCost">S/ 0.00</span>
+                                            </div>
+
+                                            <hr class="my-3 text-muted opacity-25"/>
+
+                                            <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                                <span class="fw-bold text-dark fs-5">Total al mes <span class="text-muted small fw-normal">(*)</span></span>
+                                                <span class="display-6 fw-bold text-dark" id="sumTotalMonthly">S/ 14.90</span>
+                                            </div>
+
+                                            <div class="text-end text-muted small mb-4" id="noteAnnualTotal">
+                                                (*) Facturado anualmente: <strong class="text-dark" id="sumAnnualBilled">S/ 178.80</strong>
+                                            </div>
+                                        </div>
+
+                                        <!-- Botones de Acción -->
+                                        <button type="button" class="btn-odoo-checkout" id="btnGoToStep2">
+                                            Compra ahora
+                                        </button>
+                                        <a href="/soporte" class="btn-odoo-quote">
+                                            Enviar o imprimir la cotización
+                                        </a>
+
+                                        <div class="mt-4 text-center">
+                                            <span class="text-muted small">
+                                                <i class="fa fa-lock text-success me-1"></i> Aprovisionamiento automático inmediato
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- ========================================== -->
+                        <!-- PASO 2: DATOS DE FACTURACIÓN Y PAGO (SCREEN 2) -->
+                        <!-- ========================================== -->
+                        <div id="stepBillingDetails" style="display: none;">
+                            
+                            <!-- Breadcrumb Superior de Pasos -->
+                            <div class="checkout-breadcrumbs">
+                                <span class="breadcrumb-item-done" id="crumbStep1"><i class="fa fa-check-circle me-1"></i> Orden</span>
+                                <i class="fa fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                                <span class="breadcrumb-item-active">Dirección &amp; Facturación</span>
+                                <i class="fa fa-chevron-right text-muted" style="font-size: 0.75rem;"></i>
+                                <span>Pago</span>
+                            </div>
+
+                            <div class="row g-5">
+                                
+                                <!-- Columna Izquierda: Formulario de Datos Fiscales -->
+                                <div class="col-lg-7">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h2 class="fw-bold text-dark mb-0">Detalles de Facturación</h2>
+                                        <div class="small">
+                                            <span class="text-muted">¿Ya tienes una cuenta?</span>
+                                            <a href="/login" class="btn btn-sm btn-outline-dark ms-2 fw-semibold">Iniciar sesión</a>
+                                        </div>
+                                    </div>
+
+                                    <form id="formCheckoutBilling" onsubmit="return false;">
+                                        
+                                        <!-- Tu Nombre -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small text-dark">Tu nombre y apellidos *</label>
+                                            <input type="text" class="form-control form-control-sofia" id="inputClientName" placeholder="Ej. Carlos Mendoza Ramos" required="required"/>
+                                        </div>
+
+                                        <div class="row g-3 mb-3">
+                                            <!-- Correo electrónico -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small text-dark">Correo electrónico (para tus accesos) *</label>
+                                                <input type="email" class="form-control form-control-sofia" id="inputClientEmail" placeholder="admin@tuempresa.pe" required="required"/>
+                                            </div>
+                                            <!-- Teléfono -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small text-dark">Teléfono de contacto *</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-light text-muted small border-end-0">+51</span>
+                                                    <input type="tel" class="form-control form-control-sofia border-start-0" id="inputClientPhone" placeholder="987 654 321" required="required"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-3 mb-3">
+                                            <!-- Nombre de la empresa -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small text-dark">Nombre de la empresa o Razón Social *</label>
+                                                <input type="text" class="form-control form-control-sofia" id="inputCompanyName" placeholder="Ej. Distribuidora Lima S.A.C." required="required"/>
+                                            </div>
+                                            <!-- Número de RUC -->
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small text-dark">Número de identificación fiscal (RUC / DNI) *</label>
+                                                <input type="text" class="form-control form-control-sofia" id="inputFiscalId" placeholder="20XXXXXXXXX" maxlength="11" required="required"/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Subdominio Deseado del ERP -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small text-dark">Subdominio seguro para tu ERP *</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control form-control-sofia text-lowercase" id="inputSubdomain" placeholder="miempresa" required="required"/>
+                                                <span class="input-group-text bg-light text-dark fw-bold small">.sofiaerp.com</span>
+                                            </div>
+                                            <div class="form-text text-muted small">Podrás vincular tu propio dominio (ej. <code>erp.tuempresa.pe</code>) en cualquier momento.</div>
+                                        </div>
+
+                                        <!-- Dirección Fiscal -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold small text-dark">Dirección fiscal / Domicilio comercial *</label>
+                                            <input type="text" class="form-control form-control-sofia" id="inputAddress" placeholder="Av. Principal 123, Of. 402" required="required"/>
+                                        </div>
+
+                                        <div class="row g-3 mb-4">
+                                            <!-- Ciudad / Distrito -->
+                                            <div class="col-md-5">
+                                                <label class="form-label fw-semibold small text-dark">Ciudad / Distrito *</label>
+                                                <input type="text" class="form-control form-control-sofia" id="inputCity" placeholder="San Isidro" required="required"/>
+                                            </div>
+                                            <!-- Departamento / Región -->
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small text-dark">Departamento *</label>
+                                                <select class="form-select form-control-sofia" id="selectRegion">
+                                                    <option value="Lima">Lima</option>
+                                                    <option value="Arequipa">Arequipa</option>
+                                                    <option value="La Libertad">La Libertad</option>
+                                                    <option value="Piura">Piura</option>
+                                                    <option value="Cusco">Cusco</option>
+                                                    <option value="Junin">Junín</option>
+                                                    <option value="Lambayeque">Lambayeque</option>
+                                                    <option value="Ancash">Áncash</option>
+                                                    <option value="Ica">Ica</option>
+                                                    <option value="Otros">Otro Departamento</option>
+                                                </select>
+                                            </div>
+                                            <!-- País -->
+                                            <div class="col-md-3">
+                                                <label class="form-label fw-semibold small text-dark">País</label>
+                                                <input type="text" class="form-control form-control-sofia bg-light" value="Perú" readonly="readonly"/>
+                                            </div>
+                                        </div>
+
+                                    </form>
+                                </div>
+
+                                <!-- Columna Derecha: Resumen de Facturación &amp; Finalización -->
+                                <div class="col-lg-5">
+                                    <div class="checkout-summary-card">
+                                        
+                                        <!-- Ítem 1: Plan Contratado -->
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="cart-item-avatar">
+                                                    <i class="fa fa-user"></i>
+                                                    <span class="cart-item-badge" id="badgeStep2Users">1</span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="fw-bold mb-0 text-dark" id="step2PlanNameDisplay">Plan Pyme Pro</h6>
+                                                    <span class="text-muted small" id="step2CycleLabel">por año</span>
+                                                </div>
+                                            </div>
+                                            <span class="fw-bold text-dark" id="step2PlanSubtotal">S/ 202.80</span>
+                                        </div>
+
+                                        <!-- Ítem 2: Descuento -->
+                                        <div class="d-flex align-items-center justify-content-between mb-3" id="step2RowDiscount">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="cart-item-avatar bg-success">
+                                                    <i class="fa fa-percent"></i>
+                                                    <span class="cart-item-badge">1</span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="fw-bold mb-0 text-success">Descuento suscripción anual</h6>
+                                                    <span class="text-muted small">por año</span>
+                                                </div>
+                                            </div>
+                                            <span class="fw-bold text-success" id="step2DiscountAmount">S/ -24.00</span>
+                                        </div>
+
+                                        <hr class="my-3 text-muted opacity-25"/>
+
+                                        <!-- Subtotal e Impuestos -->
+                                        <div class="d-flex justify-content-between text-muted small mb-2">
+                                            <span>Subtotal neto</span>
+                                            <span class="fw-bold text-dark" id="step2SubtotalNeto">S/ 178.80</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-muted small mb-3">
+                                            <span>IGV (18%)</span>
+                                            <span class="fw-bold text-dark" id="step2TaxAmount">S/ 32.18</span>
+                                        </div>
+
+                                        <!-- Cupón de Descuento -->
+                                        <div class="input-group mb-4">
+                                            <input type="text" class="form-control form-control-sofia" placeholder="Código de descuento..."/>
+                                            <button class="btn btn-outline-secondary px-3 fw-bold small" type="button">Aplicar</button>
+                                        </div>
+
+                                        <!-- Total Final a Pagar -->
+                                        <div class="d-flex justify-content-between align-items-baseline mb-4 pt-2 border-top">
+                                            <span class="fw-bold fs-5 text-dark">Total</span>
+                                            <span class="display-6 fw-bold text-dark" id="step2GrandTotal">S/ 210.98</span>
+                                        </div>
+
+                                        <!-- Términos y Condiciones -->
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold small text-dark mb-1">Términos y condiciones del servicio</h6>
+                                            <p class="text-secondary small mb-0" style="font-size: 0.775rem; line-height: 1.4;">
+                                                Al continuar, aceptas nuestros Términos de Servicio y la provisión automática inmediata de tu base de datos dedicada. Sin permanencias forzosas.
+                                            </p>
+                                        </div>
+
+                                        <!-- Botón de Pago Final -->
+                                        <button type="button" class="btn-odoo-checkout" id="btnFinalizePurchase">
+                                            Continuar a la finalización de la compra &gt;
+                                        </button>
+
+                                        <div class="text-center mt-3">
+                                            <a href="javascript:void(0)" class="text-muted small text-decoration-none" id="btnBackToStep1">
+                                                &lt; Volver a configurar el plan
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Lógica Interactiva Vanilla JS (Cálculo de Precios, Sincronización y Cambio de Pasos) -->
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // 1. Obtener parámetros de URL (?plan=pyme-pro&amp;billing=anual)
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var currentPlan = urlParams.get('plan') || 'pyme-pro';
+                        var isMonthly = urlParams.get('billing') === 'mensual';
+                        var usersCount = 1;
+                        var implCost = 0;
+
+                        // Tarifas por plan: [precio_anual_mes, precio_mensual_mes]
+                        var planRates = {
+                            'emprendedor': { name: 'EMPRENDEDOR', color: '#0EA5E9', anual: 9.90, mensual: 11.90 },
+                            'pyme-pro': { name: 'PYME PRO', color: '#7D1A6A', anual: 14.90, mensual: 16.90 },
+                            'corporativo': { name: 'CORPORATIVO', color: '#2563EB', anual: 19.90, mensual: 21.90 }
+                        };
+
+                        if (!planRates[currentPlan]) {
+                            currentPlan = 'pyme-pro';
+                        }
+
+                        // Elementos DOM Paso 1
+                        var planTitleDisplay = document.getElementById('planTitleDisplay');
+                        var inputUsersCount = document.getElementById('inputUsersCount');
+                        var btnMinusUser = document.getElementById('btnMinusUser');
+                        var btnPlusUser = document.getElementById('btnPlusUser');
+                        var summaryBillingSwitch = document.getElementById('summaryBillingSwitch');
+                        var sumBtnAnual = document.getElementById('sumBtnAnual');
+                        var sumBtnMensual = document.getElementById('sumBtnMensual');
+
+                        var sumUsersCount = document.getElementById('sumUsersCount');
+                        var sumPlanBaseRate = document.getElementById('sumPlanBaseRate');
+                        var sumBaseTotal = document.getElementById('sumBaseTotal');
+                        var rowAnnualDiscount = document.getElementById('rowAnnualDiscount');
+                        var sumDiscountVal = document.getElementById('sumDiscountVal');
+                        var rowImplService = document.getElementById('rowImplService');
+                        var sumImplCost = document.getElementById('sumImplCost');
+                        var sumTotalMonthly = document.getElementById('sumTotalMonthly');
+                        var noteAnnualTotal = document.getElementById('noteAnnualTotal');
+                        var sumAnnualBilled = document.getElementById('sumAnnualBilled');
+
+                        // Elementos DOM Paso 2
+                        var stepConfigPlan = document.getElementById('stepConfigPlan');
+                        var stepBillingDetails = document.getElementById('stepBillingDetails');
+                        var btnGoToStep2 = document.getElementById('btnGoToStep2');
+                        var btnBackToStep1 = document.getElementById('btnBackToStep1');
+                        var crumbStep1 = document.getElementById('crumbStep1');
+
+                        var badgeStep2Users = document.getElementById('badgeStep2Users');
+                        var step2PlanNameDisplay = document.getElementById('step2PlanNameDisplay');
+                        var step2CycleLabel = document.getElementById('step2CycleLabel');
+                        var step2PlanSubtotal = document.getElementById('step2PlanSubtotal');
+                        var step2RowDiscount = document.getElementById('step2RowDiscount');
+                        var step2DiscountAmount = document.getElementById('step2DiscountAmount');
+                        var step2SubtotalNeto = document.getElementById('step2SubtotalNeto');
+                        var step2TaxAmount = document.getElementById('step2TaxAmount');
+                        var step2GrandTotal = document.getElementById('step2GrandTotal');
+                        var btnFinalizePurchase = document.getElementById('btnFinalizePurchase');
+
+                        function recalculate() {
+                            var planData = planRates[currentPlan];
+                            if (planTitleDisplay) {
+                                planTitleDisplay.textContent = planData.name;
+                                planTitleDisplay.style.color = planData.color;
+                            }
+
+                            var regularMonthlyRate = planData.mensual;
+                            var discountedMonthlyRate = planData.anual;
+                            var effectiveMonthlyRate = isMonthly ? regularMonthlyRate : discountedMonthlyRate;
+                            
+                            var baseTotalRegular = regularMonthlyRate * usersCount;
+                            var baseTotalEffective = effectiveMonthlyRate * usersCount;
+                            var discountMonthly = isMonthly ? 0 : (2.00 * usersCount);
+
+                            // Actualizar UI Paso 1
+                            if (sumUsersCount) sumUsersCount.textContent = usersCount;
+                            if (sumPlanBaseRate) sumPlanBaseRate.textContent = 'Tarifa base regular S/ ' + regularMonthlyRate.toFixed(2) + ' c/u';
+                            if (sumBaseTotal) sumBaseTotal.textContent = 'S/ ' + baseTotalRegular.toFixed(2);
+
+                            if (isMonthly) {
+                                if (summaryBillingSwitch) summaryBillingSwitch.classList.add('monthly');
+                                if (sumBtnMensual) sumBtnMensual.classList.add('active');
+                                if (sumBtnAnual) sumBtnAnual.classList.remove('active');
+                                if (rowAnnualDiscount) rowAnnualDiscount.style.display = 'none';
+                                if (noteAnnualTotal) noteAnnualTotal.innerHTML = 'Facturado mensualmente: <strong class="text-dark">S/ ' + (baseTotalEffective + implCost).toFixed(2) + '</strong>';
+                            } else {
+                                if (summaryBillingSwitch) summaryBillingSwitch.classList.remove('monthly');
+                                if (sumBtnAnual) sumBtnAnual.classList.add('active');
+                                if (sumBtnMensual) sumBtnMensual.classList.remove('active');
+                                if (rowAnnualDiscount) rowAnnualDiscount.style.display = 'flex';
+                                if (sumDiscountVal) sumDiscountVal.textContent = 'S/ -' + discountMonthly.toFixed(2);
+                                var annualBilled = (baseTotalEffective * 12) + implCost;
+                                if (noteAnnualTotal) noteAnnualTotal.innerHTML = '(*) Facturado anualmente: <strong class="text-dark">S/ ' + annualBilled.toFixed(2) + '</strong>';
+                            }
+
+                            if (sumTotalMonthly) sumTotalMonthly.textContent = 'S/ ' + baseTotalEffective.toFixed(2);
+
+                            // Actualizar UI Paso 2 (Checkout Fiscal)
+                            if (badgeStep2Users) badgeStep2Users.textContent = usersCount;
+                            if (step2PlanNameDisplay) step2PlanNameDisplay.textContent = 'Plan ' + planData.name.charAt(0) + planData.name.slice(1).toLowerCase();
+                            if (step2CycleLabel) step2CycleLabel.textContent = isMonthly ? 'por mes' : 'por año (12 meses)';
+
+                            var netBeforeTax = isMonthly ? (baseTotalEffective + implCost) : ((baseTotalEffective * 12) + implCost);
+                            var grossBeforeDiscount = isMonthly ? (baseTotalRegular + implCost) : ((baseTotalRegular * 12) + implCost);
+                            var totalDiscount = grossBeforeDiscount - netBeforeTax;
+
+                            if (step2PlanSubtotal) step2PlanSubtotal.textContent = 'S/ ' + grossBeforeDiscount.toFixed(2);
+                            if (isMonthly) {
+                                if (step2RowDiscount) step2RowDiscount.style.display = 'none';
+                            } else {
+                                if (step2RowDiscount) step2RowDiscount.style.display = 'flex';
+                                if (step2DiscountAmount) step2DiscountAmount.textContent = 'S/ -' + totalDiscount.toFixed(2);
+                            }
+
+                            var igv = netBeforeTax * 0.18;
+                            var grandTotal = netBeforeTax + igv;
+
+                            if (step2SubtotalNeto) step2SubtotalNeto.textContent = 'S/ ' + netBeforeTax.toFixed(2);
+                            if (step2TaxAmount) step2TaxAmount.textContent = 'S/ ' + igv.toFixed(2);
+                            if (step2GrandTotal) step2GrandTotal.textContent = 'S/ ' + grandTotal.toFixed(2);
+                        }
+
+                        // Stepper de Usuarios
+                        if (btnMinusUser) {
+                            btnMinusUser.addEventListener('click', function () {
+                                if (usersCount > 1) {
+                                    usersCount--;
+                                    inputUsersCount.value = usersCount;
+                                    recalculate();
+                                }
+                            });
+                        }
+                        if (btnPlusUser) {
+                            btnPlusUser.addEventListener('click', function () {
+                                usersCount++;
+                                inputUsersCount.value = usersCount;
+                                recalculate();
+                            });
+                        }
+                        if (inputUsersCount) {
+                            inputUsersCount.addEventListener('change', function () {
+                                var val = parseInt(this.value, 10);
+                                usersCount = isNaN(val) || val &lt; 1 ? 1 : val;
+                                this.value = usersCount;
+                                recalculate();
+                            });
+                        }
+
+                        // Switch Anual / Mensual
+                        if (summaryBillingSwitch) {
+                            summaryBillingSwitch.addEventListener('click', function () {
+                                isMonthly = !isMonthly;
+                                recalculate();
+                            });
+                        }
+                        if (sumBtnAnual) {
+                            sumBtnAnual.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                isMonthly = false;
+                                recalculate();
+                            });
+                        }
+                        if (sumBtnMensual) {
+                            sumBtnMensual.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                isMonthly = true;
+                                recalculate();
+                            });
+                        }
+
+                        // Opciones de Implementación
+                        var implCards = document.querySelectorAll('.impl-option-card');
+                        implCards.forEach(function (card) {
+                            card.addEventListener('click', function () {
+                                implCards.forEach(function (c) { c.classList.remove('selected'); });
+                                this.classList.add('selected');
+                                implCost = parseFloat(this.getAttribute('data-cost')) || 0;
+                                recalculate();
+                            });
+                        });
+
+                        // Navegación entre Paso 1 y Paso 2
+                        if (btnGoToStep2) {
+                            btnGoToStep2.addEventListener('click', function () {
+                                stepConfigPlan.style.display = 'none';
+                                stepBillingDetails.style.display = 'block';
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            });
+                        }
+                        if (btnBackToStep1) {
+                            btnBackToStep1.addEventListener('click', function () {
+                                stepBillingDetails.style.display = 'none';
+                                stepConfigPlan.style.display = 'block';
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            });
+                        }
+                        if (crumbStep1) {
+                            crumbStep1.addEventListener('click', function () {
+                                stepBillingDetails.style.display = 'none';
+                                stepConfigPlan.style.display = 'block';
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            });
+                        }
+
+                        // Finalizar Compra
+                        if (btnFinalizePurchase) {
+                            btnFinalizePurchase.addEventListener('click', function () {
+                                var form = document.getElementById('formCheckoutBilling');
+                                if (form &amp;&amp; !form.checkValidity()) {
+                                    form.reportValidity();
+                                    return;
+                                }
+                                var email = document.getElementById('inputClientEmail').value;
+                                var subdomain = document.getElementById('inputSubdomain').value || 'miempresa';
+                                alert('¡Excelente! Datos validados correctamente.\n\nProcediendo a la pasarela de pago seguro para activar https://' + subdomain + '.sofiaerp.com\nCredenciales enviadas a: ' + email);
+                            });
+                        }
+
+                        // Inicializar
+                        recalculate();
+                    });
+                </script>
+
+            </div>
+        </t>
+    </template>
+
+    <record id="checkout_website_page" model="website.page">
+        <field name="name">Contratar Plan y Suscripción</field>
+        <field name="url">/checkout</field>
+        <field name="view_id" ref="checkout_page"/>
+        <field name="is_published">True</field>
+        <field name="website_indexed">True</field>
+    </record>
+</odoo>
