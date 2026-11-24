@@ -247,7 +247,7 @@
             <div class="container">
                 <!-- Título Heroico Principal -->
                 <h1 class="odoo-hero-title">
-                    Gestiona tu negocio desde <span class="highlight-badge-yellow">un solo software</span>.
+                    Gestiona tu negocio desde<br class="d-none d-md-inline"/> <span class="highlight-badge-yellow">un solo software</span>.
                 </h1>
 
                 <!-- Subtítulo Expresivo -->
