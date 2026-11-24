@@ -1,263 +1,219 @@
 // ==============================================================================
-// SOFIA ERP SaaS — Sistema de Diseño y Estilos Globales (SCSS)
+// SOFIA ERP — Estilos Corporativos Oficiales (Inspirado en Odoo.com)
 // ==============================================================================
 
 :root {
-    --sofia-primary: #4F46E5;
-    --sofia-primary-hover: #4338CA;
-    --sofia-primary-light: #EEF2FF;
-    --sofia-secondary: #06B6D4;
-    --sofia-accent: #7C3AED;
-    --sofia-dark: #0B0F19;
-    --sofia-slate-900: #0F172A;
-    --sofia-slate-800: #1E293B;
-    --sofia-slate-600: #475569;
-    --sofia-slate-500: #64748B;
-    --sofia-slate-200: #E2E8F0;
-    --sofia-slate-100: #F1F5F9;
-    --sofia-slate-50: #F8FAFC;
-    --sofia-gradient: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #06B6D4 100%);
-    --sofia-glow: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+    --odoo-purple: #714B67;
+    --odoo-purple-dark: #58394F;
+    --odoo-teal: #008784;
+    --odoo-dark: #1E293B;
+    --odoo-gray: #4B5563;
+    --odoo-light-gray: #F8FAFC;
+    --odoo-border: #E5E7EB;
 }
 
-// ------------------------------------------------------------------------------
-// Tipografía y Base
-// ------------------------------------------------------------------------------
 body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    color: var(--sofia-slate-900);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1F2937;
     background-color: #FFFFFF;
-    -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: inherit;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    color: var(--sofia-slate-900);
 }
 
 // ------------------------------------------------------------------------------
-// Header y Navegación Flotante
+// Header & Navbar Estilo Odoo.com
 // ------------------------------------------------------------------------------
-#top_menu_container {
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-}
-
-.sofia-navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+.odoo-style-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--odoo-border);
     position: sticky;
     top: 0;
-    z-index: 1030;
-    transition: all 0.3s ease;
-
-    .navbar-brand {
-        font-weight: 800;
-        font-size: 1.35rem;
-        letter-spacing: -0.03em;
-        color: var(--sofia-slate-900);
-
-        span.brand-accent {
-            background: var(--sofia-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-    }
-
-    .nav-link {
-        font-size: 0.925rem;
-        font-weight: 600;
-        color: var(--sofia-slate-600) !important;
-        padding: 0.5rem 0.9rem !important;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-
-        &:hover, &.active {
-            color: var(--sofia-primary) !important;
-            background-color: var(--sofia-primary-light);
-        }
-    }
+    z-index: 1040;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-// ------------------------------------------------------------------------------
-// Mega-Menú Desplegable (Verticales y Aplicaciones)
-// ------------------------------------------------------------------------------
-.sofia-dropdown {
-    position: static !important;
+.odoo-navbar {
+    padding: 0.6rem 0;
+    position: relative;
 
-    .dropdown-menu.sofia-megamenu {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90vw;
-        max-width: 1100px;
-        padding: 1.75rem;
-        border: 1px solid var(--sofia-slate-200);
-        border-radius: 20px;
-        background: #FFFFFF;
-        box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.03);
-        margin-top: 0.5rem;
-        display: none;
-        animation: sofiaMenuFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-
-        &.show {
-            display: block;
+    .odoo-brand {
+        text-decoration: none;
+        .brand-text {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: #212529;
+            letter-spacing: -0.04em;
         }
-    }
-
-    &:hover .dropdown-menu.sofia-megamenu {
-        display: block;
-    }
-}
-
-@keyframes sofiaMenuFade {
-    from {
-        opacity: 0;
-        transform: translate(-50%, 10px);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
-}
-
-.sofia-menu-item {
-    display: flex;
-    align-items: flex-start;
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-
-    .menu-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.15rem;
-        margin-right: 0.85rem;
-        flex-shrink: 0;
-        background: var(--sofia-slate-100);
-        color: var(--sofia-primary);
-        transition: all 0.2s ease;
-    }
-
-    .menu-content {
-        .menu-title {
-            font-size: 0.925rem;
+        .brand-dot {
+            color: var(--odoo-purple);
             font-weight: 700;
-            color: var(--sofia-slate-900);
-            margin-bottom: 0.15rem;
-            display: block;
-        }
-        .menu-desc {
-            font-size: 0.775rem;
-            color: var(--sofia-slate-500);
-            line-height: 1.35;
-            display: block;
+            font-size: 1.15rem;
+            margin-left: 1px;
         }
     }
 
-    &:hover {
-        background-color: var(--sofia-slate-50);
-        transform: translateY(-1px);
+    .odoo-nav-item {
+        margin: 0 0.35rem;
 
-        .menu-icon {
-            background-color: var(--sofia-primary);
-            color: #FFFFFF;
-            transform: scale(1.05);
-        }
+        .odoo-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #374151 !important;
+            padding: 0.5rem 0.85rem !important;
+            border-radius: 6px;
+            transition: all 0.15s ease;
 
-        .menu-title {
-            color: var(--sofia-primary);
+            &:hover {
+                color: #000000 !important;
+                background-color: #F3F4F6;
+            }
         }
     }
-}
 
-// ------------------------------------------------------------------------------
-// Botones de Acción (CTAs)
-// ------------------------------------------------------------------------------
-.btn-sofia-primary {
-    background: var(--sofia-primary);
-    color: #FFFFFF !important;
-    font-weight: 700;
-    font-size: 0.925rem;
-    padding: 0.6rem 1.35rem;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
-    transition: all 0.2s ease;
+    // Botones de acción derecha
+    .odoo-login-link {
+        font-size: 0.925rem;
+        font-weight: 500;
+        color: #374151;
+        padding: 0.4rem 0.6rem;
+        transition: color 0.15s ease;
 
-    &:hover {
-        background: var(--sofia-primary-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+        &:hover {
+            color: #000000;
+        }
     }
-}
 
-.btn-sofia-outline {
-    background: transparent;
-    color: var(--sofia-slate-800) !important;
-    font-weight: 600;
-    font-size: 0.925rem;
-    padding: 0.55rem 1.1rem;
-    border-radius: 12px;
-    border: 1px solid var(--sofia-slate-200);
-    transition: all 0.2s ease;
+    .odoo-btn-trial {
+        background-color: var(--odoo-purple);
+        color: #FFFFFF !important;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.45rem 1.15rem;
+        border-radius: 6px;
+        transition: background-color 0.2s ease, transform 0.1s ease;
 
-    &:hover {
-        background: var(--sofia-slate-100);
-        border-color: var(--sofia-slate-400);
+        &:hover {
+            background-color: var(--odoo-purple-dark);
+            transform: translateY(-1px);
+        }
     }
 }
 
 // ------------------------------------------------------------------------------
-// Badges y Pastillas de SUNAT
+// Mega-Menú Ancho Completo (Full-Width Dropdown idéntico a Odoo.com)
 // ------------------------------------------------------------------------------
-.badge-sunat {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.85rem;
-    border-radius: 9999px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: #FEF3C7;
-    color: #92400E;
-    border: 1px solid #FDE68A;
+.odoo-dropdown-full {
+    // Cuando el usuario pasa el mouse sobre Aplicaciones o Verticales
+    &:hover .odoo-megamenu-panel {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
 }
 
-.badge-saas {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    background: var(--sofia-primary-light);
-    color: var(--sofia-primary);
-    border: 1px solid rgba(79, 70, 229, 0.2);
+.odoo-megamenu-panel {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    position: fixed;
+    top: 60px; // Se posiciona exactamente debajo del navbar
+    left: 0;
+    right: 0;
+    width: 100vw;
+    background: #FFFFFF;
+    border-top: 1px solid var(--odoo-border);
+    border-bottom: 2px solid #E2E8F0;
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+    z-index: 1050;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+    .container {
+        max-width: 1200px;
+    }
+}
+
+// Títulos de Categoría en el Mega-Menú (con línea de color inferior)
+.odoo-col-title {
+    font-size: 0.775rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.35rem;
+    display: inline-block;
+    border-bottom: 2px solid;
+
+    &.title-finanzas {
+        color: #008784;
+        border-color: #008784;
+    }
+    &.title-ventas {
+        color: #E55A5A;
+        border-color: #E55A5A;
+    }
+    &.title-suministro {
+        color: #007791;
+        border-color: #007791;
+    }
+    &.title-servicios {
+        color: #F59E0B;
+        border-color: #F59E0B;
+    }
+    &.title-retail {
+        color: #059669;
+        border-color: #059669;
+    }
+    &.title-industria {
+        color: #4F46E5;
+        border-color: #4F46E5;
+    }
+    &.title-salud {
+        color: #DB2777;
+        border-color: #DB2777;
+    }
+}
+
+// Lista de enlaces estilo Odoo.com
+ul.odoo-menu-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        margin-bottom: 0.45rem;
+
+        a {
+            font-size: 0.885rem;
+            color: #374151;
+            text-decoration: none;
+            display: inline-block;
+            transition: color 0.15s ease, transform 0.15s ease;
+
+            &:hover {
+                color: #000000;
+                font-weight: 600;
+                transform: translateX(3px);
+            }
+        }
+    }
+}
+
+.odoo-megamenu-footer {
+    border-top: 1px solid #F1F5F9;
+    font-size: 0.825rem;
 }
 
 // ------------------------------------------------------------------------------
 // Pie de Página (Footer) Corporativo
 // ------------------------------------------------------------------------------
 .sofia-footer {
-    background-color: var(--sofia-dark);
+    background-color: #0F172A;
     color: #94A3B8;
-    padding: 4.5rem 0 2.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4rem 0 2rem;
 
     h6 {
         color: #FFFFFF;
-        font-size: 0.85rem;
+        font-size: 0.825rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
@@ -270,13 +226,13 @@ h1, h2, h3, h4, h5, h6 {
         margin: 0;
 
         li {
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.65rem;
 
             a {
                 color: #94A3B8;
                 text-decoration: none;
-                font-size: 0.885rem;
-                transition: color 0.2s ease;
+                font-size: 0.875rem;
+                transition: color 0.15s ease;
 
                 &:hover {
                     color: #FFFFFF;
@@ -286,10 +242,10 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .libro-reclamaciones-box {
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
-        padding: 1.15rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        padding: 1rem;
         display: inline-flex;
         align-items: center;
         gap: 0.85rem;
@@ -297,32 +253,31 @@ h1, h2, h3, h4, h5, h6 {
         transition: all 0.2s ease;
 
         .libro-icon {
-            font-size: 1.75rem;
+            font-size: 1.65rem;
             color: #FBBF24;
         }
 
         .libro-text {
-            font-size: 0.8rem;
+            font-size: 0.775rem;
             color: #E2E8F0;
-            line-height: 1.3;
+            line-height: 1.35;
 
             strong {
                 display: block;
                 color: #FFFFFF;
-                font-size: 0.85rem;
+                font-size: 0.825rem;
             }
         }
 
         &:hover {
             background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
         }
     }
 
     .footer-bottom {
-        margin-top: 3.5rem;
-        padding-top: 2rem;
+        margin-top: 3rem;
+        padding-top: 1.75rem;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         font-size: 0.825rem;
         display: flex;
