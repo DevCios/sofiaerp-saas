@@ -7,19 +7,20 @@
                 
                 <style>
                     .sofia-footer {
-                        background-color: #FAFAFA !important;
-                        border-top: 1px solid #E5E7EB !important;
-                        color: #4B5563 !important;
-                        padding-top: 4.5rem !important;
+                        background-color: #0B0F19 !important;
+                        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+                        color: #94A3B8 !important;
+                        padding-top: 4rem !important;
                         padding-bottom: 2.5rem !important;
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                        position: relative !important;
                     }
                     .sofia-footer h6 {
-                        color: #111827 !important;
-                        font-size: 0.85rem !important;
-                        font-weight: 700 !important;
+                        color: #FFFFFF !important;
+                        font-size: 0.8rem !important;
+                        font-weight: 800 !important;
                         text-transform: uppercase !important;
-                        letter-spacing: 0.06em !important;
+                        letter-spacing: 0.08em !important;
                         margin-bottom: 1.25rem !important;
                     }
                     .sofia-footer ul,
@@ -35,15 +36,22 @@
                         margin-bottom: 0.65rem !important;
                     }
                     .sofia-footer .footer-links a {
-                        color: #4B5563 !important;
+                        color: #94A3B8 !important;
                         text-decoration: none !important;
-                        font-size: 0.925rem !important;
+                        font-size: 0.9rem !important;
                         transition: color 0.15s ease, transform 0.15s ease !important;
                         display: inline-block !important;
                     }
                     .sofia-footer .footer-links a:hover {
-                        color: #714B67 !important;
+                        color: #FFFFFF !important;
                         transform: translateX(3px) !important;
+                    }
+
+                    /* Pre-Footer Banner */
+                    .footer-pre-banner {
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                        padding-bottom: 3rem;
+                        margin-bottom: 3.5rem;
                     }
 
                     /* Caja Libro de Reclamaciones Conforme a Ley 29571 */
@@ -51,34 +59,33 @@
                         display: flex !important;
                         align-items: center !important;
                         gap: 0.9rem !important;
-                        background: #FFFFFF !important;
-                        border: 1px solid #D1D5DB !important;
+                        background: rgba(255, 255, 255, 0.04) !important;
+                        border: 1px solid rgba(255, 255, 255, 0.12) !important;
                         padding: 0.85rem 1rem !important;
-                        border-radius: 8px !important;
+                        border-radius: 12px !important;
                         text-decoration: none !important;
                         transition: all 0.2s ease !important;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
                     }
                     .libro-reclamaciones-box:hover {
-                        border-color: #008784 !important;
-                        box-shadow: 0 4px 12px rgba(0, 135, 132, 0.12) !important;
+                        background: rgba(255, 255, 255, 0.08) !important;
+                        border-color: #7D1A6A !important;
                         transform: translateY(-2px) !important;
                     }
                     .libro-icon {
                         font-size: 1.6rem !important;
-                        color: #008784 !important;
+                        color: #FBBF24 !important;
                         flex-shrink: 0 !important;
                     }
                     .libro-text strong {
                         display: block !important;
-                        font-size: 0.9rem !important;
-                        color: #111827 !important;
+                        font-size: 0.85rem !important;
+                        color: #FFFFFF !important;
                         font-weight: 700 !important;
                     }
                     .libro-text span {
                         display: block !important;
-                        font-size: 0.775rem !important;
-                        color: #6B7280 !important;
+                        font-size: 0.75rem !important;
+                        color: #94A3B8 !important;
                         line-height: 1.25 !important;
                     }
 
@@ -86,50 +93,82 @@
                     .footer-bottom-row {
                         margin-top: 3.5rem !important;
                         padding-top: 1.5rem !important;
-                        border-top: 1px solid #E5E7EB !important;
-                        font-size: 0.875rem !important;
-                        color: #6B7280 !important;
+                        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+                        font-size: 0.85rem !important;
+                        color: #64748B !important;
                     }
                 </style>
 
                 <div class="container px-lg-5">
+                    
+                    <!-- Pre-Footer: Llamado a la Acción Rápido -->
+                    <div class="footer-pre-banner">
+                        <div class="row align-items-center justify-content-between g-3">
+                            <div class="col-lg-7">
+                                <h4 class="text-white fw-bold mb-2" style="font-size: 1.5rem; letter-spacing: -0.02em;">
+                                    Gestiona tu negocio desde un solo <span class="hero-badge-purple" style="font-size: 1.05rem; padding: 0.15em 0.6em;">software</span>
+                                </h4>
+                                <p class="mb-0" style="color: #94A3B8; font-size: 0.95rem;">
+                                    Comienza hoy mismo con tu periodo de prueba gratis. Sin contratos forzosos.
+                                </p>
+                            </div>
+                            <div class="col-lg-5 text-lg-end">
+                                <div class="d-inline-flex gap-2 flex-wrap">
+                                    <a href="/precios" class="sofia-btn-primary" style="padding: 0.7rem 1.75rem !important; font-size: 0.95rem !important;">
+                                        Comienza ahora
+                                    </a>
+                                    <a href="/soporte" class="btn" style="background: rgba(255,255,255,0.06); color: #FFFFFF; font-weight: 700; border: 1.5px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 0.7rem 1.5rem; font-size: 0.95rem; text-decoration: none;">
+                                        Habla con un asesor
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columnas de Contenido -->
                     <div class="row g-4">
                         <!-- Columna 1: Marca y Propuesta de Valor -->
                         <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                            <!-- Logo Oficial Idéntico al Header -->
+                            <!-- Logo Oficial Adaptable -->
                             <a class="d-inline-flex align-items-center text-decoration-none mb-3" href="/">
                                 <t t-if="res_company.logo">
-                                    <span t-field="res_company.logo" t-options="{'widget': 'image', 'style': 'max-height: 40px; width: auto; object-fit: contain; display: block;'}" role="img" t-att-aria-label="'Logo de %s' % res_company.name"/>
+                                    <div style="background: #FFFFFF; padding: 6px 14px; border-radius: 8px; display: inline-block;">
+                                        <span t-field="res_company.logo" t-options="{'widget': 'image', 'style': 'max-height: 32px; width: auto; object-fit: contain; display: block;'}" role="img" t-att-aria-label="'Logo de %s' % res_company.name"/>
+                                    </div>
                                 </t>
                                 <t t-else="">
-                                    <span style="font-size: 1.85rem; font-weight: 800; color: #1F2937; letter-spacing: -0.05em; line-height: 1;">
-                                        sofia<span style="color: #7D1A6A; font-weight: 700; font-size: 1.25rem; margin-left: 2px;">erp</span>
+                                    <span style="font-size: 1.85rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.05em; line-height: 1;">
+                                        sofia<span style="color: #C084FC; font-weight: 800; font-size: 1.25rem; margin-left: 2px;">erp</span>
                                     </span>
                                 </t>
                             </a>
-                            <p class="small mb-4 pe-lg-4" style="color: #4B5563; line-height: 1.6;">
-                                Plataforma SaaS ERP de alto rendimiento con Facturación Electrónica SUNAT UBL 2.1 y Guías de Remisión GRE 09/31 integradas. Diseñada para hacer crecer a las empresas del Perú con tecnología limpia y ágil.
+                            <p class="small mb-3 pe-lg-4" style="color: #94A3B8; line-height: 1.6;">
+                                Plataforma SaaS ERP en la nube con Facturación Electrónica SUNAT UBL 2.1, Guías GRE 09/31, Registros SIRE y Punto de Venta integrados. Diseñada para hacer crecer a las empresas del Perú.
                             </p>
-                            <div class="d-flex gap-2">
-                                <span class="badge bg-white border text-dark px-2.5 py-1.5 small fw-semibold" style="border-color: #E5E7EB !important;">
-                                    <i class="fa fa-shield text-success me-1"></i> SSL 256-Bit
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+                                    🇵🇪 Soporte en Perú
                                 </span>
-                                <span class="badge bg-white border text-dark px-2.5 py-1.5 small fw-semibold" style="border-color: #E5E7EB !important;">
-                                    <i class="fa fa-cloud text-info me-1"></i> 99.9% Uptime
+                                <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+                                    🛡️ SUNAT Homologado
+                                </span>
+                                <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
+                                    🔒 SSL 256-Bit
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Columna 2: Aplicaciones -->
+                        <!-- Columna 2: Aplicaciones (5 Pilares Homologados) -->
                         <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                             <h6>Aplicaciones</h6>
                             <ul class="footer-links">
-                                <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT</a></li>
-                                <li><a href="/aplicaciones/guias-remision">Guías GRE 09/31</a></li>
-                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex</a></li>
+                                <li><a href="/aplicaciones/facturacion-electronica">Facturación electrónica</a></li>
+                                <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE</a></li>
                                 <li><a href="/aplicaciones/ventas">Ventas &amp; CRM</a></li>
-                                <li><a href="/aplicaciones/compras">Compras &amp; Gastos</a></li>
-                                <li><a href="/aplicaciones/punto-de-venta">Punto de Venta (POS)</a></li>
+                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex</a></li>
+                                <li><a href="/aplicaciones/guias-remision">Guías de remisión GRE</a></li>
+                                <li><a href="/verticales/industria">Manufactura &amp; OEE</a></li>
+                                <li><a href="/verticales/servicios">Gestión de servicios</a></li>
                             </ul>
                         </div>
 
@@ -140,20 +179,21 @@
                                 <li><a href="/verticales/bodegas">Bodegas &amp; Minimarkets</a></li>
                                 <li><a href="/verticales/ferreterias">Ferreterías &amp; Construcción</a></li>
                                 <li><a href="/verticales/retail">Retail &amp; Calzado/Moda</a></li>
-                                <li><a href="/verticales/odontologia">Odontología &amp; Salud</a></li>
                                 <li><a href="/verticales/restaurante">Restaurantes &amp; Gastronomía</a></li>
-                                <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas &amp; Logística</a></li>
-                                <li><a href="/verticales/contabilidad">Estudios Contables &amp; SIRE</a></li>
+                                <li><a href="/verticales/industria">Industria &amp; Manufactura</a></li>
+                                <li><a href="/verticales/odontologia">Odontología &amp; Salud</a></li>
+                                <li><a href="/verticales">Todas las verticales →</a></li>
                             </ul>
                         </div>
 
                         <!-- Columna 4: Cumplimiento Legal y Libro de Reclamaciones -->
                         <div class="col-lg-3 col-md-6">
-                            <h6>Legal &amp; Transparencia</h6>
+                            <h6>Legal &amp; Soporte</h6>
                             <ul class="footer-links mb-4">
+                                <li><a href="/precios">Planes y Precios</a></li>
+                                <li><a href="/soporte">Centro de Ayuda &amp; Soporte</a></li>
                                 <li><a href="/terminos">Términos del Servicio</a></li>
                                 <li><a href="/privacidad">Política de Privacidad (Ley 29733)</a></li>
-                                <li><a href="/sla">Acuerdo de Nivel de Servicio (SLA)</a></li>
                             </ul>
 
                             <!-- Libro de Reclamaciones Virtual Conforme a Ley Peruana 29571 -->
@@ -163,7 +203,7 @@
                                 </div>
                                 <div class="libro-text">
                                     <strong>Libro de Reclamaciones</strong>
-                                    <span>Conforme al Código de Protección y Defensa del Consumidor</span>
+                                    <span>Conforme a la Ley N° 29571 • Indecopi</span>
                                 </div>
                             </a>
                         </div>
@@ -172,12 +212,16 @@
                     <!-- Barra Inferior -->
                     <div class="footer-bottom-row d-flex flex-column flex-md-row justify-content-between align-items-center">
                         <div>
-                            © 2026 SOFIA ERP. Todos los derechos reservados.
+                            © 2026 SOFIA ERP. Todos los derechos reservados. Desarrollado para empresas peruanas.
                         </div>
                         <div class="d-flex align-items-center gap-3 mt-2 mt-md-0">
                             <span>Hecho con <span class="text-danger">❤</span> en Perú</span>
                             <span>•</span>
-                            <a href="https://api.sofiaerp.com/admin" class="text-muted text-decoration-none small">
+                            <span class="small" style="color: #10B981;">
+                                <i class="fa fa-circle me-1" style="font-size: 0.6rem;"></i> Sistemas Operativos
+                            </span>
+                            <span>•</span>
+                            <a href="https://api.sofiaerp.com/admin" class="text-secondary text-decoration-none small">
                                 <i class="fa fa-lock me-1"></i> Admin Portal
                             </a>
                         </div>
