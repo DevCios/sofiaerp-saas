@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="payment_provider_mercadopago" model="payment.provider">
+        <field name="name">Mercado Pago</field>
+        <field name="code">mercadopago</field>
+        <field name="state">test</field>
+        <field name="is_published">True</field>
+        <field name="inline_form_view_id" ref="inline_form"/>
+        <field name="support_manual_capture">full_only</field>
+        <field name="support_refund">partial</field>
+        <field name="support_tokenization">True</field>
+        <field name="allow_tokenization">True</field>
+        <field name="pre_msg" type="html">
+            <p>Paga de forma 100% segura mediante Mercado Pago con tarjeta de crédito, débito o Yape.</p>
+        </field>
+    </record>
+
+    <record id="payment_method_mercadopago" model="account.payment.method">
+        <field name="name">Mercado Pago</field>
+        <field name="code">mercadopago</field>
+        <field name="payment_type">inbound</field>
+    </record>
+</odoo>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Menú Principal: Aplicaciones -->
+    <record id="menu_aplicaciones" model="website.menu">
+        <field name="name">Aplicaciones</field>
+        <field name="url">#</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">10</field>
+    </record>
+    <record id="submenu_app_facturacion" model="website.menu">
+        <field name="name">Facturación Electrónica SUNAT</field>
+        <field name="url">/aplicaciones/facturacion-electronica</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">1</field>
+    </record>
+    <record id="submenu_app_guias" model="website.menu">
+        <field name="name">Guías de Remisión (GRE)</field>
+        <field name="url">/aplicaciones/guias-remision</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">2</field>
+    </record>
+    <record id="submenu_app_inventario" model="website.menu">
+        <field name="name">Inventario &amp; Kardex</field>
+        <field name="url">/aplicaciones/inventario</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">3</field>
+    </record>
+    <record id="submenu_app_ventas" model="website.menu">
+        <field name="name">Ventas &amp; CRM</field>
+        <field name="url">/aplicaciones/ventas</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">4</field>
+    </record>
+    <record id="submenu_app_compras" model="website.menu">
+        <field name="name">Compras &amp; Proveedores</field>
+        <field name="url">/aplicaciones/compras</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">5</field>
+    </record>
+    <record id="submenu_app_pos" model="website.menu">
+        <field name="name">Punto de Venta (POS)</field>
+        <field name="url">/aplicaciones/punto-de-venta</field>
+        <field name="parent_id" ref="menu_aplicaciones"/>
+        <field name="sequence" type="int">6</field>
+    </record>
+
+    <!-- Menú Principal: Verticales (11 Ítems Solicitados) -->
+    <record id="menu_verticales" model="website.menu">
+        <field name="name">Verticales</field>
+        <field name="url">#</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">20</field>
+    </record>
+    <record id="submenu_vert_bodegas" model="website.menu">
+        <field name="name">Bodegas</field>
+        <field name="url">/verticales/bodegas</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">1</field>
+    </record>
+    <record id="submenu_vert_ferreterias" model="website.menu">
+        <field name="name">Ferreterías</field>
+        <field name="url">/verticales/ferreterias</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">2</field>
+    </record>
+    <record id="submenu_vert_retail" model="website.menu">
+        <field name="name">Retail</field>
+        <field name="url">/verticales/retail</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">3</field>
+    </record>
+    <record id="submenu_vert_industria" model="website.menu">
+        <field name="name">Industria</field>
+        <field name="url">/verticales/industria</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">4</field>
+    </record>
+    <record id="submenu_vert_odontologia" model="website.menu">
+        <field name="name">Odontología</field>
+        <field name="url">/verticales/odontologia</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">5</field>
+    </record>
+    <record id="submenu_vert_servicios" model="website.menu">
+        <field name="name">Servicios</field>
+        <field name="url">/verticales/servicios</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">6</field>
+    </record>
+    <record id="submenu_vert_restaurante" model="website.menu">
+        <field name="name">Restaurante</field>
+        <field name="url">/verticales/restaurante</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">7</field>
+    </record>
+    <record id="submenu_vert_ecommerce" model="website.menu">
+        <field name="name">Comercio electrónico</field>
+        <field name="url">/verticales/comercio-electronico</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">8</field>
+    </record>
+    <record id="submenu_vert_flotas" model="website.menu">
+        <field name="name">Gestión de flotas</field>
+        <field name="url">/verticales/gestion-de-flotas</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">9</field>
+    </record>
+    <record id="submenu_vert_rrhh" model="website.menu">
+        <field name="name">Recursos humanos</field>
+        <field name="url">/verticales/recursos-humanos</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">10</field>
+    </record>
+    <record id="submenu_vert_contabilidad" model="website.menu">
+        <field name="name">Contabilidad</field>
+        <field name="url">/verticales/contabilidad</field>
+        <field name="parent_id" ref="menu_verticales"/>
+        <field name="sequence" type="int">11</field>
+    </record>
+
+    <!-- Menú Principal: Comunidad -->
+    <record id="menu_comunidad" model="website.menu">
+        <field name="name">Comunidad</field>
+        <field name="url">#</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">30</field>
+    </record>
+    <record id="submenu_com_blog" model="website.menu">
+        <field name="name">Blog &amp; Guías SUNAT</field>
+        <field name="url">/blog</field>
+        <field name="parent_id" ref="menu_comunidad"/>
+        <field name="sequence" type="int">1</field>
+    </record>
+    <record id="submenu_com_casos" model="website.menu">
+        <field name="name">Casos de Éxito</field>
+        <field name="url">/casos-de-exito</field>
+        <field name="parent_id" ref="menu_comunidad"/>
+        <field name="sequence" type="int">2</field>
+    </record>
+    <record id="submenu_com_docs" model="website.menu">
+        <field name="name">Documentación &amp; Tutoriales</field>
+        <field name="url">/documentacion</field>
+        <field name="parent_id" ref="menu_comunidad"/>
+        <field name="sequence" type="int">3</field>
+    </record>
+
+    <!-- Menú Principal: Precios -->
+    <record id="menu_precios" model="website.menu">
+        <field name="name">Precios</field>
+        <field name="url">/precios</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">40</field>
+    </record>
+
+    <!-- Menú Principal: Soporte -->
+    <record id="menu_soporte" model="website.menu">
+        <field name="name">Soporte</field>
+        <field name="url">/soporte</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">50</field>
+    </record>
+</odoo>
