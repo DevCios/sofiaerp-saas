@@ -36,10 +36,8 @@
                         transform: translateX(-50%);
                         background-color: #7D1A6A;
                         color: #FFFFFF;
-                        font-size: 0.775rem;
+                        font-size: 0.8rem;
                         font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.06em;
                         padding: 0.35rem 1.15rem;
                         border-radius: 9999px;
                         box-shadow: 0 4px 10px rgba(125, 26, 106, 0.25);
@@ -279,7 +277,7 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="odoo-plan-card odoo-plan-featured">
                                     <div class="odoo-featured-badge">
-                                        ⭐ Más Elegido en Perú
+                                        Más elegido
                                     </div>
                                     <div>
                                         <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
