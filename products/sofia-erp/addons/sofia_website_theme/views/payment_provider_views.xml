@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Muestra el campo manual de Access Token en la pestaña Configuración / Credenciales de Mercado Pago -->
+    <record id="payment_provider_form_sofia_mercadopago" model="ir.ui.view">
+        <field name="name">payment.provider.form.sofia.mercadopago</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <group name="provider_credentials" position="inside">
+                <group string="Credencial Directa" invisible="code not in ('mercadopago', 'mercado_pago')">
+                    <field name="mercado_pago_access_token" 
+                           string="Token de Acceso (Access Token)" 
+                           password="True" 
+                           placeholder="Pega aquí tu APP_USR-... o TEST-..."/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

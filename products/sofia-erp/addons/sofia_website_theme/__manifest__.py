@@ -16,7 +16,7 @@ Módulo de Identidad Visual y Experiencia Web para SOFIA ERP (Odoo 20)
     'author': 'SOFIA ERP Platform Architecture Team',
     'website': 'https://sofiaerp.com',
     'license': 'LGPL-3',
-    'depends': ['website', 'sale'],
+    'depends': ['website', 'sale', 'payment'],
     'data': [
         'data/website_menu_data.xml',
         'data/subscription_products_data.xml',
@@ -29,6 +29,7 @@ Módulo de Identidad Visual y Experiencia Web para SOFIA ERP (Odoo 20)
         'views/verticales_page.xml',
         'views/libro_reclamaciones_page.xml',
         'views/checkout_page.xml',
+        'views/payment_provider_views.xml',
     ],
     'assets': {
         'web.assets_frontend': [
