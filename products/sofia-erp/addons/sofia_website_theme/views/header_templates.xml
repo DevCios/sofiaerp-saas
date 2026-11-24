@@ -235,7 +235,7 @@
                     .color-finanzas { color: #008784; border-color: #008784; }
                     .color-rrhh { color: #714B67; border-color: #714B67; }
                     .color-otros { color: #6B7280; border-color: #9CA3AF; }
-                    .color-contabilidad { color: #008784; border-color: #008784; }
+                    .color-contabilidad { color: #00A09D; border-color: #00A09D; }
                     .color-ventas { color: #E55A5A; border-color: #E55A5A; }
                     .color-suministro { color: #007791; border-color: #007791; }
                     .color-manufactura { color: #6C5B7B; border-color: #6C5B7B; }
@@ -346,7 +346,6 @@
                                                 <li><a href="/aplicaciones/ventas">CRM</a></li>
                                                 <li><a href="/aplicaciones/ventas">Ventas y cotizaciones</a></li>
                                                 <li><a href="/verticales/comercio-electronico">Comercio electrónico</a></li>
-                                                <li><a href="/precios">Suscripciones recurrentes</a></li>
                                                 <li><a href="/verticales/bodegas">POS para bodegas</a></li>
                                                 <li><a href="/verticales/restaurante">POS para restaurantes</a></li>
                                                 <li><a href="/aplicaciones/ventas">Fuerza de ventas</a></li>
@@ -359,7 +358,7 @@
                                             <ul class="odoo-links-list">
                                                 <li><a href="/aplicaciones/inventario">Gestión de inventario</a></li>
                                                 <li><a href="/aplicaciones/inventario">Kardex valorizado</a></li>
-                                                <li><a href="/aplicaciones/guias-remision">Guías de remisión electrónicas GRE</a></li>
+                                                <li><a href="/aplicaciones/guias-remision">Guías de remisión electrónicas</a></li>
                                                 <li><a href="/aplicaciones/compras">Compras</a></li>
                                                 <li><a href="/aplicaciones/inventario">Múltiples almacenes</a></li>
                                                 <li><a href="/aplicaciones/inventario">Trazabilidad de productos</a></li>
