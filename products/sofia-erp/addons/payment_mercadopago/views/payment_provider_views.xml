@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="payment_provider_form_mercadopago" model="ir.ui.view">
+        <field name="name">MercadoPago Provider Form</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='provider_credentials']" position="inside">
+                <group invisible="provider != 'mercadopago'">
+                    <field name="mercadopago_publishable_key" required="provider == 'mercadopago' and state != 'disabled'"/>
+                    <field name="mercadopago_access_token" password="True" required="provider == 'mercadopago' and state != 'disabled'"/>
+                    <field name="mercadopago_site_id" required="provider == 'mercadopago'"/>
+                    <field name="mercadopago_currency_id"/>
+                </group>
+            </xpath>
+            <xpath expr="//group[@name='provider_credentials']" position="after">
+                <div class="alert alert-info" role="alert" invisible="provider != 'mercadopago'">
+                    <h5 class="alert-heading font-weight-bold">Configuración de Credenciales Mercado Pago:</h5>
+                    <p class="mb-1">
+                        Puedes obtener tus credenciales (Public Key y Access Token) en el portal de desarrolladores:
+                        <a href="https://www.mercadopago.com.pe/developers/panel/app" target="_blank" class="font-weight-bold">
+                            Panel de Mercado Pago Developers ↗
+                        </a>
+                    </p>
+                    <ul class="mb-2">
+                        <li>En estado <strong>Modo de Prueba (Test)</strong>, usa tus credenciales que inician con <code>TEST-...</code>.</li>
+                        <li>En estado <strong>Habilitado (Producción)</strong>, usa tus credenciales oficiales de producción.</li>
+                    </ul>
+                    <hr class="my-2"/>
+                    <div invisible="state != 'test'">
+                        <p class="mb-1"><strong>Generador de Usuarios Sandbox:</strong> Mercado Pago exige que el comprador sea un usuario de prueba distinto al vendedor.</p>
+                        <button name="action_create_mercadopago_test_user" class="btn btn-primary btn-sm" type="object" icon="fa-user-plus">
+                            Crear Usuario Comprador de Prueba (Sandbox)
+                        </button>
+                    </div>
+                </div>
+            </xpath>
+            <group name="payment_state" position="after">
+                <group string="Configuración de Ítem y Catálogo" invisible="provider != 'mercadopago'">
+                    <field name="mercadopago_item_id"/>
+                    <field name="mercadopago_item_title"/>
+                    <field name="mercadopago_item_description"/>
+                    <field name="mercadopago_item_category"/>
+                    <field name="mercadopago_capture_method"/>
+                </group>
+            </group>
+        </field>
+    </record>
+
+    <record id="payment_token_form_mercadopago" model="ir.ui.view">
+        <field name="name">MercadoPago Token Form</field>
+        <field name="model">payment.token</field>
+        <field name="inherit_id" ref="payment.payment_token_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='provider_ref']" position="after">
+                <field name="email"/>
+                <field name="customer_id"/>
+                <field name="bin"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

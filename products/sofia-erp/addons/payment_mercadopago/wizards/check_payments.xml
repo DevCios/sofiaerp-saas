@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="check_payments_view_form" model="ir.ui.view">
+        <field name="name">check_payments.view.form</field>
+        <field name="model">payment.mercadopago.check_payment</field>
+        <field name="arch" type="xml">
+            <form string="Conciliación de Pagos Mercado Pago">
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <label for="provider_id" string="Proveedor"/>
+                        <h1><field name="provider_id" options="{'no_create': True}"/></h1>
+                    </div>
+                    <group col="4">
+                        <field name="confirmed"/>
+                        <field name="no_match"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <notebook>
+                        <page string="Pagos Obtenidos de Mercado Pago">
+                            <field name="line_ids">
+                                <tree create="false" delete="false">
+                                    <field name="mp_id"/>
+                                    <field name="mp_external_reference"/>
+                                    <field name="mp_amount" widget="monetary"/>
+                                    <field name="mp_state"/>
+                                    <field name="transaction_id"/>
+                                    <field name="transaction_state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Consultar Pagos en Mercado Pago" type="object" name="action_search_payments" class="btn-primary"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="check_payments_action" model="ir.actions.act_window">
+        <field name="name">Conciliar Pagos Mercado Pago</field>
+        <field name="res_model">payment.mercadopago.check_payment</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="action_info_check_payments_mercadopago" model="ir.actions.server">
+        <field name="name">Conciliar con Mercado Pago</field>
+        <field name="model_id" ref="payment.model_payment_provider"/>
+        <field name="state">code</field>
+        <field name="code">
+action = {
+    'type': 'ir.actions.act_window',
+    'res_model': 'payment.mercadopago.check_payment',
+    'target': 'new',
+    'views': [(env.ref('payment_mercadopago.check_payments_view_form').id, 'form')],
+}
+        </field>
+        <field name="binding_model_id" ref="payment.model_payment_provider"/>
+        <field name="binding_type">action</field>
+    </record>
+</odoo>

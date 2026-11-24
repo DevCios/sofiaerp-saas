@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="inline_form">
+        <div t-attf-id="o_mercadopago_form_{{provider_id}}" class="o_mercadopago_form p-3 border rounded bg-light">
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">Correo Electrónico del Pagador</label>
+                <input id="email" type="email" placeholder="correo@ejemplo.com" name="email" required="required" class="form-control" data-checkout="payerEmail"/>
+            </div>
+
+            <!-- Número de Tarjeta -->
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">Número de Tarjeta</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-credit-card"></i></span>
+                    <input type="tel" t-attf-id="o_mercadopago_card_number_{{provider_id}}" placeholder="4242 4242 4242 4242" required="required" maxlength="19" class="form-control" data-checkout="cardNumber"/>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <!-- Vencimiento -->
+                <div class="col-sm-7">
+                    <label class="form-label font-weight-bold">Vencimiento</label>
+                    <div class="input-group">
+                        <input type="number" t-attf-id="o_mercadopago_month_{{provider_id}}" placeholder="MM" min="1" max="12" required="required" class="form-control text-center" data-checkout="cardExpirationMonth"/>
+                        <span class="input-group-text">/</span>
+                        <input type="number" t-attf-id="o_mercadopago_year_{{provider_id}}" placeholder="AA" min="24" max="99" required="required" class="form-control text-center" data-checkout="cardExpirationYear"/>
+                    </div>
+                </div>
+                <!-- Código de Seguridad (CVV) -->
+                <div class="col-sm-5">
+                    <label class="form-label font-weight-bold">CVV</label>
+                    <div class="input-group">
+                        <input type="password" t-attf-id="o_mercadopago_code_{{provider_id}}" placeholder="123" maxlength="4" required="required" class="form-control text-center" data-checkout="securityCode"/>
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Titular de la Tarjeta -->
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">Titular de la Tarjeta</label>
+                <input type="text" t-attf-id="o_mercadopago_holder_{{provider_id}}" placeholder="Como figura en el plástico (ej. APRO)" required="required" class="form-control" data-checkout="cardholderName"/>
+                <small class="form-text text-muted">Para pruebas en Sandbox use <strong>APRO</strong> para pago aprobado o <strong>CONT</strong> para rechazo.</small>
+            </div>
+
+            <!-- Tipo y Número de Documento (Perú: DNI / RUC) -->
+            <div class="row mb-3">
+                <div class="col-sm-5">
+                    <label class="form-label font-weight-bold">Tipo Doc.</label>
+                    <select t-attf-id="o_mercadopago_doc_type_{{provider_id}}" class="form-select form-control" data-checkout="docType">
+                        <option value="DNI" selected="selected">DNI (8 dígitos)</option>
+                        <option value="RUC">RUC (11 dígitos)</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                    </select>
+                </div>
+                <div class="col-sm-7">
+                    <label class="form-label font-weight-bold">Número de Documento</label>
+                    <input type="text" t-attf-id="o_mercadopago_doc_number_{{provider_id}}" placeholder="Número de Documento" maxlength="15" required="required" class="form-control" data-checkout="docNumber"/>
+                </div>
+            </div>
+
+            <!-- Cuotas (Installments) -->
+            <div class="mb-3">
+                <label class="form-label font-weight-bold">Cuotas</label>
+                <select t-attf-id="o_mercadopago_installments_{{provider_id}}" class="form-select form-control" data-checkout="installments">
+                    <option value="1" selected="selected">1 cuota (pago directo)</option>
+                    <option value="3">3 cuotas</option>
+                    <option value="6">6 cuotas</option>
+                    <option value="12">12 cuotas</option>
+                </select>
+            </div>
+
+            <input type="hidden" t-attf-id="o_mercadopago_payment_method_{{provider_id}}" data-checkout="paymentMethodId" value="visa"/>
+        </div>
+    </template>
+</odoo>
