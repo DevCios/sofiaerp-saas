@@ -131,6 +131,76 @@
                         font-size: 0.95rem;
                         flex-shrink: 0;
                     }
+
+                    /* Hero y Barra de Beneficios Inmunes a Caché */
+                    .sofia-page-hero {
+                        background: #FFFFFF;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 3.5rem !important;
+                        text-align: center;
+                    }
+                    .sofia-page-title {
+                        font-size: clamp(2.35rem, 5vw, 3.85rem);
+                        font-weight: 900;
+                        letter-spacing: -0.04em;
+                        line-height: 1.15;
+                        color: #0F172A;
+                        max-width: 950px;
+                        margin: 0 auto 1.25rem auto;
+                    }
+                    .hero-badge-purple {
+                        background-color: #7D1A6A;
+                        color: #FFFFFF !important;
+                        padding: 0.12em 0.55em;
+                        border-radius: 9999px;
+                        display: inline-block;
+                        font-weight: 800;
+                        letter-spacing: -0.02em;
+                        box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25);
+                    }
+                    .sofia-page-subtitle {
+                        font-size: clamp(1.15rem, 2vw, 1.45rem);
+                        font-weight: 600;
+                        color: #475569;
+                        max-width: 720px;
+                        margin: 0 auto 2.25rem auto;
+                        line-height: 1.4;
+                    }
+                    .hero-benefits-strip {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        gap: 2.25rem !important;
+                        margin-top: 2.5rem !important;
+                        margin-bottom: 0.75rem !important;
+                        flex-wrap: wrap !important;
+                    }
+                    .hero-benefit-item {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        gap: 0.65rem !important;
+                        font-size: 1rem !important;
+                        font-weight: 700 !important;
+                        color: #0F172A !important;
+                    }
+                    .hero-benefit-icon {
+                        width: 24px !important;
+                        height: 24px !important;
+                        min-width: 24px !important;
+                        max-width: 24px !important;
+                        flex-shrink: 0 !important;
+                        display: inline-block !important;
+                    }
+                    .hero-benefit-divider {
+                        width: 1px !important;
+                        height: 24px !important;
+                        background-color: #E2E8F0 !important;
+                        display: inline-block !important;
+                    }
+                    @media (max-width: 768px) {
+                        .hero-benefit-divider { display: none !important; }
+                        .hero-benefits-strip { gap: 1.25rem !important; }
+                    }
                 </style>
 
                 <!-- Hero Precios -->
@@ -146,21 +216,21 @@
                         <!-- Barra de Beneficios / Confianza -->
                         <div class="hero-benefits-strip">
                             <div class="hero-benefit-item">
-                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                                 </svg>
                                 <span>SUNAT UBL 2.1 Ilimitado</span>
                             </div>
                             <div class="hero-benefit-divider"></div>
                             <div class="hero-benefit-item">
-                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                     <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
                                 </svg>
                                 <span>Copia en Google Drive</span>
                             </div>
                             <div class="hero-benefit-divider"></div>
                             <div class="hero-benefit-item">
-                                <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                     <polyline points="9 12 11 14 15 10"></polyline>
                                 </svg>

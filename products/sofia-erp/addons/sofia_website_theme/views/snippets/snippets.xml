@@ -283,21 +283,21 @@
                 <div class="d-block text-center">
                     <div class="hero-benefits-strip">
                         <div class="hero-benefit-item">
-                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                             </svg>
                             <span>Rápido de implementar</span>
                         </div>
                         <div class="hero-benefit-divider"></div>
                         <div class="hero-benefit-item">
-                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                 <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
                             </svg>
                             <span>Todo en la nube</span>
                         </div>
                         <div class="hero-benefit-divider"></div>
                         <div class="hero-benefit-item">
-                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="hero-benefit-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 24px !important; height: 24px !important; min-width: 24px !important; max-width: 24px !important; display: inline-block !important;">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                                 <polyline points="9 12 11 14 15 10"></polyline>
                             </svg>
