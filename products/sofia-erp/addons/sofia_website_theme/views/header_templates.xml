@@ -116,19 +116,19 @@
                         color: #000000 !important;
                     }
                     .odoo-trial-btn {
-                        background-color: #714B67 !important;
+                        background-color: #7D1A6A !important;
                         color: #FFFFFF !important;
                         text-decoration: none !important;
                         font-size: 0.925rem;
                         font-weight: 600;
-                        padding: 0.55rem 1.35rem;
-                        border-radius: 6px;
+                        padding: 0.55rem 1.45rem;
+                        border-radius: 9999px !important;
                         display: inline-block;
-                        box-shadow: 0 1px 3px rgba(113, 75, 103, 0.2);
+                        box-shadow: 0 1px 3px rgba(125, 26, 106, 0.25);
                         transition: background-color 0.15s ease, transform 0.1s ease;
                     }
                     .odoo-trial-btn:hover {
-                        background-color: #58394F !important;
+                        background-color: #631454 !important;
                         transform: translateY(-1px);
                     }
 
@@ -414,9 +414,9 @@
                             <a class="odoo-nav-link" href="/blog">Comunidad</a>
                         </li>
 
-                        <!-- 4. Precios -->
+                        <!-- 4. Planes -->
                         <li class="odoo-nav-item">
-                            <a class="odoo-nav-link" href="/precios">Precios</a>
+                            <a class="odoo-nav-link" href="/precios">Planes</a>
                         </li>
 
                         <!-- 5. Ayuda / Soporte -->
@@ -427,8 +427,8 @@
 
                     <!-- Botones Derecha -->
                     <div class="odoo-nav-actions">
-                        <a href="/login" class="odoo-login-btn">Inicia sesión</a>
-                        <a href="/precios" class="odoo-trial-btn">Pruébalo gratis</a>
+                        <a href="/login" class="odoo-login-btn">Acceder</a>
+                        <a href="/precios" class="odoo-trial-btn">Crear cuenta gratis</a>
                     </div>
                 </div>
 

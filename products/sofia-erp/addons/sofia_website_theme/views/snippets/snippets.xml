@@ -12,88 +12,108 @@
                     overflow: hidden;
                 }
                 
-                /* Título Principal Expresivo Estilo Odoo */
+                /* Título Principal Expresivo */
                 .odoo-hero-title {
-                    font-size: clamp(2.35rem, 5.5vw, 4.25rem);
-                    font-weight: 800;
+                    font-size: clamp(2.65rem, 6.2vw, 4.65rem);
+                    font-weight: 900;
                     letter-spacing: -0.04em;
-                    line-height: 1.18;
-                    color: #1F2937;
+                    line-height: 1.15;
+                    color: #0F172A;
                     max-width: 950px;
                     margin: 0 auto 1.5rem auto;
                 }
 
-                /* Resaltador Amarillo Orgánico (Firma Visual de Odoo) */
-                .highlight-badge-yellow {
-                    background-color: #FBBF24;
-                    color: #1F2937;
-                    padding: 0.15em 0.45em;
+                /* Resaltador Púrpura SOFIA ERP */
+                .hero-badge-purple {
+                    background-color: #7D1A6A;
+                    color: #FFFFFF;
+                    padding: 0.1em 0.55em;
                     border-radius: 9999px;
                     display: inline-block;
-                    transform: rotate(-1deg);
-                    box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
-                }
-
-                /* Subrayado Curvo Azul */
-                .highlight-underline-blue {
-                    position: relative;
-                    display: inline-block;
-                }
-                .highlight-underline-blue::after {
-                    content: "";
-                    position: absolute;
-                    left: -2%;
-                    bottom: -6px;
-                    width: 104%;
-                    height: 8px;
-                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
-                    background-size: 100% 100%;
+                    font-weight: 800;
+                    letter-spacing: -0.02em;
+                    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25);
                 }
 
                 /* Subtítulo Descriptivo */
                 .odoo-hero-subtitle {
-                    font-size: clamp(1.15rem, 2vw, 1.45rem);
-                    font-weight: 500;
-                    color: #4B5563;
+                    font-size: clamp(1.2rem, 2.2vw, 1.55rem);
+                    font-weight: 600;
+                    color: #475569;
                     max-width: 720px;
-                    margin: 0 auto 2.5rem auto;
-                    line-height: 1.5;
+                    margin: 0 auto 2.25rem auto;
+                    line-height: 1.4;
                 }
 
-                /* Botones de Acción Estilo Odoo */
-                .odoo-btn-primary {
-                    background-color: #714B67 !important;
+                /* Botones de Acción Muestra de Diseño */
+                .sofia-btn-primary {
+                    background-color: #7D1A6A !important;
                     color: #FFFFFF !important;
-                    font-size: 1.05rem !important;
+                    font-size: 1.075rem !important;
+                    font-weight: 700 !important;
+                    padding: 0.85rem 2.5rem !important;
+                    border-radius: 12px !important;
+                    text-decoration: none !important;
+                    display: inline-block !important;
+                    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.3) !important;
+                    transition: all 0.2s ease !important;
+                }
+                .sofia-btn-primary:hover {
+                    background-color: #631454 !important;
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 6px 20px rgba(125, 26, 106, 0.4) !important;
+                }
+
+                .sofia-btn-secondary {
+                    background-color: #FFFFFF !important;
+                    color: #0F172A !important;
+                    font-size: 1.075rem !important;
                     font-weight: 700 !important;
                     padding: 0.85rem 2.25rem !important;
-                    border-radius: 8px !important;
+                    border-radius: 12px !important;
                     text-decoration: none !important;
                     display: inline-block !important;
-                    box-shadow: 0 4px 14px rgba(113, 75, 103, 0.3) !important;
+                    border: 1.5px solid #7D1A6A !important;
                     transition: all 0.2s ease !important;
                 }
-                .odoo-btn-primary:hover {
-                    background-color: #58394F !important;
+                .sofia-btn-secondary:hover {
+                    background-color: #FAF5FF !important;
+                    color: #7D1A6A !important;
                     transform: translateY(-2px) !important;
-                    box-shadow: 0 6px 20px rgba(113, 75, 103, 0.4) !important;
                 }
 
-                .odoo-btn-secondary {
-                    background-color: #F3F4F6 !important;
-                    color: #374151 !important;
-                    font-size: 1.05rem !important;
-                    font-weight: 600 !important;
-                    padding: 0.85rem 2rem !important;
-                    border-radius: 8px !important;
-                    text-decoration: none !important;
-                    display: inline-block !important;
-                    border: 1px solid #E5E7EB !important;
-                    transition: all 0.2s ease !important;
+                /* Barra de Beneficios / Confianza */
+                .hero-benefits-strip {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 2.25rem;
+                    margin-top: 2.75rem;
+                    margin-bottom: 0.75rem;
+                    flex-wrap: wrap;
                 }
-                .odoo-btn-secondary:hover {
-                    background-color: #E5E7EB !important;
-                    color: #111827 !important;
+                .hero-benefit-item {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.65rem;
+                    font-size: 1.025rem;
+                    font-weight: 700;
+                    color: #0F172A;
+                }
+                .hero-benefit-icon {
+                    width: 26px;
+                    height: 26px;
+                    flex-shrink: 0;
+                }
+                .hero-benefit-divider {
+                    width: 1px;
+                    height: 28px;
+                    background-color: #E2E8F0;
+                    display: inline-block;
+                }
+                @media (max-width: 768px) {
+                    .hero-benefit-divider { display: none; }
+                    .hero-benefits-strip { gap: 1.25rem; }
                 }
 
                 /* Anotación con Flecha Manuscrita */
@@ -245,35 +265,50 @@
             </style>
 
             <div class="container">
-                <!-- Título Heroico Principal -->
+                <!-- Título Heroico Principal (Muestra Exacta de Diseño) -->
                 <h1 class="odoo-hero-title">
-                    Gestiona tu negocio desde<br class="d-none d-md-inline"/> un solo <span class="highlight-badge-yellow">software</span>
+                    Control total<br class="d-none d-md-inline"/> para <span class="hero-badge-purple">tu negocio</span>
                 </h1>
 
-                <!-- Subtítulo Expresivo -->
+                <!-- Subtítulo Limpio y Confiable -->
                 <p class="odoo-hero-subtitle">
-                    ¡Eficiente y a un <span class="highlight-underline-blue">buen precio</span>!
+                    ¡Plataforma sencilla y confiable!
                 </p>
 
                 <!-- Botones Duales de Conversión -->
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
-                    <a href="/precios" class="odoo-btn-primary">
-                        Comienza ahora desde S/ 9.90
+                    <a href="/precios" class="sofia-btn-primary">
+                        Empieza gratis
                     </a>
-                    <a href="/soporte" class="odoo-btn-secondary">
-                        Contacta a un consultor
+                    <a href="/soporte" class="sofia-btn-secondary">
+                        Habla con un asesor
                     </a>
                 </div>
 
-                <!-- Anotación Manuscrita con Flecha -->
-                <div class="d-block text-center mt-3">
-                    <div class="hero-annotation-wrapper">
-                        <span class="hero-annotation-text">
-                            <svg class="hero-annotation-arrow" viewBox="0 0 40 25">
-                                <path d="M5,20 Q20,5 35,8 M28,3 L36,8 L30,16"/>
+                <!-- Barra de Beneficios de Confianza -->
+                <div class="d-block text-center">
+                    <div class="hero-benefits-strip">
+                        <div class="hero-benefit-item">
+                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                             </svg>
-                            <span>Desde <strong>S/ 9.90 al mes</strong> • Boletas, facturas y guías de remisión electrónica</span>
-                        </span>
+                            <span>Rápido de implementar</span>
+                        </div>
+                        <div class="hero-benefit-divider"></div>
+                        <div class="hero-benefit-item">
+                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                            </svg>
+                            <span>Todo en la nube</span>
+                        </div>
+                        <div class="hero-benefit-divider"></div>
+                        <div class="hero-benefit-item">
+                            <svg class="hero-benefit-icon" viewBox="0 0 24 24" fill="none" stroke="#7D1A6A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                <polyline points="9 12 11 14 15 10"></polyline>
+                            </svg>
+                            <span>Soporte en Perú</span>
+                        </div>
                     </div>
                 </div>
 
