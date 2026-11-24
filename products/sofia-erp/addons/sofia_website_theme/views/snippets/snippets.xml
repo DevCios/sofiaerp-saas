@@ -138,9 +138,9 @@
                     .hero-benefits-strip { gap: 1.25rem; }
                 }
 
-                /* Suite de Aplicaciones SOFIA ERP (App Hub) */
+                /* Suite de Aplicaciones SOFIA ERP (App Hub Launchpad Estilo Odoo 20) */
                 .sofia-apps-hub-section {
-                    background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+                    background: radial-gradient(circle at 50% 0%, #F5F3FF 0%, #FAF5FF 35%, #F8FAFC 80%);
                     padding-top: 4.5rem !important;
                     padding-bottom: 5.5rem !important;
                     position: relative;
@@ -151,7 +151,7 @@
                     flex-wrap: wrap;
                     justify-content: center;
                     gap: 0.65rem;
-                    margin-bottom: 3rem;
+                    margin-bottom: 3.25rem;
                 }
                 .app-filter-btn {
                     background: #FFFFFF;
@@ -165,8 +165,8 @@
                     transition: all 0.2s ease;
                     display: inline-flex;
                     align-items: center;
-                    gap: 0.45rem;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                    gap: 0.5rem;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
                 }
                 .app-filter-btn:hover {
                     background: #F1F5F9;
@@ -177,79 +177,80 @@
                     background: #7D1A6A !important;
                     color: #FFFFFF !important;
                     border-color: #7D1A6A !important;
-                    box-shadow: 0 4px 12px rgba(125, 26, 106, 0.25);
+                    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25);
                 }
                 .app-filter-btn.active .app-filter-dot {
                     background-color: #FFFFFF !important;
                 }
                 .app-filter-dot {
-                    width: 8px;
-                    height: 8px;
+                    width: 9px;
+                    height: 9px;
                     border-radius: 50%;
                     display: inline-block;
                 }
                 .apps-grid-container {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-                    gap: 1.25rem;
+                    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+                    gap: 1.75rem 1.25rem;
                     max-width: 1220px;
                     margin: 0 auto;
                 }
                 .app-tile-card {
-                    background: #FFFFFF;
-                    border: 1px solid #E2E8F0;
-                    border-radius: 18px;
-                    padding: 1.5rem 0.85rem 1.15rem 0.85rem;
+                    background: transparent;
+                    border: none;
+                    padding: 0.75rem 0.5rem;
                     text-align: center;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     justify-content: flex-start;
                     text-decoration: none !important;
-                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-                    position: relative;
+                    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    cursor: pointer;
                 }
                 .app-tile-card:hover {
                     transform: translateY(-5px);
-                    border-color: #CBD5E1;
-                    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
                 }
-                .app-tile-icon {
-                    width: 58px;
-                    height: 58px;
-                    border-radius: 16px;
+                .app-tile-squircle {
+                    width: 78px;
+                    height: 78px;
+                    background: #FFFFFF;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+                    border: 1px solid rgba(226, 232, 240, 0.8);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    margin-bottom: 0.85rem;
-                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-                    transition: transform 0.2s ease;
+                    margin-bottom: 0.65rem;
+                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
                 }
-                .app-tile-card:hover .app-tile-icon {
-                    transform: scale(1.08);
+                .app-tile-card:hover .app-tile-squircle {
+                    transform: scale(1.05);
+                    box-shadow: 0 12px 24px rgba(125, 26, 106, 0.12), 0 3px 6px rgba(0, 0, 0, 0.04);
+                    border-color: #CBD5E1;
                 }
                 .app-tile-title {
-                    font-size: 0.9rem;
-                    font-weight: 700;
+                    font-size: 0.865rem;
+                    font-weight: 600;
                     color: #0F172A;
                     line-height: 1.25;
-                    margin-bottom: 0.4rem;
+                    margin-bottom: 0.35rem;
+                    max-width: 135px;
                 }
                 .app-tile-tag {
-                    font-size: 0.65rem;
+                    font-size: 0.625rem;
                     font-weight: 700;
                     text-transform: uppercase;
-                    letter-spacing: 0.04em;
+                    letter-spacing: 0.03em;
                     padding: 0.15rem 0.55rem;
                     border-radius: 9999px;
                     margin-top: auto;
                 }
-                .tag-contabilidad { background: #CCFBF1; color: #007775; }
-                .tag-ventas { background: #FFE4E6; color: #BE123C; }
-                .tag-suministro { background: #E0F2FE; color: #0369A1; }
-                .tag-manufactura { background: #F3E8FF; color: #6B21A8; }
-                .tag-servicios { background: #FFEDD5; color: #C2410C; }
+                .tag-contabilidad { background: #E6F7F7; color: #007775; }
+                .tag-ventas { background: #FEE8E8; color: #BE123C; }
+                .tag-suministro { background: #E6F2F5; color: #005B6F; }
+                .tag-manufactura { background: #F1EFF5; color: #554462; }
+                .tag-servicios { background: #FEF3E9; color: #B45309; }
                 .bento-card {
                     background: #FFFFFF;
                     border: 1px solid #E2E8F0;
@@ -325,6 +326,7 @@
         </section>
 
         <!-- 2. Sección Siguiente (Al hacer Scroll): Suite de Aplicaciones SOFIA ERP -->
+        <!-- 2. Sección Siguiente: Suite de Aplicaciones SOFIA ERP (Launchpad Odoo 20) -->
         <section class="sofia-apps-hub-section text-center position-relative" id="suite-aplicaciones">
             <div class="container">
                 <!-- Encabezado de la Suite -->
@@ -338,284 +340,423 @@
                     </p>
                 </div>
 
-                <!-- Barra de Filtros por Categoría -->
+                <!-- Barra de Filtrado por Categoría -->
                 <div class="apps-filter-bar">
                     <button type="button" class="app-filter-btn active" data-filter="all">
-                        Todas las aplicaciones (29)
+                        Todas las aplicaciones (30)
                     </button>
                     <button type="button" class="app-filter-btn" data-filter="contabilidad">
-                        <span class="app-filter-dot" style="background:#00A09D;"></span> Contabilidad
+                        <span class="app-filter-dot" style="background:#00A09D;"></span> Contabilidad (6)
                     </button>
                     <button type="button" class="app-filter-btn" data-filter="ventas">
-                        <span class="app-filter-dot" style="background:#E55A5A;"></span> Ventas &amp; POS
+                        <span class="app-filter-dot" style="background:#E55A5A;"></span> Ventas &amp; POS (6)
                     </button>
                     <button type="button" class="app-filter-btn" data-filter="suministro">
-                        <span class="app-filter-dot" style="background:#007791;"></span> Cadena de Suministro
+                        <span class="app-filter-dot" style="background:#007791;"></span> Cadena de Suministro (6)
                     </button>
                     <button type="button" class="app-filter-btn" data-filter="manufactura">
-                        <span class="app-filter-dot" style="background:#6C5B7B;"></span> Manufactura
+                        <span class="app-filter-dot" style="background:#6C5B7B;"></span> Manufactura (6)
                     </button>
                     <button type="button" class="app-filter-btn" data-filter="servicios">
-                        <span class="app-filter-dot" style="background:#E67E22;"></span> Servicios
+                        <span class="app-filter-dot" style="background:#E67E22;"></span> Servicios (6)
                     </button>
                 </div>
 
-                <!-- Matriz de Aplicaciones (App Tiles Squircles Estilo SOFIA ERP) -->
-                <div class="apps-grid-container" id="appsGrid">
-                    
-                    <!-- 1. Contabilidad -->
-                    <a href="/aplicaciones/facturacion-electronica" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #00A09D 0%, #007775 100%);">
-                            <span style="font-size: 1.65rem;">📄</span>
+                <!-- Grid de Aplicaciones (Squircles Estilo Odoo 20) -->
+                <div class="apps-grid-container">
+
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M10 8C10 5.79086 11.7909 4 14 4H26L34 12V36C34 38.2091 32.2091 40 30 40H14C11.7909 40 10 38.2091 10 36V8Z" fill="#0EA5E9"/>
+            <path d="M26 4V12H34L26 4Z" fill="#0284C7"/>
+            <path d="M10 34C10 34 16 32 22 34C28 36 34 34 34 34V37C34 38.6569 32.6569 40 31 40H13C11.3431 40 10 38.6569 10 37V34Z" fill="#0369A1"/>
+            <text x="22" y="27" font-family="'Inter', sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">$</text>
+        </svg>
                         </div>
                         <div class="app-tile-title">Facturación electrónica</div>
-                        <div class="app-tile-tag tag-contabilidad">SUNAT UBL 2.1</div>
+                        <div class="app-tile-tag tag-contabilidad">UBL 2.1 SUNAT</div>
                     </a>
 
-                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);">
-                            <span style="font-size: 1.65rem;">📊</span>
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M28 8L34 14C37 17 37 22 34 25L24 35C21 38 16 38 13 35L8 30L20 18C23 15 25 11 28 8Z" fill="#0284C7"/>
+            <path d="M16 36L10 30C7 27 7 22 10 19L20 9C23 6 28 6 31 9L36 14L24 26C21 29 19 33 16 36Z" fill="#7D1A6A"/>
+            <circle cx="22" cy="22" r="3.5" fill="#FFFFFF" opacity="0.95"/>
+        </svg>
                         </div>
-                        <div class="app-tile-title">Registros SIRE</div>
+                        <div class="app-tile-title">Registros Electrónicos SIRE</div>
                         <div class="app-tile-tag tag-contabilidad">RVIE &amp; RCE</div>
                     </a>
 
-                    <a href="/aplicaciones/gastos" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
-                            <span style="font-size: 1.65rem;">🧾</span>
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="12" width="28" height="20" rx="4" fill="#00A09D"/>
+            <path d="M8 17H36V22H8V17Z" fill="#007791"/>
+            <circle cx="28" cy="25" r="4" fill="#FBBF24"/>
+            <circle cx="28" cy="25" r="2" fill="#FFFFFF"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Gestión de gastos</div>
-                        <div class="app-tile-tag tag-contabilidad">Rendición</div>
+                        <div class="app-tile-tag tag-contabilidad">Rendición &amp; Caja</div>
                     </a>
 
-                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);">
-                            <span style="font-size: 1.65rem;">💳</span>
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="9" width="28" height="26" rx="6" fill="#00A09D"/>
+            <circle cx="22" cy="22" r="8" fill="#FFFFFF" opacity="0.25"/>
+            <path d="M16 22L20.5 26.5L28 17.5" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Cuentas por cobrar</div>
-                        <div class="app-tile-tag tag-contabilidad">Cobranzas</div>
+                        <div class="app-tile-tag tag-contabilidad">Cobranzas &amp; Mora</div>
                     </a>
 
-                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);">
-                            <span style="font-size: 1.65rem;">💼</span>
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="9" width="28" height="26" rx="6" fill="#6C5B7B"/>
+            <rect x="8" y="16" width="28" height="7" fill="#E55A5A"/>
+            <circle cx="15" cy="28" r="2.5" fill="#FBBF24"/>
+            <circle cx="23" cy="28" r="2.5" fill="#FFFFFF" opacity="0.8"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Cuentas por pagar</div>
-                        <div class="app-tile-tag tag-contabilidad">Proveedores</div>
+                        <div class="app-tile-tag tag-contabilidad">Pagos a Proveedores</div>
                     </a>
 
-                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);">
-                            <span style="font-size: 1.65rem;">🏦</span>
+                    <a href="/login" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="8" width="28" height="28" rx="7" fill="#007791"/>
+            <circle cx="22" cy="22" r="7.5" stroke="#FBBF24" stroke-width="3" fill="#005B6F"/>
+            <circle cx="22" cy="22" r="2.5" fill="#FFFFFF"/>
+            <line x1="22" y1="11" x2="22" y2="14" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="22" y1="30" x2="22" y2="33" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Caja y bancos</div>
-                        <div class="app-tile-tag tag-contabilidad">Conciliación</div>
+                        <div class="app-tile-tag tag-contabilidad">Conciliación Bancaria</div>
                     </a>
 
-                    <!-- 2. Ventas -->
-                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);">
-                            <span style="font-size: 1.65rem;">🤝</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M8 18L18 8C20 6 23 6 25 8L34 17L28 23L22 17L14 24L8 18Z" fill="#06B6D4"/>
+            <path d="M36 26L26 36C24 38 21 38 19 36L10 27L16 21L22 27L30 20L36 26Z" fill="#7D1A6A"/>
+            <path d="M18 19L24 25L28 21L22 15L18 19Z" fill="#0D9488"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">CRM</div>
-                        <div class="app-tile-tag tag-ventas">Oportunidades</div>
+                        <div class="app-tile-tag tag-ventas">Pipeline &amp; Leads</div>
                     </a>
 
-                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E55A5A 0%, #DC2626 100%);">
-                            <span style="font-size: 1.65rem;">📈</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="9" y="18" width="7.5" height="18" rx="3.75" fill="#7D1A6A"/>
+            <rect x="18.25" y="12" width="7.5" height="24" rx="3.75" fill="#E55A5A"/>
+            <rect x="27.5" y="6" width="7.5" height="30" rx="3.75" fill="#F59E0B"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Ventas y cotizaciones</div>
-                        <div class="app-tile-tag tag-ventas">WhatsApp &amp; PDF</div>
+                        <div class="app-tile-tag tag-ventas">Cotizaciones &amp; Pedidos</div>
                     </a>
 
-                    <a href="/verticales/comercio-electronico" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
-                            <span style="font-size: 1.65rem;">🌐</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M10 20C10 13.3726 15.3726 8 22 8C28.6274 8 34 13.3726 34 20C28 22 24 16 18 18C14 19 12 21 10 20Z" fill="#0D9488"/>
+            <path d="M34 24C34 30.6274 28.6274 36 22 36C15.3726 36 10 30.6274 10 24C16 22 20 28 26 26C30 25 32 23 34 24Z" fill="#E55A5A"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Comercio electrónico</div>
-                        <div class="app-tile-tag tag-ventas">Tienda Online</div>
+                        <div class="app-tile-tag tag-ventas">Tienda Online &amp; B2B</div>
                     </a>
 
-                    <a href="/verticales/bodegas" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);">
-                            <span style="font-size: 1.65rem;">🏪</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="9" y="8" width="26" height="17" rx="4" fill="#E55A5A"/>
+            <rect x="13" y="12" width="18" height="9" rx="2" fill="#FFFFFF"/>
+            <path d="M7 25H37L35 34C35 35.1046 34.1046 36 33 36H11C9.89543 36 9 35.1046 9 34L7 25Z" fill="#7D1A6A"/>
+            <rect x="14" y="29" width="16" height="3.5" rx="1.5" fill="#FBBF24"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">POS para bodegas</div>
-                        <div class="app-tile-tag tag-ventas">Código de Barras</div>
+                        <div class="app-tile-tag tag-ventas">Offline &amp; Táctil</div>
                     </a>
 
-                    <a href="/verticales/restaurante" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
-                            <span style="font-size: 1.65rem;">🍽️</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="14" fill="#FEE2E2"/>
+            <circle cx="22" cy="22" r="10" stroke="#E55A5A" stroke-width="2.5" fill="#FFFFFF"/>
+            <path d="M17 16V27M15 16V20M19 16V20" stroke="#7D1A6A" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M27 16V27M27 16C28.5 16 29 17.5 29 19.5C29 21.5 28 22 27 22" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">POS para restaurantes</div>
-                        <div class="app-tile-tag tag-ventas">Comandas &amp; Mesas</div>
+                        <div class="app-tile-tag tag-ventas">Mesas &amp; Comandas</div>
                     </a>
 
-                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);">
-                            <span style="font-size: 1.65rem;">🚀</span>
+                    <a href="/login" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="11" y="9" width="24" height="28" rx="6" fill="#E55A5A" opacity="0.3"/>
+            <rect x="9" y="7" width="24" height="28" rx="6" fill="#E55A5A"/>
+            <circle cx="21" cy="17" r="4.5" fill="#FFFFFF"/>
+            <path d="M14 29C14 25.5 17 24 21 24C25 24 28 25.5 28 29V31H14V29Z" fill="#FFFFFF"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Fuerza de ventas</div>
-                        <div class="app-tile-tag tag-ventas">Móvil en Ruta</div>
+                        <div class="app-tile-tag tag-ventas">Ventas en Campo</div>
                     </a>
 
-                    <!-- 3. Cadena de Suministro -->
-                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #007791 0%, #005566 100%);">
-                            <span style="font-size: 1.65rem;">📦</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M22 6L35 13.5L22 21L9 13.5L22 6Z" fill="#FBBF24"/>
+            <path d="M9 13.5L22 21V36L9 28.5V13.5Z" fill="#F97316"/>
+            <path d="M22 21L35 13.5V28.5L22 36V21Z" fill="#6C5B7B"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Gestión de inventario</div>
-                        <div class="app-tile-tag tag-suministro">Stock en Vivo</div>
+                        <div class="app-tile-tag tag-suministro">Stock en Tiempo Real</div>
                     </a>
 
-                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);">
-                            <span style="font-size: 1.65rem;">📋</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="8" width="28" height="28" rx="6" fill="#007791"/>
+            <line x1="14" y1="15" x2="30" y2="15" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M14 28L20 22L24 25L30 18" stroke="#FBBF24" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Kardex valorizado</div>
-                        <div class="app-tile-tag tag-suministro">Anexo 13 SUNAT</div>
+                        <div class="app-tile-tag tag-suministro">SUNAT Anexo 13</div>
                     </a>
 
-                    <a href="/aplicaciones/guias-remision" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);">
-                            <span style="font-size: 1.65rem;">🚛</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="7" y="12" width="20" height="17" rx="3" fill="#007791"/>
+            <path d="M27 16H33L37 21V29H27V16Z" fill="#E55A5A"/>
+            <circle cx="14" cy="30" r="3.5" fill="#1E293B"/>
+            <circle cx="31" cy="30" r="3.5" fill="#1E293B"/>
+            <circle cx="14" cy="30" r="1.5" fill="#FFFFFF"/>
+            <circle cx="31" cy="30" r="1.5" fill="#FFFFFF"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Guías de remisión electrónicas</div>
                         <div class="app-tile-tag tag-suministro">GRE 09 / 31</div>
                     </a>
 
-                    <a href="/aplicaciones/compras" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);">
-                            <span style="font-size: 1.65rem;">🛍️</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="7" y="11" width="30" height="22" rx="4" fill="#0D9488"/>
+            <rect x="7" y="17" width="30" height="16" rx="2" fill="#007791"/>
+            <rect x="7" y="22" width="30" height="11" rx="4" fill="#6C5B7B"/>
+            <line x1="12" y1="27" x2="20" y2="27" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Compras</div>
-                        <div class="app-tile-tag tag-suministro">Órdenes &amp; Costeo</div>
+                        <div class="app-tile-tag tag-suministro">Órdenes &amp; Proveedores</div>
                     </a>
 
-                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
-                            <span style="font-size: 1.65rem;">🏭</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M21 9C14.3726 9 9 14.3726 9 21H21V9Z" fill="#0D9488"/>
+            <path d="M23 9V21H35C35 14.3726 29.6274 9 23 9Z" fill="#7D1A6A"/>
+            <path d="M9 23C9 29.6274 14.3726 35 21 35V23H9Z" fill="#E55A5A"/>
+            <path d="M23 23V35C29.6274 35 35 29.6274 35 23H23Z" fill="#0EA5E9"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Múltiples almacenes</div>
-                        <div class="app-tile-tag tag-suministro">Transferencias</div>
+                        <div class="app-tile-tag tag-suministro">Transferencias &amp; Rutas</div>
                     </a>
 
-                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
-                            <span style="font-size: 1.65rem;">🏷️</span>
+                    <a href="/login" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="10" y="10" width="24" height="24" rx="5" fill="#0D9488"/>
+            <path d="M15 15H19V19H15V15Z" fill="#FFFFFF"/>
+            <path d="M25 15H29V19H25V15Z" fill="#FFFFFF"/>
+            <path d="M15 25H19V29H15V25Z" fill="#FFFFFF"/>
+            <circle cx="27" cy="27" r="3.5" fill="#FBBF24"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Trazabilidad de productos</div>
-                        <div class="app-tile-tag tag-suministro">Lotes &amp; Series</div>
+                        <div class="app-tile-tag tag-suministro">Series &amp; Lotes</div>
                     </a>
 
-                    <!-- 4. Manufactura -->
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #6C5B7B 0%, #4A3B58 100%);">
-                            <span style="font-size: 1.65rem;">⚙️</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M8 20L15 15V34H8V20Z" fill="#06B6D4"/>
+            <path d="M15 15L23 9V34H15V15Z" fill="#0D9488"/>
+            <path d="M23 18L30 13V34H23V18Z" fill="#E55A5A"/>
+            <path d="M30 14L36 10V34H30V14Z" fill="#FBBF24"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">MRP</div>
-                        <div class="app-tile-tag tag-manufactura">Órdenes de Planta</div>
+                        <div class="app-tile-tag tag-manufactura">Órdenes de Producción</div>
                     </a>
 
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);">
-                            <span style="font-size: 1.65rem;">📑</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="17" y="7" width="10" height="8" rx="2.5" fill="#7D1A6A"/>
+            <rect x="8" y="27" width="10" height="8" rx="2.5" fill="#6C5B7B"/>
+            <rect x="26" y="27" width="10" height="8" rx="2.5" fill="#F59E0B"/>
+            <path d="M22 15V21M22 21H13V27M22 21H31V27" stroke="#CBD5E1" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Listas de materiales (BOM)</div>
-                        <div class="app-tile-tag tag-manufactura">Recetas &amp; Mermas</div>
+                        <div class="app-tile-tag tag-manufactura">Estructura &amp; Rutas</div>
                     </a>
 
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #9333EA 0%, #6B21A8 100%);">
-                            <span style="font-size: 1.65rem;">🛡️</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M22 6L34 11V22C34 29 29 35 22 38C15 35 10 29 10 22V11L22 6Z" fill="#6C5B7B"/>
+            <circle cx="22" cy="21" r="7.5" fill="#0D9488"/>
+            <path d="M19 21L21 23L25 19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Control de calidad</div>
                         <div class="app-tile-tag tag-manufactura">Puntos de Control</div>
                     </a>
 
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%);">
-                            <span style="font-size: 1.65rem;">📈</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="9" y="9" width="11" height="11" rx="3.5" fill="#7D1A6A"/>
+            <rect x="24" y="9" width="11" height="11" rx="3.5" fill="#E55A5A"/>
+            <rect x="9" y="24" width="11" height="11" rx="3.5" fill="#0EA5E9"/>
+            <rect x="24" y="24" width="11" height="11" rx="3.5" fill="#10B981"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">KPIs de producción</div>
-                        <div class="app-tile-tag tag-manufactura">Métricas Clave</div>
+                        <div class="app-tile-tag tag-manufactura">Rendimiento &amp; Paradas</div>
                     </a>
 
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #C084FC 0%, #9333EA 100%);">
-                            <span style="font-size: 1.65rem;">⏱️</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M22 6L33 12.5V25.5L22 32L11 25.5V12.5L22 6Z" fill="#7D1A6A"/>
+            <path d="M22 6L33 12.5V20L22 15L11 20V12.5L22 6Z" fill="#F97316"/>
+            <path d="M22 15L33 20V25.5L22 32V15Z" fill="#FBBF24"/>
+            <circle cx="22" cy="19" r="5" fill="#FFFFFF"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">OEE</div>
                         <div class="app-tile-tag tag-manufactura">Eficiencia Global</div>
                     </a>
 
-                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #581C87 0%, #3B0764 100%);">
-                            <span style="font-size: 1.65rem;">🔧</span>
+                    <a href="/login" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="14" stroke="#7D1A6A" stroke-width="4.5"/>
+            <circle cx="22" cy="22" r="5" fill="#7D1A6A"/>
+            <path d="M22 13V17M13 22H17M27 22H31M15.5 28.5L18.5 25.5M28.5 28.5L25.5 25.5" stroke="#7D1A6A" stroke-width="3" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Mantenimiento preventivo</div>
-                        <div class="app-tile-tag tag-manufactura">Maquinarias</div>
+                        <div class="app-tile-tag tag-manufactura">Planes de Servicio</div>
                     </a>
 
-                    <!-- 5. Servicios -->
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);">
-                            <span style="font-size: 1.65rem;">🎧</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M12 24C12 16 17 11 25 11C28 11 31 12 33 14L22 25L12 24Z" fill="#F97316"/>
+            <path d="M25 11C33 11 38 16 38 24L22 25L25 11Z" fill="#0284C7"/>
+            <path d="M22 25L13 34" stroke="#7D1A6A" stroke-width="3" stroke-linecap="round"/>
+            <path d="M13 34C11.5 35.5 10 34 10 34" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Gestión de servicios</div>
-                        <div class="app-tile-tag tag-servicios">Atención al Cliente</div>
+                        <div class="app-tile-tag tag-servicios">Mesa de Ayuda &amp; SLA</div>
                     </a>
 
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);">
-                            <span style="font-size: 1.65rem;">💼</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="9" width="11" height="26" rx="3" fill="#F97316"/>
+            <rect x="22" y="9" width="11" height="18" rx="3" fill="#7D1A6A"/>
+            <rect x="10" y="13" width="7" height="6" rx="1.5" fill="#FFFFFF" opacity="0.9"/>
+            <rect x="24" y="13" width="7" height="6" rx="1.5" fill="#FFFFFF" opacity="0.9"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Gestión de proyectos</div>
                         <div class="app-tile-tag tag-servicios">Kanban &amp; Hitos</div>
                     </a>
 
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%);">
-                            <span style="font-size: 1.65rem;">📅</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <text x="14" y="32" font-family="'Inter', sans-serif" font-size="24" font-weight="900" fill="#7D1A6A">3</text>
+            <text x="28" y="32" font-family="'Inter', sans-serif" font-size="24" font-weight="900" fill="#F59E0B">1</text>
+            <circle cx="15" cy="8" r="2.5" fill="#CBD5E1"/>
+            <circle cx="29" cy="8" r="2.5" fill="#CBD5E1"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Planificación de actividades</div>
-                        <div class="app-tile-tag tag-servicios">Cronogramas</div>
+                        <div class="app-tile-tag tag-servicios">Cronogramas &amp; Gantt</div>
                     </a>
 
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #B45309 0%, #78350F 100%);">
-                            <span style="font-size: 1.65rem;">📝</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <rect x="9" y="7" width="26" height="30" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+            <rect x="13" y="12" width="6" height="6" rx="1.5" fill="#F97316"/>
+            <line x1="22" y1="15" x2="31" y2="15" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+            <rect x="13" y="21" width="6" height="6" rx="1.5" fill="#7D1A6A"/>
+            <line x1="22" y1="24" x2="31" y2="24" stroke="#64748B" stroke-width="2" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Gestión de tareas</div>
                         <div class="app-tile-tag tag-servicios">Flujos &amp; Checklists</div>
                     </a>
 
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #C2410C 0%, #9A3412 100%);">
-                            <span style="font-size: 1.65rem;">📜</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <path d="M11 7C11 5.34315 12.3431 4 14 4H30C31.6569 4 33 5.34315 33 7V33C33 34.6569 31.6569 36 30 36H14C12.3431 36 11 34.6569 11 33V7Z" fill="#EA580C"/>
+            <line x1="16" y1="12" x2="28" y2="12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="18" x2="28" y2="18" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="22" cy="28" r="4.5" fill="#FBBF24"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Contratos de servicios</div>
                         <div class="app-tile-tag tag-servicios">Facturación Recurrente</div>
                     </a>
 
-                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
-                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);">
-                            <span style="font-size: 1.65rem;">⏱️</span>
+                    <a href="/login" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-squircle">
+                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="24" r="12" stroke="#EA580C" stroke-width="3.5" fill="#FFF7ED"/>
+            <path d="M22 8V12M19 8H25" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M22 24L26 20M22 24V17" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
                         </div>
                         <div class="app-tile-title">Partes de trabajo</div>
-                        <div class="app-tile-tag tag-servicios">Control de Horas</div>
+                        <div class="app-tile-tag tag-servicios">Control de Horas &amp; Costos</div>
                     </a>
 
                 </div>
 
                 <!-- Enlace Complementario a Verticales -->
-                <div class="text-center mt-5">
+                <div class="text-center mt-5 pt-3">
                     <p class="text-muted small mb-0">
-                        ¿Buscas una solución lista para tu rubro? 
+                        ¿Buscas una solución prediseñada para tu rubro? 
                         <a href="/verticales" class="fw-bold" style="color: #7D1A6A; text-decoration: none;">
-                            Explora nuestras 11 Verticales de Negocio especializadas →
+                            Explora nuestras Verticales de Negocio especializadas →
                         </a>
                     </p>
                 </div>
@@ -645,6 +786,7 @@
                 });
             </script>
         </section>
+    
     </template>
 
     <!-- 2. Snippet: Grilla de las 11 Verticales Especializadas -->
