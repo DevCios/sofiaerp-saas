@@ -1,192 +1,399 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- 1. Snippet: Hero Principal SaaS -->
-    <template id="s_sofia_hero" name="Hero Principal SaaS">
-        <section class="s_sofia_hero py-5 position-relative overflow-hidden" style="background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, rgba(248, 250, 252, 0) 70%);">
-            <div class="container py-lg-5">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-6">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <span class="badge-sunat"><i class="fa fa-check-circle"></i> SUNAT UBL 2.1 &amp; GRE 09/31</span>
-                            <span class="badge-saas">100% Cloud</span>
-                        </div>
-                        <h1 class="display-4 fw-extrabold text-dark tracking-tight mb-4" style="line-height: 1.15;">
-                            El ERP Cloud que <span style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #06B6D4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">acelera tu empresa</span> en el Perú
-                        </h1>
-                        <p class="lead text-secondary mb-4">
-                            Facturación electrónica ilimitada, control de inventario en soles, punto de venta y gestión integral en una sola plataforma. Sin instalaciones ni servidores complejos.
-                        </p>
-                        <div class="d-flex flex-wrap gap-3 mb-4">
-                            <a href="/precios" class="btn btn-sofia-primary btn-lg px-4 py-3 shadow-lg">
-                                Comenzar Prueba Gratis →
-                            </a>
-                            <a href="/verticales/ferreterias" class="btn btn-sofia-outline btn-lg px-4 py-3">
-                                Ver Soluciones por Sector
-                            </a>
-                        </div>
-                        <div class="d-flex align-items-center gap-4 text-muted small">
-                            <div><i class="fa fa-bolt text-warning me-1"></i> Despliegue en 2 segundos</div>
-                            <div><i class="fa fa-lock text-success me-1"></i> Aislamiento de datos</div>
-                            <div><i class="fa fa-google text-primary me-1"></i> Respaldo Google Drive</div>
-                        </div>
+    <!-- 1. Snippet: Hero Principal Estilo Odoo.com (Diseño Premium Humano) -->
+    <template id="s_sofia_hero" name="Hero Principal SaaS (Estilo Odoo)">
+        <section class="sofia-odoo-hero py-5 text-center position-relative">
+            
+            <style>
+                .sofia-odoo-hero {
+                    background: #FFFFFF;
+                    padding-top: 5rem !important;
+                    padding-bottom: 5rem !important;
+                    overflow: hidden;
+                }
+                
+                /* Título Principal Expresivo Estilo Odoo */
+                .odoo-hero-title {
+                    font-size: clamp(2.35rem, 5.5vw, 4.25rem);
+                    font-weight: 800;
+                    letter-spacing: -0.04em;
+                    line-height: 1.18;
+                    color: #1F2937;
+                    max-width: 950px;
+                    margin: 0 auto 1.5rem auto;
+                }
+
+                /* Resaltador Amarillo Orgánico (Firma Visual de Odoo) */
+                .highlight-badge-yellow {
+                    background-color: #FBBF24;
+                    color: #1F2937;
+                    padding: 0.15em 0.45em;
+                    border-radius: 9999px;
+                    display: inline-block;
+                    transform: rotate(-1deg);
+                    box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
+                }
+
+                /* Subrayado Curvo Azul */
+                .highlight-underline-blue {
+                    position: relative;
+                    display: inline-block;
+                }
+                .highlight-underline-blue::after {
+                    content: "";
+                    position: absolute;
+                    left: -2%;
+                    bottom: -6px;
+                    width: 104%;
+                    height: 8px;
+                    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
+                    background-size: 100% 100%;
+                }
+
+                /* Subtítulo Descriptivo */
+                .odoo-hero-subtitle {
+                    font-size: clamp(1.15rem, 2vw, 1.45rem);
+                    font-weight: 500;
+                    color: #4B5563;
+                    max-width: 720px;
+                    margin: 0 auto 2.5rem auto;
+                    line-height: 1.5;
+                }
+
+                /* Botones de Acción Estilo Odoo */
+                .odoo-btn-primary {
+                    background-color: #714B67 !important;
+                    color: #FFFFFF !important;
+                    font-size: 1.05rem !important;
+                    font-weight: 700 !important;
+                    padding: 0.85rem 2.25rem !important;
+                    border-radius: 8px !important;
+                    text-decoration: none !important;
+                    display: inline-block !important;
+                    box-shadow: 0 4px 14px rgba(113, 75, 103, 0.3) !important;
+                    transition: all 0.2s ease !important;
+                }
+                .odoo-btn-primary:hover {
+                    background-color: #58394F !important;
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 6px 20px rgba(113, 75, 103, 0.4) !important;
+                }
+
+                .odoo-btn-secondary {
+                    background-color: #F3F4F6 !important;
+                    color: #374151 !important;
+                    font-size: 1.05rem !important;
+                    font-weight: 600 !important;
+                    padding: 0.85rem 2rem !important;
+                    border-radius: 8px !important;
+                    text-decoration: none !important;
+                    display: inline-block !important;
+                    border: 1px solid #E5E7EB !important;
+                    transition: all 0.2s ease !important;
+                }
+                .odoo-btn-secondary:hover {
+                    background-color: #E5E7EB !important;
+                    color: #111827 !important;
+                }
+
+                /* Anotación con Flecha Manuscrita */
+                .hero-annotation-wrapper {
+                    position: relative;
+                    display: inline-block;
+                    margin-top: 1.75rem;
+                }
+                .hero-annotation-text {
+                    font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif;
+                    font-size: 1.05rem;
+                    color: #714B67;
+                    font-weight: 700;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+                .hero-annotation-arrow {
+                    width: 38px;
+                    height: 24px;
+                    fill: none;
+                    stroke: #714B67;
+                    stroke-width: 2.5;
+                    stroke-linecap: round;
+                    transform: rotate(-15deg);
+                }
+
+                /* Grilla de Aplicaciones / Módulos debajo del Hero */
+                .odoo-apps-strip {
+                    margin-top: 4.5rem;
+                    padding-top: 3.5rem;
+                    border-top: 1px solid #F1F5F9;
+                }
+                .app-pill {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.65rem;
+                    padding: 0.65rem 1rem;
+                    background: #FFFFFF;
+                    border: 1px solid #E5E7EB;
+                    border-radius: 12px;
+                    font-size: 0.885rem;
+                    font-weight: 600;
+                    color: #374151;
+                    text-decoration: none;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+                    transition: all 0.2s ease;
+                }
+                .app-pill:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+                    border-color: #CBD5E1;
+                    color: #111827;
+                }
+                .app-icon {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.05rem;
+                }
+            </style>
+
+            <div class="container">
+                <!-- Título Heroico Estilo Odoo -->
+                <h1 class="odoo-hero-title">
+                    Gestiona toda tu empresa desde <span class="highlight-badge-yellow">un solo software</span>
+                </h1>
+
+                <!-- Subtítulo Humano y Convicente -->
+                <p class="odoo-hero-subtitle">
+                    ¡Sencillo, eficiente y a <span class="highlight-underline-blue">buen precio</span>!
+                </p>
+
+                <!-- Botones Duales de Conversión -->
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
+                    <a href="/precios" class="odoo-btn-primary">
+                        Comienza ahora, es gratis
+                    </a>
+                    <a href="/soporte" class="odoo-btn-secondary">
+                        Contacta a un consultor
+                    </a>
+                </div>
+
+                <!-- Anotación Manuscrita con Flecha -->
+                <div class="d-block text-center mt-3">
+                    <div class="hero-annotation-wrapper">
+                        <span class="hero-annotation-text">
+                            <svg class="hero-annotation-arrow" viewBox="0 0 40 25">
+                                <path d="M5,20 Q20,5 35,8 M28,3 L36,8 L30,16"/>
+                            </svg>
+                            <span>Desde <strong>S/ 89 al mes</strong> • SUNAT UBL 2.1 y Guías GRE incluidas</span>
+                        </span>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="position-relative">
-                            <div class="p-3 bg-white rounded-4 shadow-2-strong border border-slate-200">
-                                <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-3">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #EF4444;"></div>
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #F59E0B;"></div>
-                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: #10B981;"></div>
-                                        <span class="small text-muted ms-2 fw-semibold">avantgarde.sofiaerp.com</span>
-                                    </div>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 small">SUNAT En Línea</span>
-                                </div>
-                                <div class="bg-light p-4 rounded-3 text-center">
-                                    <h4 class="fw-bold mb-2">Panel de Control de Facturación</h4>
-                                    <p class="text-muted small mb-3">Monitoreo en tiempo real de comprobantes, compras y kardex valorizado.</p>
-                                    <div class="row g-2 text-start">
-                                        <div class="col-6">
-                                            <div class="p-3 bg-white rounded-3 border">
-                                                <small class="text-muted d-block">Ventas del Mes</small>
-                                                <strong class="fs-5 text-dark">S/ 48,920.00</strong>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="p-3 bg-white rounded-3 border">
-                                                <small class="text-muted d-block">Comprobantes CDR</small>
-                                                <strong class="fs-5 text-success">100% Aprobados</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
+
+                <!-- Grilla de Aplicaciones Destacadas estilo Odoo -->
+                <div class="odoo-apps-strip">
+                    <p class="text-uppercase text-muted fw-bold small letter-spacing mb-4" style="letter-spacing: 0.08em; font-size: 0.775rem;">
+                        TODAS LAS HERRAMIENTAS QUE TU NEGOCIO NECESITA EN UN SOLO LUGAR
+                    </p>
+                    <div class="row g-2 justify-content-center" style="max-width: 1050px; margin: 0 auto;">
+                        <div class="col-6 col-md-3">
+                            <a href="/aplicaciones/facturacion-electronica" class="app-pill">
+                                <div class="app-icon" style="background: #F3E8FF; color: #7E22CE;">📄</div>
+                                <span>Facturación SUNAT</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/aplicaciones/guias-remision" class="app-pill">
+                                <div class="app-icon" style="background: #DCFCE7; color: #15803D;">🚛</div>
+                                <span>Guías GRE 09/31</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/aplicaciones/inventario" class="app-pill">
+                                <div class="app-icon" style="background: #FEF3C7; color: #B45309;">📦</div>
+                                <span>Inventario &amp; Kardex</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/aplicaciones/punto-de-venta" class="app-pill">
+                                <div class="app-icon" style="background: #E0E7FF; color: #4338CA;">🛒</div>
+                                <span>Punto de Venta (POS)</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/verticales/contabilidad" class="app-pill">
+                                <div class="app-icon" style="background: #CCFBF1; color: #0F766E;">📊</div>
+                                <span>Contabilidad &amp; SIRE</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/aplicaciones/ventas" class="app-pill">
+                                <div class="app-icon" style="background: #FFE4E6; color: #BE123C;">💼</div>
+                                <span>CRM &amp; Cotizaciones</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/verticales/recursos-humanos" class="app-pill">
+                                <div class="app-icon" style="background: #F1F5F9; color: #334155;">👥</div>
+                                <span>Recursos Humanos</span>
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/precios" class="app-pill">
+                                <div class="app-icon" style="background: #FEF9C3; color: #A16207;">💳</div>
+                                <span>Pagos Mercado Pago</span>
+                            </a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </template>
 
-    <!-- 2. Snippet: Grilla de las 11 Verticales -->
+    <!-- 2. Snippet: Grilla de las 11 Verticales Especializadas -->
     <template id="s_sofia_verticales_grid" name="Grilla de Verticales">
-        <section class="py-5 bg-white">
+        <section class="py-5 bg-white border-top">
             <div class="container py-lg-4">
                 <div class="text-center max-w-2xl mx-auto mb-5">
-                    <span class="badge-saas mb-2">Especialización de Negocio</span>
-                    <h2 class="display-6 fw-bold text-dark">Verticales Diseñadas para Cada Industria</h2>
-                    <p class="text-secondary lead fs-6">
-                        No adaptes tu empresa a un software genérico. Elige la vertical preconfigurada con las reglas de tu rubro.
+                    <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.08em;">SOLUCIONES A TU MEDIDA</span>
+                    <h2 class="display-6 fw-bold text-dark mt-1 mb-2">Verticales Diseñadas para tu Rubro</h2>
+                    <p class="text-secondary fs-6">
+                        Configuración predeterminada con los flujos de trabajo de tu industria.
                     </p>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🏪</div>
-                            <h5 class="fw-bold mb-2">Bodegas &amp; Minimarkets</h5>
-                            <p class="text-muted small mb-0">Venta rápida por código de barras, caja diaria y cálculo automático de vuelto.</p>
-                        </div>
+                        <a href="/verticales/bodegas" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🏪</span>
+                                <h6 class="fw-bold mb-1">Bodegas &amp; Minimarkets</h6>
+                                <p class="text-muted small mb-0">Venta ágil por mostrador, código de barras y arqueo de caja.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🔧</div>
-                            <h5 class="fw-bold mb-2">Ferreterías</h5>
-                            <p class="text-muted small mb-0">Control de medidas fraccionadas, perfiles, bolsas, kg y despacho con guía GRE.</p>
-                        </div>
+                        <a href="/verticales/ferreterias" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🔧</span>
+                                <h6 class="fw-bold mb-1">Ferreterías &amp; Construcción</h6>
+                                <p class="text-muted small mb-0">Unidades de medida fraccionadas, perfiles y despachos GRE.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🏷️</div>
-                            <h5 class="fw-bold mb-2">Retail &amp; Calzado/Moda</h5>
-                            <p class="text-muted small mb-0">Matriz de tallas, colores, temporadas y promociones automáticas por volumen.</p>
-                        </div>
+                        <a href="/verticales/retail" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🏷️</span>
+                                <h6 class="fw-bold mb-1">Retail &amp; Calzado/Moda</h6>
+                                <p class="text-muted small mb-0">Control de tallas, colores, temporadas y promociones por volumen.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">⚙️</div>
-                            <h5 class="fw-bold mb-2">Industria &amp; Manufactura</h5>
-                            <p class="text-muted small mb-0">Lista de materiales (BOM), órdenes de fabricación y costeo de mano de obra.</p>
-                        </div>
+                        <a href="/verticales/industria" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">⚙️</span>
+                                <h6 class="fw-bold mb-1">Industria &amp; Manufactura</h6>
+                                <p class="text-muted small mb-0">Órdenes de producción, recetas, mermas y costeo real.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🦷</div>
-                            <h5 class="fw-bold mb-2">Odontología &amp; Salud</h5>
-                            <p class="text-muted small mb-0">Historias odontológicas, citas, boletas electrónicas y control de instrumental.</p>
-                        </div>
+                        <a href="/verticales/odontologia" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🦷</span>
+                                <h6 class="fw-bold mb-1">Odontología &amp; Salud</h6>
+                                <p class="text-muted small mb-0">Historias odontológicas, citas, boletas y control de insumos.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">💼</div>
-                            <h5 class="fw-bold mb-2">Servicios &amp; Consultoría</h5>
-                            <p class="text-muted small mb-0">Facturación recurrente mensual, control de proyectos y asignación de horas.</p>
-                        </div>
+                        <a href="/verticales/servicios" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">💼</span>
+                                <h6 class="fw-bold mb-1">Servicios &amp; Consultoría</h6>
+                                <p class="text-muted small mb-0">Facturación recurrente mensual, proyectos y asignación de horas.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🍽️</div>
-                            <h5 class="fw-bold mb-2">Restaurantes &amp; Gastronomía</h5>
-                            <p class="text-muted small mb-0">Punto de venta táctil, comanderas en cocina, división de cuentas y propinas.</p>
-                        </div>
+                        <a href="/verticales/restaurante" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🍽️</span>
+                                <h6 class="fw-bold mb-1">Restaurantes &amp; Gastronomía</h6>
+                                <p class="text-muted small mb-0">Comanderas táctiles, mesas, recetas y división de cuentas.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🌐</div>
-                            <h5 class="fw-bold mb-2">Comercio Electrónico</h5>
-                            <p class="text-muted small mb-0">Tienda web integrada, cobros con Mercado Pago y facturas automáticas.</p>
-                        </div>
+                        <a href="/verticales/comercio-electronico" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🌐</span>
+                                <h6 class="fw-bold mb-1">Comercio Electrónico</h6>
+                                <p class="text-muted small mb-0">Tienda web integrada, cobros con Mercado Pago y stock en vivo.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">🚛</div>
-                            <h5 class="fw-bold mb-2">Gestión de Flotas</h5>
-                            <p class="text-muted small mb-0">Control de kilometraje, choferes, mantenimientos preventivos y Guías GRE transportista.</p>
-                        </div>
+                        <a href="/verticales/gestion-de-flotas" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">🚛</span>
+                                <h6 class="fw-bold mb-1">Gestión de Flotas</h6>
+                                <p class="text-muted small mb-0">Kilometraje, choferes, mantenimientos y Guías GRE transportista.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">👥</div>
-                            <h5 class="fw-bold mb-2">Recursos Humanos</h5>
-                            <p class="text-muted small mb-0">Gestión de personal, asistencia, contratos, boletas de pago y adelantos.</p>
-                        </div>
+                        <a href="/verticales/recursos-humanos" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">👥</span>
+                                <h6 class="fw-bold mb-1">Recursos Humanos</h6>
+                                <p class="text-muted small mb-0">Control de asistencia, planillas, boletas de pago y adelantos.</p>
+                            </div>
+                        </a>
                     </div>
                     <div class="col-md-4 col-sm-6">
-                        <div class="p-4 rounded-4 border bg-light h-100 transition">
-                            <div class="fs-2 text-primary mb-3">📚</div>
-                            <h5 class="fw-bold mb-2">Contabilidad &amp; SIRE</h5>
-                            <p class="text-muted small mb-0">Plan de cuentas peruano, balances, compras y ventas compatibles con SIRE SUNAT.</p>
-                        </div>
+                        <a href="/verticales/contabilidad" class="text-decoration-none">
+                            <div class="p-3.5 rounded-3 border bg-light h-100 transition hover-shadow text-dark">
+                                <span class="fs-3 d-block mb-2">📚</span>
+                                <h6 class="fw-bold mb-1">Contabilidad &amp; SIRE</h6>
+                                <p class="text-muted small mb-0">Plan contable general empresarial y generación de archivos SIRE.</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </template>
 
-    <!-- 3. Snippet: Pilares de Valor -->
+    <!-- 3. Snippet: Pilares de Confianza -->
     <template id="s_sofia_features" name="Pilares de Valor">
         <section class="py-5 bg-light border-top border-bottom">
             <div class="container py-lg-4">
                 <div class="row g-4 text-center">
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-4 border h-100">
-                            <div class="d-inline-flex p-3 rounded-3 bg-primary-subtle text-primary fs-3 mb-3">🇵🇪</div>
-                            <h4 class="fw-bold mb-2">SUNAT UBL 2.1 Sin Límites</h4>
-                            <p class="text-secondary small mb-0">Emite facturas, boletas y guías de remisión electrónicas sin pagar costo por comprobante emitido.</p>
+                        <div class="p-4 bg-white rounded-3 border h-100">
+                            <span class="fs-2 d-block mb-2">🇵🇪</span>
+                            <h5 class="fw-bold mb-2">SUNAT UBL 2.1 Ilimitado</h5>
+                            <p class="text-muted small mb-0">Facturación y Guías GRE sin costos adicionales por comprobante emitido.</p>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-4 border h-100">
-                            <div class="d-inline-flex p-3 rounded-3 bg-success-subtle text-success fs-3 mb-3">🛡️</div>
-                            <h4 class="fw-bold mb-2">Aislamiento Total de Datos</h4>
-                            <p class="text-secondary small mb-0">Cada cliente tiene su propia base de datos física independiente. Tu información jamás se mezcla con la de otros.</p>
+                        <div class="p-4 bg-white rounded-3 border h-100">
+                            <span class="fs-2 d-block mb-2">🛡️</span>
+                            <h5 class="fw-bold mb-2">Base de Datos Dedicada</h5>
+                            <p class="text-muted small mb-0">Aislamiento físico estricto por cliente. Tu información es exclusivamente tuya.</p>
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="p-4 bg-white rounded-4 border h-100">
-                            <div class="d-inline-flex p-3 rounded-3 bg-info-subtle text-info fs-3 mb-3">☁️</div>
-                            <h4 class="fw-bold mb-2">Respaldo a Google Drive</h4>
-                            <p class="text-secondary small mb-0">Copia de seguridad diaria automatizada directo a tu cuenta de Google Drive para máxima tranquilidad.</p>
+                        <div class="p-4 bg-white rounded-3 border h-100">
+                            <span class="fs-2 d-block mb-2">☁️</span>
+                            <h5 class="fw-bold mb-2">Respaldo Google Drive</h5>
+                            <p class="text-muted small mb-0">Copia de seguridad diaria automatizada directo a tu cuenta de Google Drive.</p>
                         </div>
                     </div>
                 </div>
@@ -194,17 +401,17 @@
         </section>
     </template>
 
-    <!-- 4. Snippet: Llamada a la Acción (CTA) -->
+    <!-- 4. Snippet: Llamada a la Acción (CTA) Final Estilo Odoo -->
     <template id="s_sofia_cta" name="Llamada a la Acción">
-        <section class="py-5" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);">
-            <div class="container py-lg-5 text-center text-white">
-                <h2 class="display-6 fw-bold mb-3">Digitaliza tu Empresa Hoy con SOFIA ERP</h2>
-                <p class="lead text-slate-400 mb-4 mx-auto" style="max-width: 650px;">
-                    Comienza en menos de 2 minutos. Elige tu plan, activa tu subdominio seguro y empieza a facturar con la tecnología cloud más avanzada del Perú.
+        <section class="py-5 bg-white text-center">
+            <div class="container py-lg-5">
+                <h2 class="display-6 fw-bold mb-3">Únete a las empresas que crecen con SOFIA ERP</h2>
+                <p class="lead text-muted mb-4 mx-auto" style="max-width: 600px;">
+                    Comienza hoy mismo con tu periodo de prueba gratis. Sin contratos forzosos.
                 </p>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="/precios" class="btn btn-sofia-primary btn-lg px-5 py-3 shadow-lg">
-                        Ver Planes y Precios →
+                    <a href="/precios" class="odoo-btn-primary">
+                        Comienza ahora, es gratis
                     </a>
                 </div>
             </div>

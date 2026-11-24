@@ -5,7 +5,7 @@
         <xpath expr="//header" position="replace">
             <header id="top" class="odoo-style-header">
                 
-                <!-- Estilos embebidos directos para garantizar carga 100% libre de caché -->
+                <!-- Estilos embebidos directos para garantizar carga 100% libre de caché y colisiones -->
                 <style>
                     /* Reset y Header Base */
                     .odoo-style-header {
@@ -20,7 +20,7 @@
                     .odoo-nav-container {
                         max-width: 1400px;
                         margin: 0 auto;
-                        padding: 0.65rem 2rem;
+                        padding: 0.75rem 2rem;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
@@ -37,7 +37,7 @@
                     .odoo-logo-text {
                         font-size: 1.85rem;
                         font-weight: 800;
-                        color: #212529;
+                        color: #1F2937;
                         letter-spacing: -0.05em;
                         line-height: 1;
                     }
@@ -53,27 +53,50 @@
                         display: flex;
                         align-items: center;
                         list-style: none !important;
+                        list-style-type: none !important;
                         padding: 0 !important;
                         margin: 0 !important;
-                        gap: 0.5rem;
+                        gap: 0.25rem;
                     }
                     .odoo-nav-item {
                         position: static !important;
                         list-style: none !important;
+                        list-style-type: none !important;
                     }
                     .odoo-nav-link {
                         text-decoration: none !important;
                         font-size: 0.95rem;
                         font-weight: 500;
                         color: #4B5563 !important;
-                        padding: 0.6rem 0.9rem;
+                        padding: 0.6rem 0.95rem;
                         border-radius: 6px;
-                        display: inline-block;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        cursor: pointer;
                         transition: color 0.15s ease, background-color 0.15s ease;
                     }
-                    .odoo-nav-link:hover {
+                    .odoo-nav-link:hover,
+                    .odoo-nav-item.is-active .odoo-nav-link {
                         color: #111827 !important;
                         background-color: #F3F4F6 !important;
+                    }
+
+                    /* Flecha discreta para dropdown */
+                    .odoo-caret {
+                        display: inline-block;
+                        width: 0;
+                        height: 0;
+                        margin-left: 2px;
+                        vertical-align: middle;
+                        border-top: 4px solid #6B7280;
+                        border-right: 4px solid transparent;
+                        border-left: 4px solid transparent;
+                        transition: transform 0.2s ease;
+                    }
+                    .odoo-dropdown:hover .odoo-caret,
+                    .odoo-dropdown.is-active .odoo-caret {
+                        transform: rotate(180deg);
                     }
 
                     /* Acciones Derecha */
@@ -98,9 +121,10 @@
                         text-decoration: none !important;
                         font-size: 0.925rem;
                         font-weight: 600;
-                        padding: 0.5rem 1.25rem;
+                        padding: 0.55rem 1.35rem;
                         border-radius: 6px;
                         display: inline-block;
+                        box-shadow: 0 1px 3px rgba(113, 75, 103, 0.2);
                         transition: background-color 0.15s ease, transform 0.1s ease;
                     }
                     .odoo-trial-btn:hover {
@@ -108,7 +132,9 @@
                         transform: translateY(-1px);
                     }
 
-                    /* MEGA-MENÚ ANCHO COMPLETO (EXACTO A ODOO.COM) */
+                    /* =========================================================
+                       MEGA-MENÚ ANCHO COMPLETO (EXACTO A ODOO.COM)
+                       ========================================================= */
                     .odoo-megamenu-panel {
                         display: none !important;
                         position: absolute !important;
@@ -119,12 +145,12 @@
                         background: #FFFFFF !important;
                         border-top: 1px solid #E5E7EB !important;
                         border-bottom: 2px solid #E2E8F0 !important;
-                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+                        box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03) !important;
                         z-index: 10000 !important;
-                        padding: 2.5rem 3rem 1.75rem 3rem !important;
+                        padding: 2.75rem 3.5rem 2rem 3.5rem !important;
                     }
 
-                    /* Puente invisible para que el cursor nunca pierda el hover */
+                    /* Puente invisible para que el cursor NUNCA pierda el hover al trasladarse */
                     .odoo-megamenu-panel::before {
                         content: "" !important;
                         position: absolute !important;
@@ -133,22 +159,24 @@
                         right: 0 !important;
                         height: 35px !important;
                         background: transparent !important;
+                        z-index: 10001 !important;
                     }
 
-                    /* Mostrar menú al pasar el cursor o al tener clase activa */
+                    /* Mostrar menú con hover o clase activa (click) */
                     .odoo-dropdown:hover > .odoo-megamenu-panel,
+                    .odoo-dropdown.is-active > .odoo-megamenu-panel,
                     .odoo-megamenu-panel.is-open {
                         display: block !important;
-                        animation: odooDropdownFade 0.15s ease-out forwards;
+                        animation: odooDropdownFade 0.18s ease-out forwards;
                     }
 
                     @keyframes odooDropdownFade {
-                        from { opacity: 0; transform: translateY(3px); }
+                        from { opacity: 0; transform: translateY(4px); }
                         to { opacity: 1; transform: translateY(0); }
                     }
 
                     .odoo-mega-container {
-                        max-width: 1300px;
+                        max-width: 1250px;
                         margin: 0 auto;
                     }
 
@@ -156,66 +184,90 @@
                     .odoo-mega-grid {
                         display: grid;
                         grid-template-columns: repeat(4, 1fr);
-                        gap: 2.5rem;
+                        column-gap: 3rem;
+                        row-gap: 2rem;
                         text-align: left;
+                    }
+
+                    /* Encabezados de Columna Estilo Odoo con Línea Inferior Temática */
+                    .odoo-col-group {
+                        display: flex;
+                        flex-direction: column;
                     }
 
                     .odoo-category-header {
                         font-size: 0.8rem;
                         font-weight: 800;
                         text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                        margin-bottom: 1rem;
-                        padding-bottom: 0.4rem;
-                        display: inline-block;
+                        letter-spacing: 0.06em;
+                        margin-bottom: 1.15rem;
+                        padding-bottom: 0.45rem;
+                        display: block;
+                        width: 100%;
                         border-bottom: 2px solid;
                     }
-                    .color-finanzas { color: #008784; border-color: #008784; }
-                    .color-ventas { color: #E55A5A; border-color: #E55A5A; }
-                    .color-suministro { color: #007791; border-color: #007791; }
-                    .color-servicios { color: #F59E0B; border-color: #F59E0B; }
-                    .color-retail { color: #008784; border-color: #008784; }
+                    
+                    /* Paleta Exacta de Colores Odoo */
+                    .color-retail { color: #00A09D; border-color: #00A09D; }
+                    .color-alimentos { color: #007791; border-color: #007791; }
+                    .color-salud { color: #E55A5A; border-color: #E55A5A; }
                     .color-industria { color: #6C5B7B; border-color: #6C5B7B; }
-                    .color-salud { color: #F3722C; border-color: #F3722C; }
+                    .color-servicios { color: #E67E22; border-color: #E67E22; }
+                    .color-finanzas { color: #008784; border-color: #008784; }
                     .color-rrhh { color: #714B67; border-color: #714B67; }
+                    .color-otros { color: #6B7280; border-color: #9CA3AF; }
+
+                    /* Enlaces Limpios SIN NINGUNA VIÑETA (Cero Bullets) */
+                    .odoo-style-header ul,
+                    .odoo-style-header li,
+                    .odoo-megamenu-panel ul,
+                    .odoo-megamenu-panel li,
+                    .odoo-links-list,
+                    .odoo-links-list li {
+                        list-style: none !important;
+                        list-style-type: none !important;
+                        padding-left: 0 !important;
+                        margin-left: 0 !important;
+                    }
 
                     .odoo-links-list {
-                        list-style: none !important;
                         padding: 0 !important;
                         margin: 0 !important;
                     }
                     .odoo-links-list li {
-                        margin-bottom: 0.55rem !important;
-                        list-style: none !important;
+                        margin-bottom: 0.65rem !important;
                     }
                     .odoo-links-list a {
-                        color: #374151 !important;
+                        color: #4B5563 !important;
                         text-decoration: none !important;
-                        font-size: 0.9rem !important;
-                        display: inline-block !important;
+                        font-size: 0.925rem !important;
+                        font-weight: 400 !important;
+                        display: block !important;
+                        line-height: 1.4 !important;
                         transition: color 0.15s ease, transform 0.15s ease !important;
                     }
                     .odoo-links-list a:hover {
-                        color: #000000 !important;
+                        color: #111827 !important;
                         font-weight: 600 !important;
-                        transform: translateX(3px) !important;
+                        transform: translateX(4px) !important;
                     }
 
                     /* Pie del Mega-Menú */
                     .odoo-mega-footer {
-                        margin-top: 2rem;
+                        margin-top: 2.25rem;
                         padding-top: 1.25rem;
                         border-top: 1px solid #F3F4F6;
                         text-align: center;
                     }
                     .odoo-mega-footer a {
-                        color: #6B7280 !important;
-                        font-size: 0.875rem !important;
+                        color: #4B5563 !important;
+                        font-size: 0.9rem !important;
                         text-decoration: none !important;
                         font-weight: 600 !important;
+                        transition: color 0.15s ease;
                     }
                     .odoo-mega-footer a:hover {
-                        color: #111827 !important;
+                        color: #714B67 !important;
                     }
 
                     /* Móvil */
@@ -238,13 +290,16 @@
                     <ul class="odoo-nav-menu">
                         
                         <!-- 1. Mega-Menú: Aplicaciones -->
-                        <li class="odoo-nav-item odoo-dropdown">
-                            <a class="odoo-nav-link" href="#">Aplicaciones</a>
+                        <li class="odoo-nav-item odoo-dropdown" id="menu-apps">
+                            <a class="odoo-nav-link" href="#">
+                                <span>Aplicaciones</span>
+                                <span class="odoo-caret"></span>
+                            </a>
                             <div class="odoo-megamenu-panel">
                                 <div class="odoo-mega-container">
                                     <div class="odoo-mega-grid">
                                         <!-- Finanzas -->
-                                        <div>
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-finanzas">Finanzas</div>
                                             <ul class="odoo-links-list">
                                                 <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT UBL 2.1</a></li>
@@ -256,38 +311,38 @@
                                         </div>
 
                                         <!-- Ventas -->
-                                        <div>
-                                            <div class="odoo-category-header color-ventas">Ventas</div>
+                                        <div class="odoo-col-group">
+                                            <div class="odoo-category-header color-salud">Ventas &amp; CRM</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/aplicaciones/ventas">CRM</a></li>
+                                                <li><a href="/aplicaciones/ventas">CRM de Clientes</a></li>
                                                 <li><a href="/aplicaciones/ventas">Ventas &amp; Cotizaciones</a></li>
                                                 <li><a href="/precios">Suscripciones Recurrentes</a></li>
-                                                <li><a href="/aplicaciones/punto-de-venta">PdV para Tiendas</a></li>
+                                                <li><a href="/aplicaciones/punto-de-venta">PdV para Tiendas y Mostrador</a></li>
                                                 <li><a href="/verticales/restaurante">PdV para Restaurantes</a></li>
                                             </ul>
                                         </div>
 
                                         <!-- Cadena de Suministro -->
-                                        <div>
-                                            <div class="odoo-category-header color-suministro">Cadena de Suministro</div>
+                                        <div class="odoo-col-group">
+                                            <div class="odoo-category-header color-alimentos">Cadena de Suministro</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/aplicaciones/inventario">Inventario</a></li>
-                                                <li><a href="/verticales/industria">Manufactura</a></li>
-                                                <li><a href="/aplicaciones/guias-remision">Guías GRE 09/31</a></li>
-                                                <li><a href="/aplicaciones/compras">Compras</a></li>
-                                                <li><a href="/aplicaciones/inventario">Kardex Valorizado</a></li>
+                                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex Valorizado</a></li>
+                                                <li><a href="/verticales/industria">Manufactura &amp; Producción</a></li>
+                                                <li><a href="/aplicaciones/guias-remision">Guías de Remisión GRE 09/31</a></li>
+                                                <li><a href="/aplicaciones/compras">Compras &amp; Gastos</a></li>
+                                                <li><a href="/aplicaciones/inventario">Múltiples Almacenes</a></li>
                                             </ul>
                                         </div>
 
-                                        <!-- Servicios -->
-                                        <div>
+                                        <!-- Servicios & RRHH -->
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-servicios">Servicios &amp; RRHH</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/verticales/servicios">Proyectos</a></li>
-                                                <li><a href="/verticales/servicios">Registro de Horas</a></li>
-                                                <li><a href="/verticales/recursos-humanos">Recursos Humanos</a></li>
+                                                <li><a href="/verticales/servicios">Gestión de Proyectos</a></li>
+                                                <li><a href="/verticales/servicios">Control de Horas &amp; Asistencia</a></li>
+                                                <li><a href="/verticales/recursos-humanos">Recursos Humanos (RRHH)</a></li>
                                                 <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas</a></li>
-                                                <li><a href="/soporte">Soporte al Cliente</a></li>
+                                                <li><a href="/soporte">Mesa de Ayuda (Soporte)</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -298,15 +353,18 @@
                             </div>
                         </li>
 
-                        <!-- 2. Mega-Menú: Verticales (11 Ítems exactos estilo Odoo.com) -->
-                        <li class="odoo-nav-item odoo-dropdown">
-                            <a class="odoo-nav-link" href="#">Verticales</a>
+                        <!-- 2. Mega-Menú: Verticales (11 Sectores Exactos Estilo Odoo.com) -->
+                        <li class="odoo-nav-item odoo-dropdown" id="menu-verticales">
+                            <a class="odoo-nav-link" href="#">
+                                <span>Verticales</span>
+                                <span class="odoo-caret"></span>
+                            </a>
                             <div class="odoo-megamenu-panel">
                                 <div class="odoo-mega-container">
                                     <div class="odoo-mega-grid">
                                         
                                         <!-- Venta Minorista -->
-                                        <div>
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-retail">Venta Minorista</div>
                                             <ul class="odoo-links-list">
                                                 <li><a href="/verticales/bodegas">Bodegas</a></li>
@@ -317,7 +375,7 @@
                                         </div>
 
                                         <!-- Servicios & Salud -->
-                                        <div>
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-salud">Servicios &amp; Salud</div>
                                             <ul class="odoo-links-list">
                                                 <li><a href="/verticales/odontologia">Odontología</a></li>
@@ -327,7 +385,7 @@
                                         </div>
 
                                         <!-- Industria & Logística -->
-                                        <div>
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-industria">Industria &amp; Logística</div>
                                             <ul class="odoo-links-list">
                                                 <li><a href="/verticales/industria">Industria</a></li>
@@ -336,7 +394,7 @@
                                         </div>
 
                                         <!-- Gestión & Finanzas -->
-                                        <div>
+                                        <div class="odoo-col-group">
                                             <div class="odoo-category-header color-rrhh">Gestión &amp; Finanzas</div>
                                             <ul class="odoo-links-list">
                                                 <li><a href="/verticales/recursos-humanos">Recursos humanos</a></li>
@@ -345,7 +403,7 @@
                                         </div>
                                     </div>
                                     <div class="odoo-mega-footer">
-                                        <a href="/precios">Consulta todas las verticales de negocio →</a>
+                                        <a href="/precios">Consulta todas las verticales y soluciones →</a>
                                     </div>
                                 </div>
                             </div>
@@ -374,54 +432,82 @@
                     </div>
                 </div>
 
-                <!-- Script para garantizar persistencia y permitir Clic y Hover sin desvanecimiento -->
+                <!-- Script Blindado con Tolerancia Hover Extendida (400ms) y Bloqueo por Clic -->
                 <script type="text/javascript">
                     document.addEventListener('DOMContentLoaded', function () {
                         const dropdowns = document.querySelectorAll('.odoo-dropdown');
+                        let globalHideTimer = null;
+
+                        function closeAllMenus() {
+                            dropdowns.forEach(function (d) {
+                                d.classList.remove('is-active');
+                                const p = d.querySelector('.odoo-megamenu-panel');
+                                if (p) p.classList.remove('is-open');
+                            });
+                        }
+
                         dropdowns.forEach(function (dd) {
                             const link = dd.querySelector('.odoo-nav-link');
                             const panel = dd.querySelector('.odoo-megamenu-panel');
-                            let hideTimer = null;
 
-                            function showMenu() {
-                                clearTimeout(hideTimer);
-                                document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
-                                    if (p !== panel) p.classList.remove('is-open');
+                            function openThisMenu() {
+                                clearTimeout(globalHideTimer);
+                                dropdowns.forEach(function (other) {
+                                    if (other !== dd) {
+                                        other.classList.remove('is-active');
+                                        const op = other.querySelector('.odoo-megamenu-panel');
+                                        if (op) op.classList.remove('is-open');
+                                    }
                                 });
-                                panel.classList.add('is-open');
+                                dd.classList.add('is-active');
+                                if (panel) panel.classList.add('is-open');
                             }
 
-                            function hideMenu() {
-                                hideTimer = setTimeout(function () {
-                                    panel.classList.remove('is-open');
-                                }, 300); // 300ms de gracia para que nunca se cierre al mover el cursor
+                            function scheduleClose() {
+                                clearTimeout(globalHideTimer);
+                                globalHideTimer = setTimeout(function () {
+                                    dd.classList.remove('is-active');
+                                    if (panel) panel.classList.remove('is-open');
+                                }, 400); // 400ms de tolerancia garantizada
                             }
 
-                            dd.addEventListener('mouseenter', showMenu);
-                            dd.addEventListener('mouseleave', hideMenu);
+                            // Eventos de ratón en el nav-item
+                            dd.addEventListener('mouseenter', openThisMenu);
+                            dd.addEventListener('mouseleave', scheduleClose);
 
-                            // Soporte para alternar con Clic directo
+                            // Eventos directos en el panel para cancelar cierre
+                            if (panel) {
+                                panel.addEventListener('mouseenter', function () {
+                                    clearTimeout(globalHideTimer);
+                                    dd.classList.add('is-active');
+                                    panel.classList.add('is-open');
+                                });
+                                panel.addEventListener('mouseleave', scheduleClose);
+                            }
+
+                            // Clic para fijar / alternar el menú
                             if (link) {
                                 link.addEventListener('click', function (e) {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    const isOpen = panel.classList.contains('is-open');
-                                    document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
-                                        p.classList.remove('is-open');
-                                    });
-                                    if (!isOpen) {
-                                        panel.classList.add('is-open');
+                                    const wasActive = dd.classList.contains('is-active');
+                                    closeAllMenus();
+                                    if (!wasActive) {
+                                        dd.classList.add('is-active');
+                                        if (panel) panel.classList.add('is-open');
                                     }
                                 });
                             }
                         });
 
-                        // Cerrar al hacer clic en cualquier parte fuera del menú
+                        // Cerrar al hacer clic en enlaces no dropdown (Comunidad, Precios, Ayuda) o fuera
+                        document.querySelectorAll('.odoo-nav-item:not(.odoo-dropdown) a').forEach(function(l) {
+                            l.addEventListener('mouseenter', closeAllMenus);
+                        });
+
                         document.addEventListener('click', function (e) {
                             if (!e.target.closest('.odoo-dropdown')) {
-                                document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
-                                    p.classList.remove('is-open');
-                                });
+                                closeAllMenus();
                             }
                         });
                     });

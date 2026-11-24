@@ -1,25 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Pie de Página (Footer) Corporativo con Libro de Reclamaciones -->
+    <!-- Pie de Página (Footer) Corporativo con Libro de Reclamaciones Estilo Odoo.com -->
     <template id="sofia_footer" inherit_id="website.layout" name="SOFIA ERP Footer Corporativo">
         <xpath expr="//footer" position="replace">
             <footer id="bottom" class="sofia-footer">
+                
+                <style>
+                    .sofia-footer {
+                        background-color: #FAFAFA !important;
+                        border-top: 1px solid #E5E7EB !important;
+                        color: #4B5563 !important;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 2.5rem !important;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                    }
+                    .sofia-footer h6 {
+                        color: #111827 !important;
+                        font-size: 0.85rem !important;
+                        font-weight: 700 !important;
+                        text-transform: uppercase !important;
+                        letter-spacing: 0.06em !important;
+                        margin-bottom: 1.25rem !important;
+                    }
+                    .sofia-footer ul,
+                    .sofia-footer li,
+                    .sofia-footer .footer-links,
+                    .sofia-footer .footer-links li {
+                        list-style: none !important;
+                        list-style-type: none !important;
+                        padding-left: 0 !important;
+                        margin-left: 0 !important;
+                    }
+                    .sofia-footer .footer-links li {
+                        margin-bottom: 0.65rem !important;
+                    }
+                    .sofia-footer .footer-links a {
+                        color: #4B5563 !important;
+                        text-decoration: none !important;
+                        font-size: 0.925rem !important;
+                        transition: color 0.15s ease, transform 0.15s ease !important;
+                        display: inline-block !important;
+                    }
+                    .sofia-footer .footer-links a:hover {
+                        color: #714B67 !important;
+                        transform: translateX(3px) !important;
+                    }
+
+                    /* Caja Libro de Reclamaciones Conforme a Ley 29571 */
+                    .libro-reclamaciones-box {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 0.9rem !important;
+                        background: #FFFFFF !important;
+                        border: 1px solid #D1D5DB !important;
+                        padding: 0.85rem 1rem !important;
+                        border-radius: 8px !important;
+                        text-decoration: none !important;
+                        transition: all 0.2s ease !important;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+                    }
+                    .libro-reclamaciones-box:hover {
+                        border-color: #008784 !important;
+                        box-shadow: 0 4px 12px rgba(0, 135, 132, 0.12) !important;
+                        transform: translateY(-2px) !important;
+                    }
+                    .libro-icon {
+                        font-size: 1.6rem !important;
+                        color: #008784 !important;
+                        flex-shrink: 0 !important;
+                    }
+                    .libro-text strong {
+                        display: block !important;
+                        font-size: 0.9rem !important;
+                        color: #111827 !important;
+                        font-weight: 700 !important;
+                    }
+                    .libro-text span {
+                        display: block !important;
+                        font-size: 0.775rem !important;
+                        color: #6B7280 !important;
+                        line-height: 1.25 !important;
+                    }
+
+                    /* Barra Inferior */
+                    .footer-bottom-row {
+                        margin-top: 3.5rem !important;
+                        padding-top: 1.5rem !important;
+                        border-top: 1px solid #E5E7EB !important;
+                        font-size: 0.875rem !important;
+                        color: #6B7280 !important;
+                    }
+                </style>
+
                 <div class="container px-lg-5">
                     <div class="row g-4">
                         <!-- Columna 1: Marca y Propuesta de Valor -->
                         <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
-                            <a class="d-inline-flex align-items-center text-white text-decoration-none fw-bold fs-4 mb-3" href="/">
-                                <span class="fs-4 me-2">⚡</span>
-                                <span>SOFIA<span class="text-primary">ERP</span></span>
+                            <!-- Logo Oficial Idéntico al Header -->
+                            <a class="d-inline-flex align-items-center text-decoration-none mb-3" href="/">
+                                <span style="font-size: 1.85rem; font-weight: 800; color: #1F2937; letter-spacing: -0.05em; line-height: 1;">
+                                    sofia<span style="color: #714B67; font-weight: 700; font-size: 1.25rem; margin-left: 2px;">erp</span>
+                                </span>
                             </a>
-                            <p class="text-secondary small mb-4 pe-lg-4">
-                                Plataforma SaaS ERP de alto rendimiento con Facturación Electrónica SUNAT UBL 2.1 y Guías de Remisión GRE 09/31 integradas. Diseñada para hacer crecer a las empresas del Perú.
+                            <p class="small mb-4 pe-lg-4" style="color: #4B5563; line-height: 1.6;">
+                                Plataforma SaaS ERP de alto rendimiento con Facturación Electrónica SUNAT UBL 2.1 y Guías de Remisión GRE 09/31 integradas. Diseñada para hacer crecer a las empresas del Perú con tecnología limpia y ágil.
                             </p>
                             <div class="d-flex gap-2">
-                                <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5 small">
+                                <span class="badge bg-white border text-dark px-2.5 py-1.5 small fw-semibold" style="border-color: #E5E7EB !important;">
                                     <i class="fa fa-shield text-success me-1"></i> SSL 256-Bit
                                 </span>
-                                <span class="badge bg-dark border border-secondary text-light px-2.5 py-1.5 small">
+                                <span class="badge bg-white border text-dark px-2.5 py-1.5 small fw-semibold" style="border-color: #E5E7EB !important;">
                                     <i class="fa fa-cloud text-info me-1"></i> 99.9% Uptime
                                 </span>
                             </div>
@@ -61,7 +151,7 @@
                                 <li><a href="/sla">Acuerdo de Nivel de Servicio (SLA)</a></li>
                             </ul>
 
-                            <!-- Libro de Reclamaciones Virtual Conforme a Ley Peruana -->
+                            <!-- Libro de Reclamaciones Virtual Conforme a Ley Peruana 29571 -->
                             <a href="/libro-de-reclamaciones" class="libro-reclamaciones-box">
                                 <div class="libro-icon">
                                     <i class="fa fa-book"></i>
@@ -75,7 +165,7 @@
                     </div>
 
                     <!-- Barra Inferior -->
-                    <div class="footer-bottom text-muted">
+                    <div class="footer-bottom-row d-flex flex-column flex-md-row justify-content-between align-items-center">
                         <div>
                             © 2026 SOFIA ERP. Todos los derechos reservados.
                         </div>
