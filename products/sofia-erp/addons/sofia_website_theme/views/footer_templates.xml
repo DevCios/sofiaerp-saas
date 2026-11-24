@@ -101,8 +101,8 @@
 
                 <div class="container px-lg-5">
                     
-                    <!-- Pre-Footer: Llamado a la Acción Rápido -->
-                    <div class="footer-pre-banner">
+                    <!-- Pre-Footer: Llamado a la Acción Rápido (Se muestra en páginas internas; en la homepage ya se incluye s_sofia_cta) -->
+                    <div class="footer-pre-banner" t-if="request and request.httprequest.path != '/'">
                         <div class="row align-items-center justify-content-between g-3">
                             <div class="col-lg-7">
                                 <h4 class="text-white fw-bold mb-2" style="font-size: 1.5rem; letter-spacing: -0.02em;">
@@ -147,13 +147,13 @@
                             </p>
                             <div class="d-flex flex-wrap gap-2 mt-3">
                                 <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
-                                    🇵🇪 Soporte en Perú
+                                    <i class="fa fa-map-marker text-danger me-1"></i> Soporte en Perú
                                 </span>
                                 <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
-                                    🛡️ SUNAT Homologado
+                                    <i class="fa fa-check-circle text-info me-1"></i> SUNAT Homologado
                                 </span>
                                 <span class="badge" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #E2E8F0; padding: 0.45rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">
-                                    🔒 SSL 256-Bit
+                                    <i class="fa fa-lock text-success me-1"></i> SSL 256-Bit
                                 </span>
                             </div>
                         </div>
@@ -162,27 +162,32 @@
                         <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                             <h6>Aplicaciones</h6>
                             <ul class="footer-links">
-                                <li><a href="/aplicaciones/facturacion-electronica">Facturación electrónica</a></li>
-                                <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE</a></li>
-                                <li><a href="/aplicaciones/ventas">Ventas &amp; CRM</a></li>
-                                <li><a href="/aplicaciones/inventario">Inventario &amp; Kardex</a></li>
-                                <li><a href="/aplicaciones/guias-remision">Guías de remisión GRE</a></li>
-                                <li><a href="/verticales/industria">Manufactura &amp; OEE</a></li>
-                                <li><a href="/verticales/servicios">Gestión de servicios</a></li>
+                                <li><a href="/login">Facturación electrónica</a></li>
+                                <li><a href="/login">Contabilidad &amp; SIRE</a></li>
+                                <li><a href="/login">Ventas &amp; CRM</a></li>
+                                <li><a href="/login">Inventario &amp; Kardex</a></li>
+                                <li><a href="/login">Guías de remisión GRE</a></li>
+                                <li><a href="/login">Manufactura &amp; OEE</a></li>
+                                <li><a href="/login">Gestión de servicios</a></li>
                             </ul>
                         </div>
 
-                        <!-- Columna 3: Verticales -->
+                        <!-- Columna 3: Verticales (11 Oficiales) -->
                         <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                             <h6>Verticales de Negocio</h6>
-                            <ul class="footer-links">
-                                <li><a href="/verticales/bodegas">Bodegas &amp; Minimarkets</a></li>
-                                <li><a href="/verticales/ferreterias">Ferreterías &amp; Construcción</a></li>
-                                <li><a href="/verticales/retail">Retail &amp; Calzado/Moda</a></li>
-                                <li><a href="/verticales/restaurante">Restaurantes &amp; Gastronomía</a></li>
-                                <li><a href="/verticales/industria">Industria &amp; Manufactura</a></li>
-                                <li><a href="/verticales/odontologia">Odontología &amp; Salud</a></li>
-                                <li><a href="/verticales">Todas las verticales →</a></li>
+                            <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem;">
+                                <li><a href="/verticales/bodegas">Bodegas</a></li>
+                                <li><a href="/verticales/ferreterias">Ferreterías</a></li>
+                                <li><a href="/verticales/retail">Retail</a></li>
+                                <li><a href="/verticales/industria">Industria</a></li>
+                                <li><a href="/verticales/odontologia">Odontología</a></li>
+                                <li><a href="/verticales/servicios">Servicios</a></li>
+                                <li><a href="/verticales/restaurante">Restaurante</a></li>
+                                <li><a href="/verticales/comercio-electronico">Comercio web</a></li>
+                                <li><a href="/verticales/gestion-de-flotas">Flotas</a></li>
+                                <li><a href="/verticales/recursos-humanos">RR. HH.</a></li>
+                                <li><a href="/verticales/contabilidad">Contabilidad</a></li>
+                                <li><a href="/verticales" style="color: #C084FC !important; font-weight: 700;">Ver todas →</a></li>
                             </ul>
                         </div>
 

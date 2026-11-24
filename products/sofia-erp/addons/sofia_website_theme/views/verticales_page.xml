@@ -171,7 +171,7 @@
                 <!-- Grilla de las 11 Verticales -->
                 <section class="py-5 bg-light">
                     <div class="container py-lg-4">
-                        <div class="row g-4">
+                        <div class="row g-4 justify-content-center">
                             <!-- Bodegas -->
                             <div class="col-lg-4 col-md-6">
                                 <a href="/verticales/bodegas" class="vert-card text-dark">
