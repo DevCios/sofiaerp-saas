@@ -172,14 +172,15 @@
                             </ul>
                         </div>
 
-                        <!-- Columna 3: Verticales (11 Oficiales) -->
+                        <!-- Columna 3: Verticales (12 Oficiales) -->
                         <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
                             <h6>Verticales de Negocio</h6>
                             <ul class="footer-links" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem;">
                                 <li><a href="/verticales/bodegas">Bodegas</a></li>
                                 <li><a href="/verticales/ferreterias">Ferreterías</a></li>
                                 <li><a href="/verticales/retail">Retail</a></li>
-                                <li><a href="/verticales/industria">Industria</a></li>
+                                <li><a href="/verticales/boticas">Boticas</a></li>
+                                <li><a href="/verticales/manufactura">Manufactura</a></li>
                                 <li><a href="/verticales/odontologia">Odontología</a></li>
                                 <li><a href="/verticales/servicios">Servicios</a></li>
                                 <li><a href="/verticales/restaurante">Restaurante</a></li>
@@ -187,7 +188,6 @@
                                 <li><a href="/verticales/gestion-de-flotas">Flotas</a></li>
                                 <li><a href="/verticales/recursos-humanos">RR. HH.</a></li>
                                 <li><a href="/verticales/contabilidad">Contabilidad</a></li>
-                                <li><a href="/verticales" style="color: #C084FC !important; font-weight: 700;">Ver todas →</a></li>
                             </ul>
                         </div>
 

@@ -423,17 +423,18 @@
                                         <div class="odoo-col-group">
                                             <div class="odoo-category-header color-salud">Servicios &amp; Salud</div>
                                             <ul class="odoo-links-list">
+                                                <li><a href="/verticales/boticas">Boticas</a></li>
                                                 <li><a href="/verticales/odontologia">Odontología</a></li>
                                                 <li><a href="/verticales/servicios">Servicios</a></li>
                                                 <li><a href="/verticales/restaurante">Restaurante</a></li>
                                             </ul>
                                         </div>
 
-                                        <!-- Industria & Logística -->
+                                        <!-- Manufactura & Logística -->
                                         <div class="odoo-col-group">
-                                            <div class="odoo-category-header color-industria">Industria &amp; Logística</div>
+                                            <div class="odoo-category-header color-industria">Manufactura &amp; Logística</div>
                                             <ul class="odoo-links-list">
-                                                <li><a href="/verticales/industria">Industria</a></li>
+                                                <li><a href="/verticales/manufactura">Manufactura</a></li>
                                                 <li><a href="/verticales/gestion-de-flotas">Gestión de flotas</a></li>
                                             </ul>
                                         </div>

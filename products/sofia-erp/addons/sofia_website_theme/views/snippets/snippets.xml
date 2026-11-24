@@ -916,7 +916,26 @@
                         </a>
                     </div>
                     <div class="col-lg-4 col-md-6">
-                        <a href="/verticales/industria" class="text-decoration-none">
+                        <a href="/verticales/boticas" class="text-decoration-none">
+                            <div class="vert-bento-tile">
+                                <div class="vert-squircle-icon">
+                                    <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+                                        <rect x="17" y="7" width="10" height="30" rx="3" fill="#10B981"/>
+                                        <rect x="7" y="17" width="30" height="10" rx="3" fill="#10B981"/>
+                                        <path d="M22 17H27C29.2 17 31 18.8 31 21V23C31 25.2 29.2 27 27 27H22V17Z" fill="#0EA5E9"/>
+                                        <circle cx="22" cy="22" r="4.5" fill="#FFFFFF"/>
+                                        <path d="M22 19.5V24.5M19.5 22H24.5" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="vert-info">
+                                    <h5 class="fw-bold text-dark mb-1">Boticas</h5>
+                                    <p class="text-muted small mb-0">Venta fraccionada por pastillas, control de lotes y fechas de vencimiento, DIGEMID y boletas rápidas.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <a href="/verticales/manufactura" class="text-decoration-none">
                             <div class="vert-bento-tile">
                                 <div class="vert-squircle-icon">
                                     <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
@@ -927,7 +946,7 @@
         </svg>
                                 </div>
                                 <div class="vert-info">
-                                    <h5 class="fw-bold text-dark mb-1">Industria</h5>
+                                    <h5 class="fw-bold text-dark mb-1">Manufactura</h5>
                                     <p class="text-muted small mb-0">Listas de materiales (BOM), órdenes de producción, control de mermas y costeo real.</p>
                                 </div>
                             </div>
