@@ -259,9 +259,9 @@
 
             <!-- 1. Pantalla Completa (100vh): Hero Centrado y Limpio -->
             <div class="container my-auto">
-                <!-- Título Heroico Principal (Muestra Exacta de Diseño) -->
+                <!-- Título Heroico Principal -->
                 <h1 class="odoo-hero-title">
-                    Control total<br class="d-none d-md-inline"/> para <span class="hero-badge-purple">tu negocio</span>
+                    Gestiona tu negocio desde<br class="d-none d-md-inline"/> un solo <span class="hero-badge-purple">software</span>
                 </h1>
 
                 <!-- Subtítulo Limpio y Confiable -->
