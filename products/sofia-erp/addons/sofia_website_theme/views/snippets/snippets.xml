@@ -245,14 +245,14 @@
             </style>
 
             <div class="container">
-                <!-- Título Heroico con Identidad Propia SOFIA ERP -->
+                <!-- Título Heroico Principal -->
                 <h1 class="odoo-hero-title">
-                    El sistema operativo empresarial que <span class="highlight-badge-yellow">sincroniza tu negocio</span>
+                    Gestiona tu negocio desde <span class="highlight-badge-yellow">un solo software</span>.
                 </h1>
 
-                <!-- Subtítulo Enfocado en Valor y Sin Fricción -->
+                <!-- Subtítulo Expresivo -->
                 <p class="odoo-hero-subtitle">
-                    Facturación SUNAT, operaciones y finanzas en un flujo automatizado y <span class="highlight-underline-blue">sin fricción</span>.
+                    ¡Eficiente y a un <span class="highlight-underline-blue">buen precio</span>!
                 </p>
 
                 <!-- Botones Duales de Conversión -->
@@ -272,7 +272,7 @@
                             <svg class="hero-annotation-arrow" viewBox="0 0 40 25">
                                 <path d="M5,20 Q20,5 35,8 M28,3 L36,8 L30,16"/>
                             </svg>
-                            <span>Desde <strong>S/ 9.90 al mes</strong> • Boletas, facturas y guías sin costos ocultos</span>
+                            <span>Desde <strong>S/ 9.90 al mes</strong> • Boletas, facturas y guías de remisión electrónica</span>
                         </span>
                     </div>
                 </div>
