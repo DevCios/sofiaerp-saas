@@ -7,9 +7,31 @@
             <style>
                 .sofia-odoo-hero {
                     background: #FFFFFF;
-                    padding-top: 5rem !important;
+                    min-height: calc(100vh - 75px);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    padding-top: 2rem !important;
                     padding-bottom: 5rem !important;
+                    position: relative;
                     overflow: hidden;
+                }
+                .hero-bottom-wave {
+                    position: absolute;
+                    bottom: -1px;
+                    left: 0;
+                    width: 100%;
+                    line-height: 0;
+                    pointer-events: none;
+                    z-index: 1;
+                }
+                .sofia-bento-section {
+                    background-color: #F8FAFC;
+                    padding-top: 4rem !important;
+                    padding-bottom: 5.5rem !important;
+                    position: relative;
+                    border-bottom: 1px solid #E2E8F0;
                 }
                 
                 /* Título Principal Expresivo */
@@ -116,51 +138,22 @@
                     .hero-benefits-strip { gap: 1.25rem; }
                 }
 
-                /* Anotación con Flecha Manuscrita */
-                .hero-annotation-wrapper {
-                    position: relative;
-                    display: inline-block;
-                    margin-top: 1.75rem;
-                }
-                .hero-annotation-text {
-                    font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif;
-                    font-size: 1.05rem;
-                    color: #714B67;
-                    font-weight: 700;
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                }
-                .hero-annotation-arrow {
-                    width: 38px;
-                    height: 24px;
-                    fill: none;
-                    stroke: #714B67;
-                    stroke-width: 2.5;
-                    stroke-linecap: round;
-                    transform: rotate(-15deg);
-                }
-
-                /* Bento Workflow Hub debajo del Hero */
-                .sofia-bento-strip {
-                    margin-top: 4rem;
-                    padding-top: 3rem;
-                    border-top: 1px solid #F1F5F9;
-                }
+                /* Bento Workflow Hub */
                 .sofia-pipeline-bar {
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
-                    background: #F8FAFC;
+                    background: #FFFFFF;
                     border: 1px solid #E2E8F0;
-                    padding: 0.4rem 1rem;
+                    padding: 0.45rem 1.15rem;
                     border-radius: 9999px;
-                    margin-bottom: 2rem;
-                    font-size: 0.8rem;
+                    margin-bottom: 2.5rem;
+                    font-size: 0.825rem;
                     font-weight: 600;
                     color: #475569;
                     flex-wrap: wrap;
                     justify-content: center;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
                 }
                 .sofia-pipeline-step {
                     display: inline-flex;
@@ -250,12 +243,12 @@
                     margin-top: auto;
                 }
                 .bento-substrip {
-                    margin-top: 2.25rem;
-                    font-size: 0.85rem;
+                    margin-top: 2.5rem;
+                    font-size: 0.875rem;
                     color: #64748B;
                 }
                 .bento-substrip a {
-                    color: #714B67;
+                    color: #7D1A6A;
                     font-weight: 600;
                     text-decoration: none;
                 }
@@ -264,7 +257,8 @@
                 }
             </style>
 
-            <div class="container">
+            <!-- 1. Pantalla Completa (100vh): Hero Centrado y Limpio -->
+            <div class="container my-auto">
                 <!-- Título Heroico Principal (Muestra Exacta de Diseño) -->
                 <h1 class="odoo-hero-title">
                     Control total<br class="d-none d-md-inline"/> para <span class="hero-badge-purple">tu negocio</span>
@@ -311,109 +305,117 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Hub de Flujos Conectados (Bento Workflow Hub) -->
-                <div class="sofia-bento-strip">
-                    <!-- Ribbon de Flujo Interconectado -->
-                    <div class="sofia-pipeline-bar">
-                        <span class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Flujo en Tiempo Real:</span>
-                        <span class="sofia-pipeline-step">🛒 Venta POS / Web</span>
-                        <span class="sofia-pipeline-arrow">➔</span>
-                        <span class="sofia-pipeline-step">📄 SUNAT &amp; GRE 09/31</span>
-                        <span class="sofia-pipeline-arrow">➔</span>
-                        <span class="sofia-pipeline-step">📦 Kardex Automático</span>
-                        <span class="sofia-pipeline-arrow">➔</span>
-                        <span class="sofia-pipeline-step">📊 Asiento &amp; SIRE</span>
-                    </div>
+            <!-- Curva / Onda Visual Suave al Pie del Hero -->
+            <div class="hero-bottom-wave">
+                <svg viewBox="0 0 1440 60" fill="none" preserveAspectRatio="none" style="width: 100%; height: 50px; display: block;">
+                    <path d="M0,20 Q360,60 720,30 Q1080,0 1440,35 L1440,60 L0,60 Z" fill="#F8FAFC"/>
+                </svg>
+            </div>
+        </section>
 
-                    <!-- Cuadrícula Bento de 4 Pilares Operativos -->
-                    <div class="row g-3 justify-content-center" style="max-width: 1240px; margin: 0 auto;">
-                        
-                        <!-- Pilar 1: Ventas y POS -->
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/aplicaciones/punto-de-venta" class="bento-card">
-                                <div>
-                                    <div class="bento-icon-box" style="background: #EEF2FF; color: #4F46E5;">🛒</div>
-                                    <span class="bento-badge" style="background: #E0E7FF; color: #3730A3;">Offline &amp; Rápido</span>
-                                    <h3 class="bento-card-title">Punto de Venta &amp; CRM</h3>
-                                    <p class="bento-card-desc">
-                                        Cobros táctiles ultrarrápidos, lector de barras, cotizaciones a WhatsApp y pagos con QR / Mercado Pago.
-                                    </p>
-                                </div>
-                                <div class="bento-metric-chip">
-                                    <span style="color: #4F46E5;">⚡</span>
-                                    <span>Tickets emitidos en &lt; 1.2 segundos</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Pilar 2: SUNAT y Guías GRE (Destacado) -->
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/aplicaciones/facturacion-electronica" class="bento-card bento-card-featured">
-                                <div>
-                                    <div class="bento-icon-box" style="background: #F3E8FF; color: #7E22CE;">⚡</div>
-                                    <span class="bento-badge" style="background: #F3E8FF; color: #6B21A8;">UBL 2.1 • Homologado</span>
-                                    <h3 class="bento-card-title">Facturación &amp; GRE 09/31</h3>
-                                    <p class="bento-card-desc">
-                                        Facturas, boletas, notas de crédito y Guías de Remisión Electrónica con QR y validación directa en SUNAT.
-                                    </p>
-                                </div>
-                                <div class="bento-metric-chip" style="background: #FAF5FF; border-color: #E9D5FF;">
-                                    <span style="color: #7E22CE;">🛡️</span>
-                                    <span>0 rechazos fiscales • Envío al OSE</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Pilar 3: Kardex e Inventario -->
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/aplicaciones/inventario" class="bento-card">
-                                <div>
-                                    <div class="bento-icon-box" style="background: #FEF3C7; color: #D97706;">📦</div>
-                                    <span class="bento-badge" style="background: #FEF3C7; color: #92400E;">SUNAT Anexo 13</span>
-                                    <h3 class="bento-card-title">Kardex &amp; Multialmacén</h3>
-                                    <p class="bento-card-desc">
-                                        Valorización de inventarios (Promedio / FIFO), alertas de stock mínimo, despachos y control de lotes.
-                                    </p>
-                                </div>
-                                <div class="bento-metric-chip">
-                                    <span style="color: #D97706;">🔄</span>
-                                    <span>Kardex rebajado en cada venta</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Pilar 4: Contabilidad y SIRE -->
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <a href="/verticales/contabilidad" class="bento-card">
-                                <div>
-                                    <div class="bento-icon-box" style="background: #CCFBF1; color: #0D9488;">📊</div>
-                                    <span class="bento-badge" style="background: #CCFBF1; color: #115E59;">Automático &amp; SIRE</span>
-                                    <h3 class="bento-card-title">Contabilidad &amp; Finanzas</h3>
-                                    <p class="bento-card-desc">
-                                        Generación de propuestas RVIE / RCE para SIRE, asientos contables sin doble digitación y flujo de caja en vivo.
-                                    </p>
-                                </div>
-                                <div class="bento-metric-chip">
-                                    <span style="color: #0D9488;">📈</span>
-                                    <span>P&amp;L y balances al instante</span>
-                                </div>
-                            </a>
-                        </div>
-
-                    </div>
-
-                    <!-- Accesos Complementarios a Verticales e Industria -->
-                    <div class="bento-substrip text-center">
-                        <span>¿Operaciones especializadas? Explora nuestras verticales: </span>
-                        <a href="/verticales/bodegas">Bodegas</a> • 
-                        <a href="/verticales/ferreterias">Ferreterías</a> • 
-                        <a href="/verticales/restaurantes">Restaurantes</a> • 
-                        <a href="/verticales/talleres-mecanicos">Talleres</a> • 
-                        <a href="/verticales/servicios-profesionales">Servicios</a>
-                    </div>
+        <!-- 2. Sección Siguiente (Al hacer Scroll): Hub de Flujos Conectados (Bento Grid) -->
+        <section class="sofia-bento-section text-center position-relative">
+            <div class="container">
+                <!-- Ribbon de Flujo Interconectado -->
+                <div class="sofia-pipeline-bar">
+                    <span class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Flujo en Tiempo Real:</span>
+                    <span class="sofia-pipeline-step">🛒 Venta POS / Web</span>
+                    <span class="sofia-pipeline-arrow">➔</span>
+                    <span class="sofia-pipeline-step">📄 SUNAT &amp; GRE 09/31</span>
+                    <span class="sofia-pipeline-arrow">➔</span>
+                    <span class="sofia-pipeline-step">📦 Kardex Automático</span>
+                    <span class="sofia-pipeline-arrow">➔</span>
+                    <span class="sofia-pipeline-step">📊 Asiento &amp; SIRE</span>
                 </div>
 
+                <!-- Cuadrícula Bento de 4 Pilares Operativos -->
+                <div class="row g-3 justify-content-center" style="max-width: 1240px; margin: 0 auto;">
+                    
+                    <!-- Pilar 1: Ventas y POS -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <a href="/aplicaciones/punto-de-venta" class="bento-card">
+                            <div>
+                                <div class="bento-icon-box" style="background: #EEF2FF; color: #4F46E5;">🛒</div>
+                                <span class="bento-badge" style="background: #E0E7FF; color: #3730A3;">Offline &amp; Rápido</span>
+                                <h3 class="bento-card-title">Punto de Venta &amp; CRM</h3>
+                                <p class="bento-card-desc">
+                                    Cobros táctiles ultrarrápidos, lector de barras, cotizaciones a WhatsApp y pagos con QR / Mercado Pago.
+                                </p>
+                            </div>
+                            <div class="bento-metric-chip">
+                                <span style="color: #4F46E5;">⚡</span>
+                                <span>Tickets emitidos en &lt; 1.2 segundos</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Pilar 2: SUNAT y Guías GRE (Destacado) -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <a href="/aplicaciones/facturacion-electronica" class="bento-card bento-card-featured">
+                            <div>
+                                <div class="bento-icon-box" style="background: #F3E8FF; color: #7E22CE;">⚡</div>
+                                <span class="bento-badge" style="background: #F3E8FF; color: #6B21A8;">UBL 2.1 • Homologado</span>
+                                <h3 class="bento-card-title">Facturación &amp; GRE 09/31</h3>
+                                <p class="bento-card-desc">
+                                    Facturas, boletas, notas de crédito y Guías de Remisión Electrónica con QR y validación directa en SUNAT.
+                                </p>
+                            </div>
+                            <div class="bento-metric-chip" style="background: #FAF5FF; border-color: #E9D5FF;">
+                                <span style="color: #7E22CE;">🛡️</span>
+                                <span>0 rechazos fiscales • Envío al OSE</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Pilar 3: Kardex e Inventario -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <a href="/aplicaciones/inventario" class="bento-card">
+                            <div>
+                                <div class="bento-icon-box" style="background: #FEF3C7; color: #D97706;">📦</div>
+                                <span class="bento-badge" style="background: #FEF3C7; color: #92400E;">SUNAT Anexo 13</span>
+                                <h3 class="bento-card-title">Kardex &amp; Multialmacén</h3>
+                                <p class="bento-card-desc">
+                                    Valorización de inventarios (Promedio / FIFO), alertas de stock mínimo, despachos y control de lotes.
+                                </p>
+                            </div>
+                            <div class="bento-metric-chip">
+                                <span style="color: #D97706;">🔄</span>
+                                <span>Kardex rebajado en cada venta</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Pilar 4: Contabilidad y SIRE -->
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <a href="/verticales/contabilidad" class="bento-card">
+                            <div>
+                                <div class="bento-icon-box" style="background: #CCFBF1; color: #0D9488;">📊</div>
+                                <span class="bento-badge" style="background: #CCFBF1; color: #115E59;">Automático &amp; SIRE</span>
+                                <h3 class="bento-card-title">Contabilidad &amp; Finanzas</h3>
+                                <p class="bento-card-desc">
+                                    Generación de propuestas RVIE / RCE para SIRE, asientos contables sin doble digitación y flujo de caja en vivo.
+                                </p>
+                            </div>
+                            <div class="bento-metric-chip">
+                                <span style="color: #0D9488;">📈</span>
+                                <span>P&amp;L y balances al instante</span>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- Accesos Complementarios a Verticales e Industria -->
+                <div class="bento-substrip text-center">
+                    <span>¿Operaciones especializadas? Explora nuestras verticales: </span>
+                    <a href="/verticales/bodegas">Bodegas</a> • 
+                    <a href="/verticales/ferreterias">Ferreterías</a> • 
+                    <a href="/verticales/restaurantes">Restaurantes</a> • 
+                    <a href="/verticales/talleres-mecanicos">Talleres</a> • 
+                    <a href="/verticales/servicios-profesionales">Servicios</a>
+                </div>
             </div>
         </section>
     </template>
