@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla de la Página de Verticales de Negocio (/verticales) Estilo Odoo.com -->
+    <template id="verticales_page" name="Verticales de Negocio SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                
+                <style>
+                    .odoo-vert-hero {
+                        background: #FFFFFF;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 3.5rem !important;
+                        text-align: center;
+                    }
+                    .odoo-vert-title {
+                        font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+                        font-weight: 800;
+                        letter-spacing: -0.04em;
+                        line-height: 1.2;
+                        color: #1F2937;
+                        max-width: 900px;
+                        margin: 0 auto 1.25rem auto;
+                    }
+                    .highlight-badge-yellow {
+                        background-color: #FBBF24;
+                        color: #1F2937;
+                        padding: 0.12em 0.45em;
+                        border-radius: 9999px;
+                        display: inline-block;
+                        transform: rotate(-1deg);
+                        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
+                    }
+                    .highlight-underline-blue {
+                        position: relative;
+                        display: inline-block;
+                    }
+                    .highlight-underline-blue::after {
+                        content: "";
+                        position: absolute;
+                        left: -2%;
+                        bottom: -6px;
+                        width: 104%;
+                        height: 8px;
+                        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
+                        background-size: 100% 100%;
+                    }
+                    .odoo-vert-subtitle {
+                        font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+                        font-weight: 500;
+                        color: #4B5563;
+                        max-width: 720px;
+                        margin: 0 auto 2rem auto;
+                        line-height: 1.5;
+                    }
+                    .vert-card {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 14px;
+                        padding: 1.75rem;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        text-decoration: none;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+                    }
+                    .vert-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.07);
+                        border-color: #CBD5E1;
+                    }
+                    .vert-icon {
+                        font-size: 2.25rem;
+                        margin-bottom: 0.85rem;
+                        display: inline-block;
+                    }
+                </style>
+
+                <!-- Hero Verticales -->
+                <section class="odoo-vert-hero border-bottom">
+                    <div class="container">
+                        <h1 class="odoo-vert-title">
+                            Soluciones diseñadas para <span class="highlight-badge-yellow">tu sector</span>
+                        </h1>
+                        <p class="odoo-vert-subtitle">
+                            Configuraciones predeterminadas para las normativas y los <span class="highlight-underline-blue">flujos reales</span> de tu negocio en el Perú.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Grilla de las 11 Verticales -->
+                <section class="py-5 bg-light">
+                    <div class="container py-lg-4">
+                        <div class="row g-4">
+                            
+                            <!-- 1. Bodegas -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🏪</span>
+                                        <h5 class="fw-bold mb-2">Bodegas &amp; Minimarkets</h5>
+                                        <p class="text-secondary small mb-0">Venta ágil por mostrador, lector de código de barras, caja chica y boletas electrónicas rápidas.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 2. Ferreterías -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🔧</span>
+                                        <h5 class="fw-bold mb-2">Ferreterías &amp; Construcción</h5>
+                                        <p class="text-secondary small mb-0">Unidades fraccionadas (metros, kilos, bolsas), control de perfiles y emisión de Guías GRE 09/31.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 3. Retail -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🏷️</span>
+                                        <h5 class="fw-bold mb-2">Retail &amp; Calzado / Moda</h5>
+                                        <p class="text-secondary small mb-0">Gestión de variantes por talla y color, promociones automáticas por volumen y etiquetas térmicas.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 4. Industria -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">⚙️</span>
+                                        <h5 class="fw-bold mb-2">Industria &amp; Manufactura</h5>
+                                        <p class="text-secondary small mb-0">Lista de materiales (BOM), órdenes de producción, control de mermas y costeo real de fabricación.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 5. Odontología -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🦷</span>
+                                        <h5 class="fw-bold mb-2">Odontología &amp; Clínicas</h5>
+                                        <p class="text-secondary small mb-0">Historias clínicas odontológicas, agenda médica de citas, boletas y control de insumos por tratamiento.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 6. Servicios -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">💼</span>
+                                        <h5 class="fw-bold mb-2">Servicios &amp; Consultoría</h5>
+                                        <p class="text-secondary small mb-0">Facturación recurrente mensual, seguimiento de hitos, partes de horas y rentabilidad por cliente.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 7. Restaurantes -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🍽️</span>
+                                        <h5 class="fw-bold mb-2">Restaurantes &amp; Gastronomía</h5>
+                                        <p class="text-secondary small mb-0">Comandera para cocina y barra, gestión gráfica de mesas, recetas y división de cuentas por comensal.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 8. Comercio Electrónico -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🌐</span>
+                                        <h5 class="fw-bold mb-2">Comercio Electrónico</h5>
+                                        <p class="text-secondary small mb-0">Tienda online sincronizada en tiempo real con inventario, pasarela Mercado Pago y facturación SUNAT.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 9. Gestión de Flotas -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">🚛</span>
+                                        <h5 class="fw-bold mb-2">Gestión de Flotas &amp; Logística</h5>
+                                        <p class="text-secondary small mb-0">Control de kilometraje, choferes, mantenimientos mecánicos, consumo de combustible y Guías GRE.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 10. Recursos Humanos -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">👥</span>
+                                        <h5 class="fw-bold mb-2">Recursos Humanos &amp; Personal</h5>
+                                        <p class="text-secondary small mb-0">Marcación de asistencia, expedientes de colaboradores, boletas de pago y cálculo de adelantos.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- 11. Contabilidad & SIRE -->
+                            <div class="col-lg-4 col-md-6">
+                                <a href="/precios" class="vert-card text-dark">
+                                    <div>
+                                        <span class="vert-icon">📚</span>
+                                        <h5 class="fw-bold mb-2">Contabilidad &amp; SIRE SUNAT</h5>
+                                        <p class="text-secondary small mb-0">Plan Contable General Empresarial (PCGE), asientos automáticos, conciliación bancaria y libros SIRE.</p>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <span class="text-primary fw-bold small">Ver detalles →</span>
+                                    </div>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CTA Final -->
+                <section class="py-5 bg-white text-center border-top">
+                    <div class="container py-lg-4">
+                        <h2 class="display-6 fw-bold mb-3">¿Tu rubro tiene requerimientos específicos?</h2>
+                        <p class="lead text-muted mb-4 mx-auto" style="max-width: 650px;">
+                            Nuestros consultores adaptan los flujos de SOFIA ERP a los procesos exactos de tu organización.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/soporte" class="odoo-btn-primary">
+                                Hablar con un Asesor Especializado
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </t>
+    </template>
+
+    <record id="verticales_website_page" model="website.page">
+        <field name="name">Verticales de Negocio</field>
+        <field name="url">/verticales</field>
+        <field name="view_id" ref="verticales_page"/>
+        <field name="is_published">True</field>
+        <field name="website_indexed">True</field>
+    </record>
+</odoo>

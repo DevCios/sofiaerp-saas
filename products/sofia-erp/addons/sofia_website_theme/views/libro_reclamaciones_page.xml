@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla del Libro de Reclamaciones Virtual (/libro-de-reclamaciones) Ley 29571 Indecopi -->
+    <template id="libro_reclamaciones_page" name="Libro de Reclamaciones Virtual">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                
+                <style>
+                    .odoo-libro-hero {
+                        background: #FFFFFF;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 3rem !important;
+                        text-align: center;
+                    }
+                    .odoo-libro-title {
+                        font-size: clamp(2rem, 4vw, 3.25rem);
+                        font-weight: 800;
+                        letter-spacing: -0.04em;
+                        color: #1F2937;
+                        max-width: 850px;
+                        margin: 0 auto 1.25rem auto;
+                    }
+                    .highlight-badge-yellow {
+                        background-color: #FBBF24;
+                        color: #1F2937;
+                        padding: 0.12em 0.45em;
+                        border-radius: 9999px;
+                        display: inline-block;
+                        transform: rotate(-1deg);
+                    }
+                    .libro-form-card {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 16px;
+                        padding: 2.5rem;
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+                    }
+                    .form-section-title {
+                        font-size: 0.95rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                        color: #111827;
+                        border-bottom: 2px solid #E5E7EB;
+                        padding-bottom: 0.5rem;
+                        margin-bottom: 1.5rem;
+                    }
+                </style>
+
+                <!-- Hero -->
+                <section class="odoo-libro-hero border-bottom">
+                    <div class="container">
+                        <span class="badge bg-light text-dark border px-3 py-1.5 rounded-pill fw-bold mb-3">
+                            <i class="fa fa-book text-success me-1"></i> Ley N° 29571 • Indecopi Perú
+                        </span>
+                        <h1 class="odoo-libro-title">
+                            Libro de Reclamaciones <span class="highlight-badge-yellow">Virtual</span>
+                        </h1>
+                        <p class="text-secondary small max-w-2xl mx-auto">
+                            Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, ponemos a tu disposición nuestro Libro de Reclamaciones Virtual.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Formulario -->
+                <section class="py-5 bg-light">
+                    <div class="container py-lg-4" style="max-width: 900px;">
+                        <div class="libro-form-card">
+                            
+                            <div class="alert alert-info border-0 rounded-3 small mb-4">
+                                <i class="fa fa-info-circle me-1"></i> <strong>Información Importante:</strong>
+                                De acuerdo con el D.S. 011-2011-PCM, el proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles improrrogables.
+                            </div>
+
+                            <form action="/soporte" method="GET">
+                                <!-- 1. Identificación del Consumidor Reclamante -->
+                                <div class="form-section-title">1. Identificación del Consumidor Reclamante</div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Nombres y Apellidos *</label>
+                                        <input type="text" class="form-control" required="required" placeholder="Ej: Juan Pérez"/>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Tipo de Documento *</label>
+                                        <select class="form-select">
+                                            <option>DNI</option>
+                                            <option>RUC</option>
+                                            <option>Carné de Extranjería</option>
+                                            <option>Pasaporte</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold">Número de Documento *</label>
+                                        <input type="text" class="form-control" required="required" placeholder="Número"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Correo Electrónico *</label>
+                                        <input type="email" class="form-control" required="required" placeholder="tu@empresa.com"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold">Teléfono o Celular *</label>
+                                        <input type="tel" class="form-control" required="required" placeholder="+51 999 999 999"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold">Dirección / Domicilio *</label>
+                                        <input type="text" class="form-control" required="required" placeholder="Av. Principal 123, Distrito, Ciudad"/>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Identificación del Bien Contratado -->
+                                <div class="form-section-title">2. Identificación del Bien Contratado</div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold">Tipo de Bien *</label>
+                                        <select class="form-select">
+                                            <option>Servicio SaaS Cloud</option>
+                                            <option>Suscripción Mensual</option>
+                                            <option>Servicio de Implementación</option>
+                                            <option>Otro</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label small fw-bold">Descripción del Servicio / Plan Contratado *</label>
+                                        <input type="text" class="form-control" placeholder="Ej: Plan Pyme Pro con Facturación SUNAT"/>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Detalle de la Reclamación -->
+                                <div class="form-section-title">3. Detalle de la Reclamación</div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Tipo de Solicitud *</label>
+                                    <div class="d-flex gap-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="tipo" id="tipoReclamo" checked="checked"/>
+                                            <label class="form-check-label small" for="tipoReclamo">
+                                                <strong>Reclamo:</strong> Disconformidad relacionada a los productos o servicios.
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="tipo" id="tipoQueja"/>
+                                            <label class="form-check-label small" for="tipoQueja">
+                                                <strong>Queja:</strong> Disconformidad frente a la mala atención al público.
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Detalle del Reclamo o Queja *</label>
+                                    <textarea class="form-control" rows="4" required="required" placeholder="Explica detalladamente lo sucedido..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label small fw-bold">Pedido del Consumidor *</label>
+                                    <textarea class="form-control" rows="2" required="required" placeholder="¿Qué solución concreta solicitas?"></textarea>
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="odoo-btn-primary border-0">
+                                        Registrar Reclamo Virtual →
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </t>
+    </template>
+
+    <record id="libro_reclamaciones_website_page" model="website.page">
+        <field name="name">Libro de Reclamaciones Virtual</field>
+        <field name="url">/libro-de-reclamaciones</field>
+        <field name="view_id" ref="libro_reclamaciones_page"/>
+        <field name="is_published">True</field>
+        <field name="website_indexed">True</field>
+    </record>
+</odoo>

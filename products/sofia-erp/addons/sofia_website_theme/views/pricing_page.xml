@@ -1,16 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Plantilla de la Página Pública de Precios (/precios) -->
+    <!-- Plantilla de la Página Pública de Precios (/precios) Estilo Odoo.com -->
     <template id="pricing_page" name="Precios y Planes SOFIA ERP">
         <t t-call="website.layout">
             <div id="wrap" class="oe_structure oe_empty">
-                <!-- Header Precios -->
-                <section class="py-5 bg-light border-bottom text-center">
-                    <div class="container py-lg-4">
-                        <span class="badge-saas mb-2">Precios Sin Sorpresas</span>
-                        <h1 class="display-5 fw-extrabold text-dark mb-3">Elige el Plan Ideal para tu Empresa</h1>
-                        <p class="lead text-secondary mx-auto" style="max-width: 650px;">
-                            Sin costos ocultos ni cobros por factura emitida. Todos los planes incluyen comprobantes ilimitados ante SUNAT y respaldo automático en la nube.
+                
+                <style>
+                    /* Estilos Globales Compartidos Estilo Odoo */
+                    .odoo-pricing-hero {
+                        background: #FFFFFF;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 3.5rem !important;
+                        text-align: center;
+                    }
+                    .odoo-pricing-title {
+                        font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+                        font-weight: 800;
+                        letter-spacing: -0.04em;
+                        line-height: 1.2;
+                        color: #1F2937;
+                        max-width: 900px;
+                        margin: 0 auto 1.25rem auto;
+                    }
+                    .highlight-badge-yellow {
+                        background-color: #FBBF24;
+                        color: #1F2937;
+                        padding: 0.12em 0.45em;
+                        border-radius: 9999px;
+                        display: inline-block;
+                        transform: rotate(-1deg);
+                        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
+                    }
+                    .highlight-underline-blue {
+                        position: relative;
+                        display: inline-block;
+                    }
+                    .highlight-underline-blue::after {
+                        content: "";
+                        position: absolute;
+                        left: -2%;
+                        bottom: -6px;
+                        width: 104%;
+                        height: 8px;
+                        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
+                        background-size: 100% 100%;
+                    }
+                    .odoo-pricing-subtitle {
+                        font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+                        font-weight: 500;
+                        color: #4B5563;
+                        max-width: 720px;
+                        margin: 0 auto 2rem auto;
+                        line-height: 1.5;
+                    }
+
+                    /* Cards de Planes Estilo Odoo */
+                    .odoo-plan-card {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 16px;
+                        padding: 2.5rem 2rem;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                    }
+                    .odoo-plan-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+                        border-color: #D1D5DB;
+                    }
+                    .odoo-plan-featured {
+                        border: 2px solid #714B67 !important;
+                        box-shadow: 0 10px 25px rgba(113, 75, 103, 0.12) !important;
+                        position: relative;
+                    }
+                    .odoo-featured-badge {
+                        position: absolute;
+                        top: -14px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        background-color: #714B67;
+                        color: #FFFFFF;
+                        font-size: 0.775rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.06em;
+                        padding: 0.35rem 1.15rem;
+                        border-radius: 9999px;
+                    }
+                    .odoo-plan-name {
+                        font-size: 1.4rem;
+                        font-weight: 800;
+                        color: #111827;
+                        margin-bottom: 0.5rem;
+                    }
+                    .odoo-plan-desc {
+                        font-size: 0.885rem;
+                        color: #6B7280;
+                        min-height: 42px;
+                        margin-bottom: 1.5rem;
+                    }
+                    .odoo-price-amount {
+                        font-size: 3.25rem;
+                        font-weight: 800;
+                        color: #111827;
+                        line-height: 1;
+                    }
+                    .odoo-price-currency {
+                        font-size: 1.35rem;
+                        font-weight: 600;
+                        color: #6B7280;
+                        vertical-align: super;
+                    }
+                    .odoo-price-period {
+                        font-size: 0.95rem;
+                        color: #6B7280;
+                        font-weight: 500;
+                    }
+
+                    /* Botones */
+                    .odoo-btn-plan-primary {
+                        background-color: #714B67 !important;
+                        color: #FFFFFF !important;
+                        font-weight: 700 !important;
+                        font-size: 0.975rem !important;
+                        padding: 0.75rem 1.5rem !important;
+                        border-radius: 8px !important;
+                        text-decoration: none !important;
+                        display: block !important;
+                        text-align: center !important;
+                        transition: all 0.15s ease !important;
+                    }
+                    .odoo-btn-plan-primary:hover {
+                        background-color: #58394F !important;
+                        transform: translateY(-1px) !important;
+                    }
+                    .odoo-btn-plan-secondary {
+                        background-color: #F3F4F6 !important;
+                        color: #374151 !important;
+                        font-weight: 600 !important;
+                        font-size: 0.975rem !important;
+                        padding: 0.75rem 1.5rem !important;
+                        border-radius: 8px !important;
+                        text-decoration: none !important;
+                        display: block !important;
+                        text-align: center !important;
+                        border: 1px solid #E5E7EB !important;
+                        transition: all 0.15s ease !important;
+                    }
+                    .odoo-btn-plan-secondary:hover {
+                        background-color: #E5E7EB !important;
+                        color: #111827 !important;
+                    }
+
+                    /* Lista de características */
+                    .odoo-plan-features {
+                        list-style: none !important;
+                        padding: 0 !important;
+                        margin: 1.5rem 0 2rem 0 !important;
+                    }
+                    .odoo-plan-features li {
+                        font-size: 0.9rem;
+                        color: #4B5563;
+                        margin-bottom: 0.75rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.65rem;
+                    }
+                    .odoo-plan-features i {
+                        color: #008784;
+                        font-size: 0.95rem;
+                        flex-shrink: 0;
+                    }
+                </style>
+
+                <!-- Hero Precios -->
+                <section class="odoo-pricing-hero border-bottom">
+                    <div class="container">
+                        <h1 class="odoo-pricing-title">
+                            Planes transparentes para <span class="highlight-badge-yellow">hacer crecer</span> tu empresa
+                        </h1>
+                        <p class="odoo-pricing-subtitle">
+                            Sin cobros por factura emitida y con <span class="highlight-underline-blue">todo incluido</span>.
                         </p>
                     </div>
                 </section>
@@ -18,109 +192,109 @@
                 <!-- Cards de Planes -->
                 <section class="py-5 bg-white">
                     <div class="container py-lg-4">
-                        <div class="row g-4 align-items-stretch">
+                        <div class="row g-4 align-items-stretch justify-content-center">
+                            
                             <!-- Plan 1: Emprendedor -->
-                            <div class="col-lg-4">
-                                <div class="p-4 p-xl-5 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-plan-card">
                                     <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h4 class="fw-bold text-dark mb-0">Emprendedor</h4>
-                                            <span class="badge bg-light text-dark border">Básico</span>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h4 class="odoo-plan-name">Emprendedor</h4>
+                                            <span class="badge bg-light text-dark border px-2.5 py-1">Básico</span>
                                         </div>
-                                        <p class="text-muted small mb-4">Para pequeños negocios, bodegas y profesionales independientes.</p>
+                                        <p class="odoo-plan-desc">Para pequeños comercios, bodegas, consultores y profesionales independientes.</p>
                                         <div class="mb-4">
-                                            <span class="fs-4 text-muted">S/</span>
-                                            <span class="display-4 fw-extrabold text-dark">89</span>
-                                            <span class="text-muted">/ mes</span>
+                                            <span class="odoo-price-currency">S/</span>
+                                            <span class="odoo-price-amount">89</span>
+                                            <span class="odoo-price-period">/ mes</span>
                                         </div>
-                                        <hr class="my-4"/>
-                                        <ul class="list-unstyled mb-4 small">
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>1 a 2 Usuarios</strong> del sistema</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación Electrónica SUNAT <strong>Ilimitada</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Boletas, Facturas y Notas</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Control de Stock &amp; Inventario básico</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>5 GB</strong> almacenamiento seguro</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Subdominio seguro <code>tuempresa.sofiaerp.com</code></li>
+                                        <hr class="my-4 text-muted opacity-25"/>
+                                        <ul class="odoo-plan-features">
+                                            <li><i class="fa fa-check"></i> <span><strong>1 a 2 Usuarios</strong> concurrentes</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Facturación SUNAT <strong>Ilimitada</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span>Boletas, Facturas y Notas de Crédito</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Control de Stock y Ventas por Mostrador</span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>5 GB</strong> de almacenamiento seguro</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Subdominio seguro <code>tuempresa.sofiaerp.com</code></span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="btn btn-sofia-outline w-100 py-2.5 fw-bold">
+                                    <a href="/login" class="odoo-btn-plan-secondary">
                                         Elegir Plan Emprendedor
                                     </a>
                                 </div>
                             </div>
 
-                            <!-- Plan 2: Pyme (Destacado) -->
-                            <div class="col-lg-4">
-                                <div class="p-4 p-xl-5 rounded-4 border border-2 border-primary bg-white h-100 d-flex flex-column justify-content-between shadow-lg position-relative" style="background: linear-gradient(180deg, #FFFFFF 0%, #F5F7FF 100%);">
-                                    <div class="position-absolute top-0 start-50 translate-middle">
-                                        <span class="badge bg-primary px-3 py-1.5 rounded-pill text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                                            ⭐ Más Elegido en Perú
-                                        </span>
+                            <!-- Plan 2: Pyme Pro (Destacado) -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-plan-card odoo-plan-featured">
+                                    <div class="odoo-featured-badge">
+                                        ⭐ Más Elegido en Perú
                                     </div>
                                     <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
-                                            <h4 class="fw-bold text-dark mb-0">Pyme Pro</h4>
-                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Recomendado</span>
+                                        <div class="d-flex justify-content-between align-items-center mb-2 mt-1">
+                                            <h4 class="odoo-plan-name" style="color: #714B67;">Pyme Pro</h4>
+                                            <span class="badge text-white px-2.5 py-1" style="background-color: #714B67;">Recomendado</span>
                                         </div>
-                                        <p class="text-muted small mb-4">Para empresas comerciales, ferreterías, retail y distribuidoras en crecimiento.</p>
+                                        <p class="odoo-plan-desc">Para ferreterías, retail, restaurantes y distribuidoras en plena expansión.</p>
                                         <div class="mb-4">
-                                            <span class="fs-4 text-muted">S/</span>
-                                            <span class="display-4 fw-extrabold text-primary">169</span>
-                                            <span class="text-muted">/ mes</span>
+                                            <span class="odoo-price-currency">S/</span>
+                                            <span class="odoo-price-amount" style="color: #714B67;">169</span>
+                                            <span class="odoo-price-period">/ mes</span>
                                         </div>
-                                        <hr class="my-4"/>
-                                        <ul class="list-unstyled mb-4 small">
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Hasta 5 Usuarios</strong> incluidos</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación SUNAT <strong>Ilimitada</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Guías de Remisión (GRE 09/31)</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Multi-Almacén y Kardex valorizado</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Ventas, Compras y Punto de Venta (POS)</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>20 GB</strong> almacenamiento</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Soporte para Dominio Propio</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Respaldo diario en Google Drive</li>
+                                        <hr class="my-4 text-muted opacity-25"/>
+                                        <ul class="odoo-plan-features">
+                                            <li><i class="fa fa-check"></i> <span><strong>Hasta 5 Usuarios</strong> incluidos</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Facturación SUNAT <strong>Ilimitada</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>Guías de Remisión (GRE 09/31)</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span>Kardex Valorizado y Multi-Almacén</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Punto de Venta (POS) y Compras</span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>20 GB</strong> de almacenamiento</span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>Soporte para Dominio Propio</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span>Respaldo diario en Google Drive</span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="btn btn-sofia-primary w-100 py-2.5 fw-bold shadow">
+                                    <a href="/login" class="odoo-btn-plan-primary">
                                         Elegir Plan Pyme Pro →
                                     </a>
                                 </div>
                             </div>
 
                             <!-- Plan 3: Corporativo -->
-                            <div class="col-lg-4">
-                                <div class="p-4 p-xl-5 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-plan-card">
                                     <div>
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h4 class="fw-bold text-dark mb-0">Corporativo</h4>
-                                            <span class="badge bg-light text-dark border">Enterprise</span>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h4 class="odoo-plan-name">Corporativo</h4>
+                                            <span class="badge bg-light text-dark border px-2.5 py-1">Enterprise</span>
                                         </div>
-                                        <p class="text-muted small mb-4">Para medianas empresas, industrias, cadenas y operaciones complejas.</p>
+                                        <p class="odoo-plan-desc">Para medianas empresas, industrias, cadenas y operaciones avanzadas.</p>
                                         <div class="mb-4">
-                                            <span class="fs-4 text-muted">S/</span>
-                                            <span class="display-4 fw-extrabold text-dark">349</span>
-                                            <span class="text-muted">/ mes</span>
+                                            <span class="odoo-price-currency">S/</span>
+                                            <span class="odoo-price-amount">349</span>
+                                            <span class="odoo-price-period">/ mes</span>
                                         </div>
-                                        <hr class="my-4"/>
-                                        <ul class="list-unstyled mb-4 small">
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>Usuarios Ilimitados</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Facturación SUNAT &amp; GRE <strong>Ilimitada</strong></li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Contabilidad Completa &amp; SIRE SUNAT</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Manufactura y Control de Costos</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> <strong>50 GB</strong> almacenamiento</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Pasarela Mercado Pago Integrada</li>
-                                            <li class="mb-2.5"><i class="fa fa-check text-success me-2"></i> Soporte prioritario 24/7 vía WhatsApp</li>
+                                        <hr class="my-4 text-muted opacity-25"/>
+                                        <ul class="odoo-plan-features">
+                                            <li><i class="fa fa-check"></i> <span><strong>Usuarios Ilimitados</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span>Facturación SUNAT &amp; GRE <strong>Ilimitada</strong></span></li>
+                                            <li><i class="fa fa-check"></i> <span>Contabilidad Completa &amp; SIRE SUNAT</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Manufactura y Costeo de Recetas</span></li>
+                                            <li><i class="fa fa-check"></i> <span><strong>50 GB</strong> de almacenamiento seguro</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Pasarela Mercado Pago Integrada</span></li>
+                                            <li><i class="fa fa-check"></i> <span>Soporte prioritario 24/7 vía WhatsApp</span></li>
                                         </ul>
                                     </div>
-                                    <a href="/login" class="btn btn-sofia-outline w-100 py-2.5 fw-bold">
+                                    <a href="/login" class="odoo-btn-plan-secondary">
                                         Elegir Plan Corporativo
                                     </a>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </section>
 
-                <!-- Preguntas Frecuentes -->
+                <!-- Preguntas Frecuentes Estilo Odoo -->
                 <section class="py-5 bg-light border-top">
                     <div class="container py-lg-4" style="max-width: 850px;">
                         <h3 class="fw-bold text-center text-dark mb-4">Preguntas Frecuentes</h3>

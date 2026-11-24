@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Plantilla de la Página de Ayuda y Soporte (/soporte) Estilo Odoo.com -->
+    <template id="support_page" name="Ayuda y Soporte Técnico SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                
+                <style>
+                    .odoo-support-hero {
+                        background: #FFFFFF;
+                        padding-top: 4.5rem !important;
+                        padding-bottom: 3.5rem !important;
+                        text-align: center;
+                    }
+                    .odoo-support-title {
+                        font-size: clamp(2.2rem, 4.5vw, 3.75rem);
+                        font-weight: 800;
+                        letter-spacing: -0.04em;
+                        line-height: 1.2;
+                        color: #1F2937;
+                        max-width: 900px;
+                        margin: 0 auto 1.25rem auto;
+                    }
+                    .highlight-badge-yellow {
+                        background-color: #FBBF24;
+                        color: #1F2937;
+                        padding: 0.12em 0.45em;
+                        border-radius: 9999px;
+                        display: inline-block;
+                        transform: rotate(-1deg);
+                        box-shadow: 0 4px 10px rgba(251, 191, 36, 0.25);
+                    }
+                    .highlight-underline-blue {
+                        position: relative;
+                        display: inline-block;
+                    }
+                    .highlight-underline-blue::after {
+                        content: "";
+                        position: absolute;
+                        left: -2%;
+                        bottom: -6px;
+                        width: 104%;
+                        height: 8px;
+                        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,15 Q50,0 100,15' stroke='%2306B6D4' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center bottom;
+                        background-size: 100% 100%;
+                    }
+                    .odoo-support-subtitle {
+                        font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+                        font-weight: 500;
+                        color: #4B5563;
+                        max-width: 720px;
+                        margin: 0 auto 2rem auto;
+                        line-height: 1.5;
+                    }
+
+                    .odoo-support-card {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 16px;
+                        padding: 2.25rem 2rem;
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                    }
+                    .odoo-support-card:hover {
+                        transform: translateY(-4px);
+                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+                        border-color: #D1D5DB;
+                    }
+                    .support-icon-box {
+                        width: 56px;
+                        height: 56px;
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.75rem;
+                        margin-bottom: 1.25rem;
+                    }
+                </style>
+
+                <!-- Hero Soporte -->
+                <section class="odoo-support-hero border-bottom">
+                    <div class="container">
+                        <h1 class="odoo-support-title">
+                            Centro de Ayuda &amp; <span class="highlight-badge-yellow">Soporte Técnico</span>
+                        </h1>
+                        <p class="odoo-support-subtitle">
+                            Estamos aquí para acompañarte en todo momento. Respuestas rápidas y <span class="highlight-underline-blue">asistencia especializada</span> en Perú.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Canales de Atención -->
+                <section class="py-5 bg-light">
+                    <div class="container py-lg-4">
+                        <div class="row g-4 justify-content-center">
+                            
+                            <!-- WhatsApp -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-support-card">
+                                    <div>
+                                        <div class="support-icon-box" style="background: #DCFCE7; color: #15803D;">💬</div>
+                                        <h4 class="fw-bold mb-2">WhatsApp Directo</h4>
+                                        <p class="text-muted small mb-4">Atención inmediata con consultores certificados para dudas operativas y emisión SUNAT.</p>
+                                        <p class="small text-secondary mb-0"><strong>Horario:</strong> Lunes a Sábado de 8:00 AM a 8:00 PM</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <a href="https://wa.me/51999999999?text=Hola%20SOFIA%20ERP%2C%20necesito%20soporte%20t%C3%A9cnico" target="_blank" class="odoo-btn-plan-primary" style="background-color: #15803D !important;">
+                                            Iniciar Chat de WhatsApp →
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Correo Técnico -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-support-card">
+                                    <div>
+                                        <div class="support-icon-box" style="background: #F3E8FF; color: #7E22CE;">✉️</div>
+                                        <h4 class="fw-bold mb-2">Tickets por Correo</h4>
+                                        <p class="text-muted small mb-4">Para consultas técnicas avanzadas, certificados digitales .pfx o configuraciones SIRE.</p>
+                                        <p class="small text-secondary mb-0"><strong>Respuesta promedio:</strong> Menos de 2 horas hábiles</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <a href="mailto:soporte@sofiaerp.com" class="odoo-btn-plan-secondary">
+                                            soporte@sofiaerp.com
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Base de Conocimiento -->
+                            <div class="col-lg-4 col-md-6">
+                                <div class="odoo-support-card">
+                                    <div>
+                                        <div class="support-icon-box" style="background: #FEF3C7; color: #B45309;">📚</div>
+                                        <h4 class="fw-bold mb-2">Manuales &amp; Guías</h4>
+                                        <p class="text-muted small mb-4">Documentación paso a paso de facturación, punto de venta, inventario y guías GRE.</p>
+                                        <p class="small text-secondary mb-0"><strong>Disponible:</strong> Acceso libre 24 horas al día</p>
+                                    </div>
+                                    <div class="mt-4">
+                                        <a href="/precios" class="odoo-btn-plan-secondary">
+                                            Explorar Tutoriales →
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Monitoreo de Disponibilidad & Conexión SUNAT -->
+                <section class="py-5 bg-white border-top">
+                    <div class="container py-lg-4" style="max-width: 900px;">
+                        <div class="p-4 p-md-5 rounded-4 border bg-light text-center">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold mb-3">
+                                <i class="fa fa-circle text-success me-1" style="font-size: 0.65rem;"></i> Todos los Sistemas Operativos al 100%
+                            </span>
+                            <h3 class="fw-bold text-dark mb-2">Conectividad SUNAT en Tiempo Real</h3>
+                            <p class="text-secondary small mb-4 mx-auto" style="max-width: 600px;">
+                                La pasarela de facturación electrónica UBL 2.1 y Guías GRE 09/31 de SOFIA ERP monitorea continuamente los servidores de la SUNAT para garantizar la entrega instantánea de comprobantes y CDRs.
+                            </p>
+                            <div class="row g-3 justify-content-center text-start">
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-white rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-semibold text-dark">Servidores SUNAT</span>
+                                            <span class="badge bg-success text-white">Online</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-white rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-semibold text-dark">Guías GRE 09/31</span>
+                                            <span class="badge bg-success text-white">Activo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 bg-white rounded-3 border">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="small fw-semibold text-dark">Cloud Uptime</span>
+                                            <span class="badge bg-primary text-white">99.98%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </t>
+    </template>
+
+    <record id="support_website_page" model="website.page">
+        <field name="name">Ayuda y Soporte</field>
+        <field name="url">/soporte</field>
+        <field name="view_id" ref="support_page"/>
+        <field name="is_published">True</field>
+        <field name="website_indexed">True</field>
+    </record>
+</odoo>
