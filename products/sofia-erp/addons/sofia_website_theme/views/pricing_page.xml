@@ -72,6 +72,64 @@
                         font-weight: 500;
                     }
 
+                    /* Switch Selector de Facturación (Anual / Mensual) Estilo Odoo.com */
+                    .odoo-billing-switch-container {
+                        display: inline-flex;
+                        align-items: center;
+                        background: #F8FAFC;
+                        border: 1.5px solid #E2E8F0;
+                        border-radius: 9999px;
+                        padding: 0.35rem 0.85rem;
+                        gap: 0.85rem;
+                        cursor: pointer;
+                        user-select: none;
+                        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+                        transition: all 0.2s ease;
+                    }
+                    .odoo-billing-switch-container:hover {
+                        border-color: #CBD5E1;
+                        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+                    }
+                    .billing-option {
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        color: #64748B;
+                        transition: color 0.2s ease;
+                    }
+                    .billing-option.active {
+                        color: #0F172A;
+                        font-weight: 800;
+                    }
+                    .odoo-switch-track {
+                        width: 42px;
+                        height: 22px;
+                        background-color: #7D1A6A;
+                        border-radius: 9999px;
+                        position: relative;
+                        transition: background-color 0.25s ease;
+                    }
+                    .odoo-switch-thumb {
+                        width: 16px;
+                        height: 16px;
+                        background-color: #FFFFFF;
+                        border-radius: 50%;
+                        position: absolute;
+                        top: 3px;
+                        left: 4px;
+                        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                    }
+                    .odoo-billing-switch-container.monthly .odoo-switch-thumb {
+                        transform: translateX(18px);
+                    }
+                    .odoo-billing-switch-container.monthly .odoo-switch-track {
+                        background-color: #64748B;
+                    }
+                    .price-strikethrough {
+                        color: #EF4444 !important;
+                        font-weight: 700;
+                    }
+
                     /* Botones */
                     .odoo-btn-plan-primary {
                         background-color: #7D1A6A !important;
@@ -241,6 +299,18 @@
                 <!-- Cards de Planes -->
                 <section class="py-5 bg-white">
                     <div class="container py-lg-4">
+                        
+                        <!-- Selector de Facturación (Anual / Mensual) Estilo Odoo.com -->
+                        <div class="d-flex justify-content-center align-items-center mb-5">
+                            <div class="odoo-billing-switch-container" id="odooBillingSwitch" role="button" tabindex="0" title="Alternar entre pago Anual y Mensual">
+                                <span class="billing-option active" id="btnOptAnual">Anual</span>
+                                <div class="odoo-switch-track">
+                                    <div class="odoo-switch-thumb"></div>
+                                </div>
+                                <span class="billing-option" id="btnOptMensual">Mensual</span>
+                            </div>
+                        </div>
+
                         <div class="row g-4 align-items-stretch justify-content-center">
                             
                             <!-- Plan 1: Emprendedor -->
@@ -253,9 +323,13 @@
                                         </div>
                                         <p class="odoo-plan-desc">Para profesionales, pequeños comercios y emprendedores que inician su facturación.</p>
                                         <div class="mb-4">
-                                            <span class="odoo-price-currency">S/</span>
-                                            <span class="odoo-price-amount">9.90</span>
-                                            <span class="odoo-price-period">/ usuario al mes</span>
+                                            <div class="d-flex align-items-baseline">
+                                                <span class="odoo-price-currency me-1">S/</span>
+                                                <span class="odoo-price-amount price-val-emprendedor">9.90</span>
+                                                <span class="price-strikethrough text-decoration-line-through fs-6 ms-2">S/ 11.90*</span>
+                                            </div>
+                                            <div class="odoo-price-period">por usuario al mes</div>
+                                            <div class="billing-cycle-note text-muted" style="font-size: 0.8rem; font-weight: 500;">Facturado anualmente</div>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
@@ -286,9 +360,13 @@
                                         </div>
                                         <p class="odoo-plan-desc">Para ferreterías, retail, restaurantes y distribuidoras en plena expansión.</p>
                                         <div class="mb-4">
-                                            <span class="odoo-price-currency">S/</span>
-                                            <span class="odoo-price-amount" style="color: #7D1A6A;">14.90</span>
-                                            <span class="odoo-price-period">/ usuario al mes</span>
+                                            <div class="d-flex align-items-baseline">
+                                                <span class="odoo-price-currency me-1" style="color: #7D1A6A;">S/</span>
+                                                <span class="odoo-price-amount price-val-pyme" style="color: #7D1A6A;">14.90</span>
+                                                <span class="price-strikethrough text-decoration-line-through fs-6 ms-2">S/ 16.90*</span>
+                                            </div>
+                                            <div class="odoo-price-period">por usuario al mes</div>
+                                            <div class="billing-cycle-note text-muted" style="font-size: 0.8rem; font-weight: 500;">Facturado anualmente</div>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
@@ -318,9 +396,13 @@
                                         </div>
                                         <p class="odoo-plan-desc">Para medianas empresas, manufactura, cadenas y operaciones avanzadas.</p>
                                         <div class="mb-4">
-                                            <span class="odoo-price-currency">S/</span>
-                                            <span class="odoo-price-amount">19.90</span>
-                                            <span class="odoo-price-period">/ usuario al mes</span>
+                                            <div class="d-flex align-items-baseline">
+                                                <span class="odoo-price-currency me-1">S/</span>
+                                                <span class="odoo-price-amount price-val-corp">19.90</span>
+                                                <span class="price-strikethrough text-decoration-line-through fs-6 ms-2">S/ 21.90*</span>
+                                            </div>
+                                            <div class="odoo-price-period">por usuario al mes</div>
+                                            <div class="billing-cycle-note text-muted" style="font-size: 0.8rem; font-weight: 500;">Facturado anualmente</div>
                                         </div>
                                         <hr class="my-4 text-muted opacity-25"/>
                                         <ul class="odoo-plan-features">
@@ -339,6 +421,13 @@
                                 </div>
                             </div>
 
+                        </div>
+
+                        <!-- Nota al Pie de Descuento Anual -->
+                        <div class="text-center mt-4">
+                            <p class="text-muted small mb-0">
+                                * Precios con descuento aplicable al pago anual adelantado. Pagos mensuales aplican tarifa regular (+ S/ 2.00 por usuario al mes). Precios no incluyen IGV.
+                            </p>
                         </div>
                     </div>
                 </section>
@@ -387,6 +476,74 @@
                         </div>
                     </div>
                 </section>
+                <!-- Script Interactivo del Switch Anual / Mensual -->
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var switchContainer = document.getElementById('odooBillingSwitch');
+                        if (!switchContainer) return;
+                        
+                        var optAnual = document.getElementById('btnOptAnual');
+                        var optMensual = document.getElementById('btnOptMensual');
+                        var isMonthly = false;
+
+                        function updatePricing(monthly) {
+                            isMonthly = monthly;
+                            if (isMonthly) {
+                                switchContainer.classList.add('monthly');
+                                if (optMensual) optMensual.classList.add('active');
+                                if (optAnual) optAnual.classList.remove('active');
+                                
+                                var emp = document.querySelector('.price-val-emprendedor');
+                                if (emp) emp.textContent = '11.90';
+                                var pym = document.querySelector('.price-val-pyme');
+                                if (pym) pym.textContent = '16.90';
+                                var crp = document.querySelector('.price-val-corp');
+                                if (crp) crp.textContent = '21.90';
+                                
+                                document.querySelectorAll('.price-strikethrough').forEach(function(el) {
+                                    el.style.display = 'none';
+                                });
+                                document.querySelectorAll('.billing-cycle-note').forEach(function(el) {
+                                    el.textContent = 'Facturado mensualmente';
+                                });
+                            } else {
+                                switchContainer.classList.remove('monthly');
+                                if (optAnual) optAnual.classList.add('active');
+                                if (optMensual) optMensual.classList.remove('active');
+                                
+                                var emp = document.querySelector('.price-val-emprendedor');
+                                if (emp) emp.textContent = '9.90';
+                                var pym = document.querySelector('.price-val-pyme');
+                                if (pym) pym.textContent = '14.90';
+                                var crp = document.querySelector('.price-val-corp');
+                                if (crp) crp.textContent = '19.90';
+                                
+                                document.querySelectorAll('.price-strikethrough').forEach(function(el) {
+                                    el.style.display = 'inline-block';
+                                });
+                                document.querySelectorAll('.billing-cycle-note').forEach(function(el) {
+                                    el.textContent = 'Facturado anualmente';
+                                });
+                            }
+                        }
+
+                        switchContainer.addEventListener('click', function () {
+                            updatePricing(!isMonthly);
+                        });
+                        if (optAnual) {
+                            optAnual.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                updatePricing(false);
+                            });
+                        }
+                        if (optMensual) {
+                            optMensual.addEventListener('click', function (e) {
+                                e.stopPropagation();
+                                updatePricing(true);
+                            });
+                        }
+                    });
+                </script>
             </div>
         </t>
     </template>
