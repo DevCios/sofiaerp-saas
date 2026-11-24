@@ -138,33 +138,118 @@
                     .hero-benefits-strip { gap: 1.25rem; }
                 }
 
-                /* Bento Workflow Hub */
-                .sofia-pipeline-bar {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    background: #FFFFFF;
-                    border: 1px solid #E2E8F0;
-                    padding: 0.45rem 1.15rem;
-                    border-radius: 9999px;
-                    margin-bottom: 2.5rem;
-                    font-size: 0.825rem;
-                    font-weight: 600;
-                    color: #475569;
+                /* Suite de Aplicaciones SOFIA ERP (App Hub) */
+                .sofia-apps-hub-section {
+                    background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+                    padding-top: 4.5rem !important;
+                    padding-bottom: 5.5rem !important;
+                    position: relative;
+                    border-bottom: 1px solid #E2E8F0;
+                }
+                .apps-filter-bar {
+                    display: flex;
                     flex-wrap: wrap;
                     justify-content: center;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                    gap: 0.65rem;
+                    margin-bottom: 3rem;
                 }
-                .sofia-pipeline-step {
+                .app-filter-btn {
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    color: #475569;
+                    font-size: 0.885rem;
+                    font-weight: 600;
+                    padding: 0.55rem 1.25rem;
+                    border-radius: 9999px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
                     display: inline-flex;
                     align-items: center;
-                    gap: 0.35rem;
-                    color: #1E293B;
+                    gap: 0.45rem;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
                 }
-                .sofia-pipeline-arrow {
-                    color: #94A3B8;
-                    font-size: 0.75rem;
+                .app-filter-btn:hover {
+                    background: #F1F5F9;
+                    color: #0F172A;
+                    border-color: #CBD5E1;
                 }
+                .app-filter-btn.active {
+                    background: #7D1A6A !important;
+                    color: #FFFFFF !important;
+                    border-color: #7D1A6A !important;
+                    box-shadow: 0 4px 12px rgba(125, 26, 106, 0.25);
+                }
+                .app-filter-btn.active .app-filter-dot {
+                    background-color: #FFFFFF !important;
+                }
+                .app-filter-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    display: inline-block;
+                }
+                .apps-grid-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+                    gap: 1.25rem;
+                    max-width: 1220px;
+                    margin: 0 auto;
+                }
+                .app-tile-card {
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 18px;
+                    padding: 1.5rem 0.85rem 1.15rem 0.85rem;
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    text-decoration: none !important;
+                    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
+                    position: relative;
+                }
+                .app-tile-card:hover {
+                    transform: translateY(-5px);
+                    border-color: #CBD5E1;
+                    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.09);
+                }
+                .app-tile-icon {
+                    width: 58px;
+                    height: 58px;
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 0.85rem;
+                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.2s ease;
+                }
+                .app-tile-card:hover .app-tile-icon {
+                    transform: scale(1.08);
+                }
+                .app-tile-title {
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    color: #0F172A;
+                    line-height: 1.25;
+                    margin-bottom: 0.4rem;
+                }
+                .app-tile-tag {
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    padding: 0.15rem 0.55rem;
+                    border-radius: 9999px;
+                    margin-top: auto;
+                }
+                .tag-contabilidad { background: #CCFBF1; color: #007775; }
+                .tag-ventas { background: #FFE4E6; color: #BE123C; }
+                .tag-suministro { background: #E0F2FE; color: #0369A1; }
+                .tag-manufactura { background: #F3E8FF; color: #6B21A8; }
+                .tag-servicios { background: #FFEDD5; color: #C2410C; }
                 .bento-card {
                     background: #FFFFFF;
                     border: 1px solid #E2E8F0;
@@ -178,82 +263,6 @@
                     text-decoration: none !important;
                     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
                     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.03);
-                    position: relative;
-                    overflow: hidden;
-                }
-                .bento-card:hover {
-                    transform: translateY(-4px);
-                    border-color: #CBD5E1;
-                    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
-                }
-                .bento-card-featured {
-                    border: 1.5px solid #A855F7 !important;
-                    background: linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 30%);
-                    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.08);
-                }
-                .bento-card-featured:hover {
-                    border-color: #9333EA !important;
-                    box-shadow: 0 14px 32px rgba(168, 85, 247, 0.16);
-                }
-                .bento-icon-box {
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 1.35rem;
-                    margin-bottom: 1rem;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-                }
-                .bento-badge {
-                    font-size: 0.685rem;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    padding: 0.2rem 0.55rem;
-                    border-radius: 6px;
-                    display: inline-block;
-                    margin-bottom: 0.5rem;
-                }
-                .bento-card-title {
-                    font-size: 1.05rem;
-                    font-weight: 700;
-                    color: #0F172A;
-                    margin-bottom: 0.45rem;
-                    line-height: 1.3;
-                }
-                .bento-card-desc {
-                    font-size: 0.825rem;
-                    color: #64748B;
-                    line-height: 1.45;
-                    margin-bottom: 1rem;
-                }
-                .bento-metric-chip {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.4rem;
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    padding: 0.4rem 0.65rem;
-                    border-radius: 8px;
-                    background: #F8FAFC;
-                    border: 1px solid #EDF2F7;
-                    color: #334155;
-                    margin-top: auto;
-                }
-                .bento-substrip {
-                    margin-top: 2.5rem;
-                    font-size: 0.875rem;
-                    color: #64748B;
-                }
-                .bento-substrip a {
-                    color: #7D1A6A;
-                    font-weight: 600;
-                    text-decoration: none;
-                }
-                .bento-substrip a:hover {
-                    text-decoration: underline;
                 }
             </style>
 
@@ -315,108 +324,326 @@
             </div>
         </section>
 
-        <!-- 2. Sección Siguiente (Al hacer Scroll): Hub de Flujos Conectados (Bento Grid) -->
-        <section class="sofia-bento-section text-center position-relative">
+        <!-- 2. Sección Siguiente (Al hacer Scroll): Suite de Aplicaciones SOFIA ERP -->
+        <section class="sofia-apps-hub-section text-center position-relative" id="suite-aplicaciones">
             <div class="container">
-                <!-- Ribbon de Flujo Interconectado -->
-                <div class="sofia-pipeline-bar">
-                    <span class="text-uppercase text-muted" style="font-size: 0.7rem; letter-spacing: 0.05em;">Flujo en Tiempo Real:</span>
-                    <span class="sofia-pipeline-step">🛒 Venta POS / Web</span>
-                    <span class="sofia-pipeline-arrow">➔</span>
-                    <span class="sofia-pipeline-step">📄 SUNAT &amp; GRE 09/31</span>
-                    <span class="sofia-pipeline-arrow">➔</span>
-                    <span class="sofia-pipeline-step">📦 Kardex Automático</span>
-                    <span class="sofia-pipeline-arrow">➔</span>
-                    <span class="sofia-pipeline-step">📊 Asiento &amp; SIRE</span>
+                <!-- Encabezado de la Suite -->
+                <div class="text-center max-w-2xl mx-auto mb-4">
+                    <span class="text-uppercase fw-bold text-muted small" style="letter-spacing: 0.08em;">SUITE EMPRESARIAL COMPLETA</span>
+                    <h2 class="display-6 fw-bold text-dark mt-2 mb-2">
+                        Todas las aplicaciones de tu empresa en un solo <span class="hero-badge-purple">software</span>
+                    </h2>
+                    <p class="text-secondary fs-6 max-w-xl mx-auto" style="max-width: 680px;">
+                        Módulos integrados y sincronizados en tiempo real. Activa lo que necesitas hoy y añade más a medida que tu negocio crece en el Perú.
+                    </p>
                 </div>
 
-                <!-- Cuadrícula Bento de 4 Pilares Operativos -->
-                <div class="row g-3 justify-content-center" style="max-width: 1240px; margin: 0 auto;">
+                <!-- Barra de Filtros por Categoría -->
+                <div class="apps-filter-bar">
+                    <button type="button" class="app-filter-btn active" data-filter="all">
+                        Todas las aplicaciones (29)
+                    </button>
+                    <button type="button" class="app-filter-btn" data-filter="contabilidad">
+                        <span class="app-filter-dot" style="background:#00A09D;"></span> Contabilidad
+                    </button>
+                    <button type="button" class="app-filter-btn" data-filter="ventas">
+                        <span class="app-filter-dot" style="background:#E55A5A;"></span> Ventas &amp; POS
+                    </button>
+                    <button type="button" class="app-filter-btn" data-filter="suministro">
+                        <span class="app-filter-dot" style="background:#007791;"></span> Cadena de Suministro
+                    </button>
+                    <button type="button" class="app-filter-btn" data-filter="manufactura">
+                        <span class="app-filter-dot" style="background:#6C5B7B;"></span> Manufactura
+                    </button>
+                    <button type="button" class="app-filter-btn" data-filter="servicios">
+                        <span class="app-filter-dot" style="background:#E67E22;"></span> Servicios
+                    </button>
+                </div>
+
+                <!-- Matriz de Aplicaciones (App Tiles Squircles Estilo SOFIA ERP) -->
+                <div class="apps-grid-container" id="appsGrid">
                     
-                    <!-- Pilar 1: Ventas y POS -->
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <a href="/aplicaciones/punto-de-venta" class="bento-card">
-                            <div>
-                                <div class="bento-icon-box" style="background: #EEF2FF; color: #4F46E5;">🛒</div>
-                                <span class="bento-badge" style="background: #E0E7FF; color: #3730A3;">Offline &amp; Rápido</span>
-                                <h3 class="bento-card-title">Punto de Venta &amp; CRM</h3>
-                                <p class="bento-card-desc">
-                                    Cobros táctiles ultrarrápidos, lector de barras, cotizaciones a WhatsApp y pagos con QR / Mercado Pago.
-                                </p>
-                            </div>
-                            <div class="bento-metric-chip">
-                                <span style="color: #4F46E5;">⚡</span>
-                                <span>Tickets emitidos en &lt; 1.2 segundos</span>
-                            </div>
-                        </a>
-                    </div>
+                    <!-- 1. Contabilidad -->
+                    <a href="/aplicaciones/facturacion-electronica" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #00A09D 0%, #007775 100%);">
+                            <span style="font-size: 1.65rem;">📄</span>
+                        </div>
+                        <div class="app-tile-title">Facturación electrónica</div>
+                        <div class="app-tile-tag tag-contabilidad">SUNAT UBL 2.1</div>
+                    </a>
 
-                    <!-- Pilar 2: SUNAT y Guías GRE (Destacado) -->
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <a href="/aplicaciones/facturacion-electronica" class="bento-card bento-card-featured">
-                            <div>
-                                <div class="bento-icon-box" style="background: #F3E8FF; color: #7E22CE;">⚡</div>
-                                <span class="bento-badge" style="background: #F3E8FF; color: #6B21A8;">UBL 2.1 • Homologado</span>
-                                <h3 class="bento-card-title">Facturación &amp; GRE 09/31</h3>
-                                <p class="bento-card-desc">
-                                    Facturas, boletas, notas de crédito y Guías de Remisión Electrónica con QR y validación directa en SUNAT.
-                                </p>
-                            </div>
-                            <div class="bento-metric-chip" style="background: #FAF5FF; border-color: #E9D5FF;">
-                                <span style="color: #7E22CE;">🛡️</span>
-                                <span>0 rechazos fiscales • Envío al OSE</span>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);">
+                            <span style="font-size: 1.65rem;">📊</span>
+                        </div>
+                        <div class="app-tile-title">Registros SIRE</div>
+                        <div class="app-tile-tag tag-contabilidad">RVIE &amp; RCE</div>
+                    </a>
 
-                    <!-- Pilar 3: Kardex e Inventario -->
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <a href="/aplicaciones/inventario" class="bento-card">
-                            <div>
-                                <div class="bento-icon-box" style="background: #FEF3C7; color: #D97706;">📦</div>
-                                <span class="bento-badge" style="background: #FEF3C7; color: #92400E;">SUNAT Anexo 13</span>
-                                <h3 class="bento-card-title">Kardex &amp; Multialmacén</h3>
-                                <p class="bento-card-desc">
-                                    Valorización de inventarios (Promedio / FIFO), alertas de stock mínimo, despachos y control de lotes.
-                                </p>
-                            </div>
-                            <div class="bento-metric-chip">
-                                <span style="color: #D97706;">🔄</span>
-                                <span>Kardex rebajado en cada venta</span>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="/aplicaciones/gastos" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                            <span style="font-size: 1.65rem;">🧾</span>
+                        </div>
+                        <div class="app-tile-title">Gestión de gastos</div>
+                        <div class="app-tile-tag tag-contabilidad">Rendición</div>
+                    </a>
 
-                    <!-- Pilar 4: Contabilidad y SIRE -->
-                    <div class="col-12 col-md-6 col-lg-3">
-                        <a href="/verticales/contabilidad" class="bento-card">
-                            <div>
-                                <div class="bento-icon-box" style="background: #CCFBF1; color: #0D9488;">📊</div>
-                                <span class="bento-badge" style="background: #CCFBF1; color: #115E59;">Automático &amp; SIRE</span>
-                                <h3 class="bento-card-title">Contabilidad &amp; Finanzas</h3>
-                                <p class="bento-card-desc">
-                                    Generación de propuestas RVIE / RCE para SIRE, asientos contables sin doble digitación y flujo de caja en vivo.
-                                </p>
-                            </div>
-                            <div class="bento-metric-chip">
-                                <span style="color: #0D9488;">📈</span>
-                                <span>P&amp;L y balances al instante</span>
-                            </div>
-                        </a>
-                    </div>
+                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);">
+                            <span style="font-size: 1.65rem;">💳</span>
+                        </div>
+                        <div class="app-tile-title">Cuentas por cobrar</div>
+                        <div class="app-tile-tag tag-contabilidad">Cobranzas</div>
+                    </a>
+
+                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);">
+                            <span style="font-size: 1.65rem;">💼</span>
+                        </div>
+                        <div class="app-tile-title">Cuentas por pagar</div>
+                        <div class="app-tile-tag tag-contabilidad">Proveedores</div>
+                    </a>
+
+                    <a href="/verticales/contabilidad" class="app-tile-card" data-category="contabilidad">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);">
+                            <span style="font-size: 1.65rem;">🏦</span>
+                        </div>
+                        <div class="app-tile-title">Caja y bancos</div>
+                        <div class="app-tile-tag tag-contabilidad">Conciliación</div>
+                    </a>
+
+                    <!-- 2. Ventas -->
+                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F43F5E 0%, #E11D48 100%);">
+                            <span style="font-size: 1.65rem;">🤝</span>
+                        </div>
+                        <div class="app-tile-title">CRM</div>
+                        <div class="app-tile-tag tag-ventas">Oportunidades</div>
+                    </a>
+
+                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E55A5A 0%, #DC2626 100%);">
+                            <span style="font-size: 1.65rem;">📈</span>
+                        </div>
+                        <div class="app-tile-title">Ventas y cotizaciones</div>
+                        <div class="app-tile-tag tag-ventas">WhatsApp &amp; PDF</div>
+                    </a>
+
+                    <a href="/verticales/comercio-electronico" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                            <span style="font-size: 1.65rem;">🌐</span>
+                        </div>
+                        <div class="app-tile-title">Comercio electrónico</div>
+                        <div class="app-tile-tag tag-ventas">Tienda Online</div>
+                    </a>
+
+                    <a href="/verticales/bodegas" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);">
+                            <span style="font-size: 1.65rem;">🏪</span>
+                        </div>
+                        <div class="app-tile-title">POS para bodegas</div>
+                        <div class="app-tile-tag tag-ventas">Código de Barras</div>
+                    </a>
+
+                    <a href="/verticales/restaurante" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                            <span style="font-size: 1.65rem;">🍽️</span>
+                        </div>
+                        <div class="app-tile-title">POS para restaurantes</div>
+                        <div class="app-tile-tag tag-ventas">Comandas &amp; Mesas</div>
+                    </a>
+
+                    <a href="/aplicaciones/ventas" class="app-tile-card" data-category="ventas">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);">
+                            <span style="font-size: 1.65rem;">🚀</span>
+                        </div>
+                        <div class="app-tile-title">Fuerza de ventas</div>
+                        <div class="app-tile-tag tag-ventas">Móvil en Ruta</div>
+                    </a>
+
+                    <!-- 3. Cadena de Suministro -->
+                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #007791 0%, #005566 100%);">
+                            <span style="font-size: 1.65rem;">📦</span>
+                        </div>
+                        <div class="app-tile-title">Gestión de inventario</div>
+                        <div class="app-tile-tag tag-suministro">Stock en Vivo</div>
+                    </a>
+
+                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);">
+                            <span style="font-size: 1.65rem;">📋</span>
+                        </div>
+                        <div class="app-tile-title">Kardex valorizado</div>
+                        <div class="app-tile-tag tag-suministro">Anexo 13 SUNAT</div>
+                    </a>
+
+                    <a href="/aplicaciones/guias-remision" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);">
+                            <span style="font-size: 1.65rem;">🚛</span>
+                        </div>
+                        <div class="app-tile-title">Guías de remisión electrónicas</div>
+                        <div class="app-tile-tag tag-suministro">GRE 09 / 31</div>
+                    </a>
+
+                    <a href="/aplicaciones/compras" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);">
+                            <span style="font-size: 1.65rem;">🛍️</span>
+                        </div>
+                        <div class="app-tile-title">Compras</div>
+                        <div class="app-tile-tag tag-suministro">Órdenes &amp; Costeo</div>
+                    </a>
+
+                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);">
+                            <span style="font-size: 1.65rem;">🏭</span>
+                        </div>
+                        <div class="app-tile-title">Múltiples almacenes</div>
+                        <div class="app-tile-tag tag-suministro">Transferencias</div>
+                    </a>
+
+                    <a href="/aplicaciones/inventario" class="app-tile-card" data-category="suministro">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">
+                            <span style="font-size: 1.65rem;">🏷️</span>
+                        </div>
+                        <div class="app-tile-title">Trazabilidad de productos</div>
+                        <div class="app-tile-tag tag-suministro">Lotes &amp; Series</div>
+                    </a>
+
+                    <!-- 4. Manufactura -->
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #6C5B7B 0%, #4A3B58 100%);">
+                            <span style="font-size: 1.65rem;">⚙️</span>
+                        </div>
+                        <div class="app-tile-title">MRP</div>
+                        <div class="app-tile-tag tag-manufactura">Órdenes de Planta</div>
+                    </a>
+
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);">
+                            <span style="font-size: 1.65rem;">📑</span>
+                        </div>
+                        <div class="app-tile-title">Listas de materiales (BOM)</div>
+                        <div class="app-tile-tag tag-manufactura">Recetas &amp; Mermas</div>
+                    </a>
+
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #9333EA 0%, #6B21A8 100%);">
+                            <span style="font-size: 1.65rem;">🛡️</span>
+                        </div>
+                        <div class="app-tile-title">Control de calidad</div>
+                        <div class="app-tile-tag tag-manufactura">Puntos de Control</div>
+                    </a>
+
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #A855F7 0%, #7E22CE 100%);">
+                            <span style="font-size: 1.65rem;">📈</span>
+                        </div>
+                        <div class="app-tile-title">KPIs de producción</div>
+                        <div class="app-tile-tag tag-manufactura">Métricas Clave</div>
+                    </a>
+
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #C084FC 0%, #9333EA 100%);">
+                            <span style="font-size: 1.65rem;">⏱️</span>
+                        </div>
+                        <div class="app-tile-title">OEE</div>
+                        <div class="app-tile-tag tag-manufactura">Eficiencia Global</div>
+                    </a>
+
+                    <a href="/verticales/industria" class="app-tile-card" data-category="manufactura">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #581C87 0%, #3B0764 100%);">
+                            <span style="font-size: 1.65rem;">🔧</span>
+                        </div>
+                        <div class="app-tile-title">Mantenimiento preventivo</div>
+                        <div class="app-tile-tag tag-manufactura">Maquinarias</div>
+                    </a>
+
+                    <!-- 5. Servicios -->
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);">
+                            <span style="font-size: 1.65rem;">🎧</span>
+                        </div>
+                        <div class="app-tile-title">Gestión de servicios</div>
+                        <div class="app-tile-tag tag-servicios">Atención al Cliente</div>
+                    </a>
+
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);">
+                            <span style="font-size: 1.65rem;">💼</span>
+                        </div>
+                        <div class="app-tile-title">Gestión de proyectos</div>
+                        <div class="app-tile-tag tag-servicios">Kanban &amp; Hitos</div>
+                    </a>
+
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #D97706 0%, #B45309 100%);">
+                            <span style="font-size: 1.65rem;">📅</span>
+                        </div>
+                        <div class="app-tile-title">Planificación de actividades</div>
+                        <div class="app-tile-tag tag-servicios">Cronogramas</div>
+                    </a>
+
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #B45309 0%, #78350F 100%);">
+                            <span style="font-size: 1.65rem;">📝</span>
+                        </div>
+                        <div class="app-tile-title">Gestión de tareas</div>
+                        <div class="app-tile-tag tag-servicios">Flujos &amp; Checklists</div>
+                    </a>
+
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #C2410C 0%, #9A3412 100%);">
+                            <span style="font-size: 1.65rem;">📜</span>
+                        </div>
+                        <div class="app-tile-title">Contratos de servicios</div>
+                        <div class="app-tile-tag tag-servicios">Facturación Recurrente</div>
+                    </a>
+
+                    <a href="/verticales/servicios" class="app-tile-card" data-category="servicios">
+                        <div class="app-tile-icon" style="background: linear-gradient(135deg, #EA580C 0%, #C2410C 100%);">
+                            <span style="font-size: 1.65rem;">⏱️</span>
+                        </div>
+                        <div class="app-tile-title">Partes de trabajo</div>
+                        <div class="app-tile-tag tag-servicios">Control de Horas</div>
+                    </a>
 
                 </div>
 
-                <!-- Accesos Complementarios a Verticales e Industria -->
-                <div class="bento-substrip text-center">
-                    <span>¿Operaciones especializadas? Explora nuestras verticales: </span>
-                    <a href="/verticales/bodegas">Bodegas</a> • 
-                    <a href="/verticales/ferreterias">Ferreterías</a> • 
-                    <a href="/verticales/restaurantes">Restaurantes</a> • 
-                    <a href="/verticales/talleres-mecanicos">Talleres</a> • 
-                    <a href="/verticales/servicios-profesionales">Servicios</a>
+                <!-- Enlace Complementario a Verticales -->
+                <div class="text-center mt-5">
+                    <p class="text-muted small mb-0">
+                        ¿Buscas una solución lista para tu rubro? 
+                        <a href="/verticales" class="fw-bold" style="color: #7D1A6A; text-decoration: none;">
+                            Explora nuestras 11 Verticales de Negocio especializadas →
+                        </a>
+                    </p>
                 </div>
             </div>
+
+            <!-- Script de Filtrado Dinámico -->
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function() {
+                    var filterBtns = document.querySelectorAll('.app-filter-btn');
+                    var appCards = document.querySelectorAll('.app-tile-card');
+                    if (filterBtns &amp;&amp; filterBtns.length) {
+                        filterBtns.forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                filterBtns.forEach(function(b) { b.classList.remove('active'); });
+                                this.classList.add('active');
+                                var filter = this.getAttribute('data-filter');
+                                appCards.forEach(function(card) {
+                                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                                        card.style.display = 'flex';
+                                    } else {
+                                        card.style.display = 'none';
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
+            </script>
         </section>
     </template>
 
