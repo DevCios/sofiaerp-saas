@@ -34,6 +34,13 @@
                         align-items: center;
                         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     }
+                    .odoo-logo img,
+                    .odoo-logo span img {
+                        max-height: 40px !important;
+                        width: auto !important;
+                        object-fit: contain !important;
+                        display: block !important;
+                    }
                     .odoo-logo-text {
                         font-size: 1.85rem;
                         font-weight: 800;
@@ -42,7 +49,7 @@
                         line-height: 1;
                     }
                     .odoo-logo-erp {
-                        color: #714B67;
+                        color: #7D1A6A;
                         font-weight: 700;
                         font-size: 1.25rem;
                         margin-left: 2px;
@@ -281,9 +288,14 @@
                 <!-- Barra de Navegación -->
                 <div class="odoo-nav-container">
                     
-                    <!-- Logo estilo Odoo -->
+                    <!-- Logo dinámico desde Ajustes ➔ Empresas -->
                     <a class="odoo-logo" href="/">
-                        <span class="odoo-logo-text">sofia<span class="odoo-logo-erp">erp</span></span>
+                        <t t-if="res_company.logo">
+                            <span t-field="res_company.logo" t-options="{'widget': 'image', 'style': 'max-height: 40px; width: auto; object-fit: contain; display: block;'}" role="img" t-att-aria-label="'Logo de %s' % res_company.name"/>
+                        </t>
+                        <t t-else="">
+                            <span class="odoo-logo-text">sofia<span class="odoo-logo-erp">erp</span></span>
+                        </t>
                     </a>
 
                     <!-- Menús -->
