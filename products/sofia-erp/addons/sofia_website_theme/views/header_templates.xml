@@ -124,14 +124,26 @@
                         padding: 2.5rem 3rem 1.75rem 3rem !important;
                     }
 
-                    /* Mostrar menú al pasar el cursor */
-                    .odoo-dropdown:hover > .odoo-megamenu-panel {
+                    /* Puente invisible para que el cursor nunca pierda el hover */
+                    .odoo-megamenu-panel::before {
+                        content: "" !important;
+                        position: absolute !important;
+                        top: -30px !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        height: 35px !important;
+                        background: transparent !important;
+                    }
+
+                    /* Mostrar menú al pasar el cursor o al tener clase activa */
+                    .odoo-dropdown:hover > .odoo-megamenu-panel,
+                    .odoo-megamenu-panel.is-open {
                         display: block !important;
-                        animation: odooDropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        animation: odooDropdownFade 0.15s ease-out forwards;
                     }
 
                     @keyframes odooDropdownFade {
-                        from { opacity: 0; transform: translateY(4px); }
+                        from { opacity: 0; transform: translateY(3px); }
                         to { opacity: 1; transform: translateY(0); }
                     }
 
@@ -361,6 +373,59 @@
                         <a href="/precios" class="odoo-trial-btn">Pruébalo gratis</a>
                     </div>
                 </div>
+
+                <!-- Script para garantizar persistencia y permitir Clic y Hover sin desvanecimiento -->
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const dropdowns = document.querySelectorAll('.odoo-dropdown');
+                        dropdowns.forEach(function (dd) {
+                            const link = dd.querySelector('.odoo-nav-link');
+                            const panel = dd.querySelector('.odoo-megamenu-panel');
+                            let hideTimer = null;
+
+                            function showMenu() {
+                                clearTimeout(hideTimer);
+                                document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
+                                    if (p !== panel) p.classList.remove('is-open');
+                                });
+                                panel.classList.add('is-open');
+                            }
+
+                            function hideMenu() {
+                                hideTimer = setTimeout(function () {
+                                    panel.classList.remove('is-open');
+                                }, 300); // 300ms de gracia para que nunca se cierre al mover el cursor
+                            }
+
+                            dd.addEventListener('mouseenter', showMenu);
+                            dd.addEventListener('mouseleave', hideMenu);
+
+                            // Soporte para alternar con Clic directo
+                            if (link) {
+                                link.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const isOpen = panel.classList.contains('is-open');
+                                    document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
+                                        p.classList.remove('is-open');
+                                    });
+                                    if (!isOpen) {
+                                        panel.classList.add('is-open');
+                                    }
+                                });
+                            }
+                        });
+
+                        // Cerrar al hacer clic en cualquier parte fuera del menú
+                        document.addEventListener('click', function (e) {
+                            if (!e.target.closest('.odoo-dropdown')) {
+                                document.querySelectorAll('.odoo-megamenu-panel').forEach(function(p) {
+                                    p.classList.remove('is-open');
+                                });
+                            }
+                        });
+                    });
+                </script>
             </header>
         </xpath>
     </template>
