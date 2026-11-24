@@ -4,182 +4,363 @@
     <template id="sofia_header" inherit_id="website.layout" name="SOFIA ERP Header Odoo Style">
         <xpath expr="//header" position="replace">
             <header id="top" class="odoo-style-header">
-                <nav class="navbar navbar-expand-lg odoo-navbar">
-                    <div class="container-fluid px-3 px-xl-5">
+                
+                <!-- Estilos embebidos directos para garantizar carga 100% libre de caché -->
+                <style>
+                    /* Reset y Header Base */
+                    .odoo-style-header {
+                        background: #FFFFFF !important;
+                        border-bottom: 1px solid #E5E7EB !important;
+                        position: sticky !important;
+                        top: 0 !important;
+                        z-index: 9999 !important;
+                        width: 100% !important;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+                    }
+                    .odoo-nav-container {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        padding: 0.65rem 2rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        position: relative;
+                    }
+                    
+                    /* Logo estilo odoo */
+                    .odoo-logo {
+                        text-decoration: none !important;
+                        display: flex;
+                        align-items: center;
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    }
+                    .odoo-logo-text {
+                        font-size: 1.85rem;
+                        font-weight: 800;
+                        color: #212529;
+                        letter-spacing: -0.05em;
+                        line-height: 1;
+                    }
+                    .odoo-logo-erp {
+                        color: #714B67;
+                        font-weight: 700;
+                        font-size: 1.25rem;
+                        margin-left: 2px;
+                    }
+
+                    /* Menú de Navegación */
+                    .odoo-nav-menu {
+                        display: flex;
+                        align-items: center;
+                        list-style: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        gap: 0.5rem;
+                    }
+                    .odoo-nav-item {
+                        position: static !important;
+                        list-style: none !important;
+                    }
+                    .odoo-nav-link {
+                        text-decoration: none !important;
+                        font-size: 0.95rem;
+                        font-weight: 500;
+                        color: #4B5563 !important;
+                        padding: 0.6rem 0.9rem;
+                        border-radius: 6px;
+                        display: inline-block;
+                        transition: color 0.15s ease, background-color 0.15s ease;
+                    }
+                    .odoo-nav-link:hover {
+                        color: #111827 !important;
+                        background-color: #F3F4F6 !important;
+                    }
+
+                    /* Acciones Derecha */
+                    .odoo-nav-actions {
+                        display: flex;
+                        align-items: center;
+                        gap: 1.25rem;
+                    }
+                    .odoo-login-btn {
+                        text-decoration: none !important;
+                        font-size: 0.925rem;
+                        font-weight: 500;
+                        color: #374151 !important;
+                        transition: color 0.15s ease;
+                    }
+                    .odoo-login-btn:hover {
+                        color: #000000 !important;
+                    }
+                    .odoo-trial-btn {
+                        background-color: #714B67 !important;
+                        color: #FFFFFF !important;
+                        text-decoration: none !important;
+                        font-size: 0.925rem;
+                        font-weight: 600;
+                        padding: 0.5rem 1.25rem;
+                        border-radius: 6px;
+                        display: inline-block;
+                        transition: background-color 0.15s ease, transform 0.1s ease;
+                    }
+                    .odoo-trial-btn:hover {
+                        background-color: #58394F !important;
+                        transform: translateY(-1px);
+                    }
+
+                    /* MEGA-MENÚ ANCHO COMPLETO (EXACTO A ODOO.COM) */
+                    .odoo-megamenu-panel {
+                        display: none !important;
+                        position: absolute !important;
+                        top: 100% !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        width: 100% !important;
+                        background: #FFFFFF !important;
+                        border-top: 1px solid #E5E7EB !important;
+                        border-bottom: 2px solid #E2E8F0 !important;
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+                        z-index: 10000 !important;
+                        padding: 2.5rem 3rem 1.75rem 3rem !important;
+                    }
+
+                    /* Mostrar menú al pasar el cursor */
+                    .odoo-dropdown:hover > .odoo-megamenu-panel {
+                        display: block !important;
+                        animation: odooDropdownFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    }
+
+                    @keyframes odooDropdownFade {
+                        from { opacity: 0; transform: translateY(4px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+
+                    .odoo-mega-container {
+                        max-width: 1300px;
+                        margin: 0 auto;
+                    }
+
+                    /* Columnas del Menú */
+                    .odoo-mega-grid {
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 2.5rem;
+                        text-align: left;
+                    }
+
+                    .odoo-category-header {
+                        font-size: 0.8rem;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        margin-bottom: 1rem;
+                        padding-bottom: 0.4rem;
+                        display: inline-block;
+                        border-bottom: 2px solid;
+                    }
+                    .color-finanzas { color: #008784; border-color: #008784; }
+                    .color-ventas { color: #E55A5A; border-color: #E55A5A; }
+                    .color-suministro { color: #007791; border-color: #007791; }
+                    .color-servicios { color: #F59E0B; border-color: #F59E0B; }
+                    .color-retail { color: #008784; border-color: #008784; }
+                    .color-industria { color: #6C5B7B; border-color: #6C5B7B; }
+                    .color-salud { color: #F3722C; border-color: #F3722C; }
+                    .color-rrhh { color: #714B67; border-color: #714B67; }
+
+                    .odoo-links-list {
+                        list-style: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                    }
+                    .odoo-links-list li {
+                        margin-bottom: 0.55rem !important;
+                        list-style: none !important;
+                    }
+                    .odoo-links-list a {
+                        color: #374151 !important;
+                        text-decoration: none !important;
+                        font-size: 0.9rem !important;
+                        display: inline-block !important;
+                        transition: color 0.15s ease, transform 0.15s ease !important;
+                    }
+                    .odoo-links-list a:hover {
+                        color: #000000 !important;
+                        font-weight: 600 !important;
+                        transform: translateX(3px) !important;
+                    }
+
+                    /* Pie del Mega-Menú */
+                    .odoo-mega-footer {
+                        margin-top: 2rem;
+                        padding-top: 1.25rem;
+                        border-top: 1px solid #F3F4F6;
+                        text-align: center;
+                    }
+                    .odoo-mega-footer a {
+                        color: #6B7280 !important;
+                        font-size: 0.875rem !important;
+                        text-decoration: none !important;
+                        font-weight: 600 !important;
+                    }
+                    .odoo-mega-footer a:hover {
+                        color: #111827 !important;
+                    }
+
+                    /* Móvil */
+                    @media (max-width: 991px) {
+                        .odoo-nav-menu { display: none; }
+                        .odoo-nav-actions { display: none; }
+                        .odoo-megamenu-panel { display: none !important; }
+                    }
+                </style>
+
+                <!-- Barra de Navegación -->
+                <div class="odoo-nav-container">
+                    
+                    <!-- Logo estilo Odoo -->
+                    <a class="odoo-logo" href="/">
+                        <span class="odoo-logo-text">sofia<span class="odoo-logo-erp">erp</span></span>
+                    </a>
+
+                    <!-- Menús -->
+                    <ul class="odoo-nav-menu">
                         
-                        <!-- Logo estilo Odoo -->
-                        <a class="navbar-brand odoo-brand d-flex align-items-center" href="/">
-                            <span class="brand-text">sofia<span class="brand-dot">erp</span></span>
-                        </a>
+                        <!-- 1. Mega-Menú: Aplicaciones -->
+                        <li class="odoo-nav-item odoo-dropdown">
+                            <a class="odoo-nav-link" href="#">Aplicaciones</a>
+                            <div class="odoo-megamenu-panel">
+                                <div class="odoo-mega-container">
+                                    <div class="odoo-mega-grid">
+                                        <!-- Finanzas -->
+                                        <div>
+                                            <div class="odoo-category-header color-finanzas">Finanzas</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT UBL 2.1</a></li>
+                                                <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE</a></li>
+                                                <li><a href="/aplicaciones/facturacion-electronica">Boletas &amp; Facturas</a></li>
+                                                <li><a href="/aplicaciones/facturacion-electronica">Notas de Crédito &amp; Débito</a></li>
+                                                <li><a href="/precios">Cobros Mercado Pago</a></li>
+                                            </ul>
+                                        </div>
 
-                        <!-- Botón Móvil -->
-                        <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse" data-bs-target="#odooNavCollapse" aria-controls="odooNavCollapse" aria-expanded="false">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
+                                        <!-- Ventas -->
+                                        <div>
+                                            <div class="odoo-category-header color-ventas">Ventas</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/aplicaciones/ventas">CRM</a></li>
+                                                <li><a href="/aplicaciones/ventas">Ventas &amp; Cotizaciones</a></li>
+                                                <li><a href="/precios">Suscripciones Recurrentes</a></li>
+                                                <li><a href="/aplicaciones/punto-de-venta">PdV para Tiendas</a></li>
+                                                <li><a href="/verticales/restaurante">PdV para Restaurantes</a></li>
+                                            </ul>
+                                        </div>
 
-                        <!-- Menús Centrales -->
-                        <div class="collapse navbar-collapse" id="odooNavCollapse">
-                            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 align-items-lg-center">
-                                
-                                <!-- 1. Mega-Menú: Aplicaciones (Estilo Odoo.com) -->
-                                <li class="nav-item odoo-nav-item odoo-dropdown-full">
-                                    <a class="nav-link odoo-link" href="#" id="menuAppsToggle">
-                                        Aplicaciones
-                                    </a>
-                                    <div class="odoo-megamenu-panel">
-                                        <div class="container py-4">
-                                            <div class="row g-4 text-start">
-                                                <!-- Columna 1: Finanzas -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-finanzas">Finanzas</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/aplicaciones/facturacion-electronica">Facturación SUNAT UBL 2.1</a></li>
-                                                        <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE</a></li>
-                                                        <li><a href="/aplicaciones/facturacion-electronica">Boletas &amp; Facturas</a></li>
-                                                        <li><a href="/aplicaciones/facturacion-electronica">Notas de Crédito &amp; Débito</a></li>
-                                                        <li><a href="/precios">Cobros con Mercado Pago</a></li>
-                                                    </ul>
-                                                </div>
+                                        <!-- Cadena de Suministro -->
+                                        <div>
+                                            <div class="odoo-category-header color-suministro">Cadena de Suministro</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/aplicaciones/inventario">Inventario</a></li>
+                                                <li><a href="/verticales/industria">Manufactura</a></li>
+                                                <li><a href="/aplicaciones/guias-remision">Guías GRE 09/31</a></li>
+                                                <li><a href="/aplicaciones/compras">Compras</a></li>
+                                                <li><a href="/aplicaciones/inventario">Kardex Valorizado</a></li>
+                                            </ul>
+                                        </div>
 
-                                                <!-- Columna 2: Ventas & Clientes -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-ventas">Ventas</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/aplicaciones/ventas">CRM &amp; Clientes</a></li>
-                                                        <li><a href="/aplicaciones/ventas">Cotizaciones &amp; Pedidos</a></li>
-                                                        <li><a href="/precios">Suscripciones Recurrentes</a></li>
-                                                        <li><a href="/aplicaciones/punto-de-venta">PdV para Tiendas y Mostrador</a></li>
-                                                        <li><a href="/verticales/restaurante">PdV para Restaurantes</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Columna 3: Cadena de Suministro -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-suministro">Cadena de Suministro</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/aplicaciones/inventario">Inventario &amp; Multi-Almacén</a></li>
-                                                        <li><a href="/aplicaciones/inventario">Kardex Valorizado en Soles</a></li>
-                                                        <li><a href="/aplicaciones/guias-remision">Guías de Remisión (GRE 09/31)</a></li>
-                                                        <li><a href="/aplicaciones/compras">Compras &amp; Gastos</a></li>
-                                                        <li><a href="/verticales/industria">Manufactura &amp; Producción</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Columna 4: Gestión & Servicios -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-servicios">Servicios &amp; RRHH</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/verticales/servicios">Gestión de Proyectos &amp; Horas</a></li>
-                                                        <li><a href="/verticales/recursos-humanos">Recursos Humanos &amp; Personal</a></li>
-                                                        <li><a href="/verticales/recursos-humanos">Control de Asistencia</a></li>
-                                                        <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas &amp; Vehículos</a></li>
-                                                        <li><a href="/soporte">Mesa de Ayuda (Soporte)</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- Barra inferior del menú -->
-                                            <div class="odoo-megamenu-footer mt-4 pt-3 border-top d-flex flex-wrap justify-content-between align-items-center text-muted small">
-                                                <div>
-                                                    <span class="me-3"><i class="fa fa-cloud text-primary me-1"></i> Plataforma Cloud 100% en la nube</span>
-                                                    <span class="me-3"><i class="fa fa-check text-success me-1"></i> Homologado SUNAT</span>
-                                                    <span><i class="fa fa-lock text-info me-1"></i> Base de datos aislada por cliente</span>
-                                                </div>
-                                                <a href="/precios" class="text-primary text-decoration-none fw-semibold">
-                                                    Ver todos los módulos y planes →
-                                                </a>
-                                            </div>
+                                        <!-- Servicios -->
+                                        <div>
+                                            <div class="odoo-category-header color-servicios">Servicios &amp; RRHH</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/servicios">Proyectos</a></li>
+                                                <li><a href="/verticales/servicios">Registro de Horas</a></li>
+                                                <li><a href="/verticales/recursos-humanos">Recursos Humanos</a></li>
+                                                <li><a href="/verticales/gestion-de-flotas">Gestión de Flotas</a></li>
+                                                <li><a href="/soporte">Soporte al Cliente</a></li>
+                                            </ul>
                                         </div>
                                     </div>
-                                </li>
-
-                                <!-- 2. Mega-Menú: Verticales (Estilo Odoo.com con las 11 Verticales) -->
-                                <li class="nav-item odoo-nav-item odoo-dropdown-full">
-                                    <a class="nav-link odoo-link" href="#" id="menuVertToggle">
-                                        Verticales
-                                    </a>
-                                    <div class="odoo-megamenu-panel">
-                                        <div class="container py-4">
-                                            <div class="row g-4 text-start">
-                                                
-                                                <!-- Grupo 1: Comercio & Retail -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-retail">Comercio &amp; Retail</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/verticales/bodegas" class="fw-medium">Bodegas</a></li>
-                                                        <li><a href="/verticales/ferreterias" class="fw-medium">Ferreterías</a></li>
-                                                        <li><a href="/verticales/retail" class="fw-medium">Retail</a></li>
-                                                        <li><a href="/verticales/comercio-electronico" class="fw-medium">Comercio electrónico</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Grupo 2: Industria & Logística -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-industria">Industria &amp; Logística</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/verticales/industria" class="fw-medium">Industria</a></li>
-                                                        <li><a href="/verticales/gestion-de-flotas" class="fw-medium">Gestión de flotas</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Grupo 3: Servicios & Salud -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-salud">Servicios &amp; Salud</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/verticales/odontologia" class="fw-medium">Odontología</a></li>
-                                                        <li><a href="/verticales/servicios" class="fw-medium">Servicios</a></li>
-                                                        <li><a href="/verticales/restaurante" class="fw-medium">Restaurante</a></li>
-                                                    </ul>
-                                                </div>
-
-                                                <!-- Grupo 4: Finanzas & Personas -->
-                                                <div class="col-lg-3 col-md-6">
-                                                    <div class="odoo-col-title title-finanzas">Gestión &amp; Finanzas</div>
-                                                    <ul class="odoo-menu-list">
-                                                        <li><a href="/verticales/recursos-humanos" class="fw-medium">Recursos humanos</a></li>
-                                                        <li><a href="/verticales/contabilidad" class="fw-medium">Contabilidad</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-
-                                            <!-- Barra inferior de Verticales -->
-                                            <div class="odoo-megamenu-footer mt-4 pt-3 border-top text-center">
-                                                <a href="/precios" class="text-secondary text-decoration-none fw-semibold small">
-                                                    Consulta todas las verticales y soluciones →
-                                                </a>
-                                            </div>
-                                        </div>
+                                    <div class="odoo-mega-footer">
+                                        <a href="/precios">Consulta todas las aplicaciones y módulos →</a>
                                     </div>
-                                </li>
-
-                                <!-- 3. Comunidad -->
-                                <li class="nav-item odoo-nav-item">
-                                    <a class="nav-link odoo-link" href="/blog">Comunidad</a>
-                                </li>
-
-                                <!-- 4. Precios -->
-                                <li class="nav-item odoo-nav-item">
-                                    <a class="nav-link odoo-link" href="/precios">Precios</a>
-                                </li>
-
-                                <!-- 5. Soporte -->
-                                <li class="nav-item odoo-nav-item">
-                                    <a class="nav-link odoo-link" href="/soporte">Soporte</a>
-                                </li>
-                            </ul>
-
-                            <!-- Acciones Derecha: Inicia sesión y Pruébalo gratis (Estilo Odoo) -->
-                            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                                <a href="/login" class="odoo-login-link text-decoration-none">
-                                    Inicia sesión
-                                </a>
-                                <a href="/precios" class="btn odoo-btn-trial">
-                                    Pruébalo gratis
-                                </a>
+                                </div>
                             </div>
-                        </div>
+                        </li>
+
+                        <!-- 2. Mega-Menú: Verticales (11 Ítems exactos estilo Odoo.com) -->
+                        <li class="odoo-nav-item odoo-dropdown">
+                            <a class="odoo-nav-link" href="#">Verticales</a>
+                            <div class="odoo-megamenu-panel">
+                                <div class="odoo-mega-container">
+                                    <div class="odoo-mega-grid">
+                                        
+                                        <!-- Venta Minorista -->
+                                        <div>
+                                            <div class="odoo-category-header color-retail">Venta Minorista</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/bodegas">Bodegas</a></li>
+                                                <li><a href="/verticales/ferreterias">Ferreterías</a></li>
+                                                <li><a href="/verticales/retail">Retail</a></li>
+                                                <li><a href="/verticales/comercio-electronico">Comercio electrónico</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Servicios & Salud -->
+                                        <div>
+                                            <div class="odoo-category-header color-salud">Servicios &amp; Salud</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/odontologia">Odontología</a></li>
+                                                <li><a href="/verticales/servicios">Servicios</a></li>
+                                                <li><a href="/verticales/restaurante">Restaurante</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Industria & Logística -->
+                                        <div>
+                                            <div class="odoo-category-header color-industria">Industria &amp; Logística</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/industria">Industria</a></li>
+                                                <li><a href="/verticales/gestion-de-flotas">Gestión de flotas</a></li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Gestión & Finanzas -->
+                                        <div>
+                                            <div class="odoo-category-header color-rrhh">Gestión &amp; Finanzas</div>
+                                            <ul class="odoo-links-list">
+                                                <li><a href="/verticales/recursos-humanos">Recursos humanos</a></li>
+                                                <li><a href="/verticales/contabilidad">Contabilidad</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="odoo-mega-footer">
+                                        <a href="/precios">Consulta todas las verticales de negocio →</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <!-- 3. Comunidad -->
+                        <li class="odoo-nav-item">
+                            <a class="odoo-nav-link" href="/blog">Comunidad</a>
+                        </li>
+
+                        <!-- 4. Precios -->
+                        <li class="odoo-nav-item">
+                            <a class="odoo-nav-link" href="/precios">Precios</a>
+                        </li>
+
+                        <!-- 5. Ayuda / Soporte -->
+                        <li class="odoo-nav-item">
+                            <a class="odoo-nav-link" href="/soporte">Ayuda</a>
+                        </li>
+                    </ul>
+
+                    <!-- Botones Derecha -->
+                    <div class="odoo-nav-actions">
+                        <a href="/login" class="odoo-login-btn">Inicia sesión</a>
+                        <a href="/precios" class="odoo-trial-btn">Pruébalo gratis</a>
                     </div>
-                </nav>
+                </div>
             </header>
         </xpath>
     </template>
