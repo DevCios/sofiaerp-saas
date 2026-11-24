@@ -138,13 +138,13 @@
                     .hero-benefits-strip { gap: 1.25rem; }
                 }
 
-                /* Suite de Aplicaciones SOFIA ERP (App Hub Launchpad Estilo Odoo 20) */
+                /* Suite de Aplicaciones SOFIA ERP (App Hub Launchpad Estilo Odoo 20 con Relieve 3D) */
                 .sofia-apps-hub-section {
-                    background: radial-gradient(circle at 50% 0%, #F5F3FF 0%, #FAF5FF 35%, #F8FAFC 80%);
+                    background: radial-gradient(circle at 50% -10%, #ECE6F8 0%, #E3EAF4 45%, #E9EFF6 100%);
                     padding-top: 4.5rem !important;
                     padding-bottom: 5.5rem !important;
                     position: relative;
-                    border-bottom: 1px solid #E2E8F0;
+                    border-bottom: 1px solid #CBD5E1;
                 }
                 .apps-filter-bar {
                     display: flex;
@@ -155,8 +155,8 @@
                 }
                 .app-filter-btn {
                     background: #FFFFFF;
-                    border: 1px solid #E2E8F0;
-                    color: #475569;
+                    border: 1px solid #CBD5E1;
+                    color: #334155;
                     font-size: 0.885rem;
                     font-weight: 600;
                     padding: 0.55rem 1.25rem;
@@ -166,18 +166,20 @@
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+                    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
                 }
                 .app-filter-btn:hover {
-                    background: #F1F5F9;
+                    background: #F8FAFC;
                     color: #0F172A;
-                    border-color: #CBD5E1;
+                    border-color: #94A3B8;
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
                 }
                 .app-filter-btn.active {
                     background: #7D1A6A !important;
                     color: #FFFFFF !important;
                     border-color: #7D1A6A !important;
-                    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.25);
+                    box-shadow: 0 4px 14px rgba(125, 26, 106, 0.28);
                 }
                 .app-filter-btn.active .app-filter-dot {
                     background-color: #FFFFFF !important;
@@ -191,14 +193,14 @@
                 .apps-grid-container {
                     display: grid;
                     grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-                    gap: 1.75rem 1.25rem;
+                    gap: 1.85rem 1.25rem;
                     max-width: 1220px;
                     margin: 0 auto;
                 }
                 .app-tile-card {
                     background: transparent;
                     border: none;
-                    padding: 0.75rem 0.5rem;
+                    padding: 0.65rem 0.5rem;
                     text-align: center;
                     display: flex;
                     flex-direction: column;
@@ -209,25 +211,33 @@
                     cursor: pointer;
                 }
                 .app-tile-card:hover {
-                    transform: translateY(-5px);
+                    transform: translateY(-4px);
                 }
                 .app-tile-squircle {
-                    width: 78px;
-                    height: 78px;
-                    background: #FFFFFF;
-                    border-radius: 20px;
-                    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-                    border: 1px solid rgba(226, 232, 240, 0.8);
+                    width: 80px;
+                    height: 80px;
+                    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+                    border-radius: 22px;
+                    border: 1px solid #CBD5E1;
+                    box-shadow: 
+                        0 2px 4px rgba(15, 23, 42, 0.04),
+                        0 6px 16px rgba(15, 23, 42, 0.08),
+                        inset 0 1.5px 0.5px #FFFFFF,
+                        inset 0 -1.5px 1px rgba(15, 23, 42, 0.04);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     margin-bottom: 0.65rem;
                     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                    position: relative;
                 }
                 .app-tile-card:hover .app-tile-squircle {
-                    transform: scale(1.05);
-                    box-shadow: 0 12px 24px rgba(125, 26, 106, 0.12), 0 3px 6px rgba(0, 0, 0, 0.04);
-                    border-color: #CBD5E1;
+                    transform: translateY(-5px) scale(1.06);
+                    border-color: #94A3B8;
+                    box-shadow: 
+                        0 8px 20px rgba(15, 23, 42, 0.10),
+                        0 16px 32px rgba(125, 26, 106, 0.18),
+                        inset 0 1.5px 0.5px #FFFFFF;
                 }
                 .app-tile-title {
                     font-size: 0.865rem;
@@ -235,22 +245,24 @@
                     color: #0F172A;
                     line-height: 1.25;
                     margin-bottom: 0.35rem;
-                    max-width: 135px;
+                    max-width: 140px;
                 }
                 .app-tile-tag {
                     font-size: 0.625rem;
                     font-weight: 700;
                     text-transform: uppercase;
                     letter-spacing: 0.03em;
-                    padding: 0.15rem 0.55rem;
+                    padding: 0.2rem 0.6rem;
                     border-radius: 9999px;
                     margin-top: auto;
+                    border: 1px solid rgba(0, 0, 0, 0.05);
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
                 }
-                .tag-contabilidad { background: #E6F7F7; color: #007775; }
-                .tag-ventas { background: #FEE8E8; color: #BE123C; }
-                .tag-suministro { background: #E6F2F5; color: #005B6F; }
-                .tag-manufactura { background: #F1EFF5; color: #554462; }
-                .tag-servicios { background: #FEF3E9; color: #B45309; }
+                .tag-contabilidad { background: #CCFBF1; color: #007775; border-color: #99F6E4; }
+                .tag-ventas { background: #FFE4E6; color: #BE123C; border-color: #FECDD3; }
+                .tag-suministro { background: #E0F2FE; color: #0369A1; border-color: #BAE6FD; }
+                .tag-manufactura { background: #F3E8FF; color: #554462; border-color: #E9D5FF; }
+                .tag-servicios { background: #FFEDD5; color: #B45309; border-color: #FED7AA; }
                 .bento-card {
                     background: #FFFFFF;
                     border: 1px solid #E2E8F0;
