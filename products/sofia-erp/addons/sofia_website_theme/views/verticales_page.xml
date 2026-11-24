@@ -109,6 +109,25 @@
                         .hero-benefit-divider { display: none !important; }
                         .hero-benefits-strip { gap: 1.25rem !important; }
                     }
+                
+                    .vert-squircle-icon {
+                        width: 64px;
+                        height: 64px;
+                        min-width: 64px;
+                        background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+                        border-radius: 18px;
+                        border: 1px solid #CBD5E1;
+                        box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04), 0 4px 10px rgba(15, 23, 42, 0.06), inset 0 1.5px 0.5px #FFFFFF;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.25s ease;
+                    }
+                    .vert-card:hover .vert-squircle-icon {
+                        transform: scale(1.06);
+                        border-color: #7D1A6A;
+                        box-shadow: 0 6px 16px rgba(125, 26, 106, 0.16), inset 0 1.5px 0.5px #FFFFFF;
+                    }
                 </style>
 
                 <!-- Hero Verticales -->
@@ -152,161 +171,260 @@
                 <section class="py-5 bg-light">
                     <div class="container py-lg-4">
                         <div class="row g-4">
-                            
-                            <!-- 1. Bodegas -->
+                            <!-- Bodegas -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🏪</span>
-                                        <h5 class="fw-bold mb-2">Bodegas &amp; Minimarkets</h5>
-                                        <p class="text-secondary small mb-0">Venta ágil por mostrador, lector de código de barras, caja chica y boletas electrónicas rápidas.</p>
+                                <a href="/verticales/bodegas" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <rect x="8" y="18" width="28" height="18" rx="3" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+            <path d="M6 18L10 9H34L38 18H6Z" fill="#E55A5A"/>
+            <path d="M12 9L15 18H21L19 9H12Z" fill="#FBBF24"/>
+            <path d="M25 9L27 18H33L31 9H25Z" fill="#FBBF24"/>
+            <rect x="18" y="24" width="8" height="12" rx="1.5" fill="#7D1A6A"/>
+            <rect x="11" y="24" width="5" height="5" rx="1" fill="#0EA5E9"/>
+            <rect x="28" y="24" width="5" height="5" rx="1" fill="#0EA5E9"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Bodegas</h5>
+                                            <p class="text-secondary small mb-0">Venta ágil por mostrador, lector de código de barras, caja chica y boletas rápidas.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 2. Ferreterías -->
+                            <!-- Ferreterías -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🔧</span>
-                                        <h5 class="fw-bold mb-2">Ferreterías &amp; Construcción</h5>
-                                        <p class="text-secondary small mb-0">Unidades fraccionadas (metros, kilos, bolsas), control de perfiles y emisión de Guías GRE 09/31.</p>
+                                <a href="/verticales/ferreterias" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <circle cx="15" cy="15" r="9" stroke="#6C5B7B" stroke-width="4"/>
+            <path d="M15 10V14L18 16" stroke="#6C5B7B" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M21 21L33 33C34.5 34.5 37 34.5 38.5 33C40 31.5 40 29 38.5 27.5L27 16" stroke="#F59E0B" stroke-width="4.5" stroke-linecap="round"/>
+            <path d="M30 30L26 34" stroke="#6C5B7B" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Ferreterías</h5>
+                                            <p class="text-secondary small mb-0">Unidades de medida fraccionadas, control de perfiles y emisión de Guías GRE 09/31.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 3. Retail -->
+                            <!-- Retail -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🏷️</span>
-                                        <h5 class="fw-bold mb-2">Retail &amp; Calzado / Moda</h5>
-                                        <p class="text-secondary small mb-0">Gestión de variantes por talla y color, promociones automáticas por volumen y etiquetas térmicas.</p>
+                                <a href="/verticales/retail" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M12 8H22L34 20C35.5 21.5 35.5 24 34 25.5L25.5 34C24 35.5 21.5 35.5 20 34L8 22V12C8 9.8 9.8 8 12 8Z" fill="#E55A5A"/>
+            <path d="M12 8H20L10 18V10C10 8.9 10.9 8 12 8Z" fill="#7D1A6A"/>
+            <circle cx="15" cy="15" r="3" fill="#FFFFFF"/>
+            <line x1="18" y1="24" x2="26" y2="32" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Retail</h5>
+                                            <p class="text-secondary small mb-0">Variantes de talla y color, temporadas, promociones automáticas y etiquetas térmicas.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 4. Industria -->
+                            <!-- Industria -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">⚙️</span>
-                                        <h5 class="fw-bold mb-2">Industria &amp; Manufactura</h5>
-                                        <p class="text-secondary small mb-0">Lista de materiales (BOM), órdenes de producción, control de mermas y costeo real de fabricación.</p>
+                                <a href="/verticales/industria" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M8 22L15 17V34H8V22Z" fill="#06B6D4"/>
+            <path d="M15 17L23 11V34H15V17Z" fill="#0D9488"/>
+            <path d="M23 20L30 15V34H23V20Z" fill="#E55A5A"/>
+            <path d="M30 16L36 12V34H30V16Z" fill="#FBBF24"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Industria</h5>
+                                            <p class="text-secondary small mb-0">Listas de materiales (BOM), órdenes de producción, control de mermas y costeo real.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 5. Odontología -->
+                            <!-- Odontología -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🦷</span>
-                                        <h5 class="fw-bold mb-2">Odontología &amp; Clínicas</h5>
-                                        <p class="text-secondary small mb-0">Historias clínicas odontológicas, agenda médica de citas, boletas y control de insumos por tratamiento.</p>
+                                <a href="/verticales/odontologia" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M14 6C10 6 8 10 8 15C8 22 11 27 13 35C14 39 17 39 18 35C19 31 20 25 22 25C24 25 25 31 26 35C27 39 30 39 31 35C33 27 36 22 36 15C36 10 34 6 30 6C26 6 23 8 22 10C21 8 18 6 14 6Z" fill="#0EA5E9"/>
+            <circle cx="22" cy="18" r="6" fill="#0D9488"/>
+            <path d="M22 14V22M18 18H26" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Odontología</h5>
+                                            <p class="text-secondary small mb-0">Historias clínicas odontológicas, agenda médica de citas, boletas y control de insumos.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 6. Servicios -->
+                            <!-- Servicios -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">💼</span>
-                                        <h5 class="fw-bold mb-2">Servicios &amp; Consultoría</h5>
-                                        <p class="text-secondary small mb-0">Facturación recurrente mensual, seguimiento de hitos, partes de horas y rentabilidad por cliente.</p>
+                                <a href="/verticales/servicios" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M12 24C12 16 17 11 25 11C28 11 31 12 33 14L22 25L12 24Z" fill="#F97316"/>
+            <path d="M25 11C33 11 38 16 38 24L22 25L25 11Z" fill="#0284C7"/>
+            <path d="M22 25L13 34" stroke="#7D1A6A" stroke-width="3" stroke-linecap="round"/>
+            <path d="M13 34C11.5 35.5 10 34 10 34" stroke="#7D1A6A" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Servicios</h5>
+                                            <p class="text-secondary small mb-0">Facturación recurrente mensual, seguimiento de hitos, partes de horas y contratos.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 7. Restaurantes -->
+                            <!-- Restaurante -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🍽️</span>
-                                        <h5 class="fw-bold mb-2">Restaurantes &amp; Gastronomía</h5>
-                                        <p class="text-secondary small mb-0">Comandera para cocina y barra, gestión gráfica de mesas, recetas y división de cuentas por comensal.</p>
+                                <a href="/verticales/restaurante" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="14" fill="#FEE2E2"/>
+            <circle cx="22" cy="22" r="10" stroke="#E55A5A" stroke-width="2.5" fill="#FFFFFF"/>
+            <path d="M17 16V27M15 16V20M19 16V20" stroke="#7D1A6A" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M27 16V27M27 16C28.5 16 29 17.5 29 19.5C29 21.5 28 22 27 22" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Restaurante</h5>
+                                            <p class="text-secondary small mb-0">Comandera para cocina y barra, gestión gráfica de mesas, recetas y división de cuentas.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 8. Comercio Electrónico -->
+                            <!-- Comercio electrónico -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🌐</span>
-                                        <h5 class="fw-bold mb-2">Comercio Electrónico</h5>
-                                        <p class="text-secondary small mb-0">Tienda online sincronizada en tiempo real con inventario, pasarela Mercado Pago y facturación SUNAT.</p>
+                                <a href="/verticales/comercio-electronico" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M10 20C10 13.3726 15.3726 8 22 8C28.6274 8 34 13.3726 34 20C28 22 24 16 18 18C14 19 12 21 10 20Z" fill="#0D9488"/>
+            <path d="M34 24C34 30.6274 28.6274 36 22 36C15.3726 36 10 30.6274 10 24C16 22 20 28 26 26C30 25 32 23 34 24Z" fill="#0284C7"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Comercio electrónico</h5>
+                                            <p class="text-secondary small mb-0">Tienda web sincronizada en vivo con inventario, pasarela Mercado Pago y SUNAT.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 9. Gestión de Flotas -->
+                            <!-- Gestión de flotas -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">🚛</span>
-                                        <h5 class="fw-bold mb-2">Gestión de Flotas &amp; Logística</h5>
-                                        <p class="text-secondary small mb-0">Control de kilometraje, choferes, mantenimientos mecánicos, consumo de combustible y Guías GRE.</p>
+                                <a href="/verticales/gestion-de-flotas" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="22" r="14" stroke="#7D1A6A" stroke-width="4.5"/>
+            <circle cx="22" cy="22" r="5" fill="#7D1A6A"/>
+            <path d="M22 13V17M13 22H17M27 22H31M15.5 28.5L18.5 25.5M28.5 28.5L25.5 25.5" stroke="#7D1A6A" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Gestión de flotas</h5>
+                                            <p class="text-secondary small mb-0">Control de kilometraje, choferes, mantenimientos mecánicos y Guías GRE transportista.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 10. Recursos Humanos -->
+                            <!-- Recursos humanos -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">👥</span>
-                                        <h5 class="fw-bold mb-2">Recursos Humanos &amp; Personal</h5>
-                                        <p class="text-secondary small mb-0">Marcación de asistencia, expedientes de colaboradores, boletas de pago y cálculo de adelantos.</p>
+                                <a href="/verticales/recursos-humanos" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="14" r="3.5" fill="#7D1A6A"/>
+            <circle cx="14" cy="17" r="3" fill="#E55A5A"/>
+            <circle cx="30" cy="17" r="3" fill="#0D9488"/>
+            <path d="M17 23C17 21 19 19.5 22 19.5C25 19.5 27 21 27 23V27H17V23Z" fill="#7D1A6A"/>
+            <path d="M9 26C9 24.5 11 23 14 23V27H9V26Z" fill="#E55A5A"/>
+            <path d="M35 26C35 24.5 33 23 30 23V27H35V26Z" fill="#0D9488"/>
+            <rect x="9" y="27" width="26" height="4" rx="2" fill="#FBBF24"/>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Recursos humanos</h5>
+                                            <p class="text-secondary small mb-0">Marcación de asistencia, expedientes de colaboradores, boletas de pago y adelantos.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
 
-                            <!-- 11. Contabilidad & SIRE -->
+                            <!-- Contabilidad -->
                             <div class="col-lg-4 col-md-6">
-                                <a href="/precios" class="vert-card text-dark">
-                                    <div>
-                                        <span class="vert-icon">📚</span>
-                                        <h5 class="fw-bold mb-2">Contabilidad &amp; SIRE SUNAT</h5>
-                                        <p class="text-secondary small mb-0">Plan Contable General Empresarial (PCGE), asientos automáticos, conciliación bancaria y libros SIRE.</p>
+                                <a href="/verticales/contabilidad" class="vert-card text-dark">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="vert-squircle-icon">
+                                            <svg width="38" height="38" viewBox="0 0 44 44" fill="none">
+            <path d="M10 8C10 5.79086 11.7909 4 14 4H26L34 12V36C34 38.2091 32.2091 40 30 40H14C11.7909 40 10 38.2091 10 36V8Z" fill="#0EA5E9"/>
+            <path d="M26 4V12H34L26 4Z" fill="#0284C7"/>
+            <path d="M10 34C10 34 16 32 22 34C28 36 34 34 34 34V37C34 38.6569 32.6569 40 31 40H13C11.3431 40 10 38.6569 10 37V34Z" fill="#0369A1"/>
+            <text x="22" y="27" font-family="'Inter', sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle">$</text>
+        </svg>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-bold mb-1 text-dark">Contabilidad</h5>
+                                            <p class="text-secondary small mb-0">Plan Contable General Empresarial (PCGE), conciliación bancaria y libros SIRE SUNAT.</p>
+                                        </div>
                                     </div>
                                     <div class="mt-3 text-end">
-                                        <span class="vert-action-link">Ver detalles →</span>
+                                        <span class="vert-action-link">Ver vertical →</span>
                                     </div>
                                 </a>
                             </div>
-
                         </div>
                     </div>
                 </section>
