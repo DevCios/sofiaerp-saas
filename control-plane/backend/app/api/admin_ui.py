@@ -260,6 +260,46 @@ HTML_CONTENT = """<!DOCTYPE html>
 
 
   <!-- ========================================================================= -->
+  <!-- MODAL: GESTIÓN DE DOMINIOS PERSONALIZADOS                                 -->
+  <!-- ========================================================================= -->
+  <div id="modal-domains" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 transform transition-all max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-globe text-indigo-600"></i> Dominios Propios (White-Label)
+          </h3>
+          <p id="domains-tenant-title" class="text-xs text-slate-500 mt-0.5">Empresa: --</p>
+        </div>
+        <button onclick="closeDomainsModal()" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition">&times;</button>
+      </div>
+
+      <div class="mt-5 space-y-5">
+        <!-- Formulario para Agregar Dominio -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Vincular Nuevo Dominio</label>
+          <div class="flex gap-2">
+            <input type="text" id="input-new-domain" placeholder="ej: www.constructora.pe o erp.empresa.com" class="flex-1 px-3.5 py-2 text-sm bg-white rounded-xl border border-slate-200 outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600">
+            <button onclick="handleRegisterDomain()" id="btn-add-domain" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-xs whitespace-nowrap">
+              <i class="fa-solid fa-key"></i> Generar Token DNS
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1.5">Al registrar el dominio, el sistema generará automáticamente el token TXT que el cliente debe colocar en su proveedor de dominio.</p>
+        </div>
+
+        <!-- Lista de Dominios Registrados -->
+        <div>
+          <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Dominios Configurados</h4>
+          <div id="domains-list-container" class="space-y-3">
+            <div class="text-center py-6 text-xs text-slate-400">Cargando dominios...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
   <!-- JAVASCRIPT DE AUTENTICACIÓN Y GESTIÓN                                      -->
   <!-- ========================================================================= -->
   <script>
@@ -430,6 +470,12 @@ HTML_CONTENT = """<!DOCTYPE html>
           }
 
           // Botones de Acción
+          const domainBtn = `
+            <button onclick="openDomainsModal('${t.id}', '${t.name}', '${t.slug}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-sky-50 text-sky-700 hover:bg-sky-100 border border-sky-200 transition" title="Configurar dominios propios (www.empresa.com)">
+              <i class="fa-solid fa-globe text-[10px]"></i> Dominios
+            </button>
+          `;
+
           let actionButtons = '';
           if (t.status === 'ACTIVE') {
             actionButtons = `
@@ -476,6 +522,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               </td>
               <td class="px-5 py-4 text-right">
                 <div class="inline-flex items-center justify-end gap-1.5">
+                  ${domainBtn}
                   ${actionButtons}
                   <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">
                     Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
@@ -611,6 +658,158 @@ HTML_CONTENT = """<!DOCTYPE html>
         btn.disabled = false;
         btn.innerHTML = `<span>Crear y Desplegar Cliente</span>`;
       }
+    }
+
+    // =========================================================================
+    // GESTIÓN DE DOMINIOS PROPIOS (WHITE-LABEL)
+    // =========================================================================
+    let currentDomainsTenantId = null;
+    let currentDomainsTenantName = '';
+
+    function openDomainsModal(tenantId, tenantName, tenantSlug) {
+      currentDomainsTenantId = tenantId;
+      currentDomainsTenantName = tenantName;
+      document.getElementById('domains-tenant-title').innerText = `Empresa: ${tenantName} (${tenantSlug}.sofiaerp.com)`;
+      document.getElementById('input-new-domain').value = '';
+      document.getElementById('modal-domains').classList.remove('hidden');
+      loadTenantDomains(tenantId);
+    }
+
+    function closeDomainsModal() {
+      document.getElementById('modal-domains').classList.add('hidden');
+      currentDomainsTenantId = null;
+    }
+
+    async function loadTenantDomains(tenantId) {
+      const container = document.getElementById('domains-list-container');
+      container.innerHTML = '<div class="text-center py-6 text-xs text-slate-400"><i class="fa-solid fa-spinner fa-spin text-indigo-600 mr-2"></i> Consultando dominios...</div>';
+      const token = sessionStorage.getItem(TOKEN_KEY);
+
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/domains`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const domains = await res.json();
+
+        if (!domains || domains.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-6 text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              Esta empresa aún no tiene dominios propios vinculados. Puedes registrar uno arriba (ej: www.constructora.pe).
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = domains.map(d => {
+          const isVerified = d.status === 'VERIFIED' || d.status === 'SSL_ACTIVE';
+          const statusBadge = isVerified 
+            ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-circle-check"></i> Activo & Verificado</span>`
+            : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse"><i class="fa-solid fa-clock"></i> Esperando DNS TXT</span>`;
+
+          const dnsInstructions = !isVerified ? `
+            <div class="mt-3 p-3.5 bg-amber-50/70 rounded-xl border border-amber-200 text-xs text-slate-700 space-y-2.5">
+              <div class="font-bold text-amber-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-key text-amber-600"></i> Registro de Verificación TXT (Copia y entrega al cliente):
+              </div>
+              <div class="space-y-2 font-mono text-[11px]">
+                <div class="bg-white p-2.5 rounded-lg border border-amber-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div class="overflow-x-auto">
+                    <span class="text-slate-500 font-sans">1. Registro TXT:</span><br/>
+                    <strong>Host:</strong> _sofia-challenge.${d.domain}<br/>
+                    <strong>Valor:</strong> ${d.verification_token}
+                  </div>
+                  <button onclick="copyToClipboard('${d.verification_token}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-sans text-xs font-semibold rounded-lg border border-indigo-200 transition shrink-0">
+                    <i class="fa-regular fa-copy"></i> Copiar Token
+                  </button>
+                </div>
+                <div class="bg-white p-2.5 rounded-lg border border-amber-200">
+                  <span class="text-slate-500 font-sans">2. Registro A / CNAME:</span><br/>
+                  <strong>Host:</strong> @ o www &nbsp;|&nbsp; <strong>Destino:</strong> IP de tu VPS
+                </div>
+              </div>
+              <button onclick="handleVerifyDomain('${tenantId}', '${d.id}')" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition text-xs flex items-center justify-center gap-1.5 shadow-2xs">
+                <i class="fa-solid fa-rotate"></i> Comprobar Registro DNS en Internet Ahora
+              </button>
+            </div>
+          ` : `
+            <div class="mt-2 text-xs text-emerald-700 flex items-center gap-1.5 font-medium">
+              <i class="fa-solid fa-shield-halved"></i> Dominio activo. Listo para abrir: 
+              <a href="https://${d.domain}" target="_blank" class="font-bold underline ml-1 inline-flex items-center gap-1 text-emerald-800">${d.domain} <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+            </div>
+          `;
+
+          return `
+            <div class="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
+              <div class="flex items-center justify-between">
+                <div class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                  <i class="fa-solid fa-link text-indigo-600"></i> ${d.domain}
+                </div>
+                ${statusBadge}
+              </div>
+              ${dnsInstructions}
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = `<div class="p-3 text-xs text-rose-600 bg-rose-50 rounded-xl">Error al cargar dominios: ${err.message}</div>`;
+      }
+    }
+
+    async function handleRegisterDomain() {
+      if (!currentDomainsTenantId) return;
+      const input = document.getElementById('input-new-domain');
+      const domainVal = input.value.trim().toLowerCase();
+      if (!domainVal) {
+        alert('Por favor escribe un dominio (ej: www.constructora.pe)');
+        return;
+      }
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      const btn = document.getElementById('btn-add-domain');
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`/api/v1/tenants/${currentDomainsTenantId}/domains`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ domain: domainVal, is_primary: false })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al registrar dominio');
+
+        input.value = '';
+        loadTenantDomains(currentDomainsTenantId);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function handleVerifyDomain(tenantId, domainId) {
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/domains/${domainId}/verify`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Verificación DNS fallida');
+
+        alert('✅ ¡Dominio verificado exitosamente!\n\nEl registro TXT fue detectado correctamente y el dominio ha quedado activo.');
+        loadTenantDomains(tenantId);
+      } catch (err) {
+        alert('❌ ' + err.message);
+      }
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+      alert('Token copiado al portapapeles: ' + text);
     }
 
     document.addEventListener('DOMContentLoaded', checkAuth);
