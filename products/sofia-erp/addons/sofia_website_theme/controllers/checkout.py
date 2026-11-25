@@ -426,3 +426,17 @@ class SofiaCheckoutController(http.Controller):
             'plan': kwargs.get('plan', 'pyme-pro'),
         })
 
+    @http.route('/cuenta-suspendida', type='http', auth='public', website=True)
+    def account_suspended(self, **kwargs):
+        """ Pantalla elegante de suspensión por vencimiento de periodo de gracia """
+        tenant_host = (kwargs.get('tenant') or '').strip()
+        return request.render('sofia_website_theme.account_suspended_page', {
+            'tenant_host': tenant_host,
+        })
+
+    @http.route('/mi-cuenta', type='http', auth='public', website=True)
+    def my_account_portal(self, **kwargs):
+        """ Portal de Autogestión del Cliente: Upgrade de Plan, Usuarios Extra y Dominio Propio """
+        return request.render('sofia_website_theme.my_account_portal_page', {
+            'tenant': (kwargs.get('tenant') or '').strip(),
+        })

@@ -337,7 +337,11 @@ async def resolve_host(host: str, response: Response, db: AsyncSession = Depends
     except TenantNotFoundException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except TenantSuspendedException as e:
-        raise HTTPException(status_code=status.HTTP_423_LOCKED, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e),
+            headers={"X-Sofia-Suspension-Reason": "SUBSCRIPTION_SUSPENDED"},
+        )
 
 
 # ------------------------------------------------------------------------------
@@ -591,4 +595,3 @@ async def delete_announcement(announcement_id: UUID, db: AsyncSession = Depends(
     ann.is_active = False
     await db.commit()
     return {"status": "DEACTIVATED"}
-

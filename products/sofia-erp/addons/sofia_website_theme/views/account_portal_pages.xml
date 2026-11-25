@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================================= -->
+    <!-- PANTALLA DE CUENTA SUSPENDIDA (/cuenta-suspendida)                        -->
+    <!-- ========================================================================= -->
+    <template id="account_suspended_page" name="Suscripción Suspendida - SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white" style="min-height: calc(100vh - 180px); display: flex; align-items: center;">
+                    <div class="container py-4" style="max-width: 680px;">
+                        <div class="p-4 p-md-5 rounded-4 border shadow-sm text-center bg-white">
+                            <div class="mb-4">
+                                <div style="width: 76px; height: 76px; border-radius: 50%; background: #FEF3C7; color: #D97706; display: inline-flex; align-items: center; justify-content: center;">
+                                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #FEF3C7; color: #92400E; font-weight: 700;">
+                                Suscripción Pausada Temporalmente
+                            </span>
+
+                            <h1 class="fw-bold text-dark mb-3" style="font-size: 2rem; letter-spacing: -0.02em;">
+                                Tu instancia se encuentra pausada por renovación pendiente
+                            </h1>
+
+                            <t t-if="tenant_host">
+                                <div class="d-inline-block px-3 py-2 rounded-3 bg-light border fw-semibold text-dark mb-3">
+                                    Instancia: <span t-esc="tenant_host"/>
+                                </div>
+                            </t>
+
+                            <p class="text-secondary mb-4" style="font-size: 1.05rem;">
+                                <strong>Tus datos, comprobantes SUNAT e inventarios están 100% seguros e intactos.</strong>
+                                Una vez regularizado el pago, tu acceso se reactiva automáticamente en segundos.
+                            </p>
+
+                            <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-4">
+                                <a href="/checkout?plan=pyme-pro" class="btn btn-lg fw-bold text-white px-4" style="background-color: #7D1A6A; border-radius: 12px;">
+                                    Renovar Suscripción Ahora →
+                                </a>
+                                <a href="/soporte" class="btn btn-lg btn-outline-secondary fw-semibold px-4" style="border-radius: 12px;">
+                                    Contactar a Soporte
+                                </a>
+                            </div>
+
+                            <p class="small text-muted mb-0">
+                                ¿Ya realizaste el pago? Escríbenos con tu comprobante y lo activamos de inmediato.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- PORTAL DE AUTOGESTIÓN DEL CLIENTE (/mi-cuenta)                            -->
+    <!-- ========================================================================= -->
+    <template id="my_account_portal_page" name="Mi Cuenta SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5" style="background: #F8FAFC; min-height: calc(100vh - 180px);">
+                    <div class="container py-3" style="max-width: 1080px;">
+                        <!-- Encabezado -->
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+                            <div>
+                                <span class="badge rounded-pill px-3 py-2 mb-2" style="background: #FDF4FA; color: #7D1A6A; border: 1px solid #F5D0FE; font-weight: 700;">
+                                    Portal de Autogestión SaaS
+                                </span>
+                                <h1 class="fw-bold text-dark mb-1" style="font-size: 2.15rem; letter-spacing: -0.02em;">
+                                    Mi Cuenta SOFIA ERP
+                                </h1>
+                                <p class="text-secondary mb-0">
+                                    Amplía usuarios, mejora tu plan o configura tu dominio personalizado en un solo lugar.
+                                </p>
+                            </div>
+                            <div>
+                                <a href="/precios" class="btn btn-outline-secondary fw-semibold" style="border-radius: 10px;">
+                                    Ver Tabla de Planes
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Tarjeta 1: Agregar Usuarios Extra -->
+                            <div class="col-lg-6">
+                                <div class="p-4 bg-white rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div style="width: 46px; height: 46px; border-radius: 12px; background: #FDF4FA; color: #7D1A6A; display: inline-flex; align-items: center; justify-content: center;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                                                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h5 class="fw-bold text-dark mb-0">Agregar Usuarios Adicionales</h5>
+                                                <span class="small text-muted">Activación inmediata en tu instancia</span>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-secondary small mb-3">
+                                            ¿Tu equipo creció? Selecciona tu plan actual y cuántos usuarios necesitas sumar.
+                                        </p>
+
+                                        <div class="row g-3 mb-3">
+                                            <div class="col-sm-7">
+                                                <label class="form-label small fw-bold text-dark">Plan actual</label>
+                                                <select id="portalPlanSelect" class="form-select">
+                                                    <option value="emprendedor" data-price="9.90">Emprendedor (S/ 9.90 / usuario)</option>
+                                                    <option value="pyme-pro" data-price="14.90" selected="selected">Pyme Pro (S/ 14.90 / usuario)</option>
+                                                    <option value="corporativo" data-price="19.90">Corporativo (S/ 19.90 / usuario)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label class="form-label small fw-bold text-dark">Usuarios a sumar</label>
+                                                <input type="number" id="portalExtraUsers" class="form-control fw-bold" value="2" min="1" max="200"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="p-3 rounded-3 bg-light border d-flex justify-content-between align-items-center mb-4">
+                                            <span class="small text-secondary fw-semibold">Inversión mensual estimada (ciclo anual):</span>
+                                            <span class="fs-5 fw-bold" style="color: #7D1A6A;" id="portalUsersEstimate">S/ 29.80 / mes</span>
+                                        </div>
+                                    </div>
+
+                                    <a id="portalAddUsersBtn" href="/checkout?plan=pyme-pro&amp;users=2" class="btn w-100 fw-bold text-white py-2.5" style="background-color: #7D1A6A; border-radius: 10px;">
+                                        Ampliar Usuarios Ahora →
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta 2: Mejorar Plan (Upgrade) -->
+                            <div class="col-lg-6">
+                                <div class="p-4 bg-white rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div style="width: 46px; height: 46px; border-radius: 12px; background: #ECFDF5; color: #059669; display: inline-flex; align-items: center; justify-content: center;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h5 class="fw-bold text-dark mb-0">Mejorar de Plan (Upgrade)</h5>
+                                                <span class="small text-muted">Sin pérdida de datos ni tiempo de inactividad</span>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-secondary small mb-3">
+                                            Desbloquea Guías de Remisión (GRE 09/31), Kardex Valorizado, Dominio Propio, Contabilidad SIRE SUNAT o Manufactura.
+                                        </p>
+
+                                        <div class="d-flex flex-column gap-2 mb-4">
+                                            <a href="/checkout?plan=pyme-pro" class="p-3 rounded-3 border text-decoration-none d-flex justify-content-between align-items-center" style="background: #FDF4FA; border-color: #E9D5FF !important;">
+                                                <div>
+                                                    <div class="fw-bold text-dark">Subir a Plan Pyme Pro</div>
+                                                    <div class="small text-muted">GRE 09/31, Multi-Almacén, Dominio propio, 20 GB</div>
+                                                </div>
+                                                <span class="fw-bold" style="color: #7D1A6A;">S/ 14.90</span>
+                                            </a>
+                                            <a href="/checkout?plan=corporativo" class="p-3 rounded-3 border text-decoration-none d-flex justify-content-between align-items-center bg-white">
+                                                <div>
+                                                    <div class="fw-bold text-dark">Subir a Plan Corporativo</div>
+                                                    <div class="small text-muted">Contabilidad SIRE, Manufactura, 50 GB, Soporte 24/7</div>
+                                                </div>
+                                                <span class="fw-bold text-dark">S/ 19.90</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <a href="/soporte" class="btn btn-outline-secondary w-100 fw-semibold py-2.5" style="border-radius: 10px;">
+                                        Solicitar Cotización Corporativa a Medida
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta 3: Dominio Personalizado -->
+                            <div class="col-12">
+                                <div class="p-4 bg-white rounded-4 border shadow-sm">
+                                    <div class="row align-items-center g-4">
+                                        <div class="col-lg-8">
+                                            <h5 class="fw-bold text-dark mb-2">Conectar Dominio Propio (ej. erp.tuempresa.com)</h5>
+                                            <p class="text-secondary small mb-2">
+                                                Disponible en planes <strong>Pyme Pro</strong> y <strong>Corporativo</strong>. Apunta un registro <code>CNAME</code> hacia <code>sofiaerp.com</code> y verifica la propiedad con tu registro <code>TXT</code> en <code>_sofia-challenge</code> para emitir tu certificado SSL automático.
+                                            </p>
+                                            <div class="small text-muted">
+                                                Tu subdominio base <code>tuempresa.sofiaerp.com</code> siempre seguirá activo con certificado SSL Wildcard incluido.
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 text-lg-end">
+                                            <a href="/soporte" class="btn btn-dark fw-bold px-4 py-2.5" style="border-radius: 10px;">
+                                                Solicitar Vinculación DNS →
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <script>
+                    (function () {
+                        var planEl = document.getElementById('portalPlanSelect');
+                        var usersEl = document.getElementById('portalExtraUsers');
+                        var estEl = document.getElementById('portalUsersEstimate');
+                        var btnEl = document.getElementById('portalAddUsersBtn');
+
+                        function updateEstimate() {
+                            if (!planEl || !usersEl || !estEl || !btnEl) return;
+                            var opt = planEl.options[planEl.selectedIndex];
+                            var price = parseFloat(opt.getAttribute('data-price') || '14.90');
+                            var count = Math.max(1, parseInt(usersEl.value || '1', 10));
+                            var total = (price * count).toFixed(2);
+                            estEl.textContent = 'S/ ' + total + ' / mes';
+                            btnEl.setAttribute('href', '/checkout?plan=' + encodeURIComponent(planEl.value) + '&amp;users=' + count);
+                        }
+
+                        if (planEl &amp;&amp; usersEl) {
+                            planEl.addEventListener('change', updateEstimate);
+                            usersEl.addEventListener('input', updateEstimate);
+                            updateEstimate();
+                        }
+                    })();
+                </script>
+            </div>
+        </t>
+    </template>
+</odoo>

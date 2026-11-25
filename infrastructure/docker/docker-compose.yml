@@ -86,7 +86,7 @@ services:
       dockerfile: Dockerfile
     container_name: sofia-control-plane-worker
     restart: unless-stopped
-    command: celery -A app.tasks.celery_app worker --loglevel=info --concurrency=2
+    command: celery -A app.tasks.celery_app worker --beat --loglevel=info --concurrency=2
     environment:
       - ENVIRONMENT=production
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
