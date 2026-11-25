@@ -7,8 +7,10 @@
     'author': 'SOFIA Platform Architecture Team',
     'website': 'https://sofiaerp.com',
     'license': 'LGPL-3',
-    'depends': ['base', 'web'],
-    'data': [],
+    'depends': ['base', 'web', 'portal'],
+    'data': [
+        'views/subscription_portal_templates.xml',
+    ],
     'installable': True,
     'application': False,
     'auto_install': True,

@@ -119,8 +119,8 @@ class ResUsers(models.Model):
         if active_internal_count > max_users:
             raise UserError(_(
                 "Has alcanzado el límite de usuarios activos de tu plan %(plan)s (%(limit)d usuarios contratados).\n\n"
-                "Para agregar más colaboradores a tu equipo, amplía tus usuarios desde tu portal:\n"
-                "https://sofiaerp.com/mi-cuenta",
+                "Para agregar más colaboradores a tu equipo, ingresa a Mi Suscripción desde tu portal:\n"
+                "/my/subscription",
                 plan=plan_code,
                 limit=max_users,
             ))

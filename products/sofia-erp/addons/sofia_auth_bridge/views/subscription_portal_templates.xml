@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. Tarjeta en /my visible EXCLUSIVAMENTE para el Administrador del Tenant (base.group_system) -->
+    <template id="portal_my_home_sofia_subscription" name="Mi Suscripción SOFIA en Portal" inherit_id="portal.portal_my_home" priority="90">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <a href="/my/subscription"
+               groups="base.group_system"
+               class="o_portal_index_card col-md-6 order-0 d-flex align-items-center gap-3 p-3 rounded-3 border text-decoration-none bg-white shadow-sm mb-3">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #FDF4FA; color: #7D1A6A; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                        <line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark">Mi Suscripción SOFIA ERP</div>
+                    <div class="small text-muted">Administra tu plan, agrega usuarios o conecta tu dominio propio</div>
+                </div>
+            </a>
+        </xpath>
+    </template>
+
+    <!-- 2. Panel Privado de Suscripción del Tenant (/my/subscription) -->
+    <template id="portal_my_subscription" name="Mi Suscripción SOFIA ERP">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4" style="max-width: 1040px;">
+
+                <!-- Encabezado con datos reales del Tenant -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                    <div>
+                        <span class="badge rounded-pill px-3 py-2 mb-2" style="background: #FDF4FA; color: #7D1A6A; border: 1px solid #F5D0FE; font-weight: 700;">
+                            Panel del Administrador • <t t-esc="tenant_host"/>
+                        </span>
+                        <h1 class="fw-bold text-dark mb-1" style="font-size: 1.9rem; letter-spacing: -0.02em;">
+                            Mi Suscripción — <t t-esc="company_name"/>
+                        </h1>
+                        <p class="text-secondary mb-0 small">
+                            Controla tus usuarios activos, mejora tu plan o renueva tu suscripción directamente.
+                        </p>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <t t-if="sub_status == 'ACTIVE'">
+                            <span class="badge bg-success px-3 py-2 rounded-pill">Suscripción Activa</span>
+                        </t>
+                        <t t-elif="is_grace_period">
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Periodo de Gracia — Renovación Pendiente</span>
+                        </t>
+                        <t t-else="">
+                            <span class="badge bg-secondary px-3 py-2 rounded-pill"><t t-esc="sub_status"/></span>
+                        </t>
+                        <a href="/my" class="btn btn-sm btn-outline-secondary" style="border-radius: 8px;">← Volver al Portal</a>
+                    </div>
+                </div>
+
+                <!-- Alerta si está en periodo de gracia -->
+                <t t-if="is_grace_period">
+                    <div class="alert alert-warning d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 rounded-4 mb-4">
+                        <div>
+                            <strong>Tu suscripción se encuentra en periodo de gracia.</strong>
+                            Regulariza tu pago para evitar la pausa automática del servicio.
+                        </div>
+                        <a t-attf-href="#{central_url}/checkout?plan=#{checkout_plan}&amp;users=#{max_users}&amp;subdomain=#{tenant_slug}&amp;mode=renew"
+                           class="btn btn-dark btn-sm fw-bold px-3" style="border-radius: 8px;">
+                            Renovar Ahora →
+                        </a>
+                    </div>
+                </t>
+
+                <!-- Resumen de Consumo Real -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+                            <div class="small text-muted fw-semibold mb-1">Plan Contratado</div>
+                            <div class="fs-4 fw-bold text-dark mb-1"><t t-esc="plan_display"/></div>
+                            <div class="small text-muted">Código: <code><t t-esc="plan_code"/></code></div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted fw-semibold">Usuarios Internos Activos</span>
+                                <span class="small fw-bold" style="color: #7D1A6A;"><t t-esc="active_users"/> / <t t-esc="max_users"/></span>
+                            </div>
+                            <div class="fs-4 fw-bold text-dark mb-2">
+                                <t t-esc="active_users"/> de <t t-esc="max_users"/> cupos
+                            </div>
+                            <div class="progress" style="height: 8px; border-radius: 99px;">
+                                <div class="progress-bar"
+                                     role="progressbar"
+                                     t-attf-style="width: #{usage_pct}%; background-color: #{'#DC2626' if usage_pct >= 100 else '#7D1A6A'};">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
+                            <div class="small text-muted fw-semibold mb-1">Almacenamiento NVMe</div>
+                            <div class="fs-4 fw-bold text-dark mb-1"><t t-esc="storage_gb"/> GB</div>
+                            <div class="small text-muted">Respaldo cifrado diario incluido</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones de Crecimiento (Ampliar Usuarios + Upgrade de Plan) -->
+                <div class="row g-4">
+                    <!-- Ampliar Usuarios -->
+                    <div class="col-lg-6">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Agregar Usuarios Adicionales</h5>
+                                <p class="small text-secondary mb-3">
+                                    Suma colaboradores a <strong><t t-esc="tenant_host"/></strong>. Se habilitan al instante tras confirmar el pago.
+                                </p>
+
+                                <div class="row g-3 align-items-end mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-dark">Usuarios a agregar</label>
+                                        <input type="number" id="tenantAddUsersCount" class="form-control fw-bold" value="2" min="1" max="200"/>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="small text-muted">Tarifa de tu plan</div>
+                                        <div class="fw-bold text-dark">S/ <t t-esc="'%.2f' % unit_price"/> / usuario</div>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 rounded-3 bg-light border d-flex justify-content-between align-items-center mb-4">
+                                    <span class="small text-secondary fw-semibold">Inversión mensual adicional:</span>
+                                    <span class="fs-5 fw-bold" style="color: #7D1A6A;" id="tenantAddUsersEstimate">
+                                        S/ <t t-esc="'%.2f' % (unit_price * 2)"/> / mes
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a id="tenantAddUsersBtn"
+                               t-attf-href="#{central_url}/checkout?plan=#{checkout_plan}&amp;users=2&amp;subdomain=#{tenant_slug}&amp;mode=addons"
+                               class="btn w-100 fw-bold text-white py-2.5"
+                               style="background-color: #7D1A6A; border-radius: 10px;">
+                                Pagar y Activar Usuarios →
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Upgrade de Plan -->
+                    <div class="col-lg-6">
+                        <div class="p-4 bg-white rounded-4 border shadow-sm h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Mejorar de Plan (Upgrade)</h5>
+                                <p class="small text-secondary mb-3">
+                                    Escala tu operación sin migraciones ni cortes de servicio.
+                                </p>
+
+                                <div class="d-flex flex-column gap-2 mb-4">
+                                    <a t-attf-href="#{central_url}/checkout?plan=pyme-pro&amp;users=#{max_users}&amp;subdomain=#{tenant_slug}&amp;mode=upgrade"
+                                       class="p-3 rounded-3 border text-decoration-none d-flex justify-content-between align-items-center"
+                                       style="background: #FDF4FA; border-color: #E9D5FF !important;">
+                                        <div>
+                                            <div class="fw-bold text-dark">Plan Pyme Pro</div>
+                                            <div class="small text-muted">GRE 09/31, Multi-Almacén, Dominio propio, 20 GB</div>
+                                        </div>
+                                        <span class="fw-bold" style="color: #7D1A6A;">S/ 14.90</span>
+                                    </a>
+                                    <a t-attf-href="#{central_url}/checkout?plan=corporativo&amp;users=#{max_users}&amp;subdomain=#{tenant_slug}&amp;mode=upgrade"
+                                       class="p-3 rounded-3 border text-decoration-none d-flex justify-content-between align-items-center bg-white">
+                                        <div>
+                                            <div class="fw-bold text-dark">Plan Corporativo</div>
+                                            <div class="small text-muted">Contabilidad SIRE SUNAT, Manufactura, 50 GB, 24/7</div>
+                                        </div>
+                                        <span class="fw-bold text-dark">S/ 19.90</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <a t-attf-href="#{central_url}/soporte?tenant=#{tenant_slug}"
+                               class="btn btn-outline-secondary w-100 fw-semibold py-2.5"
+                               style="border-radius: 10px;">
+                                Hablar con un Asesor de Cuenta
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                (function () {
+                    var countEl = document.getElementById('tenantAddUsersCount');
+                    var estEl = document.getElementById('tenantAddUsersEstimate');
+                    var btnEl = document.getElementById('tenantAddUsersBtn');
+                    var unitPrice = <t t-esc="unit_price"/>;
+                    var baseCheckout = '<t t-esc="central_url"/>/checkout?plan=<t t-esc="checkout_plan"/>&amp;subdomain=<t t-esc="tenant_slug"/>&amp;mode=addons&amp;users=';
+
+                    function refresh() {
+                        if (!countEl || !estEl || !btnEl) return;
+                        var n = Math.max(1, parseInt(countEl.value || '1', 10));
+                        estEl.textContent = 'S/ ' + (n * unitPrice).toFixed(2) + ' / mes';
+                        btnEl.setAttribute('href', baseCheckout + n);
+                    }
+                    if (countEl) {
+                        countEl.addEventListener('input', refresh);
+                        countEl.addEventListener('change', refresh);
+                    }
+                })();
+            </script>
+        </t>
+    </template>
+</odoo>
