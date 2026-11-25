@@ -863,7 +863,7 @@
                                 inputSub.value = cleanVal;
                             }
 
-                            if (!cleanVal || cleanVal.length < 3) {
+                            if (!cleanVal || cleanVal.length &lt; 3) {
                                 feedbackSub.style.display = 'block';
                                 feedbackSub.className = 'small mt-1.5 fw-semibold text-muted';
                                 feedbackSub.innerHTML = 'Ingresa al menos 3 caracteres (solo letras, números y guiones).';
