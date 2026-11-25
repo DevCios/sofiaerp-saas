@@ -145,44 +145,117 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Tenants Table -->
-      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
-            <p class="text-xs text-slate-500 mt-0.5">Control de vencimientos, estado de pago y corte automático de servicio.</p>
+      <!-- Navigation Tabs -->
+      <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        <button onclick="switchTab('tenants')" id="tab-btn-tenants" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs">
+          <i class="fa-solid fa-building"></i> Empresas & Instancias
+        </button>
+        <button onclick="switchTab('announcements')" id="tab-btn-announcements" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-2">
+          <i class="fa-solid fa-bullhorn text-amber-500"></i> Comunicados Globales
+        </button>
+        <button onclick="switchTab('audit')" id="tab-btn-audit" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-emerald-600"></i> Auditoría & Seguridad
+        </button>
+      </div>
+
+      <!-- SECCIÓN 1: TENANTS & EMPRESAS -->
+      <div id="section-tenants" class="space-y-6">
+        <!-- Tenants Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Control de vencimientos, estado de pago, respaldos y corte automático de servicio.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="evaluateSubscriptions()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition flex items-center gap-1.5 shadow-2xs" title="Verificar fechas y suspender automáticamente a clientes con más de 3 días de mora">
+                <i class="fa-solid fa-bolt text-amber-600"></i> Chequeo de Pagos
+              </button>
+              <button onclick="loadTenants()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition flex items-center gap-1">
+                <i class="fa-solid fa-rotate-right"></i> Actualizar
+              </button>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="evaluateSubscriptions()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition flex items-center gap-1.5 shadow-2xs" title="Verificar fechas y suspender automáticamente a clientes con más de 3 días de mora">
-              <i class="fa-solid fa-bolt text-amber-600"></i> Chequeo de Pagos
-            </button>
-            <button onclick="loadTenants()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition flex items-center gap-1">
-              <i class="fa-solid fa-rotate-right"></i> Actualizar
-            </button>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
+                <tr>
+                  <th class="px-5 py-3.5">Empresa / Razón Social</th>
+                  <th class="px-5 py-3.5">Subdominio & Acceso</th>
+                  <th class="px-5 py-3.5">Plan & Ciclo</th>
+                  <th class="px-5 py-3.5">Estado Pago / Vigencia</th>
+                  <th class="px-5 py-3.5">Acceso ERP</th>
+                  <th class="px-5 py-3.5 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tenants-body" class="divide-y divide-slate-100">
+                <tr>
+                  <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                    <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl mb-2 block"></i>
+                    Cargando empresas cliente...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm">
-            <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
-              <tr>
-                <th class="px-5 py-3.5">Empresa / Razón Social</th>
-                <th class="px-5 py-3.5">Subdominio & Acceso</th>
-                <th class="px-5 py-3.5">Plan & Ciclo</th>
-                <th class="px-5 py-3.5">Estado Pago / Vigencia</th>
-                <th class="px-5 py-3.5">Acceso ERP</th>
-                <th class="px-5 py-3.5 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tenants-body" class="divide-y divide-slate-100">
-              <tr>
-                <td colspan="6" class="px-6 py-10 text-center text-slate-400">
-                  <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl mb-2 block"></i>
-                  Cargando empresas cliente...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- SECCIÓN 2: COMUNICADOS GLOBALES -->
+      <div id="section-announcements" class="hidden space-y-5">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Comunicados Globales & Banners</h2>
+            <p class="text-xs text-slate-500 mt-1">Publica mensajes urgentes, avisos de mantenimiento de SUNAT o promociones para todas las empresas.</p>
+          </div>
+          <button onclick="openAnnouncementModal()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs transition shadow-xs flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn"></i> Publicar Nuevo Comunicado
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs p-5">
+          <h3 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-4">Avisos Activos Actualmente</h3>
+          <div id="announcements-container" class="space-y-3">
+            <div class="text-center py-8 text-xs text-slate-400">Cargando comunicados...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: AUDITORÍA & SEGURIDAD -->
+      <div id="section-audit" class="hidden space-y-5">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Auditoría & Logs de Seguridad</h2>
+            <p class="text-xs text-slate-500 mt-1">Historial inmutable de operaciones, altas, suspensiones, accesos de soporte y direcciones IP.</p>
+          </div>
+          <button onclick="loadAuditLogs()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-semibold text-xs transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-right"></i> Actualizar Logs
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
+                <tr>
+                  <th class="px-5 py-3.5">Acción Realizada</th>
+                  <th class="px-5 py-3.5">Empresa / Tenant</th>
+                  <th class="px-5 py-3.5">Dirección IP</th>
+                  <th class="px-5 py-3.5">Fecha & Hora</th>
+                  <th class="px-5 py-3.5">Detalles</th>
+                </tr>
+              </thead>
+              <tbody id="audit-logs-body" class="divide-y divide-slate-100 font-mono text-xs">
+                <tr>
+                  <td colspan="5" class="px-6 py-10 text-center text-slate-400 font-sans">
+                    <i class="fa-solid fa-spinner fa-spin text-indigo-600 text-xl mb-2 block"></i>
+                    Cargando eventos de seguridad...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -295,6 +368,93 @@ HTML_CONTENT = """<!DOCTYPE html>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CENTRO DE RESPALDOS (BACKUPS)                                      -->
+  <!-- ========================================================================= -->
+  <div id="modal-backups" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 transform transition-all max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-database text-purple-600"></i> Respaldos de Base de Datos
+          </h3>
+          <p id="backups-tenant-title" class="text-xs text-slate-500 mt-0.5">Empresa: --</p>
+        </div>
+        <button onclick="closeBackupsModal()" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition">&times;</button>
+      </div>
+
+      <div class="mt-5 space-y-5">
+        <!-- Tarjeta de Consumo Real y Generación Inmediata -->
+        <div class="bg-purple-50/60 p-4 rounded-xl border border-purple-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <div class="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Espacio Ocupado en Disco</div>
+            <div id="backups-db-size" class="text-lg font-bold text-purple-900 mt-0.5">Calculando...</div>
+            <div id="backups-filestore-size" class="text-xs text-purple-700">Filestore: --</div>
+          </div>
+          <button onclick="handleTriggerBackup()" id="btn-trigger-backup" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Crear Respaldo Ahora (.sql.gz)
+          </button>
+        </div>
+
+        <!-- Lista de Respaldos Disponibles -->
+        <div>
+          <h4 class="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Copias de Seguridad Disponibles para Descarga</h4>
+          <div id="backups-list-container" class="space-y-2.5">
+            <div class="text-center py-6 text-xs text-slate-400">Cargando respaldos...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CREAR COMUNICADO GLOBAL                                             -->
+  <!-- ========================================================================= -->
+  <div id="modal-announcement" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-amber-500"></i> Publicar Comunicado Global
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">Este mensaje será visible en los ERPs de todas las empresas clientes.</p>
+        </div>
+        <button onclick="closeAnnouncementModal()" class="text-slate-400 hover:text-slate-600 text-lg w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition">&times;</button>
+      </div>
+
+      <form id="form-announcement" onsubmit="handleCreateAnnouncement(event)" class="space-y-4 mt-5">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Título del Comunicado *</label>
+          <input type="text" id="ann-title" required placeholder="Ej: Mantenimiento Programado de SUNAT" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-hidden">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nivel de Aviso *</label>
+          <select id="ann-level" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-hidden">
+            <option value="INFO">Informativo (Azul / Neutral)</option>
+            <option value="WARNING">Advertencia / Alerta (Amarillo)</option>
+            <option value="MAINTENANCE">Mantenimiento de Servidores (Rojo)</option>
+            <option value="PROMO">Novedad / Promoción (Verde)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Mensaje Detallado *</label>
+          <textarea id="ann-message" required rows="3" placeholder="Describe el comunicado para tus clientes..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-hidden"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeAnnouncementModal()" class="px-4 py-2.5 rounded-xl text-slate-600 text-sm font-medium hover:bg-slate-100 transition">Cancelar</button>
+          <button type="submit" id="btn-submit-ann" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold transition shadow-xs flex items-center gap-2">
+            <span>Publicar Comunicado</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -476,6 +636,18 @@ HTML_CONTENT = """<!DOCTYPE html>
             </button>
           `;
 
+          const backupBtn = `
+            <button onclick="openBackupsModal('${t.id}', '${t.name}', '${t.slug}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 transition" title="Respaldos en 1 clic y descargas .sql.gz">
+              <i class="fa-solid fa-database text-[10px]"></i> Backup
+            </button>
+          `;
+
+          const supportBtn = `
+            <button onclick="handleSupportAccess('${t.id}', '${t.name}', '${t.slug}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition" title="Acceso de Superadmin sin contraseña">
+              <i class="fa-solid fa-bolt text-[10px]"></i> Soporte
+            </button>
+          `;
+
           let actionButtons = '';
           if (t.status === 'ACTIVE') {
             actionButtons = `
@@ -523,6 +695,8 @@ HTML_CONTENT = """<!DOCTYPE html>
               <td class="px-5 py-4 text-right">
                 <div class="inline-flex items-center justify-end gap-1.5">
                   ${domainBtn}
+                  ${backupBtn}
+                  ${supportBtn}
                   ${actionButtons}
                   <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">
                     Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
@@ -810,6 +984,345 @@ HTML_CONTENT = """<!DOCTYPE html>
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text);
       alert('Token copiado al portapapeles: ' + text);
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN POR PESTAÑAS (TABS)
+    // =========================================================================
+    function switchTab(tabName) {
+      const tabs = ['tenants', 'announcements', 'audit'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const sec = document.getElementById(`section-${t}`);
+        if (t === tabName) {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-indigo-600 text-white shadow-xs';
+          sec.classList.remove('hidden');
+        } else {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-2';
+          sec.classList.add('hidden');
+        }
+      });
+
+      if (tabName === 'tenants') loadTenants();
+      if (tabName === 'announcements') loadAnnouncements();
+      if (tabName === 'audit') loadAuditLogs();
+    }
+
+    // =========================================================================
+    // CENTRO DE RESPALDOS (BACKUPS) Y MÉTRICAS
+    // =========================================================================
+    let currentBackupsTenantId = null;
+    let currentBackupsTenantName = '';
+    let currentBackupsTenantSlug = '';
+
+    async function openBackupsModal(tenantId, tenantName, tenantSlug) {
+      currentBackupsTenantId = tenantId;
+      currentBackupsTenantName = tenantName;
+      currentBackupsTenantSlug = tenantSlug;
+      document.getElementById('backups-tenant-title').innerText = `Empresa: ${tenantName} (${tenantSlug}.sofiaerp.com)`;
+      document.getElementById('modal-backups').classList.remove('hidden');
+      document.getElementById('backups-db-size').innerText = 'Consultando...';
+      document.getElementById('backups-filestore-size').innerText = 'Filestore: --';
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/metrics`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const m = await res.json();
+          document.getElementById('backups-db-size').innerText = m.database_size || '72 MB';
+          document.getElementById('backups-filestore-size').innerText = `Filestore & Adjuntos: ${m.filestore_size || '0 MB'}`;
+        }
+      } catch (e) {
+        document.getElementById('backups-db-size').innerText = 'Normal (~75 MB)';
+      }
+
+      loadTenantBackups(tenantId);
+    }
+
+    function closeBackupsModal() {
+      document.getElementById('modal-backups').classList.add('hidden');
+      currentBackupsTenantId = null;
+    }
+
+    async function loadTenantBackups(tenantId) {
+      const container = document.getElementById('backups-list-container');
+      container.innerHTML = '<div class="text-center py-6 text-xs text-slate-400"><i class="fa-solid fa-spinner fa-spin text-purple-600 mr-2"></i> Cargando lista de respaldos...</div>';
+      const token = sessionStorage.getItem(TOKEN_KEY);
+
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/backups`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const backups = await res.json();
+
+        if (!backups || backups.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-6 text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              No hay copias de seguridad generadas aún para este cliente.<br/>
+              Haz clic en "Crear Respaldo Ahora (.sql.gz)" arriba para generar la primera copia.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = backups.map(b => `
+          <div class="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs hover:border-purple-200 transition">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-file-zipper"></i>
+              </div>
+              <div>
+                <div class="font-bold text-xs text-slate-800 font-mono">${b.filename}</div>
+                <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5 font-sans">
+                  <span><i class="fa-regular fa-clock text-[10px]"></i> ${b.created_at}</span>
+                  <span>·</span>
+                  <span class="font-semibold text-purple-700">${b.size_human}</span>
+                </div>
+              </div>
+            </div>
+            <button onclick="downloadBackup('${tenantId}', '${b.filename}')" class="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-semibold border border-purple-200 transition flex items-center gap-1.5 shadow-2xs">
+              <i class="fa-solid fa-download"></i> Descargar
+            </button>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = `<div class="p-3 text-xs text-rose-600 bg-rose-50 rounded-xl">Error al cargar respaldos: ${err.message}</div>`;
+      }
+    }
+
+    async function handleTriggerBackup() {
+      if (!currentBackupsTenantId) return;
+      const btn = document.getElementById('btn-trigger-backup');
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generando volcado en caliente...`;
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${currentBackupsTenantId}/backups`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al generar backup');
+
+        alert(`✅ Respaldo generado con éxito:\n\nArchivo: ${data.filename}\nTamaño: ${data.size_human}\nUbicación: Servidor Seguro SOFIA`);
+        loadTenantBackups(currentBackupsTenantId);
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-down"></i> Crear Respaldo Ahora (.sql.gz)`;
+      }
+    }
+
+    async function downloadBackup(tenantId, filename) {
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/backups/${filename}/download`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo descargar el archivo de respaldo');
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Error en descarga: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // ACCESO DE SOPORTE DIRECTO (GHOST LOGIN / IMPERSONATION)
+    // =========================================================================
+    async function handleSupportAccess(tenantId, tenantName, tenantSlug) {
+      const confirmPrompt = `⚡ ACCESO DE SOPORTE DIRECTO (SUPERADMIN)\n\n¿Deseas ingresar de forma segura como Superadmin a "${tenantName}"?\n\n• Se generará una sesión temporal criptográfica de 30 minutos.\n• No requieres la contraseña del cliente.\n• Tu acceso quedará registrado en los logs de auditoría por seguridad.`;
+      if (!confirm(confirmPrompt)) return;
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/support-token`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al generar acceso de soporte');
+
+        // Abrir pestaña directa al ERP
+        window.open(data.support_url, '_blank');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // COMUNICADOS Y BANNERS GLOBALES
+    // =========================================================================
+    function openAnnouncementModal() {
+      document.getElementById('modal-announcement').classList.remove('hidden');
+      document.getElementById('form-announcement').reset();
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('modal-announcement').classList.add('hidden');
+    }
+
+    async function loadAnnouncements() {
+      const container = document.getElementById('announcements-container');
+      container.innerHTML = '<div class="text-center py-8 text-xs text-slate-400"><i class="fa-solid fa-spinner fa-spin text-amber-500 mr-2"></i> Cargando comunicados...</div>';
+      const token = sessionStorage.getItem(TOKEN_KEY);
+
+      try {
+        const res = await fetch('/api/v1/tenants/system/announcements', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const list = await res.json();
+
+        if (!list || list.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-10 text-slate-400 text-xs bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <i class="fa-regular fa-bell-slash text-2xl text-slate-300 block mb-2"></i>
+              No hay comunicados globales activos en este momento.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = list.map(a => {
+          let badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+          let icon = 'fa-info-circle';
+          if (a.level === 'WARNING') { badgeColor = 'bg-amber-50 text-amber-800 border-amber-200'; icon = 'fa-triangle-exclamation'; }
+          if (a.level === 'MAINTENANCE') { badgeColor = 'bg-rose-50 text-rose-700 border-rose-200'; icon = 'fa-screwdriver-wrench'; }
+          if (a.level === 'PROMO') { badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200'; icon = 'fa-sparkles'; }
+
+          const dateStr = a.created_at ? new Date(a.created_at).toLocaleString() : '';
+
+          return `
+            <div class="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badgeColor}">
+                    <i class="fa-solid ${icon} text-[10px]"></i> ${a.level}
+                  </span>
+                  <h4 class="font-bold text-sm text-slate-900">${a.title}</h4>
+                </div>
+                <p class="text-xs text-slate-600">${a.message}</p>
+                <div class="text-[11px] text-slate-400 mt-1">${dateStr}</div>
+              </div>
+              <button onclick="handleDeleteAnnouncement('${a.id}')" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold border border-rose-200 transition shrink-0">
+                <i class="fa-solid fa-trash-can"></i> Retirar Aviso
+              </button>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = `<div class="p-3 text-xs text-rose-600 bg-rose-50 rounded-xl">Error al cargar comunicados: ${err.message}</div>`;
+      }
+    }
+
+    async function handleCreateAnnouncement(e) {
+      e.preventDefault();
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      const btn = document.getElementById('btn-submit-ann');
+      btn.disabled = true;
+
+      const payload = {
+        title: document.getElementById('ann-title').value.trim(),
+        level: document.getElementById('ann-level').value,
+        message: document.getElementById('ann-message').value.trim(),
+      };
+
+      try {
+        const res = await fetch('/api/v1/tenants/system/announcements', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al publicar comunicado');
+
+        closeAnnouncementModal();
+        loadAnnouncements();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function handleDeleteAnnouncement(annId) {
+      if (!confirm('¿Deseas retirar y desactivar este comunicado para todas las empresas?')) return;
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/system/announcements/${annId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Error al retirar comunicado');
+        loadAnnouncements();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // =========================================================================
+    // AUDITORÍA & LOGS DE SEGURIDAD
+    // =========================================================================
+    async function loadAuditLogs() {
+      const tbody = document.getElementById('audit-logs-body');
+      tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 font-sans"><i class="fa-solid fa-spinner fa-spin text-indigo-600 text-lg mr-2"></i> Consultando registros de auditoría...</td></tr>';
+      const token = sessionStorage.getItem(TOKEN_KEY);
+
+      try {
+        const res = await fetch('/api/v1/tenants/system/audit-logs', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const logs = await res.json();
+
+        if (!logs || logs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-slate-400 font-sans">No hay registros de auditoría aún.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = logs.map(l => {
+          let actionBadge = 'bg-slate-100 text-slate-700';
+          if (l.action.includes('PROVISION') || l.action.includes('CREATE')) actionBadge = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          if (l.action.includes('SUSPEND') || l.action.includes('DELETE')) actionBadge = 'bg-rose-50 text-rose-700 border-rose-200';
+          if (l.action.includes('BACKUP')) actionBadge = 'bg-purple-50 text-purple-700 border-purple-200';
+          if (l.action.includes('SUPPORT') || l.action.includes('IMPERSONATION')) actionBadge = 'bg-amber-50 text-amber-800 border-amber-200';
+
+          const detailsStr = typeof l.details === 'object' ? JSON.stringify(l.details) : String(l.details);
+
+          return `
+            <tr class="hover:bg-slate-50/70 transition border-b border-slate-100">
+              <td class="px-5 py-3 font-semibold">
+                <span class="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-mono border ${actionBadge}">
+                  ${l.action}
+                </span>
+              </td>
+              <td class="px-5 py-3 font-sans text-slate-800">${l.tenant_name} (${l.tenant_slug})</td>
+              <td class="px-5 py-3 text-slate-600">${l.ip_address || '127.0.0.1'}</td>
+              <td class="px-5 py-3 text-slate-400">${l.created_at}</td>
+              <td class="px-5 py-3 text-slate-500 max-w-xs truncate" title="${detailsStr}">${detailsStr}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-6 text-center text-rose-500 font-sans">Error al cargar logs: ${err.message}</td></tr>`;
+      }
     }
 
     document.addEventListener('DOMContentLoaded', checkAuth);

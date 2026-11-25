@@ -2,7 +2,7 @@ from app.core.database import Base
 from app.models.tenant import Tenant, TenantDomain
 from app.models.user import User, UserTenantMembership
 from app.models.product import Product, ProductPlan, Subscription
-from app.models.audit import TenantAuditLog, CapacityRecord
+from app.models.audit import TenantAuditLog, CapacityRecord, SystemAnnouncement
 
 __all__ = [
     "Base",
@@ -15,4 +15,5 @@ __all__ = [
     "Subscription",
     "TenantAuditLog",
     "CapacityRecord",
+    "SystemAnnouncement",
 ]

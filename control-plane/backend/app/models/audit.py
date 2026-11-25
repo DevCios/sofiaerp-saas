@@ -3,7 +3,8 @@ Modelos ORM para Auditoría Inmutable y Registro de Capacidad y Telemetría.
 """
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, DateTime, ForeignKey, Integer, BigInteger
+from typing import Optional
+from sqlalchemy import String, DateTime, ForeignKey, Integer, BigInteger, Boolean
 from sqlalchemy.dialects.postgresql import UUID, JSONB, INET
 from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
@@ -47,3 +48,22 @@ class CapacityRecord(Base):
     measured_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
     )
+
+
+class SystemAnnouncement(Base):
+    __tablename__ = "system_announcements"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    title: Mapped[str] = mapped_column(String(150), nullable=False)
+    message: Mapped[str] = mapped_column(String(500), nullable=False)
+    level: Mapped[str] = mapped_column(String(30), default="INFO", nullable=False)  # INFO, WARNING, MAINTENANCE, PROMO
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    target_tenant_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("tenants.id", ondelete="CASCADE"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
+    )
+

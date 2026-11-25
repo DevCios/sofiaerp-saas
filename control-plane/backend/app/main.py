@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from app.core.config import settings
 from app.core.database import engine, Base, AsyncSessionLocal
+import app.models  # Asegura registro de todos los modelos ORM en Base.metadata
 from app.api.v1.router import api_v1_router
 from app.api.admin_ui import admin_ui_router
 
