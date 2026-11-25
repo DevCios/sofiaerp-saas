@@ -122,21 +122,26 @@ HTML_CONTENT = """<!DOCTYPE html>
       </div>
 
       <!-- Metrics Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total de Clientes</div>
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Empresas</div>
           <div id="metric-tenants" class="text-3xl font-bold text-slate-900 mt-2">--</div>
-          <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Base de datos por tenant</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Registradas en plataforma</div>
         </div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Motor Runtime</div>
-          <div class="text-3xl font-bold text-slate-900 mt-2">Odoo 20</div>
-          <div class="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-flag"></i> Español (Perú) Nativo</div>
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Instancias Activas</div>
+          <div id="metric-active" class="text-3xl font-bold text-emerald-600 mt-2">--</div>
+          <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> En servicio normal</div>
         </div>
         <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Seguridad Perimetral</div>
-          <div class="text-3xl font-bold text-emerald-600 mt-2">Blindado</div>
-          <div class="text-xs text-slate-500 font-medium mt-1">Nginx HTTPS + PgBouncer Tx Mode</div>
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Suspendidas por Pago</div>
+          <div id="metric-suspended" class="text-3xl font-bold text-rose-600 mt-2">--</div>
+          <div class="text-xs text-rose-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-ban"></i> Acceso cortado</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200">
+          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Aislamiento Físico</div>
+          <div class="text-3xl font-bold text-indigo-600 mt-2">100%</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Database-per-tenant</div>
         </div>
       </div>
 
@@ -330,7 +335,11 @@ HTML_CONTENT = """<!DOCTYPE html>
         }
 
         const tenants = await res.json();
+        const activeCount = tenants.filter(t => t.status === 'ACTIVE').length;
+        const suspendedCount = tenants.filter(t => t.status === 'SUSPENDED').length;
         document.getElementById('metric-tenants').innerText = tenants.length;
+        document.getElementById('metric-active').innerText = activeCount;
+        document.getElementById('metric-suspended').innerText = suspendedCount;
 
         if (tenants.length === 0) {
           tbody.innerHTML = `
@@ -346,10 +355,42 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         tbody.innerHTML = tenants.map(t => {
           const domainUrl = 'https://' + t.slug + '.sofiaerp.com';
-          const badgeClass = t.status === 'ACTIVE' 
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-            : 'bg-amber-50 text-amber-700 border-amber-200';
-          const statusText = t.status === 'ACTIVE' ? 'Activo' : 'Aprovisionando';
+          let badgeClass = 'bg-slate-50 text-slate-700 border-slate-200';
+          let dotClass = 'bg-slate-400';
+          let statusText = t.status;
+
+          if (t.status === 'ACTIVE') {
+            badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            dotClass = 'bg-emerald-500';
+            statusText = 'Activo';
+          } else if (t.status === 'SUSPENDED') {
+            badgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+            dotClass = 'bg-rose-500';
+            statusText = 'Suspendido (Corte)';
+          } else if (t.status === 'PROVISIONING') {
+            badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+            dotClass = 'bg-amber-500 animate-pulse';
+            statusText = 'Aprovisionando';
+          } else if (t.status === 'ARCHIVED') {
+            badgeClass = 'bg-slate-100 text-slate-600 border-slate-300';
+            dotClass = 'bg-slate-400';
+            statusText = 'Archivado';
+          }
+
+          let actionButtons = '';
+          if (t.status === 'ACTIVE') {
+            actionButtons = `
+              <button onclick="toggleTenantStatus('${t.id}', 'SUSPENDED', '${t.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition" title="Suspender acceso por falta de pago">
+                <i class="fa-solid fa-ban text-[11px]"></i> Suspender
+              </button>
+            `;
+          } else if (t.status === 'SUSPENDED') {
+            actionButtons = `
+              <button onclick="toggleTenantStatus('${t.id}', 'ACTIVE', '${t.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition" title="Reactivar servicio tras regularización de pago">
+                <i class="fa-solid fa-circle-check text-[11px]"></i> Reactivar
+              </button>
+            `;
+          }
 
           return `
             <tr class="hover:bg-slate-50/70 transition">
@@ -362,15 +403,18 @@ HTML_CONTENT = """<!DOCTYPE html>
               <td class="px-6 py-4 font-mono text-xs text-slate-500">${t.database_name}</td>
               <td class="px-6 py-4">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">
-                  <span class="w-1.5 h-1.5 rounded-full ${t.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-amber-500'}"></span>
+                  <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
                   ${statusText}
                 </span>
               </td>
               <td class="px-6 py-4 text-xs text-slate-500">${new Date(t.created_at).toLocaleDateString()}</td>
               <td class="px-6 py-4 text-right">
-                <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
-                  Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                </a>
+                <div class="inline-flex items-center justify-end gap-2">
+                  ${actionButtons}
+                  <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                    Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                  </a>
+                </div>
               </td>
             </tr>
           `;
@@ -379,6 +423,40 @@ HTML_CONTENT = """<!DOCTYPE html>
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500">Error al cargar clientes: ${err.message}</td></tr>`;
       }
+    }
+
+    async function toggleTenantStatus(tenantId, newStatus, tenantName) {
+      const isSuspending = newStatus === 'SUSPENDED';
+      const confirmPrompt = isSuspending 
+        ? `⚠️ ATENCIÓN: ¿Deseas suspender el acceso de "${tenantName}" por falta de pago?\n\n• El cliente no podrá ingresar al sistema.\n• La base de datos y sus comprobantes permanecerán intactos.\n• Podrás reactivarlo en cualquier momento tras verificar el abono.`
+        : `✅ ¿Deseas reactivar el acceso de "${tenantName}" a su ERP?`;
+
+      if (!confirm(confirmPrompt)) return;
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            status: newStatus,
+            reason: isSuspending ? 'Suspensión manual por falta de pago' : 'Reactivación por pago verificado'
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Error al actualizar estado del tenant');
+        }
+
+        loadTenants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
     }
 
     async function handleCreateTenant(e) {

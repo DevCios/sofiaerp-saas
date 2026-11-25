@@ -19,6 +19,11 @@ class TenantCreate(TenantBase):
     plan_code: str = Field(..., example="SOFIA-ERP-PRO")
 
 
+class TenantStatusUpdate(BaseModel):
+    status: str = Field(..., pattern=r"^(ACTIVE|SUSPENDED|ARCHIVED)$", example="SUSPENDED")
+    reason: Optional[str] = Field(None, max_length=255, example="Falta de pago de suscripción mensual")
+
+
 class TenantDomainBase(BaseModel):
     domain: str = Field(..., min_length=4, max_length=255, example="erp.constructorasur.pe")
     is_primary: bool = Field(False)

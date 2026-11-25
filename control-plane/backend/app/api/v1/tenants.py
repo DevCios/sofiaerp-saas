@@ -14,6 +14,7 @@ from app.models.user import User, UserTenantMembership
 from app.schemas.tenant import (
     TenantCreate,
     TenantResponse,
+    TenantStatusUpdate,
     TenantDomainCreate,
     TenantDomainResponse,
 )
@@ -140,6 +141,25 @@ async def get_tenant(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)
     tenant = result.scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
+    return tenant
+
+
+@router.patch("/{tenant_id}/status", response_model=TenantResponse, summary="Actualizar estado del tenant (ACTIVE, SUSPENDED, ARCHIVED)")
+@router.put("/{tenant_id}/status", response_model=TenantResponse, summary="Actualizar estado del tenant (ACTIVE, SUSPENDED, ARCHIVED)")
+async def update_tenant_status(
+    tenant_id: UUID,
+    payload: TenantStatusUpdate,
+    db: AsyncSession = Depends(get_db_session)
+):
+    stmt = select(Tenant).where(Tenant.id == tenant_id)
+    result = await db.execute(stmt)
+    tenant = result.scalar_one_or_none()
+    if not tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
+    
+    tenant.status = payload.status
+    await db.commit()
+    await db.refresh(tenant)
     return tenant
 
 
