@@ -21,14 +21,19 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         # Migración segura e idempotente de columnas de suscripción en tenants
-        await conn.execute(text("""
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan_code VARCHAR(50) DEFAULT 'SOFIA-ERP-PRO';
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS billing_cycle VARCHAR(20) DEFAULT 'MONTHLY';
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS payment_status VARCHAR(30) DEFAULT 'PAID';
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_date TIMESTAMPTZ;
-            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_reference VARCHAR(100);
-        """))
+        migration_statements = [
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan_code VARCHAR(50) DEFAULT 'SOFIA-ERP-PRO'",
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS billing_cycle VARCHAR(20) DEFAULT 'MONTHLY'",
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ",
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS payment_status VARCHAR(30) DEFAULT 'PAID'",
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_date TIMESTAMPTZ",
+            "ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_reference VARCHAR(100)",
+        ]
+        for stmt in migration_statements:
+            try:
+                await conn.execute(text(stmt))
+            except Exception:
+                pass
 
     # Seed inicial seguro de Superadministrador SOFIA
     async with AsyncSessionLocal() as session:
