@@ -56,6 +56,46 @@ def trigger_control_plane_provisioning(subdomain, company_name, admin_email, pla
 
 class SofiaCheckoutController(http.Controller):
 
+    @http.route('/checkout/check_subdomain', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
+    def checkout_check_subdomain(self, subdomain=None, **kwargs):
+        """
+        Valida en tiempo real mientras el usuario escribe si el subdominio deseado
+        está disponible o ya fue registrado, consultando al Control Plane.
+        """
+        clean_sub = (subdomain or '').strip().lower()
+        if not clean_sub:
+            return {'available': False, 'message': 'Ingresa un nombre para tu subdominio.'}
+
+        reserved = [
+            "admin", "api", "www", "mail", "smtp", "app", "sofia", "sofiaerp", 
+            "control-plane", "portal", "status", "test", "demo", "billing", "auth",
+            "root", "support", "soporte", "help", "dev", "staging", "prod"
+        ]
+        if clean_sub in reserved:
+            return {'available': False, 'message': 'Este subdominio es un nombre reservado del sistema.'}
+
+        import re
+        if len(clean_sub) < 3 or len(clean_sub) > 63 or not re.match(r"^[a-z0-9]+(-[a-z0-9]+)*$", clean_sub):
+            return {'available': False, 'message': 'Debe tener entre 3 y 63 caracteres (solo letras minúsculas, números y guiones).'}
+
+        # 1. Consultar en la base de datos central de Control Plane
+        control_plane_url = os.getenv("CONTROL_PLANE_API_URL", "http://control-plane-api:8000").rstrip("/")
+        try:
+            resp = requests.get(f"{control_plane_url}/api/v1/tenants/check-availability/{clean_sub}", timeout=4)
+            if resp.status_code == 200:
+                data = resp.json()
+                return data
+        except Exception as e:
+            _logger.warning("SOFIA ERP: No se pudo verificar disponibilidad vía Control Plane API (%s), usando fallback local.", e)
+
+        # 2. Fallback local: verificar si ya existe en Odoo en comentarios de partners o notas de pedidos
+        domain_str = f"{clean_sub}.sofiaerp.com"
+        existing_partner = request.env['res.partner'].sudo().search([('comment', 'ilike', domain_str)], limit=1)
+        if existing_partner:
+            return {'available': False, 'message': f"El subdominio '{clean_sub}' ya está reservado por otra empresa."}
+
+        return {'available': True, 'message': f"¡Subdominio disponible! https://{clean_sub}.sofiaerp.com"}
+
     @http.route('/checkout/process_payment', type='jsonrpc', auth='public', methods=['POST'], csrf=False)
     def checkout_process_payment(self, **post):
         """

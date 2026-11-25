@@ -2,6 +2,7 @@
 Endpoints para Administración de Tenants, Dominios, Verificación DNS y Resolución Dinámica.
 """
 from typing import List
+import re
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
@@ -27,8 +28,51 @@ router = APIRouter(prefix="/tenants", tags=["Tenants, Dominios & Resolución"])
 
 
 # ------------------------------------------------------------------------------
-# CRUD de Tenants
+# CRUD y Verificación de Disponibilidad de Tenants
 # ------------------------------------------------------------------------------
+@router.get("/check-availability/{slug}", summary="Comprobar disponibilidad de subdominio en tiempo real")
+async def check_slug_availability(slug: str, db: AsyncSession = Depends(get_db_session)):
+    clean_slug = slug.strip().lower()
+    reserved = [
+        "admin", "api", "www", "mail", "smtp", "app", "sofia", "sofiaerp", 
+        "control-plane", "portal", "status", "test", "demo", "billing", "auth",
+        "root", "support", "soporte", "help", "dev", "staging", "prod"
+    ]
+    if clean_slug in reserved:
+        return {
+            "available": False,
+            "slug": clean_slug,
+            "reason": "RESERVED",
+            "message": "Este subdominio es un nombre reservado del sistema."
+        }
+    
+    if len(clean_slug) < 3 or len(clean_slug) > 63 or not re.match(r"^[a-z0-9]+(-[a-z0-9]+)*$", clean_slug):
+        return {
+            "available": False,
+            "slug": clean_slug,
+            "reason": "INVALID_FORMAT",
+            "message": "El subdominio debe tener entre 3 y 63 caracteres (solo letras minúsculas, números y guiones simples)."
+        }
+    
+    stmt = select(Tenant).where(Tenant.slug == clean_slug)
+    result = await db.execute(stmt)
+    existing = result.scalar_one_or_none()
+    
+    if existing:
+        return {
+            "available": False,
+            "slug": clean_slug,
+            "reason": "ALREADY_EXISTS",
+            "message": "El subdominio ya está registrado por otra empresa. Por favor elige otro."
+        }
+        
+    return {
+        "available": True,
+        "slug": clean_slug,
+        "message": f"¡Subdominio disponible! https://{clean_slug}.sofiaerp.com"
+    }
+
+
 @router.post("", response_model=TenantResponse, status_code=status.HTTP_201_CREATED, summary="Registrar y aprovisionar un nuevo Tenant")
 async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db_session)):
     existing_tenant = await db.execute(select(Tenant).where(Tenant.slug == payload.slug))

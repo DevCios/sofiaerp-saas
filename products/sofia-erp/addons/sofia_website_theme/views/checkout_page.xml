@@ -506,10 +506,11 @@
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold small text-dark">Subdominio seguro para tu ERP *</label>
                                             <div class="input-group">
-                                                <input type="text" class="form-control form-control-sofia text-lowercase" id="inputSubdomain" placeholder="miempresa" required="required"/>
+                                                <input type="text" class="form-control form-control-sofia text-lowercase" id="inputSubdomain" placeholder="miempresa" required="required" autocomplete="off"/>
                                                 <span class="input-group-text bg-light text-dark fw-bold small">.sofiaerp.com</span>
                                             </div>
-                                            <div class="form-text text-muted small">Podrás vincular tu propio dominio (ej. <code>erp.tuempresa.pe</code>) en cualquier momento.</div>
+                                            <div id="subdomainFeedback" class="small mt-1.5 fw-semibold" style="display: none; transition: all 0.2s ease;"></div>
+                                            <div class="form-text text-muted small mt-1">Podrás vincular tu propio dominio (ej. <code>erp.tuempresa.pe</code>) en cualquier momento.</div>
                                         </div>
 
                                         <!-- Dirección Fiscal -->
@@ -846,12 +847,82 @@
                             });
                         }
 
+                        // Validación en Tiempo Real de Disponibilidad del Subdominio
+                        var inputSub = document.getElementById('inputSubdomain');
+                        var feedbackSub = document.getElementById('subdomainFeedback');
+                        var checkSubTimer = null;
+                        var isSubdomainAvailable = false;
+
+                        function checkSubdomainAvailability() {
+                            clearTimeout(checkSubTimer);
+                            if (!inputSub || !feedbackSub) return;
+
+                            var rawVal = inputSub.value.trim().toLowerCase();
+                            var cleanVal = rawVal.replace(/[^a-z0-9-]/g, '');
+                            if (cleanVal !== inputSub.value) {
+                                inputSub.value = cleanVal;
+                            }
+
+                            if (!cleanVal || cleanVal.length < 3) {
+                                feedbackSub.style.display = 'block';
+                                feedbackSub.className = 'small mt-1.5 fw-semibold text-muted';
+                                feedbackSub.innerHTML = 'Ingresa al menos 3 caracteres (solo letras, números y guiones).';
+                                inputSub.classList.remove('border-success', 'border-danger');
+                                isSubdomainAvailable = false;
+                                return;
+                            }
+
+                            feedbackSub.style.display = 'block';
+                            feedbackSub.className = 'small mt-1.5 fw-semibold text-secondary';
+                            feedbackSub.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Comprobando disponibilidad...';
+
+                            checkSubTimer = setTimeout(function () {
+                                fetch('/checkout/check_subdomain', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ params: { subdomain: cleanVal } })
+                                })
+                                .then(function (res) { return res.json(); })
+                                .then(function (res) {
+                                    var data = res.result || res;
+                                    if (data.available) {
+                                        isSubdomainAvailable = true;
+                                        inputSub.classList.remove('border-danger');
+                                        inputSub.classList.add('border-success');
+                                        feedbackSub.className = 'small mt-1.5 fw-semibold text-success';
+                                        feedbackSub.innerHTML = '<i class="fa fa-check-circle me-1"></i> ' + (data.message || '¡Subdominio disponible!');
+                                    } else {
+                                        isSubdomainAvailable = false;
+                                        inputSub.classList.remove('border-success');
+                                        inputSub.classList.add('border-danger');
+                                        feedbackSub.className = 'small mt-1.5 fw-semibold text-danger';
+                                        feedbackSub.innerHTML = '<i class="fa fa-times-circle me-1"></i> ' + (data.message || 'Subdominio no disponible.');
+                                    }
+                                })
+                                .catch(function () {
+                                    isSubdomainAvailable = true;
+                                    feedbackSub.style.display = 'none';
+                                });
+                            }, 350);
+                        }
+
+                        if (inputSub) {
+                            inputSub.addEventListener('input', checkSubdomainAvailability);
+                            inputSub.addEventListener('blur', checkSubdomainAvailability);
+                        }
+
                         // Finalizar Compra con integración a Mercado Pago
                         if (btnFinalizePurchase) {
                             btnFinalizePurchase.addEventListener('click', function () {
                                 var form = document.getElementById('formCheckoutBilling');
                                 if (form &amp;&amp; !form.checkValidity()) {
                                     form.reportValidity();
+                                    return;
+                                }
+
+                                if (inputSub &amp;&amp; !isSubdomainAvailable) {
+                                    alert('Por favor verifica que el subdominio elegido esté disponible antes de proceder con el pago.');
+                                    inputSub.focus();
                                     return;
                                 }
 
