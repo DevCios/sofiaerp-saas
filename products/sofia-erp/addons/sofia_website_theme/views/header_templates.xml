@@ -455,17 +455,12 @@
                             </div>
                         </li>
 
-                        <!-- 3. Comunidad -->
-                        <li class="odoo-nav-item">
-                            <a class="odoo-nav-link" href="/blog">Comunidad</a>
-                        </li>
-
-                        <!-- 4. Planes -->
+                        <!-- 3. Planes -->
                         <li class="odoo-nav-item">
                             <a class="odoo-nav-link" href="/precios">Planes</a>
                         </li>
 
-                        <!-- 5. Ayuda / Soporte -->
+                        <!-- 4. Ayuda / Soporte -->
                         <li class="odoo-nav-item">
                             <a class="odoo-nav-link" href="/soporte">Ayuda</a>
                         </li>
@@ -546,7 +541,7 @@
                             }
                         });
 
-                        // Cerrar al hacer clic en enlaces no dropdown (Comunidad, Precios, Ayuda) o fuera
+                        // Cerrar al hacer clic en enlaces no dropdown (Planes, Ayuda) o fuera
                         document.querySelectorAll('.odoo-nav-item:not(.odoo-dropdown) a').forEach(function(l) {
                             l.addEventListener('mouseenter', closeAllMenus);
                         });

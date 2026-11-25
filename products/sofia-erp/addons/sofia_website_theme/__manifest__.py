@@ -7,7 +7,7 @@
     'description': """
 Módulo de Identidad Visual y Experiencia Web para SOFIA ERP (Odoo 20)
 =====================================================================
-* Cabecera SaaS con Mega-menús interactivos: Aplicaciones, Verticales, Comunidad, Precios, Soporte e Inicio de sesión.
+* Cabecera SaaS con Mega-menús interactivos: Aplicaciones, Verticales, Planes, Ayuda e Inicio de sesión.
 * 11 Verticales de negocio: Bodegas, Ferreterías, Retail, Industria, Odontología, Servicios, Restaurante, Comercio Electrónico, Gestión de Flotas, Recursos Humanos, Contabilidad.
 * Footer institucional con Libro de Reclamaciones virtual y cumplimiento normativo peruano.
 * Snippets prediseñados de alto impacto (Hero SaaS, Grilla de Verticales, Tabla de Precios con integración Mercado Pago).

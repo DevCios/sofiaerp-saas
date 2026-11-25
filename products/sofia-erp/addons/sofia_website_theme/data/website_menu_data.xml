@@ -118,32 +118,6 @@
         <field name="sequence" type="int">11</field>
     </record>
 
-    <!-- Menú Principal: Comunidad -->
-    <record id="menu_comunidad" model="website.menu">
-        <field name="name">Comunidad</field>
-        <field name="url">#</field>
-        <field name="parent_id" ref="website.main_menu"/>
-        <field name="sequence" type="int">30</field>
-    </record>
-    <record id="submenu_com_blog" model="website.menu">
-        <field name="name">Blog &amp; Guías SUNAT</field>
-        <field name="url">/blog</field>
-        <field name="parent_id" ref="menu_comunidad"/>
-        <field name="sequence" type="int">1</field>
-    </record>
-    <record id="submenu_com_casos" model="website.menu">
-        <field name="name">Casos de Éxito</field>
-        <field name="url">/casos-de-exito</field>
-        <field name="parent_id" ref="menu_comunidad"/>
-        <field name="sequence" type="int">2</field>
-    </record>
-    <record id="submenu_com_docs" model="website.menu">
-        <field name="name">Documentación &amp; Tutoriales</field>
-        <field name="url">/documentacion</field>
-        <field name="parent_id" ref="menu_comunidad"/>
-        <field name="sequence" type="int">3</field>
-    </record>
-
     <!-- Menú Principal: Precios -->
     <record id="menu_precios" model="website.menu">
         <field name="name">Precios</field>
