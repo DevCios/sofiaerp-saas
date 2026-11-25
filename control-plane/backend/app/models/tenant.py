@@ -3,6 +3,7 @@ Modelos ORM para Tenants y Dominios Personalizados.
 """
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
 from sqlalchemy import String, Boolean, DateTime, ForeignKey, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -26,6 +27,14 @@ class Tenant(Base):
     # SHARED_PROTECTED, DEDICATED
     runtime_mode: Mapped[str] = mapped_column(String(30), default="SHARED_PROTECTED", nullable=False)
     dedicated_host: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    # Suscripción y Facturación Recurrente
+    plan_code: Mapped[Optional[str]] = mapped_column(String(50), default="SOFIA-ERP-PRO", nullable=True)
+    billing_cycle: Mapped[Optional[str]] = mapped_column(String(20), default="MONTHLY", nullable=True)
+    subscription_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    payment_status: Mapped[Optional[str]] = mapped_column(String(30), default="PAID", nullable=True)
+    last_payment_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_payment_reference: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False

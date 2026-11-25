@@ -147,23 +147,31 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       <!-- Tenants Table -->
       <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-          <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
-          <button onclick="loadTenants()" class="text-xs text-slate-500 hover:text-indigo-600 flex items-center gap-1 font-medium transition">
-            <i class="fa-solid fa-rotate-right"></i> Actualizar
-          </button>
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Empresas Registradas</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Control de vencimientos, estado de pago y corte automático de servicio.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="evaluateSubscriptions()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 transition flex items-center gap-1.5 shadow-2xs" title="Verificar fechas y suspender automáticamente a clientes con más de 3 días de mora">
+              <i class="fa-solid fa-bolt text-amber-600"></i> Chequeo de Pagos
+            </button>
+            <button onclick="loadTenants()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 transition flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Actualizar
+            </button>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-100">
               <tr>
-                <th class="px-6 py-3.5">Empresa / Razón Social</th>
-                <th class="px-6 py-3.5">Subdominio & Acceso</th>
-                <th class="px-6 py-3.5">Base de Datos</th>
-                <th class="px-6 py-3.5">Estado</th>
-                <th class="px-6 py-3.5">Fecha Alta</th>
-                <th class="px-6 py-3.5 text-right">Acción</th>
+                <th class="px-5 py-3.5">Empresa / Razón Social</th>
+                <th class="px-5 py-3.5">Subdominio & Acceso</th>
+                <th class="px-5 py-3.5">Plan & Ciclo</th>
+                <th class="px-5 py-3.5">Estado Pago / Vigencia</th>
+                <th class="px-5 py-3.5">Acceso ERP</th>
+                <th class="px-5 py-3.5 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody id="tenants-body" class="divide-y divide-slate-100">
@@ -224,9 +232,17 @@ HTML_CONTENT = """<!DOCTYPE html>
         <div>
           <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Plan Comercial</label>
           <select id="t-plan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition">
-            <option value="SOFIA-ERP-PRO">SOFIA ERP Profesional (Odoo 20 + SUNAT UBL 2.1)</option>
-            <option value="SOFIA-ERP-ENTERPRISE">SOFIA ERP Enterprise (Multiproducto Completo)</option>
-            <option value="SOFIA-ERP-BASIC">SOFIA ERP Básico</option>
+            <option value="SOFIA-ERP-PRO">SOFIA ERP Pyme Pro (S/ 14.90 / mes)</option>
+            <option value="SOFIA-ERP-EMPRENDEDOR">SOFIA ERP Emprendedor (S/ 9.90 / mes)</option>
+            <option value="SOFIA-ERP-CORPORATIVO">SOFIA ERP Corporativo (S/ 19.90 / mes)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Ciclo de Facturación & Vigencia</label>
+          <select id="t-cycle" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition">
+            <option value="MONTHLY">Mensual (Vigencia inicial: 30 días)</option>
+            <option value="ANNUAL">Anual (Vigencia inicial: 365 días)</option>
           </select>
         </div>
 
@@ -355,63 +371,113 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         tbody.innerHTML = tenants.map(t => {
           const domainUrl = 'https://' + t.slug + '.sofiaerp.com';
-          let badgeClass = 'bg-slate-50 text-slate-700 border-slate-200';
-          let dotClass = 'bg-slate-400';
-          let statusText = t.status;
+          let accessBadgeClass = 'bg-slate-50 text-slate-700 border-slate-200';
+          let accessDotClass = 'bg-slate-400';
+          let accessText = t.status;
 
           if (t.status === 'ACTIVE') {
-            badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
-            dotClass = 'bg-emerald-500';
-            statusText = 'Activo';
+            accessBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            accessDotClass = 'bg-emerald-500';
+            accessText = 'Activo';
           } else if (t.status === 'SUSPENDED') {
-            badgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
-            dotClass = 'bg-rose-500';
-            statusText = 'Suspendido (Corte)';
+            accessBadgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+            accessDotClass = 'bg-rose-500';
+            accessText = 'Suspendido';
           } else if (t.status === 'PROVISIONING') {
-            badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
-            dotClass = 'bg-amber-500 animate-pulse';
-            statusText = 'Aprovisionando';
+            accessBadgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+            accessDotClass = 'bg-amber-500 animate-pulse';
+            accessText = 'Aprovisionando';
           } else if (t.status === 'ARCHIVED') {
-            badgeClass = 'bg-slate-100 text-slate-600 border-slate-300';
-            dotClass = 'bg-slate-400';
-            statusText = 'Archivado';
+            accessBadgeClass = 'bg-slate-100 text-slate-600 border-slate-300';
+            accessDotClass = 'bg-slate-400';
+            accessText = 'Archivado';
           }
 
+          // Cálculo de vigencia de pago y fecha de vencimiento
+          let paymentBadge = '';
+          let expiresDateStr = '30 días de vigencia';
+          if (t.subscription_expires_at) {
+            const expDate = new Date(t.subscription_expires_at);
+            const now = new Date();
+            const diffDays = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+            expiresDateStr = expDate.toLocaleDateString();
+
+            if (diffDays > 5) {
+              paymentBadge = `
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <i class="fa-solid fa-circle-check text-[10px]"></i> Al Día (${diffDays}d)
+                </span>
+              `;
+            } else if (diffDays >= 0) {
+              paymentBadge = `
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                  <i class="fa-solid fa-clock text-[10px]"></i> Vence en ${diffDays}d
+                </span>
+              `;
+            } else {
+              paymentBadge = `
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                  <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Vencido (${Math.abs(diffDays)}d mora)
+                </span>
+              `;
+            }
+          } else {
+            paymentBadge = `
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <i class="fa-solid fa-circle-check text-[10px]"></i> Al Día
+              </span>
+            `;
+          }
+
+          // Botones de Acción
           let actionButtons = '';
           if (t.status === 'ACTIVE') {
             actionButtons = `
-              <button onclick="toggleTenantStatus('${t.id}', 'SUSPENDED', '${t.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition" title="Suspender acceso por falta de pago">
-                <i class="fa-solid fa-ban text-[11px]"></i> Suspender
+              <button onclick="toggleTenantStatus('${t.id}', 'SUSPENDED', '${t.name}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition" title="Cortar acceso por falta de pago">
+                <i class="fa-solid fa-ban text-[10px]"></i> Suspender
+              </button>
+              <button onclick="renewTenant('${t.id}', '${t.name}', 30)" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition" title="Renovar +30 días por abono mensual recibido">
+                <i class="fa-solid fa-plus text-[10px]"></i> +30d
               </button>
             `;
           } else if (t.status === 'SUSPENDED') {
             actionButtons = `
-              <button onclick="toggleTenantStatus('${t.id}', 'ACTIVE', '${t.name}')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition" title="Reactivar servicio tras regularización de pago">
-                <i class="fa-solid fa-circle-check text-[11px]"></i> Reactivar
+              <button onclick="renewTenant('${t.id}', '${t.name}', 30)" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition" title="Reactivar servicio y extender vigencia 30 días">
+                <i class="fa-solid fa-play text-[10px]"></i> Reactivar (+30d)
               </button>
             `;
           }
 
+          const cycleLabel = t.billing_cycle === 'ANNUAL' ? 'Anual' : 'Mensual';
+          const planDisplay = (t.plan_code || 'PRO').replace('SOFIA-ERP-', '');
+
           return `
             <tr class="hover:bg-slate-50/70 transition">
-              <td class="px-6 py-4 font-semibold text-slate-900">${t.name}</td>
-              <td class="px-6 py-4">
+              <td class="px-5 py-4 font-semibold text-slate-900">${t.name}</td>
+              <td class="px-5 py-4">
                 <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-medium">
                   ${t.slug}.sofiaerp.com <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                 </a>
               </td>
-              <td class="px-6 py-4 font-mono text-xs text-slate-500">${t.database_name}</td>
-              <td class="px-6 py-4">
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}">
-                  <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
-                  ${statusText}
+              <td class="px-5 py-4">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                  ${planDisplay} · ${cycleLabel}
                 </span>
               </td>
-              <td class="px-6 py-4 text-xs text-slate-500">${new Date(t.created_at).toLocaleDateString()}</td>
-              <td class="px-6 py-4 text-right">
-                <div class="inline-flex items-center justify-end gap-2">
+              <td class="px-5 py-4">
+                ${paymentBadge}
+                <div class="text-[11px] text-slate-400 mt-1 font-mono">Vence: ${expiresDateStr}</div>
+              </td>
+              <td class="px-5 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${accessBadgeClass}">
+                  <span class="w-1.5 h-1.5 rounded-full ${accessDotClass}"></span>
+                  ${accessText}
+                </span>
+              </td>
+              <td class="px-5 py-4 text-right">
+                <div class="inline-flex items-center justify-end gap-1.5">
                   ${actionButtons}
-                  <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition">
+                  <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">
                     Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
                   </a>
                 </div>
@@ -457,6 +523,49 @@ HTML_CONTENT = """<!DOCTYPE html>
         alert('Error: ' + err.message);
       }
     }
+
+    async function renewTenant(tenantId, tenantName, days = 30) {
+      const confirmPrompt = `💳 Confirmar pago y extender suscripción:\n\n¿Registrar abono de "${tenantName}" y extender su vigencia por +${days} días?`;
+      if (!confirm(confirmPrompt)) return;
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            status: 'ACTIVE',
+            extend_days: days,
+            reason: `Renovación de suscripción (+${days} días) por pago registrado.`
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al renovar suscripción');
+
+        loadTenants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function evaluateSubscriptions() {
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch('/api/v1/tenants/evaluate-subscriptions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al evaluar suscripciones');
+        alert(`⚡ Chequeo de pagos completado:\n• Empresas evaluadas: ${data.checked_total}\n• Suspendidas automáticamente por mora (>3 días): ${data.suspended_count}\n• Por vencer pronto: ${data.due_soon_count}`);
+        loadTenants();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
     }
 
     async function handleCreateTenant(e) {
@@ -471,6 +580,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         admin_email: document.getElementById('t-email').value.trim(),
         admin_password: document.getElementById('t-pass').value.trim(),
         plan_code: document.getElementById('t-plan').value,
+        billing_cycle: document.getElementById('t-cycle') ? document.getElementById('t-cycle').value : 'MONTHLY',
       };
 
       btn.disabled = true;

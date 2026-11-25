@@ -2,6 +2,7 @@
 Endpoints para Administración de Tenants, Dominios, Verificación DNS y Resolución Dinámica.
 """
 from typing import List
+from datetime import datetime, timedelta, timezone
 import re
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -86,6 +87,10 @@ async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db
     db_name = f"sofia_tenant_{payload.slug.replace('-', '_')}"
     filestore_dir = f"/var/lib/sofia/filestores/{payload.slug}"
 
+    cycle = (payload.billing_cycle or "MONTHLY").upper()
+    duration_days = 365 if cycle == "ANNUAL" else 30
+    expires_at = datetime.now(timezone.utc) + timedelta(days=duration_days)
+
     new_tenant = Tenant(
         name=payload.name,
         slug=payload.slug,
@@ -93,6 +98,12 @@ async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db
         filestore_path=filestore_dir,
         status="PROVISIONING",
         runtime_mode=payload.runtime_mode or "SHARED_PROTECTED",
+        plan_code=payload.plan_code or "SOFIA-ERP-PRO",
+        billing_cycle=cycle,
+        subscription_expires_at=expires_at,
+        payment_status="PAID",
+        last_payment_date=datetime.now(timezone.utc),
+        last_payment_reference=payload.payment_reference,
     )
     db.add(new_tenant)
     await db.flush()
@@ -158,9 +169,70 @@ async def update_tenant_status(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
     
     tenant.status = payload.status
+    now = datetime.now(timezone.utc)
+
+    if payload.extend_days and payload.extend_days > 0:
+        base_date = tenant.subscription_expires_at or now
+        if base_date < now:
+            base_date = now
+        tenant.subscription_expires_at = base_date + timedelta(days=payload.extend_days)
+        tenant.payment_status = "PAID"
+        tenant.last_payment_date = now
+        tenant.status = "ACTIVE"
+    elif payload.status == "ACTIVE":
+        tenant.payment_status = "PAID"
+        if not tenant.subscription_expires_at or tenant.subscription_expires_at < now:
+            tenant.subscription_expires_at = now + timedelta(days=30)
+    elif payload.status == "SUSPENDED":
+        tenant.payment_status = "OVERDUE"
+
     await db.commit()
     await db.refresh(tenant)
     return tenant
+
+
+@router.post("/evaluate-subscriptions", summary="Verificar vigencia de suscripciones y suspender tenants morosos")
+async def evaluate_subscriptions(db: AsyncSession = Depends(get_db_session)):
+    """
+    Tarea ejecutada periódicamente (cron diario o webhook):
+    - Revisa todos los tenants con suscripción activa.
+    - Si pasaron más de 3 días de gracia tras su fecha de vencimiento: SUSPENDED (Corte de servicio).
+    - Si venció hoy pero está dentro de los 3 días de gracia: DUE_SOON.
+    """
+    now = datetime.now(timezone.utc)
+    stmt = select(Tenant).where(Tenant.status.in_(["ACTIVE", "SUSPENDED"]))
+    result = await db.execute(stmt)
+    tenants = result.scalars().all()
+
+    suspended_list = []
+    due_soon_list = []
+
+    for t in tenants:
+        if not t.subscription_expires_at:
+            continue
+        
+        # 3 días de gracia
+        grace_deadline = t.subscription_expires_at + timedelta(days=3)
+        if now > grace_deadline:
+            if t.status != "SUSPENDED":
+                t.status = "SUSPENDED"
+                suspended_list.append(t.slug)
+            t.payment_status = "OVERDUE"
+        elif now > t.subscription_expires_at:
+            t.payment_status = "DUE_SOON"
+            due_soon_list.append(t.slug)
+        else:
+            t.payment_status = "PAID"
+
+    await db.commit()
+    return {
+        "checked_total": len(tenants),
+        "suspended_count": len(suspended_list),
+        "suspended_tenants": suspended_list,
+        "due_soon_count": len(due_soon_list),
+        "due_soon_tenants": due_soon_list,
+    }
+
 
 
 # ------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 from app.core.config import settings
 from app.core.database import engine, Base, AsyncSessionLocal
 from app.api.v1.router import api_v1_router
@@ -18,6 +19,15 @@ async def lifespan(app: FastAPI):
     # Inicialización segura de tablas del Control Plane si no existen
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Migración segura e idempotente de columnas de suscripción en tenants
+        await conn.execute(text("""
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan_code VARCHAR(50) DEFAULT 'SOFIA-ERP-PRO';
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS billing_cycle VARCHAR(20) DEFAULT 'MONTHLY';
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMPTZ;
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS payment_status VARCHAR(30) DEFAULT 'PAID';
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_date TIMESTAMPTZ;
+            ALTER TABLE tenants ADD COLUMN IF NOT EXISTS last_payment_reference VARCHAR(100);
+        """))
 
     # Seed inicial seguro de Superadministrador SOFIA
     async with AsyncSessionLocal() as session:
