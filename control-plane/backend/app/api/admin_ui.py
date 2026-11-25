@@ -990,7 +990,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || 'Verificación DNS fallida');
 
-        alert('✅ ¡Dominio verificado exitosamente!\n\nEl registro TXT fue detectado correctamente y el dominio ha quedado activo.');
+        alert(`✅ ¡Dominio verificado exitosamente!\n\nEl registro TXT fue detectado correctamente y el dominio ha quedado activo.`);
         loadTenantDomains(tenantId);
       } catch (err) {
         alert('❌ ' + err.message);
