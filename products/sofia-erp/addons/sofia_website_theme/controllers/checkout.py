@@ -2,15 +2,56 @@
 import json
 import logging
 import os
+import secrets
+import string
 import requests
 from werkzeug.exceptions import NotFound
 
 from odoo import http, _
-from odoo.http import request
+from odoo.http import request, Response
 
 _logger = logging.getLogger(__name__)
 
 MP_PREFERENCE_API = "https://api.mercadopago.com/checkout/preferences"
+
+
+def trigger_control_plane_provisioning(subdomain, company_name, admin_email, plan_code="SOFIA-PLAN-PRO"):
+    """
+    Invoca la API del Control Plane de SOFIA ERP (FastAPI) para aprovisionar
+    de forma inmediata la base de datos PostgreSQL aislada y filestore del tenant.
+    """
+    control_plane_url = os.getenv("CONTROL_PLANE_API_URL", "http://control-plane-api:8000").rstrip("/")
+    endpoint = f"{control_plane_url}/api/v1/tenants"
+
+    # Generar clave temporal robusta para el administrador del tenant
+    chars = string.ascii_letters + string.digits
+    temp_password = "Sofia" + "".join(secrets.choice(chars) for _ in range(8)) + "#"
+
+    payload = {
+        "name": company_name or f"Empresa {subdomain.capitalize()}",
+        "slug": subdomain.lower().strip(),
+        "runtime_mode": "SHARED_PROTECTED",
+        "admin_email": admin_email.lower().strip(),
+        "admin_password": temp_password,
+        "plan_code": plan_code or "SOFIA-PLAN-PRO",
+    }
+
+    try:
+        _logger.info("SOFIA ERP: Solicitando aprovisionamiento automático a Control Plane para tenant '%s'...", subdomain)
+        resp = requests.post(endpoint, json=payload, timeout=12)
+        if resp.status_code == 201:
+            data = resp.json()
+            _logger.info("SOFIA ERP: Tenant '%s' aprovisionado exitosamente en Control Plane (ID: %s)", subdomain, data.get('id'))
+            return {"success": True, "password": temp_password, "already_exists": False, "data": data}
+        elif resp.status_code == 400 and "ya se encuentra en uso" in resp.text:
+            _logger.info("SOFIA ERP: Tenant '%s' ya existía en Control Plane.", subdomain)
+            return {"success": True, "password": None, "already_exists": True}
+        else:
+            _logger.error("SOFIA ERP: Control Plane devolvió HTTP %s: %s", resp.status_code, resp.text)
+            return {"success": False, "error": resp.text}
+    except Exception as ex:
+        _logger.error("SOFIA ERP: Error al comunicar con Control Plane API: %s", ex)
+        return {"success": False, "error": str(ex)}
 
 
 class SofiaCheckoutController(http.Controller):
@@ -36,6 +77,7 @@ class SofiaCheckoutController(http.Controller):
             city = (post.get('city') or '').strip()
             region = (post.get('region') or '').strip()
             amount_total = float(post.get('amount_total', 0.0))
+            impl_cost = float(post.get('impl_cost', 0.0))
 
             if not email or not fiscal_id:
                 return {
@@ -151,7 +193,6 @@ class SofiaCheckoutController(http.Controller):
 
             # Generar preferencia real en Mercado Pago si tiene credenciales configuradas
             if access_token:
-
                 preference_payload = {
                     "items": [
                         {
@@ -179,11 +220,12 @@ class SofiaCheckoutController(http.Controller):
                         }
                     },
                     "back_urls": {
-                        "success": f"{base_url}/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}",
+                        "success": f"{base_url}/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}&email={email}&company={company_name}",
                         "failure": f"{base_url}/checkout/failure?plan={plan}",
-                        "pending": f"{base_url}/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}&status=pending"
+                        "pending": f"{base_url}/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}&email={email}&company={company_name}&status=pending"
                     },
                     "auto_return": "approved",
+                    "notification_url": f"{base_url}/checkout/webhook/mercadopago",
                     "external_reference": f"SOFIA-SUB-{subdomain}-{fiscal_id}",
                     "statement_descriptor": "SOFIA ERP SAAS",
                     "metadata": {
@@ -193,7 +235,8 @@ class SofiaCheckoutController(http.Controller):
                         "users": users,
                         "partner_id": partner.id,
                         "fiscal_id": fiscal_id,
-                        "email": email
+                        "email": email,
+                        "company_name": company_name or client_name
                     }
                 }
 
@@ -223,7 +266,7 @@ class SofiaCheckoutController(http.Controller):
             return {
                 'status': 'demo_success',
                 'message': _("Solicitud de suscripción registrada exitosamente."),
-                'redirect_url': f"/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}&mode=demo"
+                'redirect_url': f"/checkout/success?subdomain={subdomain}&plan={plan}&users={users}&billing={billing}&email={email}&company={company_name}&mode=demo"
             }
 
         except Exception as e:
@@ -233,15 +276,107 @@ class SofiaCheckoutController(http.Controller):
                 'message': str(e)
             }
 
+    @http.route('/checkout/webhook/mercadopago', type='json', auth='none', methods=['POST'], csrf=False)
+    def checkout_webhook_mercadopago(self, **post):
+        """
+        Webhook asíncrono de Mercado Pago:
+        Verifica el estado del pago mediante la API oficial de Mercado Pago
+        y dispara el aprovisionamiento automático del tenant en Celery si está aprobado.
+        """
+        try:
+            data = json.loads(request.httprequest.data) if request.httprequest.data else {}
+        except Exception:
+            data = {}
+
+        _logger.info("SOFIA ERP: Webhook Mercado Pago recibido: %s", data)
+        action = data.get('action') or data.get('type')
+        payment_id = data.get('data', {}).get('id') or data.get('id')
+
+        if action in ['payment.created', 'payment.updated', 'payment'] and payment_id:
+            try:
+                access_token = request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+                if not access_token:
+                    mp_provider = request.env['payment.provider'].sudo().search([('code', 'in', ['mercadopago', 'mercado_pago'])], limit=1)
+                    if mp_provider:
+                        access_token = getattr(mp_provider, 'mercado_pago_access_token', None)
+
+                if access_token:
+                    resp = requests.get(
+                        f"https://api.mercadopago.com/v1/payments/{payment_id}",
+                        headers={"Authorization": f"Bearer {access_token}"},
+                        timeout=10
+                    )
+                    if resp.status_code == 200:
+                        payment_data = resp.json()
+                        status = payment_data.get('status')
+                        metadata = payment_data.get('metadata', {})
+                        subdomain = metadata.get('subdomain')
+                        email = metadata.get('email')
+                        company_name = metadata.get('company_name')
+                        plan = metadata.get('plan', 'pyme-pro')
+
+                        _logger.info("SOFIA ERP: Pago %s con estado '%s' para subdominio '%s'", payment_id, status, subdomain)
+                        if status == 'approved' and subdomain and email:
+                            plan_code_map = {
+                                'emprendedor': 'SOFIA-PLAN-EMP',
+                                'pyme-pro': 'SOFIA-PLAN-PRO',
+                                'corporativo': 'SOFIA-PLAN-CORP',
+                            }
+                            plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
+                            trigger_control_plane_provisioning(
+                                subdomain=subdomain,
+                                company_name=company_name,
+                                admin_email=email,
+                                plan_code=plan_code
+                            )
+            except Exception as e:
+                _logger.exception("SOFIA ERP: Error en webhook Mercado Pago: %s", e)
+
+        return Response("OK", status=200)
+
     @http.route('/checkout/success', type='http', auth='public', website=True)
     def checkout_success(self, **kwargs):
         """ Pantalla de Confirmación de Pago y Aprovisionamiento """
+        subdomain = (kwargs.get('subdomain') or '').strip().lower()
+        plan = kwargs.get('plan', 'pyme-pro')
+        users = kwargs.get('users', '1')
+        billing = kwargs.get('billing', 'anual')
+        mode = kwargs.get('mode', 'live')
+        email = (kwargs.get('email') or '').strip()
+        company = (kwargs.get('company') or '').strip()
+
+        collection_status = kwargs.get('collection_status') or kwargs.get('status')
+        is_approved = (collection_status == 'approved') or (mode == 'demo') or not collection_status
+
+        provisioning_result = None
+        if subdomain and is_approved:
+            plan_code_map = {
+                'emprendedor': 'SOFIA-PLAN-EMP',
+                'pyme-pro': 'SOFIA-PLAN-PRO',
+                'corporativo': 'SOFIA-PLAN-CORP',
+            }
+            plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
+            provisioning_result = trigger_control_plane_provisioning(
+                subdomain=subdomain,
+                company_name=company or f"Empresa {subdomain.capitalize()}",
+                admin_email=email or f"admin@{subdomain}.sofiaerp.com",
+                plan_code=plan_code
+            )
+
+        temp_password = provisioning_result.get('password') if provisioning_result else None
+        already_exists = provisioning_result.get('already_exists') if provisioning_result else False
+        login_url = f"https://{subdomain}.sofiaerp.com" if subdomain else "https://sofiaerp.com/login"
+
         return request.render('sofia_website_theme.checkout_success_page', {
-            'subdomain': kwargs.get('subdomain', 'miempresa'),
-            'plan': kwargs.get('plan', 'pyme-pro'),
-            'users': kwargs.get('users', '1'),
-            'billing': kwargs.get('billing', 'anual'),
-            'mode': kwargs.get('mode', 'live'),
+            'subdomain': subdomain or 'miempresa',
+            'plan': plan,
+            'users': users,
+            'billing': billing,
+            'mode': mode,
+            'admin_email': email,
+            'temp_password': temp_password,
+            'already_exists': already_exists,
+            'login_url': login_url,
         })
 
     @http.route('/checkout/failure', type='http', auth='public', website=True)
@@ -250,3 +385,4 @@ class SofiaCheckoutController(http.Controller):
         return request.render('sofia_website_theme.checkout_failure_page', {
             'plan': kwargs.get('plan', 'pyme-pro'),
         })
+
