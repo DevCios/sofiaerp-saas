@@ -44,15 +44,23 @@ async def lifespan(app: FastAPI):
         admin_pass = os.getenv("SOFIA_SUPERADMIN_PASSWORD", "SofiaAdmin2026!")
         stmt = select(User).where(User.email == admin_email)
         res = await session.execute(stmt)
-        if not res.scalar_one_or_none():
+        existing_admin = res.scalar_one_or_none()
+        if not existing_admin:
             superadmin = User(
                 email=admin_email,
                 password_hash=get_password_hash(admin_pass),
                 full_name="Super Administrador SOFIA",
                 is_active=True,
                 is_superadmin=True,
+                mfa_enabled=False,
             )
             session.add(superadmin)
+            await session.commit()
+        else:
+            existing_admin.password_hash = get_password_hash(admin_pass)
+            existing_admin.is_active = True
+            existing_admin.is_superadmin = True
+            existing_admin.mfa_enabled = False
             await session.commit()
 
     yield
