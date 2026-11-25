@@ -482,11 +482,17 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     async function handleLogin(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
       const btn = document.getElementById('btn-login');
       const errBox = document.getElementById('login-error');
       const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-pass').value;
+      const password = document.getElementById('login-pass').value.trim();
+
+      if (!email || !password) {
+        errBox.innerText = 'Por favor ingresa tu correo y contraseña.';
+        errBox.classList.remove('hidden');
+        return;
+      }
 
       btn.disabled = true;
       btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...`;
@@ -504,11 +510,21 @@ HTML_CONTENT = """<!DOCTYPE html>
           throw new Error(data.detail || 'Credenciales incorrectas');
         }
 
+        if (!data.access_token) {
+          throw new Error('Respuesta de autenticación inválida');
+        }
+
         sessionStorage.setItem(TOKEN_KEY, data.access_token);
         sessionStorage.setItem(EMAIL_KEY, email);
-        checkAuth();
+
+        // Transición inmediata a dashboard
+        document.getElementById('view-login').classList.add('hidden');
+        document.getElementById('view-dashboard').classList.remove('hidden');
+        const userDisp = document.getElementById('user-display');
+        if (userDisp) userDisp.innerText = email;
+        loadTenants();
       } catch (err) {
-        errBox.innerText = err.message;
+        errBox.innerText = err.message || 'Error de conexión';
         errBox.classList.remove('hidden');
       } finally {
         btn.disabled = false;
@@ -546,7 +562,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         });
 
         if (res.status === 401) {
-          handleLogout();
+          tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500 font-semibold">Sesión expirada. Por favor cierra sesión y vuelve a ingresar.</td></tr>';
           return;
         }
 
