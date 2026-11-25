@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import hashlib
+import hmac
 import json
 import logging
 import os
@@ -316,92 +318,206 @@ class SofiaCheckoutController(http.Controller):
                 'message': str(e)
             }
 
-    @http.route('/checkout/webhook/mercadopago', type='json', auth='none', methods=['POST'], csrf=False)
+    def _get_mp_access_token(self):
+        """Obtiene el Access Token de Mercado Pago desde payment.provider, ir.config_parameter o ENV."""
+        access_token = None
+        if 'payment.provider' in request.env:
+            mp_provider = request.env['payment.provider'].sudo().search([
+                ('code', 'in', ['mercadopago', 'mercado_pago']),
+            ], limit=1)
+            if mp_provider:
+                access_token = (
+                    getattr(mp_provider, 'mercado_pago_access_token', None)
+                    or getattr(mp_provider, 'mercadopago_access_token', None)
+                    or getattr(mp_provider, 'mp_access_token', None)
+                )
+        if not access_token:
+            access_token = (
+                request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token')
+                or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+            )
+        return access_token
+
+    def _verify_mp_webhook_signature(self, data_id):
+        """
+        Valida la firma HMAC-SHA256 (x-signature) de Mercado Pago si hay webhook_secret configurado.
+        Retorna True si es válida o si no hay secreto configurado (en cuyo caso se valida vía API MP).
+        """
+        webhook_secret = (
+            request.env['ir.config_parameter'].sudo().get_param('mercadopago.webhook_secret')
+            or os.getenv('MERCADOPAGO_WEBHOOK_SECRET')
+        )
+        if not webhook_secret:
+            return True
+
+        x_signature = request.httprequest.headers.get('x-signature', '')
+        x_request_id = request.httprequest.headers.get('x-request-id', '')
+        if not x_signature:
+            return False
+
+        parts = {}
+        for item in x_signature.split(','):
+            if '=' in item:
+                k, v = item.split('=', 1)
+                parts[k.strip()] = v.strip()
+
+        ts = parts.get('ts')
+        v1 = parts.get('v1')
+        if not ts or not v1:
+            return False
+
+        manifest = f"id:{data_id};request-id:{x_request_id};ts:{ts};"
+        expected = hmac.new(webhook_secret.encode('utf-8'), manifest.encode('utf-8'), hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, v1)
+
+    def _verify_mp_payment_approved(self, payment_id):
+        """
+        Consulta server-to-server la API oficial de Mercado Pago para verificar
+        que el pago existe y tiene status == 'approved'.
+        """
+        if not payment_id or not str(payment_id).isdigit():
+            return None
+
+        access_token = self._get_mp_access_token()
+        if not access_token:
+            return None
+
+        try:
+            resp = requests.get(
+                f"https://api.mercadopago.com/v1/payments/{payment_id}",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10,
+            )
+            if resp.status_code == 200:
+                payment_data = resp.json()
+                if payment_data.get('status') == 'approved':
+                    return payment_data
+        except Exception as exc:
+            _logger.exception("SOFIA ERP: Error verificando pago %s en Mercado Pago: %s", payment_id, exc)
+        return None
+
+    @http.route('/checkout/webhook/mercadopago', type='http', auth='none', methods=['POST'], csrf=False)
     def checkout_webhook_mercadopago(self, **post):
         """
-        Webhook asíncrono de Mercado Pago:
-        Verifica el estado del pago mediante la API oficial de Mercado Pago
-        y dispara el aprovisionamiento automático del tenant en Celery si está aprobado.
+        Webhook HTTP REST oficial de Mercado Pago (v1/v2):
+        1. Recibe POST JSON plano (type='http', compatible con REST estándar).
+        2. Valida firma HMAC x-signature si hay secreto configurado.
+        3. Verifica el pago directamente contra la API de Mercado Pago (status == 'approved').
+        4. Dispara el aprovisionamiento automático del tenant en Control Plane / Celery.
         """
         try:
-            data = json.loads(request.httprequest.data) if request.httprequest.data else {}
+            raw_body = request.httprequest.get_data(as_text=True) or ''
+            data = json.loads(raw_body) if raw_body else {}
         except Exception:
             data = {}
 
-        _logger.info("SOFIA ERP: Webhook Mercado Pago recibido: %s", data)
-        action = data.get('action') or data.get('type')
-        payment_id = data.get('data', {}).get('id') or data.get('id')
+        action = data.get('action') or data.get('type') or request.params.get('type') or request.params.get('topic')
+        payment_id = (
+            (data.get('data') or {}).get('id')
+            or request.params.get('data.id')
+            or request.params.get('id')
+            or data.get('id')
+        )
+
+        _logger.info("SOFIA ERP: Webhook Mercado Pago recibido (action=%s, payment_id=%s)", action, payment_id)
+
+        if payment_id and not self._verify_mp_webhook_signature(payment_id):
+            _logger.warning("SOFIA ERP: Firma x-signature inválida en webhook para payment_id=%s", payment_id)
+            return Response(json.dumps({"error": "invalid_signature"}), status=401, mimetype='application/json')
 
         if action in ['payment.created', 'payment.updated', 'payment'] and payment_id:
-            try:
-                access_token = request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
-                if not access_token:
-                    mp_provider = request.env['payment.provider'].sudo().search([('code', 'in', ['mercadopago', 'mercado_pago'])], limit=1)
-                    if mp_provider:
-                        access_token = getattr(mp_provider, 'mercado_pago_access_token', None)
+            payment_data = self._verify_mp_payment_approved(payment_id)
+            if payment_data:
+                metadata = payment_data.get('metadata') or {}
+                subdomain = (metadata.get('subdomain') or '').strip().lower()
+                email = (metadata.get('email') or '').strip().lower()
+                company_name = metadata.get('company_name')
+                plan = metadata.get('plan', 'pyme-pro')
 
-                if access_token:
-                    resp = requests.get(
-                        f"https://api.mercadopago.com/v1/payments/{payment_id}",
-                        headers={"Authorization": f"Bearer {access_token}"},
-                        timeout=10
+                _logger.info("SOFIA ERP: Pago %s APROBADO para subdominio '%s'", payment_id, subdomain)
+                if subdomain and email:
+                    plan_code_map = {
+                        'emprendedor': 'SOFIA-PLAN-EMP',
+                        'pyme-pro': 'SOFIA-PLAN-PRO',
+                        'corporativo': 'SOFIA-PLAN-CORP',
+                    }
+                    plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
+                    trigger_control_plane_provisioning(
+                        subdomain=subdomain,
+                        company_name=company_name,
+                        admin_email=email,
+                        plan_code=plan_code,
                     )
-                    if resp.status_code == 200:
-                        payment_data = resp.json()
-                        status = payment_data.get('status')
-                        metadata = payment_data.get('metadata', {})
-                        subdomain = metadata.get('subdomain')
-                        email = metadata.get('email')
-                        company_name = metadata.get('company_name')
-                        plan = metadata.get('plan', 'pyme-pro')
 
-                        _logger.info("SOFIA ERP: Pago %s con estado '%s' para subdominio '%s'", payment_id, status, subdomain)
-                        if status == 'approved' and subdomain and email:
-                            plan_code_map = {
-                                'emprendedor': 'SOFIA-PLAN-EMP',
-                                'pyme-pro': 'SOFIA-PLAN-PRO',
-                                'corporativo': 'SOFIA-PLAN-CORP',
-                            }
-                            plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
-                            trigger_control_plane_provisioning(
-                                subdomain=subdomain,
-                                company_name=company_name,
-                                admin_email=email,
-                                plan_code=plan_code
-                            )
-            except Exception as e:
-                _logger.exception("SOFIA ERP: Error en webhook Mercado Pago: %s", e)
-
-        return Response("OK", status=200)
+        return Response(json.dumps({"status": "ok"}), status=200, mimetype='application/json')
 
     @http.route('/checkout/success', type='http', auth='public', website=True)
     def checkout_success(self, **kwargs):
-        """ Pantalla de Confirmación de Pago y Aprovisionamiento """
+        """
+        Pantalla de Confirmación de Pago y Aprovisionamiento Seguro:
+        NUNCA confía en parámetros manipulables de la URL para crear un tenant.
+        Exige verificación real server-to-server del payment_id ante Mercado Pago.
+        """
+        payment_id = kwargs.get('payment_id') or kwargs.get('collection_id')
+        mode = kwargs.get('mode', 'live')
         subdomain = (kwargs.get('subdomain') or '').strip().lower()
         plan = kwargs.get('plan', 'pyme-pro')
         users = kwargs.get('users', '1')
         billing = kwargs.get('billing', 'anual')
-        mode = kwargs.get('mode', 'live')
         email = (kwargs.get('email') or '').strip()
         company = (kwargs.get('company') or '').strip()
 
-        collection_status = kwargs.get('collection_status') or kwargs.get('status')
-        is_approved = (collection_status == 'approved') or (mode == 'demo') or not collection_status
-
         provisioning_result = None
-        if subdomain and is_approved:
-            plan_code_map = {
-                'emprendedor': 'SOFIA-PLAN-EMP',
-                'pyme-pro': 'SOFIA-PLAN-PRO',
-                'corporativo': 'SOFIA-PLAN-CORP',
-            }
-            plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
-            provisioning_result = trigger_control_plane_provisioning(
-                subdomain=subdomain,
-                company_name=company or f"Empresa {subdomain.capitalize()}",
-                admin_email=email or f"admin@{subdomain}.sofiaerp.com",
-                plan_code=plan_code
+        verified_payment = self._verify_mp_payment_approved(payment_id) if payment_id else None
+
+        if verified_payment:
+            # Usar metadata confiable proveniente directamente del pago aprobado en Mercado Pago
+            metadata = verified_payment.get('metadata') or {}
+            subdomain = (metadata.get('subdomain') or subdomain).strip().lower()
+            email = (metadata.get('email') or email).strip().lower()
+            company = metadata.get('company_name') or company
+            plan = metadata.get('plan') or plan
+            users = str(metadata.get('users') or users)
+            billing = metadata.get('billing') or billing
+
+            if subdomain:
+                plan_code_map = {
+                    'emprendedor': 'SOFIA-PLAN-EMP',
+                    'pyme-pro': 'SOFIA-PLAN-PRO',
+                    'corporativo': 'SOFIA-PLAN-CORP',
+                }
+                plan_code = plan_code_map.get(plan, 'SOFIA-PLAN-PRO')
+                provisioning_result = trigger_control_plane_provisioning(
+                    subdomain=subdomain,
+                    company_name=company or f"Empresa {subdomain.capitalize()}",
+                    admin_email=email or f"admin@{subdomain}.sofiaerp.com",
+                    plan_code=plan_code,
+                )
+        else:
+            # Solo permitir modo demo si está explícitamente habilitado en parámetros del sistema
+            allow_demo = (
+                request.env['ir.config_parameter'].sudo().get_param('sofia.allow_demo_checkout', 'False').lower()
+                in ['true', '1']
             )
+            if mode == 'demo' and allow_demo and subdomain:
+                plan_code_map = {
+                    'emprendedor': 'SOFIA-PLAN-EMP',
+                    'pyme-pro': 'SOFIA-PLAN-PRO',
+                    'corporativo': 'SOFIA-PLAN-CORP',
+                }
+                provisioning_result = trigger_control_plane_provisioning(
+                    subdomain=subdomain,
+                    company_name=company or f"Empresa {subdomain.capitalize()}",
+                    admin_email=email or f"admin@{subdomain}.sofiaerp.com",
+                    plan_code=plan_code_map.get(plan, 'SOFIA-PLAN-PRO'),
+                )
+            else:
+                _logger.warning(
+                    "SOFIA ERP: Acceso a /checkout/success sin pago verificado (payment_id=%s, subdomain=%s). Bloqueado.",
+                    payment_id,
+                    subdomain,
+                )
+                return request.redirect('/precios')
 
         temp_password = provisioning_result.get('password') if provisioning_result else None
         already_exists = provisioning_result.get('already_exists') if provisioning_result else False
