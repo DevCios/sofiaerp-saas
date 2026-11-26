@@ -179,7 +179,8 @@ class PosExpressSession(models.Model):
         provider = getattr(company, 'l10n_pe_edi_provider', 'sunat') or 'sunat'
         test_env = bool(getattr(company, 'l10n_pe_edi_test_env', True))
 
-        # Métodos de pago
+        # Métodos de pago (garantiza que Yape y Plin estén disponibles en esta empresa)
+        self.env['pos.express.config'].sudo().ensure_peru_digital_wallets(company)
         methods = []
         for j in config.payment_journal_ids.filtered(lambda x: x.company_id == company and x.active):
             nl = j.name.lower()
@@ -478,7 +479,8 @@ class PosExpressSession(models.Model):
 
             for pj, p_amt in to_pay:
                 pml = pj.inbound_payment_method_line_ids[:1]
-                payment = self.env['account.payment'].sudo().with_company(company).create({
+                Payment = self.env['account.payment'].sudo().with_company(company)
+                pay_vals = {
                     'payment_type': 'inbound',
                     'partner_type': 'customer',
                     'partner_id': partner.id,
@@ -488,7 +490,13 @@ class PosExpressSession(models.Model):
                     'company_id': company.id,
                     'payment_method_line_id': pml.id if pml else False,
                     'pos_express_session_id': session.id,
-                })
+                }
+                if note:
+                    if 'memo' in Payment._fields:
+                        pay_vals['memo'] = note
+                    elif 'ref' in Payment._fields:
+                        pay_vals['ref'] = note
+                payment = Payment.create(pay_vals)
                 payment.action_post()
                 payment_breakdown.append(f'{pj.name}: {company.currency_id.symbol or "S/"} {p_amt:.2f}')
                 p_lines = payment.move_id.line_ids.filtered(

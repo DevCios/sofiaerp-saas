@@ -31,6 +31,7 @@ POS Express — Punto de Venta Ultraligero para SOFIA ERP (Odoo 20)
         'views/pos_express_views.xml',
         'views/pos_express_terminal.xml',
     ],
+    'post_init_hook': 'post_init_create_yape_plin',
     'installable': True,
     'application': True,
     'auto_install': False,

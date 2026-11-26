@@ -572,10 +572,11 @@ class SofiaSunatSetupWizard(models.TransientModel):
                     "Para Modo Producción Real debes subir tu Certificado Digital oficial (.pfx / .p12) en la pestaña '2. Certificado Digital (.pfx)'. No se puede emitir en Producción con un certificado demo."
                 ))
 
-        # 3. Configurar Diarios, Series Electrónicas e Impuestos según Régimen Tributario
+        # 3. Configurar Diarios, Series Electrónicas, Billeteras (Yape/Plin) e Impuestos
         if self.configure_series:
             self._configure_sales_journals(company)
         self._configure_nrus_taxes(company)
+        self._ensure_yape_plin_journals(company)
 
         # 4. Modo Híbrido: auto-sincronizar empresa y Clave SOL/GRE a Sofia Gateway (sin exportar .pfx)
         gateway_note = ''
@@ -611,6 +612,26 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 'next': {'type': 'ir.actions.act_window_close'},
             },
         }
+
+    def _ensure_yape_plin_journals(self, company):
+        """Asegura diarios contables Yape y Plin para Facturación y POS Express (no compras web)."""
+        Journal = self.env['account.journal'].sudo().with_company(company)
+        for wallet_name, wallet_code in (('Yape', 'YAPE'), ('Plin', 'PLIN')):
+            exists = Journal.search([
+                ('company_id', '=', company.id),
+                ('type', '=', 'bank'),
+                '|', ('code', '=', wallet_code), ('name', 'ilike', wallet_name),
+            ], limit=1)
+            if not exists:
+                try:
+                    Journal.create({
+                        'name': wallet_name,
+                        'code': wallet_code,
+                        'type': 'bank',
+                        'company_id': company.id,
+                    })
+                except Exception:
+                    pass
 
     def _sync_issuer_to_sofia_gateway(self, company, clean_ruc, sol_user, sol_pass):
         """Sincroniza RUC, entorno y credenciales SOL/GRE con Sofia Gateway sin exportar el .pfx."""

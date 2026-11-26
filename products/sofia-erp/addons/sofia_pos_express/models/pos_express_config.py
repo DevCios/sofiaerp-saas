@@ -137,9 +137,70 @@ class PosExpressConfig(models.Model):
             config.open_session_count = 1 if session else 0
 
     @api.model
+    def ensure_peru_digital_wallets(self, company=None):
+        """
+        Crea los diarios contables Yape y Plin (account.journal tipo 'bank') para la empresa
+        y los vincula a las cajas POS Express.
+        Al ser diarios internos y NO payment.provider, funcionan en POS Express y Facturación
+        pero jamás aparecen en compras web (reservadas exclusivamente a Mercado Pago).
+        """
+        company = company or self.env.company
+        Journal = self.env['account.journal'].sudo().with_company(company)
+        created_or_found = Journal.browse()
+
+        for wallet_name, wallet_code in (('Yape', 'YAPE'), ('Plin', 'PLIN')):
+            existing = Journal.search([
+                ('company_id', '=', company.id),
+                ('type', '=', 'bank'),
+                '|', ('code', '=', wallet_code), ('name', 'ilike', wallet_name),
+            ], limit=1)
+            if not existing:
+                code_taken = Journal.search([
+                    ('company_id', '=', company.id),
+                    ('code', '=', wallet_code),
+                ], limit=1)
+                final_code = f'{wallet_code[:3]}2' if code_taken else wallet_code
+                try:
+                    existing = Journal.create({
+                        'name': wallet_name,
+                        'code': final_code,
+                        'type': 'bank',
+                        'company_id': company.id,
+                    })
+                except Exception as exc:
+                    _logger.warning("No se pudo crear diario %s para %s: %s", wallet_name, company.name, exc)
+                    continue
+            created_or_found |= existing
+
+        # Vincular automáticamente a todas las cajas POS Express de la empresa
+        if created_or_found:
+            configs = self.sudo().search([('company_id', '=', company.id)])
+            for cfg in configs:
+                missing_ids = [j.id for j in created_or_found if j.id not in cfg.payment_journal_ids.ids]
+                if missing_ids:
+                    cfg.write({'payment_journal_ids': [(4, jid) for jid in missing_ids]})
+
+        return created_or_found
+
+    def action_sync_yape_plin(self):
+        self.ensure_one()
+        self.ensure_peru_digital_wallets(self.company_id)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Yape y Plin habilitados',
+                'message': 'Los diarios Yape y Plin quedaron activos para POS Express y Facturación (excluidos de compras web).',
+                'type': 'success',
+                'sticky': False,
+            },
+        }
+
+    @api.model
     def ensure_default_config(self, company=None):
         """Garantiza que exista al menos una Caja POS Express lista para usar en la empresa."""
         company = company or self.env.company
+        self.ensure_peru_digital_wallets(company)
         cfg = self.sudo().search([('company_id', '=', company.id), ('active', '=', True)], limit=1)
         if cfg:
             return cfg
