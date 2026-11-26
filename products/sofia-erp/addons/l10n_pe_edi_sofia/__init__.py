@@ -1,3 +1,2 @@
 # -*- coding: utf-8 -*-
-from . import modules
-from .hooks import post_init_hook, uninstall_hook
+# Meta-módulo orquestador de la Suite Fiscal Perú SOFIA ERP (instala todos los módulos unitarios de addons_pe)
