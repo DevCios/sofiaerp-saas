@@ -21,6 +21,10 @@ Módulo único y consolidado de Facturación Electrónica y Cumplimiento Tributa
         'account',
         'stock',
         'stock_delivery',
+        'sale_stock',
+        'purchase',
+        'stock_landed_costs',
+        'point_of_sale',
         'l10n_pe',
         'l10n_latam_invoice_document',
         'account_edi_ubl_cii',
@@ -78,6 +82,17 @@ Módulo único y consolidado de Facturación Electrónica y Cumplimiento Tributa
         'modules/l10n_pe_edi_stock/views/vehicle_views.xml',
         'modules/l10n_pe_edi_stock/security/ir.access.csv',
 
+        # 6b. Facturación Electrónica en Punto de Venta (POS)
+        'modules/l10n_pe_edi_pos/views/pos_order_views.xml',
+        'modules/l10n_pe_edi_pos/receipt/pos_order_receipt.xml',
+
+        # 6c. Kardex Físico/Valorizado SUNAT (PLE 12.1 / 13.1) y Costos en Destino (Importadores)
+        'modules/l10n_pe_reports_stock/views/product_views.xml',
+        'modules/l10n_pe_reports_stock/views/stock_picking_views.xml',
+        'modules/l10n_pe_reports_stock/views/stock_warehouse_views.xml',
+        'modules/l10n_pe_reports_stock/wizard/stock_move_ple_report.xml',
+        'modules/l10n_pe_reports_stock/security/ir.access.csv',
+
         # 7. Secuencias LATAM para Comprobantes
         'modules/account_move_sequence_latam/security/ir.access.csv',
         'modules/account_move_sequence_latam/views/account_journal_views.xml',
@@ -116,6 +131,11 @@ Módulo único y consolidado de Facturación Electrónica y Cumplimiento Tributa
         'modules/l10n_pe_sunat/security/sunat_security.xml',
         'modules/l10n_pe_sunat/views/sunat_menus.xml',
     ],
+    'assets': {
+        'point_of_sale._assets_pos': [
+            'l10n_pe_edi_sofia/static/src/pos/**/*',
+        ],
+    },
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'installable': True,
