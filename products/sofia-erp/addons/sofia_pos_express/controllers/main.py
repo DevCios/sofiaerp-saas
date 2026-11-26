@@ -137,11 +137,15 @@ class PosExpressController(http.Controller):
 
         try:
             credential = {'login': login, 'password': password, 'type': 'password'}
-            auth_info = request.session.authenticate(request.env, credential)
+            try:
+                auth_info = request.session.authenticate(request.env, credential)
+            except TypeError:
+                auth_info = request.session.authenticate(request.db, credential)
             uid = auth_info.get('uid') if isinstance(auth_info, dict) else auth_info
             if not uid:
                 return self._json_response({'error': 'Credenciales incorrectas.'}, status=401)
-        except Exception:
+        except Exception as exc:
+            _logger.warning("POS Express app_login falló para '%s': %s", login, exc)
             return self._json_response({'error': 'Usuario o contraseña incorrectos.'}, status=401)
 
         user = request.env['res.users'].sudo().browse(int(uid))
