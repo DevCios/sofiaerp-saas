@@ -21,12 +21,16 @@ class ResCompany(models.Model):
         help="The password used to login to SUNAT SOL",
         groups='base.group_system')
     l10n_pe_edi_provider = fields.Selection(
-        selection=[('sunat', 'SUNAT'), ('digiflow', 'Estela (formerly Digiflow)')],
+        selection=[
+            ('sunat', 'SUNAT (Servidores Oficiales)'),
+            ('digiflow', 'Estela / Digiflow OSE'),
+            ('nubefact', 'NubeFact OSE'),
+        ],
         string="Electronic Service Provider (ESP)", default="sunat",
-        help="Selector for the service we are going to use to report the invoices:"
-             "Estela (formerly DIGIFLOW): With the certificate that estela (formerly digiflow) provided you, user and "
-             "password you will report the invoices to them."
-             "SUNAT: You will report the invoices directly to them using your own certified, user and password.")
+        help="Selector for the service we are going to use to report the invoices:\n"
+             "- SUNAT: Envío directo a los servidores oficiales de SUNAT (por defecto).\n"
+             "- Estela / Digiflow OSE: Envío mediante OSE Digiflow.\n"
+             "- NubeFact OSE: Envío mediante OSE NubeFact.")
     l10n_pe_edi_address_type_code = fields.Char(
         string="Address Type Code",
         default="0000",
@@ -55,6 +59,20 @@ class ResCompany(models.Model):
         """
         self.ensure_one()
         company_sudo = self.sudo()
+        if self.l10n_pe_edi_provider == 'nubefact':
+            wsdl = (
+                'https://demo-ose.nubefact.com/ol-ti-itcpe/billService?wsdl'
+                if self.l10n_pe_edi_test_env
+                else 'https://ose.nubefact.com/ol-ti-itcpe/billService?wsdl'
+            )
+            return {
+                'fault_ns': 's',
+                'wsdl': wsdl,
+                'token': UsernameToken(
+                    company_sudo.l10n_pe_edi_provider_username or 'MODDATOS',
+                    company_sudo.l10n_pe_edi_provider_password or 'MODDATOS',
+                ),
+            }
         if self.l10n_pe_edi_provider == 'digiflow':
             if self.l10n_pe_edi_test_env:
                 return {

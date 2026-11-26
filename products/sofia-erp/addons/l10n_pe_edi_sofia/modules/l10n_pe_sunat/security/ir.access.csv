@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sofia_sunat_setup_wizard_manager,sofia.sunat.setup.wizard manager,model_sofia_sunat_setup_wizard,account.group_account_manager,1,1,1,1
+access_sofia_sunat_setup_wizard_system,sofia.sunat.setup.wizard system,model_sofia_sunat_setup_wizard,base.group_system,1,1,1,1

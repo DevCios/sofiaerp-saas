@@ -104,6 +104,12 @@
               groups="account.group_account_manager"
               sequence="40"/>
 
+    <menuitem id="menu_sunat_quick_setup"
+              name="Asistente de Configuración Rápida"
+              parent="menu_sunat_config"
+              action="l10n_pe_edi_sofia.action_sofia_sunat_setup_wizard"
+              sequence="5"/>
+
     <menuitem id="menu_sunat_company"
               name="Datos Fiscales de la Empresa"
               parent="menu_sunat_config"

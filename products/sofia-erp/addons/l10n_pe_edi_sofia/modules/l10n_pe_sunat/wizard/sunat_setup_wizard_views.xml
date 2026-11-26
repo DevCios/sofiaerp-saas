@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sofia_sunat_setup_wizard_form" model="ir.ui.view">
+        <field name="name">sofia.sunat.setup.wizard.form</field>
+        <field name="model">sofia.sunat.setup.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Asistente de Configuración Rápida SUNAT">
+                <div class="alert alert-info mb-3" role="alert">
+                    <strong>Configuración en 1 minuto:</strong> Completa los datos de tu empresa, elige tu proveedor
+                    (<strong>SUNAT Directo</strong> por defecto, Digiflow o NubeFact), sube tu certificado <code>.pfx</code>
+                    y define tus series (<code>FE01/BE01/FC01/BC01</code> o <code>FE02/BE02/FC02/BC02</code>).
+                </div>
+
+                <notebook>
+                    <page string="1. Empresa y Proveedor SUNAT">
+                        <group>
+                            <group string="Datos Fiscales">
+                                <field name="company_id" readonly="1"/>
+                                <field name="ruc" placeholder="20123456789"/>
+                                <field name="company_name" placeholder="MI EMPRESA S.A.C."/>
+                                <field name="street" placeholder="Av. Javier Prado 123, Lima"/>
+                                <field name="address_type_code"/>
+                            </group>
+                            <group string="Servidor y Credenciales SOL">
+                                <field name="provider"/>
+                                <field name="test_env" widget="boolean_toggle"/>
+                                <field name="sol_username" placeholder="MODDATOS (Beta) o RUC+UsuarioSOL"/>
+                                <field name="sol_password" password="True" placeholder="Clave SOL"/>
+                            </group>
+                        </group>
+                    </page>
+
+                    <page string="2. Certificado Digital (.pfx)">
+                        <group>
+                            <field name="current_certificate_id" invisible="not current_certificate_id"/>
+                            <field name="certificate_file" filename="certificate_filename"/>
+                            <field name="certificate_filename" invisible="1"/>
+                            <field name="certificate_password" password="True" placeholder="Contraseña del archivo .pfx"/>
+                        </group>
+                    </page>
+
+                    <page string="3. Series Electrónicas">
+                        <group>
+                            <field name="configure_series" widget="boolean_toggle"/>
+                            <field name="series_preset" invisible="not configure_series"/>
+                        </group>
+                        <group invisible="not configure_series">
+                            <group string="Facturas Electrónicas">
+                                <field name="serie_factura"/>
+                                <field name="serie_nc_factura"/>
+                                <field name="serie_nd_factura"/>
+                            </group>
+                            <group string="Boletas de Venta Electrónicas">
+                                <field name="serie_boleta"/>
+                                <field name="serie_nc_boleta"/>
+                                <field name="serie_nd_boleta"/>
+                            </group>
+                        </group>
+                    </page>
+
+                    <page string="4. Guías de Remisión (GRE 2.0)">
+                        <group>
+                            <field name="configure_gre" widget="boolean_toggle"/>
+                        </group>
+                        <group invisible="not configure_gre">
+                            <group string="Credenciales API REST SUNAT (GRE)">
+                                <field name="gre_client_id"/>
+                                <field name="gre_client_secret" password="True"/>
+                            </group>
+                            <group string="Usuario SOL para GRE">
+                                <field name="gre_sol_username"/>
+                                <field name="gre_sol_password" password="True"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+
+                <footer>
+                    <button name="action_apply_configuration"
+                            string="Guardar y Activar Facturación Electrónica"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sofia_sunat_setup_wizard" model="ir.actions.act_window">
+        <field name="name">Asistente de Configuración Rápida SUNAT</field>
+        <field name="res_model">sofia.sunat.setup.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

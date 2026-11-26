@@ -127,8 +127,10 @@ Módulo único y consolidado de Facturación Electrónica y Cumplimiento Tributa
         'modules/l10n_pe_pdt_621/wizard/pdt621_wizard_views.xml',
         'modules/l10n_pe_pdt_621/views/pdt621_menus.xml',
 
-        # 14. Centro de Operaciones SUNAT (Seguridad y Menú Unificado)
+        # 14. Centro de Operaciones SUNAT (Seguridad, Asistente Rápido y Menú Unificado)
         'modules/l10n_pe_sunat/security/sunat_security.xml',
+        'modules/l10n_pe_sunat/security/ir.access.csv',
+        'modules/l10n_pe_sunat/wizard/sunat_setup_wizard_views.xml',
         'modules/l10n_pe_sunat/views/sunat_menus.xml',
     ],
     'assets': {

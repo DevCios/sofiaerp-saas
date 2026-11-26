@@ -41,8 +41,10 @@ class AccountJournalSequence(models.Model):
     def _expected_prefix_regex(self):
         """ Patrón esperado para la serie según el tipo de documento (PE).
 
-        Factura (01) F###, Boleta (03) B###, N.C. (07) F/B + C##,
-        N.D. (08) F/B + D##. Ej.: F001, B001, FC01, BC01, FD01, BD01.
+        Factura (01) F[A-Z0-9]{3} (ej. F001, FE01, FE02),
+        Boleta (03) B[A-Z0-9]{3} (ej. B001, BE01, BE02),
+        N.C. (07) F/B + C/E + 2 dígitos (ej. FC01, BC01, FC02, BC02),
+        N.D. (08) F/B + D/E + 2 dígitos (ej. FD01, BD01, FD02, BD02).
         Devuelve None si el tipo de documento no es de Perú.
         """
         self.ensure_one()
@@ -51,12 +53,12 @@ class AccountJournalSequence(models.Model):
         code = doc_type.code or ''
         if letter not in ('F', 'B'):
             return None
-        if code == '01' or code == '03':
-            return r'%s\d{3}' % letter
+        if code in ('01', '03'):
+            return r'%s[A-Z0-9]\d{2}' % letter
         if code == '07':
-            return r'%sC\d{2}' % letter
+            return r'%s[CE0-9]\d{2}' % letter
         if code == '08':
-            return r'%sD\d{2}' % letter
+            return r'%s[DE0-9]\d{2}' % letter
         return None
 
     @api.constrains('name', 'journal_id', 'l10n_latam_document_type_id')
