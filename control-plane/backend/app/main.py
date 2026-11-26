@@ -57,10 +57,10 @@ async def lifespan(app: FastAPI):
             session.add(superadmin)
             await session.commit()
         else:
+            # Respeta mfa_enabled en producción; solo asegura cuenta activa y clave sincronizada con env
             existing_admin.password_hash = get_password_hash(admin_pass)
             existing_admin.is_active = True
             existing_admin.is_superadmin = True
-            existing_admin.mfa_enabled = False
             await session.commit()
 
         # Seed idempotente de Producto y Planes Comerciales SOFIA ERP

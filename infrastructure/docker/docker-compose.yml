@@ -118,6 +118,12 @@ services:
     depends_on:
       - postgres
       - redis
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect ping --timeout=5 | grep -q pong"]
+      interval: 45s
+      timeout: 15s
+      retries: 3
+      start_period: 20s
 
   # ----------------------------------------------------------------------------
   # 4. Connection Pooler (PgBouncer)
