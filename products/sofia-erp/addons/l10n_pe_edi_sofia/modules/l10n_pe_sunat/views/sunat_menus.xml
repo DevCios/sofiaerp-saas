@@ -2,23 +2,23 @@
 <odoo>
     <!-- ACCIONES PROPIAS DE LA APP SUNAT -->
     <record id="action_sunat_invoices_out" model="ir.actions.act_window">
-        <field name="name">Comprobantes ElectrÃ³nicos de Venta</field>
+        <field name="name">Comprobantes Electrónicos de Venta</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund'))]</field>
         <field name="context">{'default_move_type': 'out_invoice'}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No hay comprobantes de venta emitidos aÃºn.
+                No hay comprobantes de venta emitidos aún.
             </p>
             <p>
-                AquÃ­ podrÃ¡s visualizar todas las Facturas, Boletas y Notas ElectrÃ³nicas con su estado ante SUNAT (CDR).
+                Aquí podrás visualizar todas las Facturas, Boletas y Notas Electrónicas con su estado ante SUNAT (CDR).
             </p>
         </field>
     </record>
 
     <record id="action_sunat_invoices_in" model="ir.actions.act_window">
-        <field name="name">Comprobantes ElectrÃ³nicos de Compra</field>
+        <field name="name">Comprobantes Electrónicos de Compra</field>
         <field name="res_model">account.move</field>
         <field name="view_mode">list,kanban,form</field>
         <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund'))]</field>
@@ -30,14 +30,14 @@
         </field>
     </record>
 
-    <!-- MENÃš PRINCIPAL RAÃZ (APP DRAWER / 9 PUNTITOS) CON LOGO OFICIAL SUNAT -->
+    <!-- MENÚ PRINCIPAL RAÍZ (APP DRAWER / 9 PUNTITOS) CON LOGO OFICIAL SUNAT -->
     <menuitem id="menu_sunat_root"
               name="SUNAT"
               web_icon="l10n_pe_edi_sofia,static/description/icon.png"
               groups="group_sunat_user"
               sequence="30"/>
 
-    <!-- 1. COMPROBANTES ELECTRÃ“NICOS (PRIMER ELEMENTO: VISTA PRINCIPAL AL ENTRAR) -->
+    <!-- 1. COMPROBANTES ELECTRÓNICOS (PRIMER ELEMENTO: VISTA PRINCIPAL AL ENTRAR) -->
     <menuitem id="menu_sunat_comprobantes"
               name="Comprobantes"
               parent="menu_sunat_root"
@@ -56,12 +56,12 @@
               sequence="20"/>
 
     <menuitem id="menu_sunat_comprobantes_gre"
-              name="GuÃ­as de RemisiÃ³n (GRE 2.0)"
+              name="Guías de Remisión (GRE 2.0)"
               parent="menu_sunat_comprobantes"
               action="stock.action_picking_tree_all"
               sequence="30"/>
 
-    <!-- 2. REPORTES TRIBUTARIOS SUNAT (SIRE, PLE Y DECLARA FÃCIL 621) -->
+    <!-- 2. REPORTES TRIBUTARIOS SUNAT (SIRE, PLE Y DECLARA FÁCIL 621) -->
     <menuitem id="menu_sunat_reports"
               name="Reportes"
               parent="menu_sunat_root"
@@ -80,7 +80,7 @@
               sequence="20"/>
 
     <menuitem id="menu_sunat_report_pdt621"
-              name="Declara FÃ¡cil 621 (IGV / Renta MYPE)"
+              name="Declara Fácil 621 (IGV / Renta MYPE)"
               parent="menu_sunat_reports"
               action="l10n_pe_edi_sofia.action_l10n_pe_pdt621_wizard"
               sequence="30"/>
@@ -97,11 +97,11 @@
               action="account.res_partner_action_customer"
               sequence="10"/>
 
-    <!-- 4. CONFIGURACIÃ“N FISCAL (SOLO ADMINISTRADORES) -->
+    <!-- 4. CONFIGURACIÓN FISCAL (ADMINISTRADORES) -->
     <menuitem id="menu_sunat_config"
-              name="ConfiguraciÃ³n"
+              name="Configuración"
               parent="menu_sunat_root"
-              groups="account.group_account_manager"
+              groups="account.group_account_manager,base.group_system"
               sequence="40"/>
 
     <menuitem id="menu_sunat_quick_setup"
@@ -117,7 +117,7 @@
               sequence="10"/>
 
     <menuitem id="menu_sunat_journals"
-              name="Series y Diarios de FacturaciÃ³n"
+              name="Series y Diarios de Facturación"
               parent="menu_sunat_config"
               action="account.action_account_journal_form"
               sequence="20"/>
