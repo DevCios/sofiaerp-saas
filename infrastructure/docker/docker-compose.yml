@@ -22,6 +22,7 @@ volumes:
   redis_data:
   sofia_filestores:
   sofia_backups:
+  sofia_sunat_storage:
   nginx_ssl_certs:
 
 services:
@@ -201,3 +202,65 @@ services:
       - sofia-net-data
     depends_on:
       - pgbouncer
+
+  # ----------------------------------------------------------------------------
+  # 8. SOFIA SUNAT Gateway API (Caja Negra Multi-App - gateway.sofiaerp.com)
+  # ----------------------------------------------------------------------------
+  sunat-gateway-api:
+    build:
+      context: ../../sunat-gateway
+      dockerfile: Dockerfile
+    container_name: sofia-sunat-gateway-api
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - PUBLIC_BASE_URL=https://gateway.sofiaerp.com
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
+      - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
+      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/4
+      - SUNAT_VAULT_MASTER_KEY=${SUNAT_VAULT_MASTER_KEY:-sofia_change_vault_master_key_in_env}
+      - GATEWAY_JWT_SECRET=${GATEWAY_JWT_SECRET:-sofia_change_gateway_jwt_secret_in_env}
+      - GATEWAY_ADMIN_EMAIL=${SOFIA_SUPERADMIN_EMAIL:-admin@sofiaerp.com}
+      - GATEWAY_ADMIN_PASSWORD=${SOFIA_SUPERADMIN_PASSWORD:-SofiaAdmin2026!}
+    volumes:
+      - ../../sunat-gateway/app:/app/app
+      - sofia_sunat_storage:/var/lib/sofia-sunat/storage
+    networks:
+      - sofia-net-public
+      - sofia-net-app
+      - sofia-net-data
+    depends_on:
+      - postgres
+      - redis
+
+  # ----------------------------------------------------------------------------
+  # 9. SOFIA SUNAT Gateway Worker (Colas Resilientes, Nocturno y Anti-1033)
+  # ----------------------------------------------------------------------------
+  sunat-gateway-worker:
+    build:
+      context: ../../sunat-gateway
+      dockerfile: Dockerfile
+    container_name: sofia-sunat-gateway-worker
+    restart: unless-stopped
+    command: celery -A app.tasks.celery_app worker --beat -Q sunat_realtime,sunat_retry,sunat_night_batch,sunat_webhooks --loglevel=info --concurrency=1
+    environment:
+      - ENVIRONMENT=production
+      - PUBLIC_BASE_URL=https://gateway.sofiaerp.com
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
+      - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
+      - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/4
+      - SUNAT_VAULT_MASTER_KEY=${SUNAT_VAULT_MASTER_KEY:-sofia_change_vault_master_key_in_env}
+      - GATEWAY_JWT_SECRET=${GATEWAY_JWT_SECRET:-sofia_change_gateway_jwt_secret_in_env}
+    volumes:
+      - ../../sunat-gateway/app:/app/app
+      - sofia_sunat_storage:/var/lib/sofia-sunat/storage
+    networks:
+      - sofia-net-public
+      - sofia-net-data
+    depends_on:
+      - postgres
+      - redis
