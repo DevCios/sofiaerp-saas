@@ -1,4 +1,4 @@
-﻿from odoo import _, api, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import html2plaintext
 
@@ -50,10 +50,10 @@ class PosOrder(models.Model):
                 vals['l10n_pe_edi_refund_reason'] = next(iter(refund_reasons))
                 refunded_invoice_code = refunded_move.l10n_latam_document_type_id.code
                 if refunded_invoice_code == '01':
-                    # refunding a "Factura electrÃ³nica" is done through a "Nota de CrÃ©dito electrÃ³nica"
+                    # refunding a "Factura electrónica" is done through a "Nota de Crédito electrónica"
                     vals['l10n_latam_document_type_id'] = self.env.ref('l10n_pe.document_type07').id
                 elif refunded_invoice_code == '03':
-                    # refunding a "Boleta de venta electrÃ³nica" is done through a "Nota de CrÃ©dito Boleta electrÃ³nica"
+                    # refunding a "Boleta de venta electrónica" is done through a "Nota de Crédito Boleta electrónica"
                     vals['l10n_latam_document_type_id'] = self.env.ref('l10n_pe.document_type07b').id
         return vals
 

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
 
@@ -47,7 +47,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>Banco de la NaciÃ³n account number:</span></td>
+                                <td><span>Banco de la Nación account number:</span></td>
                                 <td class="ps-2">
                                     <span t-out="spot['payee_financial_account']"/>
                                 </td>

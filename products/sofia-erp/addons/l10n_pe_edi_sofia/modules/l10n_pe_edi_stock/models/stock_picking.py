@@ -1,4 +1,4 @@
-﻿import base64
+import base64
 import hashlib
 import logging
 import re
@@ -34,30 +34,30 @@ PE_TRANSFER_REASONS = [
 PE_RELATED_DOCUMENT = [
     ('01', 'Factura'),
     ('03', 'Boleta de Venta'),
-    ('04', 'LiquidaciÃ³n de Compra'),
-    ('09', 'GuÃ­a de RemisiÃ³n Remitente'),
-    ('12', 'Ticket o cinta emitido por mÃ¡quina registradora'),
-    ('31', 'GuÃ­a de RemisiÃ³n Transportista'),
-    ('48', 'Comprobante de Operaciones - Ley NÂ° 29972'),
-    ('49', 'Constancia de DepÃ³sito - IVAP (Ley 28211)'),
-    ('50', 'DeclaraciÃ³n Aduanera de MercancÃ­as'),
-    ('52', 'DeclaraciÃ³n Simplificada (DS)'),
-    ('65', 'AutorizaciÃ³n de CirculaciÃ³n para transportar MATPEL - Callao'),
-    ('66', 'AutorizaciÃ³n de CirculaciÃ³n para transporte de carga y mercancÃ­as en Lima Metropolitana'),
-    ('67', 'Permiso de OperaciÃ³n Especial para el servicio de transporte de MATPEL - MTC'),
-    ('68', 'HabilitaciÃ³n Sanitaria de Transporte Terrestre de Productos Pesqueros y AcuÃ­colas'),
-    ('69', 'Permiso / AutorizaciÃ³n de operaciÃ³n de transporte de mercancÃ­as'),
-    ('71', 'ResoluciÃ³n de AdjudicaciÃ³n de bienes - SUNAT'),
-    ('72', 'ResoluciÃ³n de Comiso de bienes - SUNAT'),
-    ('73', 'GuÃ­a de Transporte Forestal o de Fauna - SERFOR'),
-    ('74', 'GuÃ­a de TrÃ¡nsito - SUCAMEC'),
-    ('75', 'AutorizaciÃ³n para operar como empresa de Saneamiento Ambiental - MINSA'),
-    ('76', 'AutorizaciÃ³n para manejo y recojo de residuos sÃ³lidos peligrosos y no peligrosos'),
-    ('77', 'Certificado fitosanitario la movilizaciÃ³n de plantas, productos vegetales, y otros artÃ­culos reglamentados'),
-    ('78', 'Registro Ãšnico de Usuarios y Transportistas de Alcohol EtÃ­lico'),
-    ('80', 'Constancia de DepÃ³sito - DetracciÃ³n'),
-    ('81', 'CÃ³digo de autorizaciÃ³n emitida por el SCOP'),
-    ('82', 'DeclaraciÃ³n jurada de mudanza'),
+    ('04', 'Liquidación de Compra'),
+    ('09', 'Guía de Remisión Remitente'),
+    ('12', 'Ticket o cinta emitido por máquina registradora'),
+    ('31', 'Guía de Remisión Transportista'),
+    ('48', 'Comprobante de Operaciones - Ley N° 29972'),
+    ('49', 'Constancia de Depósito - IVAP (Ley 28211)'),
+    ('50', 'Declaración Aduanera de Mercancías'),
+    ('52', 'Declaración Simplificada (DS)'),
+    ('65', 'Autorización de Circulación para transportar MATPEL - Callao'),
+    ('66', 'Autorización de Circulación para transporte de carga y mercancías en Lima Metropolitana'),
+    ('67', 'Permiso de Operación Especial para el servicio de transporte de MATPEL - MTC'),
+    ('68', 'Habilitación Sanitaria de Transporte Terrestre de Productos Pesqueros y Acuícolas'),
+    ('69', 'Permiso / Autorización de operación de transporte de mercancías'),
+    ('71', 'Resolución de Adjudicación de bienes - SUNAT'),
+    ('72', 'Resolución de Comiso de bienes - SUNAT'),
+    ('73', 'Guía de Transporte Forestal o de Fauna - SERFOR'),
+    ('74', 'Guía de Tránsito - SUCAMEC'),
+    ('75', 'Autorización para operar como empresa de Saneamiento Ambiental - MINSA'),
+    ('76', 'Autorización para manejo y recojo de residuos sólidos peligrosos y no peligrosos'),
+    ('77', 'Certificado fitosanitario la movilización de plantas, productos vegetales, y otros artículos reglamentados'),
+    ('78', 'Registro Único de Usuarios y Transportistas de Alcohol Etílico'),
+    ('80', 'Constancia de Depósito - Detracción'),
+    ('81', 'Código de autorización emitida por el SCOP'),
+    ('82', 'Declaración jurada de mudanza'),
 ]
 ERROR_MESSAGES = {
     "request": _lt("There was an error communicating with the SUNAT service. Details:"),
@@ -72,7 +72,7 @@ ERROR_MESSAGES = {
 # SUNAT validation codes returned when the submitted delivery guide is missing
 # data required by a newer regulation, meaning the installed module is out of
 # date and must be updated. 3617: the "Fecha de entrega de bienes al
-# transportista" is missing for public transport (R. S. NÂ° 000108-2026/SUNAT).
+# transportista" is missing for public transport (R. S. N° 000108-2026/SUNAT).
 OUTDATED_MODULE_SUNAT_CODES = {"3617"}
 
 
@@ -286,7 +286,7 @@ class StockPicking(models.Model):
         return {
             'date_issue': date_pe.strftime(DEFAULT_PE_DATE_FORMAT),
             'time_issue': date_pe.strftime("%H:%M:%S"),
-            'l10n_pe_edi_observation': self.l10n_pe_edi_observation or 'GuÃ­a',
+            'l10n_pe_edi_observation': self.l10n_pe_edi_observation or 'Guía',
             'record': self,
             'partner': self.l10n_pe_edi_delivery_partner_id,
             'delivery_address': self.l10n_pe_edi_delivery_address_id,

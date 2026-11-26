@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_invoice_ticket_document">
         <t t-call="web.basic_layout">
@@ -21,7 +21,7 @@
 
                 <!-- Datos Comprobante -->
                 <div class="text-center" style="font-size: 11px; font-weight: bold; margin: 6px 0;">
-                    <div><t t-out="(o.l10n_latam_document_type_id.name or 'COMPROBANTE ELECTRÃ“NICO').upper()"/></div>
+                    <div><t t-out="(o.l10n_latam_document_type_id.name or 'COMPROBANTE ELECTRÓNICO').upper()"/></div>
                     <div><t t-out="o.name"/></div>
                 </div>
 
@@ -29,13 +29,13 @@
 
                 <!-- Datos Cliente -->
                 <div style="margin-bottom: 6px;">
-                    <div><b>Fecha EmisiÃ³n:</b> <t t-out="o.invoice_date"/></div>
+                    <div><b>Fecha Emisión:</b> <t t-out="o.invoice_date"/></div>
                     <div t-if="o.invoice_date_due"><b>Fecha Venc.:</b> <t t-out="o.invoice_date_due"/></div>
                     <div><b>Cliente:</b> <t t-out="o.partner_id.name"/></div>
                     <div><b><t t-out="o.partner_id.l10n_latam_identification_type_id.name or 'DOC'"/>:</b> <t t-out="o.partner_id.vat or '-'"/></div>
-                    <div t-if="o.partner_id.street"><b>DirecciÃ³n:</b> <t t-out="o.partner_id.street"/></div>
+                    <div t-if="o.partner_id.street"><b>Dirección:</b> <t t-out="o.partner_id.street"/></div>
                     <div><b>Moneda:</b> <t t-out="o.currency_id.currency_unit_label or o.currency_id.name"/></div>
-                    <div t-if="o.invoice_payment_term_id"><b>CondiciÃ³n:</b> <t t-out="o.invoice_payment_term_id.name"/></div>
+                    <div t-if="o.invoice_payment_term_id"><b>Condición:</b> <t t-out="o.invoice_payment_term_id.name"/></div>
                 </div>
 
                 <div style="border-top: 1px dashed #000; margin: 4px 0;"/>
@@ -102,10 +102,10 @@
 
                 <!-- Detracciones (SPOT) -->
                 <div t-if="spot" style="border: 1px dashed #000; padding: 4px; margin-bottom: 6px; font-size: 9px;">
-                    <div style="font-weight: bold; text-align: center;">OPERACIÃ“N SUJETA AL SPOT</div>
-                    <div><b>Cta. Banco NaciÃ³n:</b> <t t-out="spot.get('payee_financial_account')"/></div>
+                    <div style="font-weight: bold; text-align: center;">OPERACIÓN SUJETA AL SPOT</div>
+                    <div><b>Cta. Banco Nación:</b> <t t-out="spot.get('payee_financial_account')"/></div>
                     <div><b>Porcentaje:</b> <t t-out="spot.get('payment_percent')"/>%</div>
-                    <div><b>Monto DetracciÃ³n:</b> S/ <t t-out="f'{spot.get(\'amount\', 0):.2f}'"/></div>
+                    <div><b>Monto Detracción:</b> S/ <t t-out="f'{spot.get(\'amount\', 0):.2f}'"/></div>
                 </div>
 
                 <!-- QR y Hash -->
@@ -120,8 +120,8 @@
                 <div style="border-top: 1px dashed #000; margin: 6px 0;"/>
 
                 <div class="text-center" style="font-size: 8px;">
-                    <div>RepresentaciÃ³n impresa del Comprobante de Pago ElectrÃ³nico</div>
-                    <div>Â¡Gracias por su compra!</div>
+                    <div>Representación impresa del Comprobante de Pago Electrónico</div>
+                    <div>¡Gracias por su compra!</div>
                 </div>
             </div>
         </t>

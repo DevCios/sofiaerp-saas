@@ -1,4 +1,4 @@
-﻿# Part of Odoo. See LICENSE file for full copyright and licensing details.
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
 import io
 import re
@@ -23,18 +23,18 @@ from odoo.addons.l10n_pe.tools.partner_identifiers import PE_RUC_SUNAT_CODE
 
 CATALOG52 = [
     ("1002", "TRANSFERENCIA GRATUITA DE UN BIEN Y/O SERVICIO PRESTADO GRATUITAMENTE"),
-    ("2000", "COMPROBANTE DE PERCEPCIÃ“N"),
-    ("2001", "BIENES TRANSFERIDOS EN LA AMAZONÃA REGIÃ“N SELVAPARA SER CONSUMIDOS EN LA MISMA"),
-    ("2002", "SERVICIOS PRESTADOS EN LA AMAZONÃA REGIÃ“N SELVA PARA SER CONSUMIDOS EN LA MISMA"),
-    ("2003", "CONTRATOS DE CONSTRUCCIÃ“N EJECUTADOS EN LA AMAZONÃA REGIÃ“N SELVA"),
-    ("2004", "Agencia de Viaje - Paquete turÃ­stico"),
+    ("2000", "COMPROBANTE DE PERCEPCIÓN"),
+    ("2001", "BIENES TRANSFERIDOS EN LA AMAZONÍA REGIÓN SELVAPARA SER CONSUMIDOS EN LA MISMA"),
+    ("2002", "SERVICIOS PRESTADOS EN LA AMAZONÍA REGIÓN SELVA PARA SER CONSUMIDOS EN LA MISMA"),
+    ("2003", "CONTRATOS DE CONSTRUCCIÓN EJECUTADOS EN LA AMAZONÍA REGIÓN SELVA"),
+    ("2004", "Agencia de Viaje - Paquete turístico"),
     ("2005", "Venta realizada por emisor itinerante"),
-    ("2006", "OperaciÃ³n sujeta a detracciÃ³n"),
-    ("2007", "OperaciÃ³n sujeta al IVAP"),
+    ("2006", "Operación sujeta a detracción"),
+    ("2007", "Operación sujeta al IVAP"),
     ("2008", "VENTA EXONERADA DEL IGV-ISC-IPM. PROHIBIDA LA VENTA FUERA DE LA ZONA COMERCIAL DE TACNA"),
-    ("2009", "PRIMERA VENTA DE MERCANCÃA IDENTIFICABLE ENTRE USUARIOS DE LA ZONA COMERCIAL"),
+    ("2009", "PRIMERA VENTA DE MERCANCÍA IDENTIFICABLE ENTRE USUARIOS DE LA ZONA COMERCIAL"),
     ("2010", "Restitucion Simplificado de Derechos Arancelarios"),
-    ("2011", "EXPORTACION DE SERVICIOS - DECRETO LEGISLATIVO NÂº 919"),
+    ("2011", "EXPORTACION DE SERVICIOS - DECRETO LEGISLATIVO Nº 919"),
 ]
 
 REFUND_REASON = [
@@ -1394,10 +1394,10 @@ class AccountMove(models.Model):
                         "document type of the invoice related and set this document with that document type. In case of "
                         "this document being posted and having a number already, reset to draft and cancel it, this "
                         "document will be cancelled locally and not reported."),
-            '3034': self.env._("You need to configure the account for 'Banco de la NaciÃ³n'. go to the Other Info setting"
+            '3034': self.env._("You need to configure the account for 'Banco de la Nación'. go to the Other Info setting"
                         " on this invoice and select the Recipient Bank field, If you want to set it by default go to "
                         "the partner related to your company and set the bank account related to the Banco de la "
-                        "NaciÃ³n"),
+                        "Nación"),
             '3128': self.env._("As you have a document that must be detracted (withheld) which mean a document over 700 "
                         "Soles With services you must select on the 'Operation Type field the correct code 1001 "
                         "for example"),
