@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <data>
-        <template id="l10n_pe_edi_pos.pos_order_receipt_header" inherit_id="point_of_sale.pos_order_receipt_header">
+        <template id="l10n_pe_edi_sofia.pos_order_receipt_header" inherit_id="point_of_sale.pos_order_receipt_header">
             <div name="logo" position="after">
                 <t t-if="conditions.get('code_pe')">
                     <div class="text-center fw-bold my-3">
@@ -13,7 +13,7 @@
             </div>
         </template>
 
-        <template id="l10n_pe_edi_pos.pos_order_receipt" inherit_id="point_of_sale.pos_order_receipt">
+        <template id="l10n_pe_edi_sofia.pos_order_receipt" inherit_id="point_of_sale.pos_order_receipt">
             <xpath expr="//div[@name='prices']" position="inside">
                 <t t-if="conditions.get('code_pe') and conditions.get('has_pe_edi_data')">
                     <div class="mt-2 text-center">
