@@ -33,7 +33,7 @@
     <!-- MENÃš PRINCIPAL RAÃZ (APP DRAWER / 9 PUNTITOS) CON LOGO OFICIAL SUNAT -->
     <menuitem id="menu_sunat_root"
               name="SUNAT"
-              web_icon="l10n_pe_sunat,static/description/icon.png"
+              web_icon="l10n_pe_edi_sofia,static/description/icon.png"
               groups="group_sunat_user"
               sequence="30"/>
 
