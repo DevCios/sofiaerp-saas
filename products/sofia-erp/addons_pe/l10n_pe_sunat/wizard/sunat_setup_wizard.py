@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
+import base64
+import datetime
 import re
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.serialization import pkcs12
+from cryptography.x509.oid import NameOID
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 SERIE_RE = re.compile(r'^[A-Z0-9]{4}$')
+DEMO_CERT_PREFIX = '[DEMO BETA]'
 
 
 class SofiaSunatSetupWizard(models.TransientModel):
@@ -63,6 +71,11 @@ class SofiaSunatSetupWizard(models.TransientModel):
     gre_sol_password = fields.Char(string='GRE Clave SOL')
 
     # 3. Certificado Digital (.pfx / .p12)
+    auto_generate_demo_cert = fields.Boolean(
+        string='Generar Certificado Demo (.pfx) para SUNAT Beta',
+        default=True,
+        help='En Modo Pruebas (SUNAT Beta), genera automáticamente un certificado autofirmado RSA-2048 válido para firmar XML y recibir CDR de pruebas al instante.',
+    )
     current_certificate_id = fields.Many2one(
         'certificate.certificate',
         string='Certificado Actual Activo',
@@ -93,9 +106,22 @@ class SofiaSunatSetupWizard(models.TransientModel):
     serie_nd_boleta = fields.Char(string='Serie Nota Débito Boleta (08)', default='BD01', size=4)
 
     @api.model
+    def _get_demo_credentials(self, provider):
+        if provider == 'digiflow':
+            return ('20557912879MODDATOS', 'moddatos')
+        return ('MODDATOS', 'MODDATOS')
+
+    @api.model
     def default_get(self, fields_list):
         vals = super().default_get(fields_list)
         company = self.env.company
+        provider = getattr(company, 'l10n_pe_edi_provider', False) or 'sunat'
+        test_env = bool(getattr(company, 'l10n_pe_edi_test_env', True))
+        sol_user = company.sudo().l10n_pe_edi_provider_username or ''
+        sol_pass = company.sudo().l10n_pe_edi_provider_password or ''
+        if test_env and not sol_user:
+            sol_user, sol_pass = self._get_demo_credentials(provider)
+        current_cert = company.l10n_pe_edi_certificate_id if getattr(company, 'l10n_pe_edi_certificate_id', False) else False
         vals.update({
             'company_id': company.id,
             'ruc': (company.vat or '').strip(),
@@ -106,14 +132,82 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'city_id': company.partner_id.city_id.id if getattr(company.partner_id, 'city_id', False) else False,
             'l10n_pe_district': company.partner_id.l10n_pe_district.id if getattr(company.partner_id, 'l10n_pe_district', False) else False,
             'address_type_code': getattr(company, 'l10n_pe_edi_address_type_code', False) or '0000',
-            'provider': getattr(company, 'l10n_pe_edi_provider', False) or 'sunat',
-            'test_env': bool(getattr(company, 'l10n_pe_edi_test_env', True)),
-            'sol_username': company.sudo().l10n_pe_edi_provider_username or '',
-            'current_certificate_id': company.l10n_pe_edi_certificate_id.id if getattr(company, 'l10n_pe_edi_certificate_id', False) else False,
+            'provider': provider,
+            'test_env': test_env,
+            'sol_username': sol_user,
+            'sol_password': sol_pass if test_env else '',
+            'auto_generate_demo_cert': bool(test_env and not current_cert),
+            'current_certificate_id': current_cert.id if current_cert else False,
             'gre_client_id': company.sudo().l10n_pe_edi_stock_client_id or '',
             'gre_sol_username': company.sudo().l10n_pe_edi_stock_client_username or '',
         })
         return vals
+
+    @api.onchange('test_env', 'provider')
+    def _onchange_test_env_provider(self):
+        if self.test_env:
+            demo_user, demo_pass = self._get_demo_credentials(self.provider)
+            if not self.sol_username or self.sol_username in ('MODDATOS', '20557912879MODDATOS'):
+                self.sol_username = demo_user
+                self.sol_password = demo_pass
+            if not self.certificate_file and not self.current_certificate_id:
+                self.auto_generate_demo_cert = True
+        else:
+            if self.sol_username in ('MODDATOS', '20557912879MODDATOS'):
+                self.sol_username = False
+                self.sol_password = False
+            self.auto_generate_demo_cert = False
+
+    def _generate_demo_certificate_pfx(self, ruc, company_name):
+        """Genera un certificado PKCS#12 (.pfx) autofirmado RSA-2048 para pruebas en SUNAT Beta."""
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+        )
+        org_name = (company_name or 'SOFIA ERP DEMO')[:64]
+        subject = issuer = x509.Name([
+            x509.NameAttribute(NameOID.COUNTRY_NAME, 'PE'),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, org_name),
+            x509.NameAttribute(NameOID.COMMON_NAME, f'{ruc} DEMO SUNAT BETA'),
+        ])
+        now = datetime.datetime.now(datetime.timezone.utc)
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(issuer)
+            .public_key(private_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + datetime.timedelta(days=365))
+            .add_extension(
+                x509.BasicConstraints(ca=False, path_length=None),
+                critical=True,
+            )
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    content_commitment=True,
+                    key_encipherment=False,
+                    data_encipherment=False,
+                    key_agreement=False,
+                    key_cert_sign=False,
+                    crl_sign=False,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .sign(private_key, hashes.SHA256())
+        )
+        password_str = 'sofia_demo_beta'
+        pfx_bytes = pkcs12.serialize_key_and_certificates(
+            name=f'sunat_demo_{ruc}'.encode('utf-8'),
+            key=private_key,
+            cert=cert,
+            cas=None,
+            encryption_algorithm=serialization.BestAvailableEncryption(password_str.encode('utf-8')),
+        )
+        return base64.b64encode(pfx_bytes), password_str
 
     def _lookup_ruc_sunat(self):
         """Consulta el RUC en vivo en SUNAT reutilizando el motor de sofiaerp_pe_vat."""
@@ -291,8 +385,19 @@ class SofiaSunatSetupWizard(models.TransientModel):
         if not re.match(r'^\d{11}$', clean_ruc):
             raise UserError(_("El RUC debe tener exactamente 11 dígitos numéricos."))
 
-        if not self.test_env and (not self.sol_username or not self.sol_password):
-            raise UserError(_("Para Modo Producción Real debes ingresar tu Usuario SOL Secundario y Clave SOL."))
+        sol_user = (self.sol_username or '').strip()
+        sol_pass = (self.sol_password or '').strip()
+        if self.test_env:
+            demo_user, demo_pass = self._get_demo_credentials(self.provider)
+            if not sol_user:
+                sol_user = demo_user
+            if not sol_pass:
+                sol_pass = demo_pass
+        else:
+            if not sol_user or not sol_pass:
+                raise UserError(_("Para Modo Producción Real debes ingresar tu Usuario SOL Secundario y Clave SOL."))
+            if sol_user.upper() in ('MODDATOS', '20557912879MODDATOS'):
+                raise UserError(_("El usuario SOL '%s' es solo para Modo Pruebas (Beta). Ingresa tu Usuario SOL Secundario de Producción.") % sol_user)
 
         if self.configure_series:
             self._validate_series()
@@ -311,10 +416,10 @@ class SofiaSunatSetupWizard(models.TransientModel):
         }
         if pe_country:
             company_vals['country_id'] = pe_country.id
-        if self.sol_username:
-            company_vals['l10n_pe_edi_provider_username'] = self.sol_username.strip()
-        if self.sol_password:
-            company_vals['l10n_pe_edi_provider_password'] = self.sol_password.strip()
+        if sol_user:
+            company_vals['l10n_pe_edi_provider_username'] = sol_user
+        if sol_pass:
+            company_vals['l10n_pe_edi_provider_password'] = sol_pass
 
         if self.configure_gre:
             if self.gre_client_id:
@@ -338,7 +443,8 @@ class SofiaSunatSetupWizard(models.TransientModel):
         if partner_vals and company.partner_id:
             company.partner_id.sudo().write(partner_vals)
 
-        # 2. Registrar Certificado Digital (.pfx / .p12) si fue subido
+        # 2. Registrar Certificado Digital (.pfx / .p12) o generar Demo autofirmado en Modo Pruebas
+        cert_note = ''
         if self.certificate_file:
             try:
                 cert = self.env['certificate.certificate'].sudo().create({
@@ -353,6 +459,28 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 raise UserError(_(
                     "No se pudo cargar el certificado digital (.pfx). Verifica que el archivo y la contraseña sean correctos.\nDetalle: %s"
                 ) % str(exc))
+        elif self.test_env and (self.auto_generate_demo_cert or not company.l10n_pe_edi_certificate_id):
+            try:
+                demo_pfx_b64, demo_pwd = self._generate_demo_certificate_pfx(clean_ruc, self.company_name.strip())
+                demo_cert = self.env['certificate.certificate'].sudo().create({
+                    'name': f'{DEMO_CERT_PREFIX} Certificado Pruebas SUNAT ({clean_ruc})',
+                    'content': demo_pfx_b64,
+                    'content_format': 'pkcs12',
+                    'pkcs12_password': demo_pwd,
+                    'company_id': company.id,
+                })
+                company.write({'l10n_pe_edi_certificate_id': demo_cert.id})
+                cert_note = ' | Certificado Demo Beta generado'
+            except Exception as exc:
+                raise UserError(_(
+                    "No se pudo generar el certificado digital demo para SUNAT Beta.\nDetalle: %s"
+                ) % str(exc))
+        elif not self.test_env:
+            active_cert = company.l10n_pe_edi_certificate_id
+            if not active_cert or (active_cert.name or '').startswith(DEMO_CERT_PREFIX):
+                raise UserError(_(
+                    "Para Modo Producción Real debes subir tu Certificado Digital oficial (.pfx / .p12) en la pestaña '2. Certificado Digital (.pfx)'. No se puede emitir en Producción con un certificado demo."
+                ))
 
         # 3. Configurar Diarios y Series Electrónicas
         if self.configure_series:
@@ -366,10 +494,11 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'params': {
                 'title': _('¡Facturación Electrónica SUNAT Activada!'),
                 'message': _(
-                    'Proveedor: %s (%s) | Series activas: %s / %s (NC: %s / %s).'
+                    'Proveedor: %s (%s)%s | Series activas: %s / %s (NC: %s / %s).'
                 ) % (
                     provider_label,
                     env_label,
+                    cert_note,
                     self.serie_factura,
                     self.serie_boleta,
                     self.serie_nc_factura,

@@ -38,12 +38,23 @@
                                 <field name="test_env" widget="boolean_toggle"/>
                                 <field name="sol_username" placeholder="MODDATOS (Beta) o RUC+UsuarioSOL"/>
                                 <field name="sol_password" password="True" placeholder="Clave SOL"/>
+                                <div colspan="2" class="alert alert-warning py-2 mb-0" role="alert" invisible="not test_env">
+                                    <strong>Modo Pruebas SUNAT Beta activo:</strong> se usarán credenciales de prueba
+                                    (<code>MODDATOS</code>) y un certificado <code>.pfx</code> demo autofirmado para que
+                                    puedas emitir facturas/boletas y recibir CDR de pruebas al instante.
+                                </div>
                             </group>
                         </group>
                     </page>
 
                     <page string="2. Certificado Digital (.pfx)">
+                        <div class="alert alert-success mb-3" role="alert" invisible="not test_env">
+                            <strong>Pruebas inmediatas sin certificado pagado:</strong> mientras <em>Modo Pruebas (SUNAT Beta)</em>
+                            esté activo, no necesitas subir un archivo <code>.pfx</code>. SOFIA ERP generará automáticamente un
+                            certificado demo autofirmado RSA-2048 aceptado por SUNAT Beta.
+                        </div>
                         <group>
+                            <field name="auto_generate_demo_cert" widget="boolean_toggle" invisible="not test_env"/>
                             <field name="current_certificate_id" invisible="not current_certificate_id"/>
                             <field name="certificate_file" filename="certificate_filename"/>
                             <field name="certificate_filename" invisible="1"/>
