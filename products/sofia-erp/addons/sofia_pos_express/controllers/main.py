@@ -44,10 +44,10 @@ class PosExpressController(http.Controller):
             return {}
 
     def _signing_secret(self):
-        return (
-            request.env['ir.config_parameter'].sudo().get_param('database.secret')
-            or 'sofia_pos_express_fallback_secret'
-        ).encode('utf-8')
+        param = request.env['ir.config_parameter'].sudo().search(
+            [('key', '=', 'database.secret')], limit=1
+        )
+        return (param.value or 'sofia_pos_express_fallback_secret').encode('utf-8')
 
     def _issue_pos_token(self, uid, company_id):
         exp = int(time.time()) + TOKEN_TTL_SECONDS
