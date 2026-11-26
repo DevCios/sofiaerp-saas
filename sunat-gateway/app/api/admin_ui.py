@@ -135,6 +135,9 @@ PANEL_HTML = r"""<!DOCTYPE html>
     </div>
     <button class="btn" style="width:100%;padding:10px" onclick="doLogin()">Ingresar al Panel</button>
     <p id="loginErr" style="color:var(--err);font-size:12px;margin-top:10px;text-align:center"></p>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center">
+      <a href="/consulta" style="font-size:12.5px;font-weight:600;color:var(--o20-teal);text-decoration:none">¿Buscas tu comprobante? Ir al Portal de Consulta Pública →</a>
+    </div>
   </div>
 </div>
 
@@ -151,6 +154,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <div class="sunat-pill">
         <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
         <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
+        <a href="/consulta" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">Consulta Pública</a>
         <a href="https://api.sofiaerp.com/admin" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">SOFIA Platform</a>
         <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
         <button class="btn btn-sm btn-nav" onclick="logout()">Salir</button>

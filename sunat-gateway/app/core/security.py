@@ -85,3 +85,24 @@ def verify_admin_jwt(token: str) -> Optional[dict]:
         return payload
     except jwt.PyJWTError:
         return None
+
+
+def create_public_download_token(doc_id: str, ttl_minutes: int = 10) -> str:
+    """Genera token JWT temporal (10 min) atado exclusivamente a un doc_id para descargas públicas."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": doc_id,
+        "scope": "public_doc_download",
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(minutes=ttl_minutes)).timestamp()),
+    }
+    return jwt.encode(payload, settings.GATEWAY_JWT_SECRET, algorithm="HS256")
+
+
+def verify_public_download_token(token: str, doc_id: str) -> bool:
+    """Valida firma, vigencia y correspondencia exacta del doc_id en descargas públicas."""
+    try:
+        payload = jwt.decode(token, settings.GATEWAY_JWT_SECRET, algorithms=["HS256"])
+        return payload.get("scope") == "public_doc_download" and hmac.compare_digest(str(payload.get("sub", "")), doc_id)
+    except jwt.PyJWTError:
+        return False

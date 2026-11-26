@@ -184,3 +184,14 @@ def test_summary_ra_rc_validation():
     with pytest.raises(FiscalValidationError) as exc:
         validate_emit_request(bad_ra, issuer)
     assert "YYYYMMDD" in " ".join(exc.value.errors)
+
+
+def test_public_download_token_isolation():
+    from app.core.security import create_public_download_token, verify_public_download_token
+
+    doc_a = "11111111-1111-1111-1111-111111111111"
+    doc_b = "22222222-2222-2222-2222-222222222222"
+    token = create_public_download_token(doc_a, ttl_minutes=5)
+    assert verify_public_download_token(token, doc_a) is True
+    assert verify_public_download_token(token, doc_b) is False
+    assert verify_public_download_token("invalid.jwt.token", doc_a) is False
