@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.api.admin_ui import router as admin_ui_router
 from app.api.public_portal import router as public_portal_router
@@ -18,6 +19,8 @@ settings = get_settings()
 async def lifespan(_app: FastAPI):
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Migración idempotente sin downtime para bases existentes
+        await conn.execute(text("ALTER TABLE issuers ADD COLUMN IF NOT EXISTS is_nrus BOOLEAN NOT NULL DEFAULT FALSE"))
     yield
     await async_engine.dispose()
 

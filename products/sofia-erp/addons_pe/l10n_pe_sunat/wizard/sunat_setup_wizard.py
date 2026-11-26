@@ -43,6 +43,22 @@ class SofiaSunatSetupWizard(models.TransientModel):
         size=4,
         help='0000 para domicilio fiscal principal según ficha RUC SUNAT.',
     )
+    tax_regime = fields.Selection(
+        selection=[
+            ('general', 'Régimen General / MYPE / RER (Facturas + Boletas con IGV 18%)'),
+            ('nrus', 'Nuevo RUS — NRUS (Solo Boletas Electrónicas sin IGV 0%)'),
+        ],
+        string='Régimen Tributario SUNAT',
+        required=True,
+        default='general',
+        help='Si eliges Nuevo RUS (NRUS), el sistema configurará únicamente Boletas Electrónicas (BE01) '
+             'con impuesto Inafecto 0% (código 30) y desactivará las Facturas para cumplir con SUNAT.',
+    )
+    apply_nrus_tax_to_products = fields.Boolean(
+        string='Aplicar impuesto Inafecto 0% (NRUS) a todos los productos existentes',
+        default=True,
+        help='Reemplaza el IGV 18% por Inafecto 0% (INA / código 30) en los productos vendibles de esta empresa.',
+    )
 
     # 2. Proveedor y Credenciales SUNAT / OSE
     provider = fields.Selection(
@@ -136,6 +152,7 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'city_id': company.partner_id.city_id.id if getattr(company.partner_id, 'city_id', False) else False,
             'l10n_pe_district': company.partner_id.l10n_pe_district.id if getattr(company.partner_id, 'l10n_pe_district', False) else False,
             'address_type_code': getattr(company, 'l10n_pe_edi_address_type_code', False) or '0000',
+            'tax_regime': getattr(company, 'l10n_pe_tax_regime', False) or 'general',
             'provider': provider,
             'test_env': test_env,
             'sol_username': sol_user,
@@ -284,14 +301,18 @@ class SofiaSunatSetupWizard(models.TransientModel):
             self.serie_nd_boleta = f'BD{num}'
 
     def _validate_series(self):
-        for label, val in [
-            ('Factura', self.serie_factura),
+        series_to_check = [
             ('Boleta', self.serie_boleta),
-            ('Nota de Crédito Factura', self.serie_nc_factura),
             ('Nota de Crédito Boleta', self.serie_nc_boleta),
-            ('Nota de Débito Factura', self.serie_nd_factura),
             ('Nota de Débito Boleta', self.serie_nd_boleta),
-        ]:
+        ]
+        if self.tax_regime != 'nrus':
+            series_to_check = [
+                ('Factura', self.serie_factura),
+                ('Nota de Crédito Factura', self.serie_nc_factura),
+                ('Nota de Débito Factura', self.serie_nd_factura),
+            ] + series_to_check
+        for label, val in series_to_check:
             clean = (val or '').strip().upper()
             if not SERIE_RE.match(clean):
                 raise UserError(_(
@@ -319,6 +340,52 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 'l10n_latam_document_type_id': doc_type.id,
             })
 
+    def _configure_nrus_taxes(self, company):
+        """Adecúa el impuesto de venta por defecto al régimen tributario (Inafecto 0% NRUS vs IGV 18%)."""
+        Tax = self.env['account.tax'].sudo()
+        if self.tax_regime == 'nrus':
+            ina_tax = Tax.search([
+                ('company_id', '=', company.id),
+                ('type_tax_use', '=', 'sale'),
+                ('l10n_pe_edi_tax_code', '=', '9998'),
+                ('amount', '=', 0.0),
+            ], limit=1)
+            if not ina_tax:
+                tax_group = self.env['account.tax.group'].sudo().search([
+                    ('company_id', '=', company.id),
+                    ('l10n_pe_edi_code', '=', 'INA'),
+                ], limit=1) or self.env['account.tax.group'].sudo().search([('company_id', '=', company.id)], limit=1)
+                ina_vals = {
+                    'name': '0% INA (NRUS)',
+                    'description': 'INA',
+                    'amount': 0.0,
+                    'amount_type': 'percent',
+                    'type_tax_use': 'sale',
+                    'company_id': company.id,
+                    'l10n_pe_edi_tax_code': '9998',
+                    'l10n_pe_edi_affectation_reason': '30',
+                }
+                if tax_group:
+                    ina_vals['tax_group_id'] = tax_group.id
+                ina_tax = Tax.create(ina_vals)
+            company.write({'account_sale_tax_id': ina_tax.id})
+            if self.apply_nrus_tax_to_products:
+                products = self.env['product.template'].sudo().search([
+                    ('sale_ok', '=', True),
+                    '|', ('company_id', '=', False), ('company_id', '=', company.id),
+                ])
+                if products:
+                    products.with_company(company).write({'taxes_id': [(6, 0, [ina_tax.id])]})
+        else:
+            igv_tax = Tax.search([
+                ('company_id', '=', company.id),
+                ('type_tax_use', '=', 'sale'),
+                ('l10n_pe_edi_tax_code', '=', '1000'),
+                ('amount', '=', 18.0),
+            ], limit=1)
+            if igv_tax and company.account_sale_tax_id.l10n_pe_edi_tax_code == '9998':
+                company.write({'account_sale_tax_id': igv_tax.id})
+
     def _configure_sales_journals(self, company):
         Journal = self.env['account.journal'].sudo()
         DocType = self.env['l10n_latam.document.type'].sudo()
@@ -331,36 +398,50 @@ class SofiaSunatSetupWizard(models.TransientModel):
         doc_08_f = pe_docs.filtered(lambda d: d.code == '08' and (d.doc_code_prefix or '').startswith('F'))[:1] or pe_docs.filtered(lambda d: d.code == '08')[:1]
         doc_08_b = pe_docs.filtered(lambda d: d.code == '08' and (d.doc_code_prefix or '').startswith('B'))[:1] or doc_08_f
 
-        # Diario 1: Facturas Electrónicas
-        inv_journal = Journal.search([
-            ('company_id', '=', company.id),
-            ('type', '=', 'sale'),
-            ('code', '=', self.serie_factura.strip().upper()),
-        ], limit=1)
-        if not inv_journal:
-            inv_journal = Journal.search([
+        default_income_acc = False
+        if self.tax_regime == 'nrus':
+            # En NRUS SUNAT prohíbe Facturas (01): archivar diarios de Factura electrónicos
+            fac_journals = Journal.search([
                 ('company_id', '=', company.id),
                 ('type', '=', 'sale'),
                 ('l10n_latam_use_documents', '=', True),
-            ], order='sequence, id', limit=1)
-        if not inv_journal:
-            inv_journal = Journal.create({
-                'name': f'Facturas Electrónicas ({self.serie_factura.strip().upper()})',
-                'code': self.serie_factura.strip().upper(),
-                'type': 'sale',
-                'company_id': company.id,
-                'l10n_latam_use_documents': True,
-            })
+                ('code', '=like', 'F%'),
+            ])
+            if fac_journals:
+                default_income_acc = fac_journals[0].default_account_id.id if fac_journals[0].default_account_id else False
+                fac_journals.write({'active': False})
         else:
-            inv_journal.write({'l10n_latam_use_documents': True})
+            # Diario 1: Facturas Electrónicas (reactivar si existía archivado)
+            inv_code = self.serie_factura.strip().upper()
+            inv_journal = Journal.with_context(active_test=False).search([
+                ('company_id', '=', company.id),
+                ('type', '=', 'sale'),
+                ('code', '=', inv_code),
+            ], limit=1)
+            if not inv_journal:
+                inv_journal = Journal.search([
+                    ('company_id', '=', company.id),
+                    ('type', '=', 'sale'),
+                    ('l10n_latam_use_documents', '=', True),
+                ], order='sequence, id', limit=1)
+            if not inv_journal:
+                inv_journal = Journal.create({
+                    'name': f'Facturas Electrónicas ({inv_code})',
+                    'code': inv_code,
+                    'type': 'sale',
+                    'company_id': company.id,
+                    'l10n_latam_use_documents': True,
+                })
+            else:
+                inv_journal.write({'active': True, 'l10n_latam_use_documents': True})
+            default_income_acc = inv_journal.default_account_id.id if inv_journal.default_account_id else False
+            self._upsert_journal_sequence(inv_journal, doc_01, self.serie_factura)
+            self._upsert_journal_sequence(inv_journal, doc_07_f, self.serie_nc_factura)
+            self._upsert_journal_sequence(inv_journal, doc_08_f, self.serie_nd_factura)
 
-        self._upsert_journal_sequence(inv_journal, doc_01, self.serie_factura)
-        self._upsert_journal_sequence(inv_journal, doc_07_f, self.serie_nc_factura)
-        self._upsert_journal_sequence(inv_journal, doc_08_f, self.serie_nd_factura)
-
-        # Diario 2: Boletas de Venta Electrónicas
+        # Diario 2: Boletas de Venta Electrónicas (siempre activo; diario principal en NRUS)
         bol_code = self.serie_boleta.strip().upper()
-        bol_journal = Journal.search([
+        bol_journal = Journal.with_context(active_test=False).search([
             ('company_id', '=', company.id),
             ('type', '=', 'sale'),
             ('code', '=', bol_code),
@@ -372,10 +453,14 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 'type': 'sale',
                 'company_id': company.id,
                 'l10n_latam_use_documents': True,
-                'default_account_id': inv_journal.default_account_id.id if inv_journal.default_account_id else False,
+                'sequence': 1 if self.tax_regime == 'nrus' else 10,
+                'default_account_id': default_income_acc,
             })
         else:
-            bol_journal.write({'l10n_latam_use_documents': True})
+            bol_vals = {'active': True, 'l10n_latam_use_documents': True}
+            if self.tax_regime == 'nrus':
+                bol_vals['sequence'] = 1
+            bol_journal.write(bol_vals)
 
         self._upsert_journal_sequence(bol_journal, doc_03, self.serie_boleta)
         self._upsert_journal_sequence(bol_journal, doc_07_b, self.serie_nc_boleta)
@@ -415,6 +500,7 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'zip': (self.zip_code or '').strip(),
             'state_id': self.state_id.id if self.state_id else False,
             'l10n_pe_edi_address_type_code': (self.address_type_code or '0000').strip(),
+            'l10n_pe_tax_regime': self.tax_regime,
             'l10n_pe_edi_provider': self.provider,
             'l10n_pe_edi_test_env': self.test_env,
         }
@@ -486,9 +572,10 @@ class SofiaSunatSetupWizard(models.TransientModel):
                     "Para Modo Producción Real debes subir tu Certificado Digital oficial (.pfx / .p12) en la pestaña '2. Certificado Digital (.pfx)'. No se puede emitir en Producción con un certificado demo."
                 ))
 
-        # 3. Configurar Diarios y Series Electrónicas
+        # 3. Configurar Diarios, Series Electrónicas e Impuestos según Régimen Tributario
         if self.configure_series:
             self._configure_sales_journals(company)
+        self._configure_nrus_taxes(company)
 
         # 4. Modo Híbrido: auto-sincronizar empresa y Clave SOL/GRE a Sofia Gateway (sin exportar .pfx)
         gateway_note = ''
@@ -498,22 +585,26 @@ class SofiaSunatSetupWizard(models.TransientModel):
 
         env_label = "Pruebas (Beta)" if self.test_env else "Producción Real"
         provider_label = dict(self._fields['provider'].selection).get(self.provider, self.provider)
+        regime_note = ' | Régimen NRUS (Solo Boletas 0% INA)' if self.tax_regime == 'nrus' else ''
+        series_summary = (
+            f'{self.serie_boleta} (NC: {self.serie_nc_boleta})'
+            if self.tax_regime == 'nrus'
+            else f'{self.serie_factura} / {self.serie_boleta} (NC: {self.serie_nc_factura} / {self.serie_nc_boleta})'
+        )
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
             'params': {
                 'title': _('¡Facturación Electrónica SUNAT Activada!'),
                 'message': _(
-                    'Proveedor: %s (%s)%s%s | Series activas: %s / %s (NC: %s / %s).'
+                    'Proveedor: %s (%s)%s%s%s | Series activas: %s.'
                 ) % (
                     provider_label,
                     env_label,
+                    regime_note,
                     cert_note,
                     gateway_note,
-                    self.serie_factura,
-                    self.serie_boleta,
-                    self.serie_nc_factura,
-                    self.serie_nc_boleta,
+                    series_summary,
                 ),
                 'type': 'success',
                 'sticky': False,
@@ -549,6 +640,7 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'ubigeo': ubigeo,
             'establishment_code': est_code,
             'is_beta': bool(self.test_env),
+            'is_nrus': self.tax_regime == 'nrus',
             'dispatch_policy': 'INSTANT_WITH_RETRY',
             'sol_username': sol_user or None,
             'sol_password': sol_pass or None,

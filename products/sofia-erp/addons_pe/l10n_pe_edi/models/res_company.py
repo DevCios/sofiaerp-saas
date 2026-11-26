@@ -41,6 +41,16 @@ class ResCompany(models.Model):
         string="Test Environment",
         help='Peru: Electronic documents in this setting are processed through a test environment that does not have a real '
              'SUNAT signature. This mode is recommended only for non-production databases that are used for testing purposes.')
+    l10n_pe_tax_regime = fields.Selection(
+        selection=[
+            ('general', 'Régimen General / MYPE Tributario / RER'),
+            ('nrus', 'Nuevo RUS (NRUS — Solo Boletas sin IGV)'),
+        ],
+        string="Régimen Tributario SUNAT",
+        default='general',
+        help="Define si la empresa opera en Régimen General/MYPE/RER (Facturas + Boletas con IGV 18%) "
+             "o en Nuevo RUS (solo Boletas Electrónicas sin IGV, afectación Inafecto 30).",
+    )
 
     @api.depends('country_id')
     def _compute_l10n_pe_edi_certificate(self):

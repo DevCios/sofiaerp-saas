@@ -59,6 +59,7 @@ class Issuer(Base):
 
     # Entorno y política de envío
     is_beta: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_nrus: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     dispatch_policy: Mapped[DispatchPolicy] = mapped_column(
         Enum(DispatchPolicy), default=DispatchPolicy.INSTANT_WITH_RETRY, nullable=False
     )

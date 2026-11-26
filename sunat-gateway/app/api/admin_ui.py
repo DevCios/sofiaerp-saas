@@ -337,6 +337,13 @@ PANEL_HTML = r"""<!DOCTYPE html>
             </select>
           </div>
           <div>
+            <label>Régimen Tributario</label>
+            <select id="issNrus">
+              <option value="false">General / MYPE / RER (Facturas + Boletas)</option>
+              <option value="true">Nuevo RUS — NRUS (Solo Boletas sin IGV)</option>
+            </select>
+          </div>
+          <div>
             <label>Política de Envío</label>
             <select id="issPolicy">
               <option value="INSTANT_WITH_RETRY">Inmediato + Reintentos Inteligentes</option>
@@ -611,7 +618,7 @@ async function refreshAll() {
   document.getElementById('issuersTable').innerHTML = issuers.map(i => `
     <tr>
       <td><code>${i.ruc}</code></td>
-      <td>${i.business_name}</td>
+      <td>${i.business_name} ${i.is_nrus ? '<span class="badge b-info" style="margin-left:4px">NRUS</span>' : ''}</td>
       <td>${i.is_beta ? '<span class="badge b-warn">BETA</span>' : '<span class="badge b-ok">PRODUCCIÓN</span>'}</td>
       <td>${i.signing_mode === 'tenant_local' ? '<span class="badge b-info">Tenant Odoo (.pfx local)</span>' : '<span class="badge b-ok">Bóveda Gateway</span>'}</td>
       <td><code>${i.dispatch_policy}</code></td>
@@ -664,6 +671,7 @@ async function saveIssuer() {
         address: document.getElementById('issAddr').value.trim() || null,
         ubigeo: document.getElementById('issUbigeo').value.trim() || '150101',
         is_beta: isBeta,
+        is_nrus: document.getElementById('issNrus').value === 'true',
         dispatch_policy: document.getElementById('issPolicy').value,
         sol_username: document.getElementById('issSolUser').value.trim() || null,
         sol_password: document.getElementById('issSolPass').value || null,

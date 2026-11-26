@@ -32,6 +32,15 @@ def validate_emit_request(req: EmitDocumentRequest, issuer: Issuer) -> dict:
     if not issuer.is_active:
         errors.append(f"La empresa emisora RUC {issuer.ruc} está desactivada en el Gateway.")
 
+    # 0. Reglas estrictas SUNAT para contribuyentes NRUS (Nuevo RUS)
+    if getattr(issuer, "is_nrus", False):
+        if req.doc_type == "01":
+            errors.append(
+                f"La empresa RUC {issuer.ruc} pertenece al Nuevo RUS (NRUS) y no puede emitir Facturas Electrónicas (01). Solo Boletas (03) y Notas (07/08)."
+            )
+        if req.doc_type in ("07", "08") and req.serie.startswith("F"):
+            errors.append("Un emisor NRUS solo puede emitir Notas de Crédito/Débito de Boleta (serie B...).")
+
     # 1. Validación de certificado vigente y protección Producción vs Beta
     if not req.already_signed:
         if not issuer.pfx_content_enc:
@@ -110,6 +119,10 @@ def validate_emit_request(req: EmitDocumentRequest, issuer: Issuer) -> dict:
     for idx, item in enumerate(req.items or [], start=1):
         line_base = q2(item.quantity * item.unit_price_without_tax)
         if item.igv_affectation_code.startswith("1"):
+            if getattr(issuer, "is_nrus", False):
+                errors.append(
+                    f"Ítem #{idx}: un emisor NRUS no puede emitir operaciones gravadas con IGV (código {item.igv_affectation_code}). Usa Inafecto (30) o Exonerado (20)."
+                )
             line_igv = q2(line_base * item.igv_rate)
             taxable += line_base
             igv_total += line_igv

@@ -626,6 +626,28 @@ class AccountMove(models.Model):
         }
 
     def _l10n_pe_edi_sign_invoices_sunat_estela(self, edi_str):
+        # Guard tributario NRUS: SUNAT prohíbe Facturas (01) e IGV 18% en Nuevo RUS
+        if getattr(self.company_id, 'l10n_pe_tax_regime', 'general') == 'nrus':
+            if self.l10n_latam_document_type_id_code == '01':
+                return {
+                    'message': self.env._(
+                        "Tu empresa está configurada en Régimen Nuevo RUS (NRUS): SUNAT no permite emitir "
+                        "Facturas Electrónicas (01). Emite una Boleta de Venta Electrónica (03) sin IGV."
+                    ),
+                    'level': 'danger',
+                }
+            igv_lines = self.invoice_line_ids.filtered(
+                lambda line: '1000' in line.tax_ids.mapped('l10n_pe_edi_tax_code')
+            )
+            if igv_lines:
+                return {
+                    'message': self.env._(
+                        "Tu empresa está en Régimen Nuevo RUS (NRUS): no puedes emitir comprobantes con IGV 18%. "
+                        "Usa el impuesto Inafecto 0% (INA / código 30)."
+                    ),
+                    'level': 'danger',
+                }
+
         credentials = self.company_id._l10n_pe_edi_get_credentials(
             sunat_wsdl=self._l10n_pe_edi_get_sunat_invoice_wsdl(),
         )

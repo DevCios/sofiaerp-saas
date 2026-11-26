@@ -195,3 +195,56 @@ def test_public_download_token_isolation():
     assert verify_public_download_token(token, doc_a) is True
     assert verify_public_download_token(token, doc_b) is False
     assert verify_public_download_token("invalid.jwt.token", doc_a) is False
+
+
+def test_nrus_blocks_factura_and_igv_items():
+    issuer_nrus = Issuer(
+        ruc="10456789012",
+        business_name="BODEGA DON PEPE",
+        is_beta=True,
+        is_nrus=True,
+        is_active=True,
+        pfx_content_enc=b"encrypted",
+        cert_is_demo=True,
+    )
+    # 1. Factura (01) debe bloquearse para NRUS
+    req_fac = EmitDocumentRequest(
+        issuer_ruc="10456789012",
+        doc_type="01",
+        serie="FE01",
+        correlativo="1",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        customer=CustomerSchema(doc_type="6", doc_number="20100047218", name="EMPRESA X"),
+        items=[DocumentItemSchema(description="Abarrotes", quantity=Decimal("1"), unit_price_without_tax=Decimal("20.00"), igv_affectation_code="30", igv_rate=Decimal("0"))],
+    )
+    with pytest.raises(FiscalValidationError) as exc1:
+        validate_emit_request(req_fac, issuer_nrus)
+    assert "NRUS" in " ".join(exc1.value.errors)
+
+    # 2. Boleta (03) con IGV gravado (10) debe bloquearse para NRUS
+    req_bol_igv = EmitDocumentRequest(
+        issuer_ruc="10456789012",
+        doc_type="03",
+        serie="BE01",
+        correlativo="1",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        customer=CustomerSchema(doc_type="1", doc_number="12345678", name="JUAN PEREZ"),
+        items=[DocumentItemSchema(description="Abarrotes", quantity=Decimal("1"), unit_price_without_tax=Decimal("20.00"), igv_affectation_code="10", igv_rate=Decimal("0.18"))],
+    )
+    with pytest.raises(FiscalValidationError) as exc2:
+        validate_emit_request(req_bol_igv, issuer_nrus)
+    assert "Inafecto (30)" in " ".join(exc2.value.errors)
+
+    # 3. Boleta (03) Inafecta (30) 0% IGV debe pasar limpiamente
+    req_bol_ok = EmitDocumentRequest(
+        issuer_ruc="10456789012",
+        doc_type="03",
+        serie="BE01",
+        correlativo="1",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        customer=CustomerSchema(doc_type="1", doc_number="12345678", name="JUAN PEREZ"),
+        items=[DocumentItemSchema(description="Abarrotes", quantity=Decimal("2"), unit_price_without_tax=Decimal("15.00"), igv_affectation_code="30", igv_rate=Decimal("0"))],
+    )
+    totals = validate_emit_request(req_bol_ok, issuer_nrus)
+    assert totals["igv_amount"] == Decimal("0.00")
+    assert totals["total_amount"] == Decimal("30.00")

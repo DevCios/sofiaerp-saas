@@ -91,6 +91,7 @@ class IssuerCreateRequest(BaseModel):
     ubigeo: Optional[str] = Field(default="150101", pattern=r"^\d{6}$")
     establishment_code: str = Field(default="0000", pattern=r"^\d{4}$")
     is_beta: bool = True
+    is_nrus: bool = False
     dispatch_policy: Literal["INSTANT_WITH_RETRY", "SCHEDULED_NIGHT", "HYBRID_BOLETA_SUMMARY"] = "INSTANT_WITH_RETRY"
     night_window_start: int = Field(default=1, ge=0, le=23)
     night_window_end: int = Field(default=5, ge=0, le=23)

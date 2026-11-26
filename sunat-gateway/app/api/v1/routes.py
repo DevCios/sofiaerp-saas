@@ -241,6 +241,7 @@ async def list_issuers(_admin: dict = Depends(get_gateway_admin), db: AsyncSessi
             "address": iss.address,
             "ubigeo": iss.ubigeo,
             "is_beta": iss.is_beta,
+            "is_nrus": iss.is_nrus,
             "dispatch_policy": iss.dispatch_policy.value,
             "night_window_start": iss.night_window_start,
             "night_window_end": iss.night_window_end,
@@ -276,6 +277,7 @@ async def upsert_issuer(
     issuer.ubigeo = body.ubigeo or "150101"
     issuer.establishment_code = body.establishment_code or "0000"
     issuer.is_beta = body.is_beta
+    issuer.is_nrus = body.is_nrus
     issuer.dispatch_policy = DispatchPolicy(body.dispatch_policy)
     issuer.night_window_start = body.night_window_start
     issuer.night_window_end = body.night_window_end
@@ -323,6 +325,7 @@ async def upsert_issuer(
         "id": issuer.id,
         "ruc": issuer.ruc,
         "is_beta": issuer.is_beta,
+        "is_nrus": issuer.is_nrus,
         "cert_is_demo": issuer.cert_is_demo,
         "signing_mode": "gateway_vault" if issuer.pfx_content_enc else "tenant_local",
     }

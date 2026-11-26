@@ -32,6 +32,13 @@
                                 <field name="state_id"/>
                                 <field name="zip_code"/>
                                 <field name="address_type_code"/>
+                                <field name="tax_regime"/>
+                                <field name="apply_nrus_tax_to_products" widget="boolean_toggle" invisible="tax_regime != 'nrus'"/>
+                                <div colspan="2" class="alert alert-info py-2 mb-0" role="alert" invisible="tax_regime != 'nrus'">
+                                    <strong>Modo Nuevo RUS (NRUS) con envío a SUNAT:</strong> se configurarán únicamente
+                                    <strong>Boletas Electrónicas (BE01)</strong> sin IGV (Inafecto 0%, código 30) y se
+                                    desactivarán las Facturas (01) para cumplir con la normativa SUNAT.
+                                </div>
                             </group>
                             <group string="Servidor y Credenciales SOL">
                                 <field name="provider"/>
@@ -68,7 +75,7 @@
                             <field name="series_preset" invisible="not configure_series"/>
                         </group>
                         <group invisible="not configure_series">
-                            <group string="Facturas Electrónicas">
+                            <group string="Facturas Electrónicas" invisible="tax_regime == 'nrus'">
                                 <field name="serie_factura"/>
                                 <field name="serie_nc_factura"/>
                                 <field name="serie_nd_factura"/>
