@@ -22,7 +22,8 @@ Este proyecto opera bajo el Skill y Runbook obligatorio: **`sofia-erp-architect`
    - **Aislamiento Database-per-Tenant y Filestore Físico Separado:** Cada cliente tiene su propia base de datos física (`sofia_tenant_<slug>`).
    - **Protección contra Host Header Injection:** Nginx forzará siempre `X-Odoo-dbfilter` validado en base de datos.
 
-3. **Metodología:**
+3. **Metodología y Estándar Visual (UI/UX):**
    - Documentar antes de codificar.
    - Registrar cambios arquitectónicos mediante ADRs en `docs/adr/`.
-   - Mantener pruebas automatizadas unitarias en `control-plane/backend/tests/`.
+   - Mantener pruebas automatizadas unitarias en `control-plane/backend/tests/` y `sunat-gateway/tests/`.
+   - **Design System Obligatorio (Odoo 20):** Todo desarrollo frontend en `sofiaerp.com` (Control Plane, Sofia Gateway, Website/Portal y módulos web) debe seguir la paleta y layout oficial de **Odoo 20** documentado en `docs/design-system-odoo20.md` (Navbar `#66598F`, Primario `#714B67`, Teal `#017E84`, fondo `#F6F7F9`, superficies `#FFFFFF`, KPIs pastel).

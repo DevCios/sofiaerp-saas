@@ -3,24 +3,27 @@
 // ==============================================================================
 
 :root {
-    /* Identidad Oficial SOFIA ERP */
-    --sofia-purple: #7D1A6A;
-    --sofia-purple-hover: #631454;
-    --sofia-purple-light: #FAF5FF;
-    --sofia-dark: #0F172A;
-    --sofia-slate: #475569;
-    --sofia-gray: #64748B;
-    --sofia-light-gray: #F8FAFC;
-    --sofia-border: #E2E8F0;
+    /* Identidad Oficial SOFIA ERP — Design System Odoo 20 */
+    --sofia-navbar: #66598F;
+    --sofia-purple: #714B67;
+    --sofia-purple-hover: #5C3B53;
+    --sofia-purple-light: #EAE6F8;
+    --sofia-teal: #017E84;
+    --sofia-teal-light: #D9F2EE;
+    --sofia-dark: #1F2937;
+    --sofia-slate: #4B5563;
+    --sofia-gray: #6B7280;
+    --sofia-light-gray: #F6F7F9;
+    --sofia-border: #E2E5EC;
 
     /* Compatibilidad con variables previas */
-    --odoo-purple: #7D1A6A;
-    --odoo-purple-dark: #631454;
-    --odoo-teal: #00A09D;
-    --odoo-dark: #0F172A;
+    --odoo-purple: #714B67;
+    --odoo-purple-dark: #5C3B53;
+    --odoo-teal: #017E84;
+    --odoo-dark: #1F2937;
     --odoo-gray: #4B5563;
-    --odoo-light-gray: #F8FAFC;
-    --odoo-border: #E2E8F0;
+    --odoo-light-gray: #F6F7F9;
+    --odoo-border: #E2E5EC;
 }
 
 body {

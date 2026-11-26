@@ -10,119 +10,174 @@ PANEL_HTML = r"""<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sofia Gateway — Pasarela Resiliente SUNAT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
     :root {
-      --bg: #0b1120; --card: #111827; --card2: #1e293b; --border: #273449;
-      --text: #f1f5f9; --muted: #94a3b8; --primary: #3b82f6; --primary-h: #2563eb;
-      --ok: #10b981; --warn: #f59e0b; --err: #ef4444; --info: #06b6d4;
+      /* Sistema de Diseño Oficial SOFIA / Odoo 20 */
+      --o20-navbar: #66598F;
+      --o20-navbar-h: #554979;
+      --o20-primary: #714B67;
+      --o20-primary-h: #5C3B53;
+      --o20-primary-soft: #EAE6F8;
+      --o20-teal: #017E84;
+      --o20-teal-h: #01666B;
+      --o20-teal-soft: #D9F2EE;
+      --bg: #F6F7F9;
+      --card: #FFFFFF;
+      --card2: #F9FAFB;
+      --border: #E2E5EC;
+      --text: #1F2937;
+      --muted: #6B7280;
+      --ok: #0F766E;
+      --warn: #B45309;
+      --err: #B91C1C;
+      --info: #5B4B8A;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
     .hidden { display: none !important; }
-    header { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
-    .subbar { background: #0f172a; border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .badge { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; display: inline-block; }
-    .b-ok { background: rgba(16,185,129,.18); color: #34d399; }
-    .b-warn { background: rgba(245,158,11,.18); color: #fbbf24; }
-    .b-err { background: rgba(239,68,68,.18); color: #f87171; }
-    .b-info { background: rgba(6,182,212,.18); color: #22d3ee; }
-    .container { max-width: 1280px; margin: 24px auto; padding: 0 20px; }
-    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 9px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; }
-    .tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* Top Navbar Estilo Odoo 20 */
+    header { background: var(--o20-navbar); color: #FFFFFF; padding: 0 20px; min-height: 50px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(17,24,39,.12); position: sticky; top: 0; z-index: 30; }
+    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 9px; letter-spacing: -0.01em; color: #FFFFFF; }
+    .brand-mark { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+    .nav-links { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
+    .tab { background: transparent; border: none; color: rgba(255,255,255,.86); padding: 7px 11px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; transition: background .15s, color .15s; }
+    .tab:hover { background: rgba(255,255,255,.14); color: #FFFFFF; }
+    .tab.active { background: rgba(255,255,255,.22); color: #FFFFFF; font-weight: 600; }
+
+    /* Control Panel Blanco Estilo Odoo 20 */
+    .subbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .badge { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+    .b-ok { background: var(--o20-teal-soft); color: var(--ok); }
+    .b-warn { background: #FDE8D7; color: var(--warn); }
+    .b-err { background: #FDE2E2; color: var(--err); }
+    .b-info { background: var(--o20-primary-soft); color: var(--info); }
+    .b-nav { background: rgba(255,255,255,.16); color: #FFFFFF; }
+    .container { max-width: 1320px; margin: 20px auto; padding: 0 20px; }
+
+    /* KPIs Pastel Estilo Odoo 20 */
     .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px; }
-    .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 22px; }
-    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-    .kpi .lbl { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
-    .kpi .val { font-size: 28px; font-weight: 700; margin-top: 6px; }
-    .desk-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: border-color .15s, transform .15s; }
-    .desk-card:hover { border-color: var(--primary); transform: translateY(-1px); }
-    .desk-card .title { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #93c5fd; }
-    .desk-card .desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
-    .card h3 { margin: 0 0 14px 0; font-size: 15px; }
+    .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .kpi-purple { background: #F4F1FB; border-color: #DED7F2; }
+    .kpi-teal { background: #EBF8F6; border-color: #C4E8E2; }
+    .kpi-peach { background: #FEF3E8; border-color: #F7D8BA; }
+    .kpi-rose { background: #FDF0F0; border-color: #F6CECE; }
+    .kpi .lbl { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .val { font-size: 28px; font-weight: 700; margin-top: 6px; color: var(--text); }
+
+    /* Tarjetas de Escritorio */
+    .desk-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+    .desk-card:hover { border-color: var(--o20-primary); box-shadow: 0 4px 12px rgba(113,75,103,.10); transform: translateY(-1px); }
+    .desk-card .title { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--o20-primary); }
+    .desk-card .desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+    /* Contenedores y Tablas */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(16,24,40,.03); }
+    .card h3 { margin: 0 0 14px 0; font-size: 15px; font-weight: 700; color: var(--text); }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid var(--border); text-align: left; }
-    th { color: var(--muted); font-weight: 600; font-size: 12px; }
-    input, select, textarea { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; width: 100%; font-size: 13px; }
-    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-    .btn { background: var(--primary); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
-    .btn:hover { background: var(--primary-h); }
-    .btn-sm { padding: 4px 9px; font-size: 12px; }
-    .btn-sec { background: var(--card2); border: 1px solid var(--border); color: var(--text); }
-    .btn-err { background: #dc2626; }
-    .login-box { max-width: 390px; margin: 90px auto; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+    thead tr { background: var(--card2); }
+    th, td { padding: 10px 10px; border-bottom: 1px solid #EEF0F4; text-align: left; }
+    tbody tr:hover { background: #F9FAFB; }
+    th { color: #4B5563; font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; }
+    code { background: #F3F4F6; color: #374151; padding: 2px 5px; border-radius: 4px; font-size: 12px; }
+    input, select, textarea { background: #FFFFFF; border: 1px solid #D1D5DB; color: var(--text); padding: 8px 10px; border-radius: 6px; width: 100%; font-size: 13px; transition: border-color .15s, box-shadow .15s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--o20-primary); box-shadow: 0 0 0 3px rgba(113,75,103,.12); }
+    label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+
+    /* Botones Estilo Odoo 20 */
+    .btn { background: var(--o20-primary); color: #FFFFFF; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; transition: background .15s; }
+    .btn:hover { background: var(--o20-primary-h); }
+    .btn-teal { background: var(--o20-teal); color: #FFFFFF; }
+    .btn-teal:hover { background: var(--o20-teal-h); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-sec { background: #FFFFFF; border: 1px solid #D1D5DB; color: #374151; }
+    .btn-sec:hover { background: #F3F4F6; }
+    .btn-nav { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25); color: #FFFFFF; }
+    .btn-nav:hover { background: rgba(255,255,255,.25); }
+    .btn-err { background: #DC2626; color: #FFFFFF; }
+    .btn-err:hover { background: #B91C1C; }
+
+    /* Login Card */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(180deg, #F4F1FB 0%, #F6F7F9 100%); }
+    .login-box { max-width: 400px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 30px; box-shadow: 0 10px 25px rgba(102,89,143,.10); }
+    .login-logo { width: 46px; height: 46px; border-radius: 10px; background: var(--o20-primary); color: #FFFFFF; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; }
     .row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .sunat-pill { display: flex; gap: 8px; align-items: center; font-size: 12px; flex-wrap: wrap; }
-    pre { background: #020617; border: 1px solid var(--border); padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; color: #a5f3fc; }
+    pre { background: #1F2937; border: 1px solid var(--border); padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 12px; color: #E5E7EB; }
   </style>
 </head>
 <body>
 
-<div id="loginView" class="login-box">
-  <h2 style="margin-top:0">Sofia Gateway</h2>
-  <p style="color:var(--muted);font-size:13px">Pasarela Resiliente SUNAT Híbrida · <code>gateway.sofiaerp.com</code></p>
-  <div style="margin-bottom:12px">
-    <label>Correo Administrador</label>
-    <input id="loginEmail" type="email" value="admin@sofiaerp.com" />
+<div id="loginView" class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">S</div>
+    <h2 style="margin:0 0 4px 0;text-align:center;color:var(--text)">Sofia Gateway</h2>
+    <p style="color:var(--muted);font-size:12.5px;text-align:center;margin:0 0 22px 0">Pasarela Resiliente SUNAT Híbrida · <code>gateway.sofiaerp.com</code></p>
+    <div style="margin-bottom:12px">
+      <label>Correo Administrador</label>
+      <input id="loginEmail" type="email" value="admin@sofiaerp.com" />
+    </div>
+    <div style="margin-bottom:18px">
+      <label>Contraseña</label>
+      <input id="loginPass" type="password" placeholder="Contraseña" />
+    </div>
+    <button class="btn" style="width:100%;padding:10px" onclick="doLogin()">Ingresar al Panel</button>
+    <p id="loginErr" style="color:var(--err);font-size:12px;margin-top:10px;text-align:center"></p>
   </div>
-  <div style="margin-bottom:16px">
-    <label>Contraseña</label>
-    <input id="loginPass" type="password" placeholder="Contraseña" />
-  </div>
-  <button class="btn" style="width:100%" onclick="doLogin()">Ingresar al Panel</button>
-  <p id="loginErr" style="color:#f87171;font-size:12px;margin-top:10px"></p>
 </div>
 
 <div id="appView" class="hidden">
   <header>
-    <div class="brand">
-      <span>Sofia Gateway</span>
-      <span class="badge b-info">gateway.sofiaerp.com</span>
-      <span class="badge b-ok">Modo Híbrido</span>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <div class="brand">
+        <span class="brand-mark">S</span>
+        <span>Sofia Gateway</span>
+      </div>
+      <nav class="nav-links">
+        <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
+        <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
+        <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
+        <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
+        <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
+        <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
+        <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
+        <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
+      </nav>
     </div>
     <div class="sunat-pill">
-      <span id="sunatBetaStatus" class="badge b-warn">SUNAT Beta: ...</span>
-      <span id="sunatProdStatus" class="badge b-warn">SUNAT Prod: ...</span>
-      <button class="btn btn-sm btn-sec" onclick="refreshAll()">Actualizar</button>
-      <button class="btn btn-sm btn-sec" onclick="logout()">Salir</button>
+      <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
+      <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
+      <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
+      <button class="btn btn-sm btn-nav" onclick="logout()">Salir</button>
     </div>
   </header>
 
   <div class="subbar">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:12px;color:var(--muted)">Empresa activa:</span>
-      <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:260px">
+      <span style="font-size:12.5px;font-weight:600;color:var(--text)">Empresa activa:</span>
+      <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:270px;padding:6px 10px">
         <option value="">Todas las Empresas (Vista Global)</option>
       </select>
       <span id="activeEnvBadge" class="badge b-info">Global</span>
     </div>
     <div style="font-size:12px;color:var(--muted)">
+      <span class="badge b-ok" style="margin-right:6px">Modo Híbrido</span>
       Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas pueden firmar en Bóveda Gateway
     </div>
   </div>
 
   <div class="container">
-    <div class="tabs">
-      <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
-      <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
-      <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
-      <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
-      <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
-      <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
-      <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
-      <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
-    </div>
-
     <!-- TAB 1: ESCRITORIO -->
     <div id="tab-desk">
       <div class="grid4">
-        <div class="kpi"><div class="lbl">Comprobantes Totales</div><div class="val" id="kTotal">0</div></div>
-        <div class="kpi"><div class="lbl">Aceptados SUNAT</div><div class="val" style="color:var(--ok)" id="kAccepted">0</div></div>
-        <div class="kpi"><div class="lbl">En Cola / Contingencia</div><div class="val" style="color:var(--warn)" id="kQueued">0</div></div>
-        <div class="kpi"><div class="lbl">Observados / Rechazados</div><div class="val" style="color:var(--err)" id="kRejected">0</div></div>
+        <div class="kpi kpi-purple"><div class="lbl">Comprobantes Totales</div><div class="val" id="kTotal">0</div></div>
+        <div class="kpi kpi-teal"><div class="lbl">Aceptados SUNAT</div><div class="val" style="color:var(--ok)" id="kAccepted">0</div></div>
+        <div class="kpi kpi-peach"><div class="lbl">En Cola / Contingencia</div><div class="val" style="color:var(--warn)" id="kQueued">0</div></div>
+        <div class="kpi kpi-rose"><div class="lbl">Observados / Rechazados</div><div class="val" style="color:var(--err)" id="kRejected">0</div></div>
       </div>
 
       <div class="grid3">
@@ -298,7 +353,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div style="margin-top:14px">
           <button class="btn" onclick="createClient()">Generar API Key</button>
         </div>
-        <div id="newKeyBox" class="hidden" style="margin-top:14px;padding:12px;background:#022c22;border:1px solid #10b981;border-radius:8px;font-size:13px"></div>
+        <div id="newKeyBox" class="hidden" style="margin-top:14px;padding:12px;background:#EBF8F6;border:1px solid #017E84;border-radius:8px;font-size:13px;color:#0F766E"></div>
       </div>
 
       <div class="card">
@@ -606,7 +661,7 @@ async function createClient() {
   });
   const box = document.getElementById('newKeyBox');
   box.classList.remove('hidden');
-  box.innerHTML = `<strong>API Key creada (cópiala ahora, no se volverá a mostrar):</strong><br><code style="font-size:14px;color:#34d399">${res.api_key}</code>`;
+  box.innerHTML = `<strong>API Key creada (cópiala ahora, no se volverá a mostrar):</strong><br><code style="font-size:14px;color:#017E84;background:#FFFFFF">${res.api_key}</code>`;
   refreshAll();
 }
 

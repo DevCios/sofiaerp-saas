@@ -14,13 +14,44 @@ HTML_CONTENT = """<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOFIA ERP SaaS — Control Plane de Administración</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigo: {
+              50: '#F5F3FA',
+              100: '#EAE6F8',
+              200: '#D6CEE8',
+              300: '#B8A8D6',
+              400: '#8F7AB5',
+              500: '#714B67',
+              600: '#714B67',
+              700: '#5C3B53',
+              800: '#492E42',
+              900: '#352030',
+            },
+            emerald: {
+              50: '#EBF8F6',
+              100: '#D9F2EE',
+              200: '#B5E4DC',
+              500: '#017E84',
+              600: '#017E84',
+              700: '#0F766E',
+            },
+          }
+        }
+      }
+    };
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; background-color: #F6F7F9; color: #1F2937; }
+    .o20-navbar { background-color: #66598F; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-[#F6F7F9] text-slate-800 min-h-screen flex flex-col">
 
   <!-- ========================================================================= -->
   <!-- VISTA 1: PANTALLA DE LOGIN SEGURO DE SUPERADMINISTRADOR                     -->
@@ -82,26 +113,29 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- ========================================================================= -->
   <div id="view-dashboard" class="flex-1 flex flex-col hidden">
     
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <!-- Header Estilo Odoo 20 -->
+    <header class="o20-navbar text-white sticky top-0 z-30 shadow-xs">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold text-base">
             S
           </div>
           <div>
-            <span class="font-bold text-slate-900 text-lg">SOFIA Platform</span>
-            <span class="text-xs text-slate-500 block -mt-0.5">Control Plane Multi-Tenant • Odoo 20 + SUNAT</span>
+            <span class="font-bold text-white text-base tracking-tight">SOFIA Platform</span>
+            <span class="text-[11px] text-white/75 block -mt-0.5">Control Plane Multi-Tenant • Odoo 20 + SUNAT</span>
           </div>
         </div>
         
-        <div class="flex items-center gap-3">
-          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-semibold text-indigo-800">
-            <i class="fa-solid fa-user-shield text-indigo-600"></i>
+        <div class="flex items-center gap-2.5">
+          <a href="https://gateway.sofiaerp.com" target="_blank" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white/15 hover:bg-white/25 text-white text-xs font-medium transition">
+            <i class="fa-solid fa-tower-broadcast"></i> Sofia Gateway
+          </a>
+          <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/15 text-xs font-medium text-white">
+            <i class="fa-solid fa-user-shield"></i>
             <span id="user-display">Superadmin</span>
           </div>
-          <button onclick="handleLogout()" class="text-xs text-rose-600 hover:text-rose-700 border border-rose-200 hover:bg-rose-50 px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión
+          <button onclick="handleLogout()" class="text-xs text-white bg-white/15 hover:bg-white/25 border border-white/25 px-3 py-1.5 rounded-md font-medium transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Salir
           </button>
         </div>
       </div>
@@ -121,27 +155,27 @@ HTML_CONTENT = """<!DOCTYPE html>
         </button>
       </div>
 
-      <!-- Metrics Cards -->
+      <!-- Metrics Cards (Pastel Odoo 20) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Empresas</div>
+        <div class="bg-[#F4F1FB] p-5 rounded-xl border border-[#DED7F2]">
+          <div class="text-slate-600 text-xs font-semibold uppercase tracking-wider">Total Empresas</div>
           <div id="metric-tenants" class="text-3xl font-bold text-slate-900 mt-2">--</div>
           <div class="text-xs text-slate-500 font-medium mt-1">Registradas en plataforma</div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Instancias Activas</div>
+        <div class="bg-[#EBF8F6] p-5 rounded-xl border border-[#C4E8E2]">
+          <div class="text-slate-600 text-xs font-semibold uppercase tracking-wider">Instancias Activas</div>
           <div id="metric-active" class="text-3xl font-bold text-emerald-600 mt-2">--</div>
-          <div class="text-xs text-emerald-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> En servicio normal</div>
+          <div class="text-xs text-emerald-700 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> En servicio normal</div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Suspendidas por Pago</div>
-          <div id="metric-suspended" class="text-3xl font-bold text-rose-600 mt-2">--</div>
-          <div class="text-xs text-rose-600 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-ban"></i> Acceso cortado</div>
+        <div class="bg-[#FDF0F0] p-5 rounded-xl border border-[#F6CECE]">
+          <div class="text-slate-600 text-xs font-semibold uppercase tracking-wider">Suspendidas por Pago</div>
+          <div id="metric-suspended" class="text-3xl font-bold text-rose-700 mt-2">--</div>
+          <div class="text-xs text-rose-700 font-medium mt-1 flex items-center gap-1"><i class="fa-solid fa-ban"></i> Acceso cortado</div>
         </div>
-        <div class="bg-white p-5 rounded-2xl border border-slate-200">
-          <div class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Aislamiento Físico</div>
+        <div class="bg-[#FEF3E8] p-5 rounded-xl border border-[#F7D8BA]">
+          <div class="text-slate-600 text-xs font-semibold uppercase tracking-wider">Aislamiento Físico</div>
           <div class="text-3xl font-bold text-indigo-600 mt-2">100%</div>
-          <div class="text-xs text-slate-500 font-medium mt-1">Database-per-tenant</div>
+          <div class="text-xs text-amber-800 font-medium mt-1">Database-per-tenant</div>
         </div>
       </div>
 
