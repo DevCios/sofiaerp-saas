@@ -5,10 +5,13 @@ sin exponer el socket de Docker a la aplicación web.
 """
 import os
 import re
+import secrets
 import shutil
+import uuid
 from typing import Dict, Any, Optional
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from passlib.hash import pbkdf2_sha512
 
 
 class ProvisioningError(Exception):
@@ -158,6 +161,88 @@ class ProvisioningService:
             raise ProvisioningError(f"Error al eliminar base de datos '{db_name}': {str(e)}")
 
     @classmethod
+    def customize_cloned_database(
+        cls,
+        db_name: str,
+        slug: str,
+        company_name: Optional[str] = None,
+        admin_email: Optional[str] = None,
+        admin_password: Optional[str] = None,
+        pg_host: str = "postgres",
+        pg_port: int = 5432,
+        admin_user: str = "sofia_admin",
+        admin_password_pg: str = "sofia_pass",
+    ) -> bool:
+        """
+        Personaliza una base de datos clonada desde sofia_template_db con los datos
+        exclusivos del nuevo cliente: Razón Social, Usuario Admin (email + hash pbkdf2_sha512
+        nativo de Odoo 20), web.base.url, database.uuid y database.secret únicos.
+        """
+        conn = psycopg2.connect(
+            dbname=db_name,
+            user=admin_user,
+            password=admin_password_pg,
+            host=pg_host,
+            port=pg_port,
+            connect_timeout=10,
+        )
+        try:
+            with conn.cursor() as cur:
+                # Verificar que la BD ya tenga esquema Odoo (tabla ir_config_parameter)
+                cur.execute("SELECT to_regclass('public.ir_config_parameter');")
+                if not cur.fetchone()[0]:
+                    return False
+
+                # 1. Regenerar identificadores únicos del tenant (UUID, secret y URL base)
+                params = [
+                    ("database.uuid", str(uuid.uuid4())),
+                    ("database.secret", secrets.token_hex(24)),
+                    ("web.base.url", f"https://{slug}.sofiaerp.com"),
+                    ("sofia.tenant_slug", slug),
+                    ("sofia.entitlements.last_sync", "0"),
+                ]
+                for key, value in params:
+                    cur.execute("UPDATE ir_config_parameter SET value = %s WHERE key = %s;", (value, key))
+                    if cur.rowcount == 0:
+                        cur.execute(
+                            "INSERT INTO ir_config_parameter (key, value, create_uid, write_uid, create_date, write_date) "
+                            "VALUES (%s, %s, 1, 1, NOW(), NOW());",
+                            (key, value),
+                        )
+
+                # 2. Actualizar Razón Social y correo de la empresa principal (id=1)
+                if company_name:
+                    cur.execute("UPDATE res_company SET name = %s WHERE id = 1;", (company_name,))
+                    cur.execute(
+                        "UPDATE res_partner SET name = %s WHERE id = (SELECT partner_id FROM res_company WHERE id = 1);",
+                        (company_name,),
+                    )
+                if admin_email:
+                    cur.execute(
+                        "UPDATE res_partner SET email = %s WHERE id = (SELECT partner_id FROM res_company WHERE id = 1);",
+                        (admin_email.strip().lower(),),
+                    )
+
+                # 3. Actualizar Usuario Administrador principal de Odoo (id=2)
+                if admin_email and admin_password:
+                    clean_email = admin_email.strip().lower()
+                    odoo_hash = pbkdf2_sha512.hash(admin_password)
+                    admin_display = f"Admin {company_name}" if company_name else "Administrador"
+                    cur.execute(
+                        "UPDATE res_users SET login = %s, password = %s, active = TRUE WHERE id = 2;",
+                        (clean_email, odoo_hash),
+                    )
+                    cur.execute(
+                        "UPDATE res_partner SET name = %s, email = %s WHERE id = (SELECT partner_id FROM res_users WHERE id = 2);",
+                        (admin_display, clean_email),
+                    )
+
+            conn.commit()
+            return True
+        finally:
+            conn.close()
+
+    @classmethod
     def provision_tenant_pipeline(
         cls,
         slug: str,
@@ -169,13 +254,17 @@ class ProvisioningService:
         owner_user: str = "odoo_runtime_user",
         max_connections: int = 30,
         dry_run: bool = False,
+        company_name: Optional[str] = None,
+        tenant_admin_email: Optional[str] = None,
+        tenant_admin_password: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Ejecuta el pipeline completo y atómico de aprovisionamiento de un tenant:
         1. Sanitización de identificador.
-        2. Creación de base de datos PostgreSQL con límite de conexiones.
-        3. Creación de filestore aislado con permisos 0750.
-        4. Si falla en algún punto, realiza rollback ordenado.
+        2. Creación de base de datos PostgreSQL clonando sofia_template_db con límite de conexiones.
+        3. Personalización automática de empresa, admin (correo/clave), URL y UUID único.
+        4. Creación de filestore aislado con permisos 0750.
+        5. Si falla en algún punto, realiza rollback ordenado.
         """
         db_name = cls.sanitize_database_name(slug)
         filestore_path = cls.get_filestore_path(base_filestore_dir, slug, db_name)
@@ -191,7 +280,7 @@ class ProvisioningService:
 
         db_created = False
         try:
-            # 1. Crear Base de Datos
+            # 1. Crear Base de Datos (clonando sofia_template_db si existe)
             db_created = cls.create_tenant_database(
                 db_name=db_name,
                 owner_user=owner_user,
@@ -202,7 +291,22 @@ class ProvisioningService:
                 max_connections=max_connections,
             )
 
-            # 2. Inicializar Filestore
+            # 2. Personalizar la BD clonada con los datos exclusivos del cliente
+            customized = False
+            if db_created:
+                customized = cls.customize_cloned_database(
+                    db_name=db_name,
+                    slug=slug,
+                    company_name=company_name,
+                    admin_email=tenant_admin_email,
+                    admin_password=tenant_admin_password,
+                    pg_host=pg_host,
+                    pg_port=pg_port,
+                    admin_user=admin_user,
+                    admin_password_pg=admin_password,
+                )
+
+            # 3. Inicializar Filestore
             cls.initialize_filestore(filestore_path)
 
             return {
@@ -211,6 +315,7 @@ class ProvisioningService:
                 "database_name": db_name,
                 "filestore_path": filestore_path,
                 "new_database": db_created,
+                "customized": customized,
             }
 
         except Exception as e:

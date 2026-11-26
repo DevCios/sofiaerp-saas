@@ -9,23 +9,46 @@ from app.core.config import settings
 from app.services.provisioning_service import ProvisioningService, ProvisioningError
 
 
-def dispatch_tenant_provisioning(tenant_id: str, db_name: str, filestore_path: str):
+def dispatch_tenant_provisioning(
+    tenant_id: str,
+    db_name: str,
+    filestore_path: str,
+    company_name: str | None = None,
+    admin_email: str | None = None,
+    admin_password: str | None = None,
+):
     """Encola la tarea de aprovisionamiento en Celery."""
-    provision_tenant_task.delay(tenant_id, db_name, filestore_path)
+    provision_tenant_task.delay(
+        tenant_id,
+        db_name,
+        filestore_path,
+        company_name,
+        admin_email,
+        admin_password,
+    )
 
 
 @celery_app.task(bind=True, max_retries=3, default_retry_delay=60)
-def provision_tenant_task(self, tenant_id: str, db_name: str, filestore_path: str):
+def provision_tenant_task(
+    self,
+    tenant_id: str,
+    db_name: str,
+    filestore_path: str,
+    company_name: str | None = None,
+    admin_email: str | None = None,
+    admin_password: str | None = None,
+):
     """
     Orquestador asíncrono de aprovisionamiento:
-    1. Crea la base de datos PostgreSQL de forma aislada con cuota de conexiones.
-    2. Crea el directorio de filestore con permisos 0750.
-    3. Actualiza el estado del tenant a ACTIVE en la base de datos central.
+    1. Clona sofia_template_db en la base física aislada del cliente con cuota de conexiones.
+    2. Personaliza razón social, correo/contraseña del admin, web.base.url y UUID único.
+    3. Crea el directorio de filestore con permisos 0750.
+    4. Actualiza el estado del tenant a ACTIVE en la base de datos central.
     """
     pg_host = os.getenv("POSTGRES_HOST", "postgres")
     pg_port = int(os.getenv("POSTGRES_PORT", 5432))
     admin_user = os.getenv("POSTGRES_USER", "sofia_admin")
-    admin_password = os.getenv("POSTGRES_PASSWORD", "sofia_pass")
+    admin_password_pg = os.getenv("POSTGRES_PASSWORD", "sofia_pass")
     central_db = os.getenv("POSTGRES_DB", "sofia_central_db")
     owner_user = os.getenv("ODOO_DB_USER", admin_user)
 
@@ -37,8 +60,11 @@ def provision_tenant_task(self, tenant_id: str, db_name: str, filestore_path: st
             pg_host=pg_host,
             pg_port=pg_port,
             admin_user=admin_user,
-            admin_password=admin_password,
+            admin_password=admin_password_pg,
             owner_user=owner_user,
+            company_name=company_name,
+            tenant_admin_email=admin_email,
+            tenant_admin_password=admin_password,
         )
 
         # Actualizar estado a ACTIVE en la base de datos central
@@ -46,7 +72,7 @@ def provision_tenant_task(self, tenant_id: str, db_name: str, filestore_path: st
             conn = psycopg2.connect(
                 dbname=central_db,
                 user=admin_user,
-                password=admin_password,
+                password=admin_password_pg,
                 host=pg_host,
                 port=pg_port,
                 connect_timeout=10,

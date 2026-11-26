@@ -169,8 +169,15 @@ async def create_tenant(
     await db.commit()
     await db.refresh(new_tenant)
 
-    # Despachar tarea en Celery
-    dispatch_tenant_provisioning(str(new_tenant.id), new_tenant.database_name, new_tenant.filestore_path)
+    # Despachar tarea en Celery con los datos exclusivos del cliente para personalizar su BD clonada
+    dispatch_tenant_provisioning(
+        tenant_id=str(new_tenant.id),
+        db_name=new_tenant.database_name,
+        filestore_path=new_tenant.filestore_path,
+        company_name=new_tenant.name,
+        admin_email=payload.admin_email,
+        admin_password=payload.admin_password,
+    )
 
     return new_tenant
 
