@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>POS Express — SOFIA ERP</title>
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- VISTA 1: CONEXIÓN AL TENANT SOFIA ERP -->
+  <div id="loginView" class="login-wrap">
+    <div class="login-box">
+      <img src="icon.png" alt="POS Express" class="login-logo-img" />
+      <h2>POS Express</h2>
+      <p class="login-sub">Terminal Ultraligero conectado a <strong>SOFIA ERP + Sofia Gateway</strong></p>
+
+      <form id="loginForm" onsubmit="doAppLogin(event)">
+        <div class="field">
+          <label for="fServer">URL de tu Empresa (SOFIA ERP)</label>
+          <input id="fServer" type="url" required placeholder="https://minegocio.sofiaerp.com" value="https://sofiaerp.com" />
+        </div>
+        <div class="field">
+          <label for="fLogin">Correo / Usuario</label>
+          <input id="fLogin" type="text" required placeholder="cajero@miempresa.com" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="fPass">Contraseña</label>
+          <input id="fPass" type="password" required placeholder="••••••••" autocomplete="current-password" />
+        </div>
+        <div id="loginErr" class="alert-err hidden"></div>
+        <button id="btnLogin" type="submit" class="btn" style="width:100%;padding:11px">Conectar y Abrir Caja</button>
+      </form>
+      <div class="login-foot">SOFIA ERP · SUNAT Directo / Sofia Gateway · NRUS · Yape &amp; Plin</div>
+    </div>
+  </div>
+
+  <!-- VISTA 2: TERMINAL POS EXPRESS -->
+  <div id="appView" class="app-shell hidden">
+    <header>
+      <div class="brand">
+        <img src="icon.png" alt="POS" class="nav-logo" />
+        <div>
+          <span id="hdrTitle">POS Express</span>
+          <span id="hdrSub" class="brand-sub">Conectado...</span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <span id="badgeOnline" class="pill pill-ok">Online</span>
+        <button id="badgeQueue" class="pill pill-warn hidden" onclick="syncOfflineQueue()" title="Sincronizar ventas pendientes">Pendientes: 0</button>
+        <span id="badgeRegime" class="pill hidden">NRUS</span>
+        <span id="badgeSales" class="pill">Ventas: S/ 0.00</span>
+        <button class="btn btn-nav" onclick="openCashModal()">Caja In/Out</button>
+        <button class="btn btn-nav" onclick="openHistoryModal()">Historial</button>
+        <button class="btn btn-nav" onclick="openCloseModal()">Cerrar Turno</button>
+        <button class="btn btn-nav" onclick="refreshFromServer()">Sincronizar</button>
+        <button class="btn btn-nav" onclick="doLogout()">Salir</button>
+      </div>
+    </header>
+
+    <div id="workspace" class="workspace">
+      <div class="left-pane">
+        <div class="search-bar">
+          <input id="searchInput" type="search" placeholder="Buscar producto o escanear código de barras (Enter)..." autocomplete="off" />
+        </div>
+        <div id="catBar" class="cats"></div>
+        <div id="prodGrid" class="prod-grid"></div>
+      </div>
+
+      <div class="right-pane">
+        <div class="cart-top">
+          <div class="doc-switch">
+            <button id="btnDoc03" class="doc-btn active" onclick="selectDocType('03')">Boleta (03)</button>
+            <button id="btnDoc01" class="doc-btn" onclick="selectDocType('01')">Factura (01)</button>
+          </div>
+          <div class="cust-row">
+            <input id="custDocInput" placeholder="DNI (8) o RUC (11) SUNAT..." />
+            <button class="btn btn-sec btn-sm" onclick="consultCustomer()">Buscar</button>
+          </div>
+          <div class="cust-meta">
+            <span>Cliente: <strong id="custName">Consumidor Final</strong></span>
+            <a href="#" onclick="resetCustomer();return false;">Restablecer</a>
+          </div>
+        </div>
+
+        <div id="cartLines" class="cart-lines"></div>
+
+        <div class="checkout-box">
+          <div class="total-row">
+            <span>TOTAL</span>
+            <span id="cartTotal">S/ 0.00</span>
+          </div>
+          <div id="payMethods" class="pay-grid"></div>
+          <input id="payRefInput" class="hidden ref-input" placeholder="N° Operación Yape / Plin / Voucher (opcional)" />
+          <div class="paid-row">
+            <input id="paidInput" type="number" step="0.01" placeholder="Recibido" oninput="updateChange()" />
+            <span id="changeLbl">Vuelto: S/ 0.00</span>
+          </div>
+          <div class="quick-amts">
+            <button onclick="setQuickPaid('exact')">Exacto</button>
+            <button onclick="setQuickPaid(10)">S/ 10</button>
+            <button onclick="setQuickPaid(20)">S/ 20</button>
+            <button onclick="setQuickPaid(50)">S/ 50</button>
+            <button onclick="setQuickPaid(100)">S/ 100</button>
+          </div>
+          <button id="btnPay" class="btn pay-cta" onclick="submitCheckout()">Cobrar y Emitir SUNAT</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-bar">
+      <button class="btn btn-sec" style="flex:1" onclick="toggleMobileView(false)">Catálogo</button>
+      <button id="mobCartBtn" class="btn" style="flex:1" onclick="toggleMobileView(true)">Carrito (0)</button>
+    </div>
+  </div>
+
+  <!-- MODAL TICKET -->
+  <div id="ticketModal" class="modal-bg hidden">
+    <div class="modal-card">
+      <div id="ticketContent" class="ticket-paper"></div>
+      <div class="no-print modal-actions">
+        <button class="btn" style="flex:1" onclick="window.print()">Imprimir</button>
+        <a id="btnWaShare" class="btn btn-teal" style="flex:1" target="_blank" href="#">WhatsApp</a>
+        <button class="btn btn-sec" style="flex:1" onclick="closeModal('ticketModal')">Nueva Venta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CAJA IN/OUT -->
+  <div id="cashModal" class="modal-bg hidden">
+    <div class="modal-card">
+      <h3>Movimiento de Efectivo (Caja)</h3>
+      <div class="field"><label>Tipo</label><select id="cmType"><option value="in">Entrada de Efectivo</option><option value="out">Salida de Efectivo</option></select></div>
+      <div class="field"><label>Monto</label><input id="cmAmt" type="number" step="0.01" placeholder="0.00" /></div>
+      <div class="field"><label>Concepto</label><input id="cmNote" placeholder="Ej. Pago proveedor / Sencillo" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-sec" onclick="closeModal('cashModal')">Cancelar</button>
+        <button class="btn" onclick="saveCashMove()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL HISTORIAL -->
+  <div id="historyModal" class="modal-bg hidden">
+    <div class="modal-card" style="max-width:560px">
+      <h3>Comprobantes del Turno</h3>
+      <div id="historyList" style="max-height:360px;overflow-y:auto;font-size:13px"></div>
+      <div class="modal-actions"><button class="btn btn-sec" onclick="closeModal('historyModal')">Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL CIERRE -->
+  <div id="closeModal" class="modal-bg hidden">
+    <div class="modal-card">
+      <h3>Arqueo y Cierre de Turno</h3>
+      <div id="closeSummary" class="summary-box"></div>
+      <div class="field"><label>Efectivo Contado Real</label><input id="clCounted" type="number" step="0.01" /></div>
+      <div class="field"><label>Notas de Cierre</label><input id="clNote" placeholder="Opcional" /></div>
+      <div class="modal-actions">
+        <button class="btn btn-sec" onclick="closeModal('closeModal')">Cancelar</button>
+        <button class="btn btn-err" onclick="confirmCloseSession()">Cerrar Turno</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

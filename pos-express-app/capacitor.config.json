@@ -1,0 +1,8 @@
+{
+  "appId": "com.sofiaerp.posexpress",
+  "appName": "POS Express",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

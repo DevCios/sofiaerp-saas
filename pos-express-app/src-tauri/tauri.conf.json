@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "POS Express",
+  "version": "2.0.0",
+  "identifier": "com.sofiaerp.posexpress",
+  "build": {
+    "frontendDist": "../www"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "POS Express — SOFIA ERP",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 620,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/icon.png"],
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false,
+        "languages": ["Spanish"],
+        "installMode": "currentUser"
+      }
+    }
+  }
+}

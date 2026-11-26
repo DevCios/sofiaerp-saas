@@ -1,0 +1,18 @@
+[package]
+name = "sofia_pos_express"
+version = "2.0.0"
+description = "POS Express — Terminal Ultraligero para SOFIA ERP"
+authors = ["SOFIA ERP"]
+edition = "2021"
+
+[lib]
+name = "sofia_pos_express_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

@@ -1,0 +1,15 @@
+{
+  "name": "POS Express — SOFIA ERP",
+  "short_name": "POS Express",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F6F7F9",
+  "theme_color": "#66598F",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}
