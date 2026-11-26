@@ -39,9 +39,12 @@ class PosExpressController(http.Controller):
             if not session:
                 session = Session.create({'config_id': cfg.id, 'user_id': request.env.uid})
 
+        action = request.env.ref('sofia_pos_express.action_pos_express_config', raise_if_not_found=False)
+        back_url = f'/odoo/action-{action.id}' if action else '/odoo'
+
         html = request.env['ir.ui.view'].sudo()._render_template(
             'sofia_pos_express.pos_express_terminal',
-            {'session_id': session.id, 'session_name': session.name},
+            {'session_id': session.id, 'session_name': session.name, 'back_url': back_url},
         )
         return request.make_response(html, headers=[('Content-Type', 'text/html; charset=utf-8')])
 

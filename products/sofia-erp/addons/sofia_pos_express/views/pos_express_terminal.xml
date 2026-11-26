@@ -124,7 +124,7 @@
                 }
             </style>
         </head>
-        <body t-att-data-session-id="session_id">
+        <body t-att-data-session-id="session_id" t-att-data-back-url="back_url">
             <header>
                 <div class="brand">
                     <span class="brand-mark">S</span>
@@ -139,7 +139,7 @@
                     <button class="btn btn-nav" onclick="openCashModal()">Caja In/Out</button>
                     <button class="btn btn-nav" onclick="openHistoryModal()">Historial</button>
                     <button class="btn btn-nav" onclick="openCloseModal()">Cerrar Turno</button>
-                    <a href="/odoo" class="btn btn-nav">Salir a ERP</a>
+                    <a t-att-href="back_url" class="btn btn-nav">Salir a ERP</a>
                 </div>
             </header>
 
@@ -255,6 +255,7 @@
             <script>
             //<![CDATA[
                 const SESSION_ID = Number(document.body.dataset.sessionId);
+                const BACK_URL = document.body.dataset.backUrl || '/odoo';
                 let POS = null;
                 let CART = [];
                 let ACTIVE_CAT = 0;
@@ -273,7 +274,7 @@
 
                 async function boot() {
                     POS = await postApi('data', { session_id: SESSION_ID });
-                    if (POS.error) { alert(POS.error); window.location.href = '/odoo'; return; }
+                    if (POS.error) { alert(POS.error); window.location.href = BACK_URL; return; }
 
                     document.getElementById('hdrTitle').textContent = POS.header_title || 'POS Express';
                     document.getElementById('hdrSub').textContent = `${POS.session_name} · ${POS.user_name} · ${POS.company_info.provider.toUpperCase()}${POS.company_info.test_env ? ' (BETA)' : ''}`;
@@ -566,7 +567,7 @@
                     });
                     if (res.error) { alert(res.error); return; }
                     alert(`Turno ${res.session_name} cerrado. Diferencia: S/ ${res.difference.toFixed(2)}`);
-                    window.location.href = '/odoo';
+                    window.location.href = BACK_URL;
                 }
 
                 async function startCameraScan() {
