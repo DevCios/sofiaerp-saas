@@ -29,8 +29,8 @@ class EmitDocumentRequest(BaseModel):
     2) Modo XML Passthrough (para SOFIA ERP / Odoo 20): enviar raw_xml_base64 (firmado o sin firmar).
     """
     issuer_ruc: str = Field(..., pattern=r"^\d{11}$")
-    doc_type: Literal["01", "03", "07", "08"]
-    serie: str = Field(..., min_length=4, max_length=4)
+    doc_type: Literal["01", "03", "07", "08", "RA", "RC"]
+    serie: str = Field(..., min_length=4, max_length=10)
     correlativo: str = Field(..., min_length=1, max_length=8)
     issue_date: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
     issue_time: Optional[str] = Field(default="12:00:00", pattern=r"^\d{2}:\d{2}:\d{2}$")

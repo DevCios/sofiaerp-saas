@@ -19,7 +19,12 @@ from app.models import (
     Issuer,
     WebhookLog,
 )
-from app.services.sunat_soap import recover_cdr_from_sunat, send_bill_to_sunat
+from app.services.sunat_soap import (
+    get_summary_status_from_sunat,
+    recover_cdr_from_sunat,
+    send_bill_to_sunat,
+    send_summary_to_sunat,
+)
 from app.services.xml_signer import save_artifact_file
 from app.tasks.celery_app import celery_app
 
@@ -66,6 +71,9 @@ def _apply_sunat_result(db, doc: Document, issuer: Issuer, resp, action_name: st
 
     webhook_event = None
 
+    if getattr(resp, "ticket", None):
+        doc.sunat_ticket = resp.ticket
+
     if resp.outcome in ("ACCEPTED", "ACCEPTED_WITH_OBS"):
         if resp.cdr_zip_bytes:
             cdr_filename = f"R-{doc.xml_filename[:-4]}.zip"
@@ -76,6 +84,12 @@ def _apply_sunat_result(db, doc: Document, issuer: Issuer, resp, action_name: st
         doc.accepted_at = datetime.now(timezone.utc)
         doc.next_retry_at = None
         webhook_event = "document.accepted"
+    elif resp.outcome == "TICKET_PENDING":
+        doc.status = DocumentStatus.RETRY_SCHEDULED
+        doc.next_retry_at = datetime.now(timezone.utc) + timedelta(seconds=20)
+        db.commit()
+        dispatch_document_task.apply_async(args=[doc.id], countdown=15)
+        return
     elif resp.outcome == "RECOVER_CDR":
         doc.status = DocumentStatus.RECOVERING_CDR
         doc.next_retry_at = datetime.now(timezone.utc) + timedelta(seconds=15)
@@ -119,6 +133,28 @@ def dispatch_document_task(document_id: str, force: bool = False):
         xml_bytes = Path(doc.xml_path).read_bytes()
         sol_user = decrypt_secret(issuer.sol_username_enc) or ""
         sol_pass = decrypt_secret(issuer.sol_password_enc) or ""
+
+        if doc.doc_type in ("RA", "RC"):
+            if doc.sunat_ticket:
+                resp = get_summary_status_from_sunat(
+                    ruc=issuer.ruc,
+                    ticket=doc.sunat_ticket,
+                    sol_username=sol_user,
+                    sol_password=sol_pass,
+                    is_beta=issuer.is_beta,
+                )
+                _apply_sunat_result(db, doc, issuer, resp, "getStatus")
+            else:
+                resp = send_summary_to_sunat(
+                    ruc=issuer.ruc,
+                    xml_filename=doc.xml_filename,
+                    xml_bytes=xml_bytes,
+                    sol_username=sol_user,
+                    sol_password=sol_pass,
+                    is_beta=issuer.is_beta,
+                )
+                _apply_sunat_result(db, doc, issuer, resp, "sendSummary")
+            return {"document_id": doc.id, "status": doc.status.value, "sunat_code": doc.sunat_code, "ticket": doc.sunat_ticket}
 
         resp = send_bill_to_sunat(
             ruc=issuer.ruc,

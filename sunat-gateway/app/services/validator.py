@@ -49,6 +49,11 @@ def validate_emit_request(req: EmitDocumentRequest, issuer: Issuer) -> dict:
         errors.append(f"La serie '{req.serie}' no es válida para Boleta (03): debe iniciar con 'B' (ej. B001, BE01).")
     elif req.doc_type in ("07", "08") and not SERIE_NOTA_RE.match(req.serie):
         errors.append(f"La serie '{req.serie}' no es válida para Nota (07/08): debe iniciar con 'F' o 'B'.")
+    elif req.doc_type in ("RA", "RC"):
+        if not re.match(r"^\d{8}$", req.serie):
+            errors.append(f"Para Resumen/Baja ({req.doc_type}), 'serie' debe ser la fecha YYYYMMDD (ej. 20261126).")
+        if not req.raw_xml_base64:
+            errors.append(f"Los Resúmenes Diarios (RC) y Bajas (RA) requieren enviar raw_xml_base64.")
 
     # 3. Validación de fecha de emisión (alerta si excede 3 días hacia atrás en Producción)
     try:

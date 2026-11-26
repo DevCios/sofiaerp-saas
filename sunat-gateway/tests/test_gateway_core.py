@@ -151,3 +151,36 @@ def test_multitenant_ruc_access_enforcement():
     with pytest.raises(HTTPException) as exc:
         assert_ruc_access(restricted, "20100047218")
     assert exc.value.status_code == 403
+
+
+def test_summary_ra_rc_validation():
+    issuer = Issuer(
+        ruc="20600994345",
+        business_name="SOFIA ERP S.A.C.",
+        is_beta=True,
+        is_active=True,
+    )
+    req_ra = EmitDocumentRequest(
+        issuer_ruc="20600994345",
+        doc_type="RA",
+        serie="20261126",
+        correlativo="1",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        raw_xml_base64="PFZvaWRlZERvY3VtZW50cy8+",
+        already_signed=True,
+    )
+    totals = validate_emit_request(req_ra, issuer)
+    assert totals["mode"] == "xml_passthrough"
+
+    bad_ra = EmitDocumentRequest(
+        issuer_ruc="20600994345",
+        doc_type="RC",
+        serie="FE01",
+        correlativo="1",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        raw_xml_base64="PFN1bW1hcnkvPg==",
+        already_signed=True,
+    )
+    with pytest.raises(FiscalValidationError) as exc:
+        validate_emit_request(bad_ra, issuer)
+    assert "YYYYMMDD" in " ".join(exc.value.errors)

@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
-from sqlalchemy import desc, func, select
+from sqlalchemy import delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import assert_ruc_access, get_api_client_or_admin, get_gateway_admin
@@ -31,6 +31,7 @@ from app.models import (
     Document,
     DocumentStatus,
     Issuer,
+    WebhookLog,
 )
 from app.schemas import (
     AdminLoginRequest,
@@ -327,6 +328,81 @@ async def upsert_issuer(
     }
 
 
+@router.get("/summaries", tags=["Dashboard"])
+async def list_summaries(
+    ruc: Optional[str] = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=300),
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Bandeja de Resúmenes Diarios (RC) y Comunicaciones de Baja (RA) con seguimiento de Ticket SUNAT."""
+    stmt = (
+        select(Document)
+        .where(Document.doc_type.in_(["RA", "RC"]))
+        .order_by(desc(Document.created_at))
+        .limit(limit)
+    )
+    if ruc:
+        stmt = stmt.where(Document.issuer_ruc == ruc)
+    res = await db.execute(stmt)
+    return [
+        {
+            "id": d.id,
+            "issuer_ruc": d.issuer_ruc,
+            "doc_type": d.doc_type,
+            "number": f"{d.doc_type}-{d.serie}-{int(d.correlativo)}",
+            "issue_date": d.issue_date,
+            "status": d.status.value,
+            "sunat_ticket": d.sunat_ticket,
+            "sunat_code": d.sunat_code,
+            "sunat_message": d.sunat_message,
+            "attempt_count": d.attempt_count,
+            "has_cdr": bool(d.cdr_path),
+            "created_at": d.created_at.isoformat(),
+        }
+        for d in res.scalars().all()
+    ]
+
+
+@router.delete("/issuers/{ruc}/beta-documents", tags=["Issuers"])
+async def purge_issuer_beta_documents(
+    ruc: str,
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Limpia comprobantes de prueba de un RUC en modo Beta antes de pasarlo a Producción Real."""
+    res = await db.execute(select(Issuer).where(Issuer.ruc == ruc))
+    issuer = res.scalar_one_or_none()
+    if not issuer:
+        raise HTTPException(status_code=404, detail=f"Empresa RUC {ruc} no encontrada.")
+    if not issuer.is_beta:
+        raise HTTPException(
+            status_code=400,
+            detail="Por seguridad tributaria, solo se pueden limpiar documentos cuando la empresa está en modo BETA.",
+        )
+
+    docs_res = await db.execute(select(Document).where(Document.issuer_ruc == ruc))
+    docs = docs_res.scalars().all()
+    doc_ids = [d.id for d in docs]
+    removed_files = 0
+    for d in docs:
+        for fpath in (d.xml_path, d.cdr_path):
+            if fpath and Path(fpath).exists():
+                try:
+                    Path(fpath).unlink()
+                    removed_files += 1
+                except OSError:
+                    pass
+
+    if doc_ids:
+        await db.execute(delete(WebhookLog).where(WebhookLog.document_id.in_(doc_ids)))
+        await db.execute(delete(DeliveryAttempt).where(DeliveryAttempt.document_id.in_(doc_ids)))
+        await db.execute(delete(Document).where(Document.id.in_(doc_ids)))
+        await db.commit()
+
+    return {"ruc": ruc, "deleted_documents": len(doc_ids), "removed_files": removed_files}
+
+
 @router.delete("/issuers/{issuer_id}", tags=["Issuers"])
 async def toggle_issuer(issuer_id: str, _admin: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
     issuer = await db.get(Issuer, issuer_id)
@@ -460,7 +536,10 @@ async def emit_document(
         raise HTTPException(status_code=422, detail={"validation_errors": exc.errors})
 
     # 4. Construir / Decodificar XML UBL 2.1 + Firma Local Instantánea (.pfx)
-    xml_filename = f"{body.issuer_ruc}-{body.doc_type}-{body.serie}-{body.correlativo}.xml"
+    if body.doc_type in ("RA", "RC"):
+        xml_filename = f"{body.issuer_ruc}-{body.doc_type}-{body.serie}-{int(body.correlativo)}.xml"
+    else:
+        xml_filename = f"{body.issuer_ruc}-{body.doc_type}-{body.serie}-{body.correlativo}.xml"
     if body.raw_xml_base64:
         try:
             raw_xml = base64.b64decode(body.raw_xml_base64)
@@ -543,7 +622,7 @@ async def emit_document(
     # Encolar envío asíncrono a SUNAT o intento rápido síncrono (Modo Híbrido SOFIA ERP)
     cdr_xml_b64 = None
     response_msg = "Firmado y encolado en Sofia Gateway para envío a SUNAT."
-    if dispatch_now and body.try_sync:
+    if dispatch_now and body.try_sync and body.doc_type not in ("RA", "RC"):
         sol_user = decrypt_secret(issuer.sol_username_enc) or ""
         sol_pass = decrypt_secret(issuer.sol_password_enc) or ""
         resp = await asyncio.to_thread(

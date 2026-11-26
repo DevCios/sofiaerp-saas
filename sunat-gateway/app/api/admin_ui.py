@@ -108,6 +108,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
     <div class="tabs">
       <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
       <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
+      <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
       <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
       <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
       <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
@@ -128,6 +129,10 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div class="desk-card" onclick="openTab('documents')">
           <div class="title">Documentos</div>
           <div class="desc">Bandeja de Facturas, Boletas y Notas. Descarga de XML/CDR, reintentos y recuperación anti-1033.</div>
+        </div>
+        <div class="desk-card" onclick="openTab('summaries')">
+          <div class="title">Resúmenes y Bajas (RC / RA)</div>
+          <div class="desc">Resúmenes Diarios de Boletas y Comunicaciones de Baja con seguimiento automático de Ticket SUNAT.</div>
         </div>
         <div class="desk-card" onclick="openTab('contingencies')">
           <div class="title">Contingencias y Colas</div>
@@ -165,6 +170,24 @@ PANEL_HTML = r"""<!DOCTYPE html>
               </tr>
             </thead>
             <tbody id="docsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2B: RESÚMENES Y BAJAS (RC/RA) -->
+    <div id="tab-summaries" class="hidden">
+      <div class="card">
+        <h3>Resúmenes Diarios (RC) y Comunicaciones de Baja (RA)</h3>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>RUC</th><th>Resumen / Baja</th><th>Fecha</th><th>Ticket SUNAT</th>
+                <th>Estado</th><th>Detalle SUNAT</th><th>Intentos</th><th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="summariesTable"></tbody>
           </table>
         </div>
       </div>
@@ -253,7 +276,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div style="overflow-x:auto">
           <table>
             <thead>
-              <tr><th>RUC</th><th>Razón Social</th><th>Entorno</th><th>Modo de Firma</th><th>Política</th><th>Certificado</th><th>SOL</th></tr>
+              <tr><th>RUC</th><th>Razón Social</th><th>Entorno</th><th>Modo de Firma</th><th>Política</th><th>Certificado</th><th>SOL</th><th>Acciones</th></tr>
             </thead>
             <tbody id="issuersTable"></tbody>
           </table>
@@ -353,7 +376,7 @@ function logout() {
 }
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'contingencies', 'observations', 'issuers', 'clients', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -405,9 +428,10 @@ async function refreshSunatHealth() {
 async function refreshScopedData() {
   const ruc = selectedRuc();
   const q = ruc ? `?ruc=${encodeURIComponent(ruc)}` : '';
-  const [stats, docs, conts, obs] = await Promise.all([
+  const [stats, docs, summaries, conts, obs] = await Promise.all([
     api('/stats' + q),
     api('/documents' + (ruc ? `?ruc=${encodeURIComponent(ruc)}&limit=50` : '?limit=50')),
+    api('/summaries' + q),
     api('/contingencies' + q),
     api('/observations' + q),
   ]);
@@ -434,6 +458,23 @@ async function refreshScopedData() {
       </td>
     </tr>
   `).join('') || '<tr><td colspan="8" style="color:var(--muted);text-align:center">Sin comprobantes registrados aún.</td></tr>';
+
+  document.getElementById('summariesTable').innerHTML = summaries.map(s => `
+    <tr>
+      <td><code>${s.issuer_ruc}</code></td>
+      <td><strong>${s.number}</strong></td>
+      <td>${s.issue_date}</td>
+      <td><code>${s.sunat_ticket || '-'}</code></td>
+      <td>${statusBadge(s.status)}</td>
+      <td style="max-width:260px;font-size:12px;color:var(--muted)">${s.sunat_code ? `[${s.sunat_code}] ` : ''}${s.sunat_message || ''}</td>
+      <td>${s.attempt_count}</td>
+      <td class="row-actions">
+        <button class="btn btn-sm btn-sec" onclick="retryDoc('${s.id}')">Consultar / Reenviar</button>
+        <button class="btn btn-sm btn-sec" onclick="downloadFile('${s.id}','xml')">XML</button>
+        ${s.has_cdr ? `<button class="btn btn-sm" onclick="downloadFile('${s.id}','cdr')">CDR</button>` : ''}
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" style="color:var(--muted);text-align:center">Sin Resúmenes Diarios (RC) ni Comunicaciones de Baja (RA).</td></tr>';
 
   document.getElementById('contTable').innerHTML = conts.map(c => `
     <tr>
@@ -485,8 +526,9 @@ async function refreshAll() {
       <td><code>${i.dispatch_policy}</code></td>
       <td>${i.has_certificate ? (i.cert_is_demo ? '<span class="badge b-warn">DEMO</span>' : `<span class="badge b-ok">OK (${i.cert_days_left}d)</span>`) : '<span class="badge b-info">En Tenant</span>'}</td>
       <td>${i.has_sol ? '<span class="badge b-ok">OK</span>' : '<span class="badge b-err">Falta</span>'}</td>
+      <td>${i.is_beta ? `<button class="btn btn-sm btn-err" onclick="purgeBeta('${i.ruc}')">Limpiar Beta</button>` : '<span style="font-size:11px;color:var(--muted)">Protegido</span>'}</td>
     </tr>
-  `).join('') || '<tr><td colspan="7" style="color:var(--muted);text-align:center">Registra o sincroniza tu primera empresa desde SOFIA ERP.</td></tr>';
+  `).join('') || '<tr><td colspan="8" style="color:var(--muted);text-align:center">Registra o sincroniza tu primera empresa desde SOFIA ERP.</td></tr>';
 
   document.getElementById('clientsTable').innerHTML = clients.map(c => `
     <tr>
@@ -566,6 +608,17 @@ async function createClient() {
   box.classList.remove('hidden');
   box.innerHTML = `<strong>API Key creada (cópiala ahora, no se volverá a mostrar):</strong><br><code style="font-size:14px;color:#34d399">${res.api_key}</code>`;
   refreshAll();
+}
+
+async function purgeBeta(ruc) {
+  if (!confirm(`¿Eliminar todos los comprobantes de prueba BETA del RUC ${ruc}? Haz esto antes de pasar la empresa a Producción.`)) return;
+  try {
+    const res = await api(`/issuers/${encodeURIComponent(ruc)}/beta-documents`, { method: 'DELETE' });
+    alert(`Limpieza completada para ${ruc}: ${res.deleted_documents} documentos y ${res.removed_files} archivos eliminados.`);
+    refreshAll();
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
 }
 
 async function revokeClient(id) {

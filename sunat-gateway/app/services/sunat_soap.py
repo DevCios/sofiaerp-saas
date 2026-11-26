@@ -55,15 +55,55 @@ SOAP_GET_STATUS_CDR_TPL = """<?xml version="1.0" encoding="UTF-8"?>
   </soapenv:Body>
 </soapenv:Envelope>"""
 
+SOAP_SEND_SUMMARY_TPL = """<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ser="http://service.sunat.gob.pe"
+                  xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+  <soapenv:Header>
+    <wsse:Security>
+      <wsse:UsernameToken>
+        <wsse:Username>{username}</wsse:Username>
+        <wsse:Password>{password}</wsse:Password>
+      </wsse:UsernameToken>
+    </wsse:Security>
+  </soapenv:Header>
+  <soapenv:Body>
+    <ser:sendSummary>
+      <fileName>{zip_filename}</fileName>
+      <contentFile>{zip_b64}</contentFile>
+    </ser:sendSummary>
+  </soapenv:Body>
+</soapenv:Envelope>"""
+
+SOAP_GET_STATUS_TPL = """<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ser="http://service.sunat.gob.pe"
+                  xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+  <soapenv:Header>
+    <wsse:Security>
+      <wsse:UsernameToken>
+        <wsse:Username>{username}</wsse:Username>
+        <wsse:Password>{password}</wsse:Password>
+      </wsse:UsernameToken>
+    </wsse:Security>
+  </soapenv:Header>
+  <soapenv:Body>
+    <ser:getStatus>
+      <ticket>{ticket}</ticket>
+    </ser:getStatus>
+  </soapenv:Body>
+</soapenv:Envelope>"""
+
 
 @dataclass
 class SunatResponse:
-    outcome: str  # ACCEPTED, ACCEPTED_WITH_OBS, REJECTED, RETRYABLE, RECOVER_CDR
+    outcome: str  # ACCEPTED, ACCEPTED_WITH_OBS, REJECTED, RETRYABLE, RECOVER_CDR, TICKET_PENDING
     http_status: Optional[int] = None
     sunat_code: Optional[str] = None
     sunat_message: Optional[str] = None
     notes: Optional[list[str]] = None
     cdr_zip_bytes: Optional[bytes] = None
+    ticket: Optional[str] = None
     latency_ms: int = 0
     endpoint_url: str = ""
 
@@ -309,6 +349,171 @@ def recover_cdr_from_sunat(
             http_status=resp.status_code,
             sunat_code="PARSE_ERR",
             sunat_message=f"Error leyendo getStatusCdr: {exc}",
+            latency_ms=latency_ms,
+            endpoint_url=url,
+        )
+
+
+def send_summary_to_sunat(
+    ruc: str,
+    xml_filename: str,
+    xml_bytes: bytes,
+    sol_username: str,
+    sol_password: str,
+    is_beta: bool = True,
+) -> SunatResponse:
+    """Envía Resumen Diario (RC) o Comunicación de Baja (RA) vía SOAP sendSummary y obtiene el ticket."""
+    url = settings.SUNAT_BILL_BETA_URL if is_beta else settings.SUNAT_BILL_PROD_URL
+    ws_user = "MODDATOS" if is_beta else (sol_username if sol_username.startswith(ruc) else f"{ruc}{sol_username}")
+    ws_pass = "MODDATOS" if is_beta else sol_password
+
+    zip_filename, zip_b64 = _zip_xml_bytes(xml_filename, xml_bytes)
+    envelope = SOAP_SEND_SUMMARY_TPL.format(
+        username=ws_user,
+        password=ws_pass,
+        zip_filename=zip_filename,
+        zip_b64=zip_b64,
+    ).encode("utf-8")
+
+    t0 = time.monotonic()
+    try:
+        with httpx.Client(timeout=settings.SUNAT_TIMEOUT_SECONDS) as client:
+            resp = client.post(
+                url,
+                content=envelope,
+                headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": "urn:sendSummary"},
+            )
+        latency_ms = int((time.monotonic() - t0) * 1000)
+    except (httpx.TimeoutException, httpx.TransportError) as exc:
+        return SunatResponse(
+            outcome="RETRYABLE",
+            sunat_code="NET_ERR",
+            sunat_message=f"Error de red/timeout enviando sendSummary: {exc}",
+            latency_ms=int((time.monotonic() - t0) * 1000),
+            endpoint_url=url,
+        )
+
+    try:
+        root = etree.fromstring(resp.content)
+        ticket_nodes = root.xpath(".//*[local-name()='ticket']/text()")
+        if ticket_nodes and ticket_nodes[0].strip():
+            ticket = ticket_nodes[0].strip()
+            return SunatResponse(
+                outcome="TICKET_PENDING",
+                http_status=resp.status_code,
+                sunat_code="98",
+                sunat_message=f"Ticket SUNAT recibido ({ticket}). Consultando estado del resumen...",
+                ticket=ticket,
+                latency_ms=latency_ms,
+                endpoint_url=url,
+            )
+        code, msg = _extract_soap_fault(resp.content)
+        return SunatResponse(
+            outcome=classify_sunat_code(code),
+            http_status=resp.status_code,
+            sunat_code=code or f"HTTP_{resp.status_code}",
+            sunat_message=msg or "SUNAT no devolvió ticket en sendSummary.",
+            latency_ms=latency_ms,
+            endpoint_url=url,
+        )
+    except Exception as exc:
+        return SunatResponse(
+            outcome="RETRYABLE",
+            http_status=resp.status_code,
+            sunat_code="PARSE_ERR",
+            sunat_message=f"Error leyendo sendSummary: {exc}",
+            latency_ms=latency_ms,
+            endpoint_url=url,
+        )
+
+
+def get_summary_status_from_sunat(
+    ruc: str,
+    ticket: str,
+    sol_username: str,
+    sol_password: str,
+    is_beta: bool = True,
+) -> SunatResponse:
+    """Consulta el estado de un ticket RC/RA en SUNAT vía SOAP getStatus."""
+    url = settings.SUNAT_BILL_BETA_URL if is_beta else settings.SUNAT_BILL_PROD_URL
+    ws_user = "MODDATOS" if is_beta else (sol_username if sol_username.startswith(ruc) else f"{ruc}{sol_username}")
+    ws_pass = "MODDATOS" if is_beta else sol_password
+
+    envelope = SOAP_GET_STATUS_TPL.format(
+        username=ws_user,
+        password=ws_pass,
+        ticket=ticket,
+    ).encode("utf-8")
+
+    t0 = time.monotonic()
+    try:
+        with httpx.Client(timeout=settings.SUNAT_TIMEOUT_SECONDS) as client:
+            resp = client.post(
+                url,
+                content=envelope,
+                headers={"Content-Type": "text/xml; charset=utf-8", "SOAPAction": "urn:getStatus"},
+            )
+        latency_ms = int((time.monotonic() - t0) * 1000)
+    except (httpx.TimeoutException, httpx.TransportError) as exc:
+        return SunatResponse(
+            outcome="RETRYABLE",
+            sunat_code="NET_ERR",
+            sunat_message=f"Error de red consultando getStatus({ticket}): {exc}",
+            ticket=ticket,
+            latency_ms=int((time.monotonic() - t0) * 1000),
+            endpoint_url=url,
+        )
+
+    try:
+        root = etree.fromstring(resp.content)
+        status_code_nodes = root.xpath(".//*[local-name()='statusCode']/text()")
+        content_nodes = root.xpath(".//*[local-name()='content']/text()")
+        st_code = status_code_nodes[0].strip() if status_code_nodes else None
+
+        if st_code == "98":
+            return SunatResponse(
+                outcome="TICKET_PENDING",
+                http_status=resp.status_code,
+                sunat_code="98",
+                sunat_message=f"Ticket {ticket} en proceso en SUNAT (código 98).",
+                ticket=ticket,
+                latency_ms=latency_ms,
+                endpoint_url=url,
+            )
+
+        if content_nodes and content_nodes[0].strip():
+            cdr_bytes = base64.b64decode(content_nodes[0].strip())
+            code, desc, notes = parse_cdr_zip(cdr_bytes)
+            outcome = "REJECTED" if st_code == "99" else classify_sunat_code(code)
+            return SunatResponse(
+                outcome=outcome,
+                http_status=resp.status_code,
+                sunat_code=code,
+                sunat_message=desc,
+                notes=notes,
+                cdr_zip_bytes=cdr_bytes,
+                ticket=ticket,
+                latency_ms=latency_ms,
+                endpoint_url=url,
+            )
+
+        code, msg = _extract_soap_fault(resp.content)
+        return SunatResponse(
+            outcome="RETRYABLE",
+            http_status=resp.status_code,
+            sunat_code=st_code or code or "NO_STATUS",
+            sunat_message=msg or f"SUNAT aún no devuelve CDR para ticket {ticket}.",
+            ticket=ticket,
+            latency_ms=latency_ms,
+            endpoint_url=url,
+        )
+    except Exception as exc:
+        return SunatResponse(
+            outcome="RETRYABLE",
+            http_status=resp.status_code,
+            sunat_code="PARSE_ERR",
+            sunat_message=f"Error leyendo getStatus({ticket}): {exc}",
+            ticket=ticket,
             latency_ms=latency_ms,
             endpoint_url=url,
         )
