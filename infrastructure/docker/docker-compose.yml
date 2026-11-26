@@ -76,6 +76,7 @@ services:
       - sofia_filestores:/var/lib/sofia/filestores
       - sofia_backups:/var/lib/sofia/backups
     networks:
+      - sofia-net-public
       - sofia-net-app
       - sofia-net-data
     depends_on:
@@ -111,6 +112,7 @@ services:
       - sofia_backups:/var/lib/sofia/backups
       - ./backups/rclone.conf:/etc/sofia/rclone/rclone.conf:ro
     networks:
+      - sofia-net-public
       - sofia-net-data
     depends_on:
       - postgres
@@ -194,6 +196,7 @@ services:
       - ../../control-plane/keys:/etc/sofia/keys:ro
       - ../../products:/mnt/products:ro
     networks:
+      - sofia-net-public
       - sofia-net-app
       - sofia-net-data
     depends_on:
