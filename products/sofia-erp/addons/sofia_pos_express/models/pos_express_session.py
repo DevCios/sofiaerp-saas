@@ -393,18 +393,18 @@ class PosExpressSession(models.Model):
         # Envío automático a SUNAT / Sofia Gateway sin bloquear el cobro si SUNAT está saturado
         sunat_status = 'PENDIENTE'
         sunat_msg = ''
-        if config.auto_send_sunat and hasattr(move, '_l10n_pe_edi_sign_invoices_sunat_estela'):
+        if config.auto_send_sunat and hasattr(move, '_l10n_pe_edi_post_invoice'):
             try:
-                if hasattr(move, '_l10n_pe_edi_send_invoice'):
-                    move._l10n_pe_edi_send_invoice()
-                elif hasattr(move, 'action_send_and_print'):
-                    pass
+                edi_res = move._l10n_pe_edi_post_invoice() or {}
                 st = getattr(move, 'l10n_pe_edi_status', False)
-                if st == 'sent':
+                if st == 'sent' or edi_res.get('success'):
                     sunat_status = 'ACEPTADO'
-                elif getattr(move, 'l10n_pe_edi_warnings', False):
+                elif edi_res.get('level') == 'danger':
+                    sunat_status = 'OBSERVADO / REVISAR'
+                    sunat_msg = str(edi_res.get('message') or '')[:160]
+                else:
                     sunat_status = 'EN COLA'
-                    sunat_msg = 'Firmado localmente y encolado en Sofia Gateway.'
+                    sunat_msg = str(edi_res.get('message') or 'Firmado localmente y encolado en Sofia Gateway.')[:160]
             except Exception as exc:
                 _logger.warning("POS Express: aviso enviando %s a SUNAT: %s", move.name, exc)
                 sunat_status = 'EN COLA'
@@ -606,6 +606,11 @@ class PosExpressSession(models.Model):
         if 'l10n_pe_edi_refund_reason' in self.env['account.move']._fields:
             vals['l10n_pe_edi_refund_reason'] = '01'
         cn = move.sudo().with_company(move.company_id)._reverse_moves([vals], cancel=True)
+        if cn and hasattr(cn, '_l10n_pe_edi_post_invoice'):
+            try:
+                cn._l10n_pe_edi_post_invoice()
+            except Exception as exc:
+                _logger.warning("POS Express: aviso enviando NC %s a SUNAT: %s", cn.name, exc)
         return {
             'success': True,
             'credit_note_name': cn.name if cn else 'N/A',
