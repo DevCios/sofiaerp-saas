@@ -110,3 +110,44 @@ def test_validator_blocks_demo_cert_in_production_and_bad_series():
     assert "DEMO BETA" in joined
     assert "serie 'BE01'" in joined
     assert "RUC válido" in joined
+
+
+def test_hybrid_mode_allows_already_signed_without_gateway_pfx():
+    """En modo híbrido SOFIA ERP, el .pfx vive en Odoo y el Gateway acepta already_signed=True sin .pfx propio."""
+    issuer_hybrid = Issuer(
+        ruc="20600994345",
+        business_name="SOFIA TENANT S.A.C.",
+        is_beta=False,
+        is_active=True,
+        pfx_content_enc=None,
+        cert_is_demo=False,
+    )
+    req = EmitDocumentRequest(
+        issuer_ruc="20600994345",
+        doc_type="01",
+        serie="FE01",
+        correlativo="15",
+        issue_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        currency="PEN",
+        raw_xml_base64="PFhtbC8+",
+        already_signed=True,
+        try_sync=True,
+        total_amount_hint=Decimal("118.00"),
+        igv_amount_hint=Decimal("18.00"),
+    )
+    totals = validate_emit_request(req, issuer_hybrid)
+    assert totals["mode"] == "xml_passthrough"
+    assert totals["total_amount"] == Decimal("118.00")
+    assert totals["igv_amount"] == Decimal("18.00")
+
+
+def test_multitenant_ruc_access_enforcement():
+    from fastapi import HTTPException
+    from app.api.deps import assert_ruc_access
+    from app.models import ApiClient
+
+    restricted = ApiClient(name="POS A", key_prefix="sk_live_abc", key_hash="h1", allowed_rucs=["20600994345"])
+    assert_ruc_access(restricted, "20600994345")  # permitido
+    with pytest.raises(HTTPException) as exc:
+        assert_ruc_access(restricted, "20100047218")
+    assert exc.value.status_code == 403

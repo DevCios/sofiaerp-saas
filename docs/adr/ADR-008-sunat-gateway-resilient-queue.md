@@ -1,6 +1,6 @@
-# ADR-008: Microservicio `sofia-sunat-gateway` (Caja Negra Resiliente SUNAT Multi-App)
+# ADR-008: Microservicio **Sofia Gateway** (`sunat-gateway/` — Pasarela Resiliente SUNAT Híbrida)
 
-- **Estado:** Aprobado
+- **Estado:** Aprobado (v2.0 — Enfoque Híbrido)
 - **Fecha:** 2026-11-26
 - **Autor:** Equipo de Arquitectura SOFIA ERP
 - **Dominio Oficial:** `https://gateway.sofiaerp.com`
@@ -32,9 +32,10 @@ Se implementa el microservicio independiente **`sunat-gateway/`** con:
   - Panel Web protegido con autenticación de administrador (JWT HS256/RS256).
   - Webhooks salientes firmados con **HMAC-SHA256** (`X-Sofia-Signature`).
   - Zero Docker Socket exposure; zero puertos de Postgres/Redis expuestos a Internet.
-- **Modos de Entrada Duales:**
-  - **JSON simplificado** (estilo API moderna para POS/apps externas): genera XML UBL 2.1, valida, firma y encola.
-  - **XML Passthrough** (ideal para SOFIA ERP / Odoo 20): recibe XML UBL 2.1 ya construido (firmado o sin firmar), firma si falta, valida y gestiona toda la cola resiliente y recuperación de CDR.
+- **Modos de Entrada Duales (Arquitectura Híbrida):**
+  - **Modo Híbrido SOFIA ERP (`already_signed=True` + `try_sync=True`):** Cada tenant de Odoo 20 conserva su propio certificado `.pfx` y series dentro de su base de datos aislada. Al guardar el *Asistente de Configuración Rápida SUNAT* (`l10n_pe_sunat`), Odoo auto-sincroniza silenciosamente RUC, entorno y Clave SOL/GRE a **Sofia Gateway** mediante `X-Internal-Service-Key` sobre la red interna `sofia-net-app` (sin exportar el `.pfx`). Al emitir, Odoo firma localmente el XML y delega el envío a Sofia Gateway (con intento rápido síncrono + fallback automático a cola Celery, ventana nocturna y recuperación `1033`; y fallback a SUNAT directo si el Gateway se reinicia).
+  - **Modo JSON Estructurado (POS / apps externas sin ERP):** Genera XML UBL 2.1, valida, firma con `.pfx` custodiado en la bóveda Fernet del Gateway y encola.
+- **Aislamiento Multi-Tenant Estricto:** Todas las operaciones de lectura, descarga XML/CDR, reintento y recuperación verifican `api_client.allowed_rucs`.
 
 ---
 

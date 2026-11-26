@@ -1,6 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import base64
 import io
+import logging
+import os
 import re
 import zipfile
 from copy import deepcopy
@@ -8,7 +10,10 @@ from datetime import datetime
 from hashlib import sha1
 from zoneinfo import ZoneInfo
 
+import requests
 from lxml import etree, objectify
+
+_logger = logging.getLogger(__name__)
 from num2words import num2words
 from requests.exceptions import ConnectionError as ReqConnectionError
 from requests.exceptions import HTTPError, ReadTimeout
@@ -539,6 +544,87 @@ class AccountMove(models.Model):
         soap_response = result.content
         return self._l10n_pe_edi_decode_soap_response(soap_response) if soap_response else {}
 
+    @api.model
+    def _l10n_pe_edi_get_sofia_gateway_config(self):
+        icp = self.env['ir.config_parameter'].sudo()
+        base_url = (
+            icp.get_param('sofia_gateway.url')
+            or os.environ.get('SOFIA_GATEWAY_URL')
+            or 'http://sunat-gateway-api:8010'
+        ).rstrip('/')
+        headers = {'Content-Type': 'application/json'}
+        api_key = icp.get_param('sofia_gateway.api_key')
+        internal_key = os.environ.get('INTERNAL_SERVICE_KEY')
+        if api_key:
+            headers['X-API-Key'] = api_key
+        elif internal_key:
+            headers['X-Internal-Service-Key'] = internal_key
+        return base_url, headers
+
+    def _l10n_pe_edi_send_via_sofia_gateway(self, edi_str):
+        """Modo Híbrido: envía el XML ya firmado localmente con el .pfx del tenant a Sofia Gateway."""
+        self.ensure_one()
+        base_url, headers = self._l10n_pe_edi_get_sofia_gateway_config()
+        serie_folio = self._l10n_pe_edi_get_serie_folio()
+        issue_date = (self.invoice_date or fields.Date.context_today(self)).strftime('%Y-%m-%d')
+        payload = {
+            'issuer_ruc': (self.company_id.vat or '').strip(),
+            'doc_type': self.l10n_latam_document_type_id_code,
+            'serie': serie_folio['serie'],
+            'correlativo': str(serie_folio['folio']),
+            'issue_date': issue_date,
+            'currency': self.currency_id.name if self.currency_id.name in ('PEN', 'USD') else 'PEN',
+            'external_ref': f'{self.env.cr.dbname}:{self.id}',
+            'raw_xml_base64': base64.b64encode(edi_str).decode('ascii'),
+            'already_signed': True,
+            'try_sync': True,
+            'total_amount_hint': float(abs(self.amount_total)),
+            'igv_amount_hint': float(abs(self.amount_tax)),
+        }
+        try:
+            resp = requests.post(
+                f'{base_url}/api/v1/documents/emit',
+                json=payload,
+                headers=headers,
+                timeout=20,
+            )
+            if resp.status_code >= 500:
+                return None  # Fallback a SUNAT directo si el Gateway está reiniciándose
+            data = resp.json()
+        except Exception as exc:
+            _logger.warning("Sofia Gateway inaccesible para %s (%s). Usando fallback SUNAT directo.", self.name, exc)
+            return None
+
+        if resp.status_code >= 400:
+            detail = data.get('detail') or resp.text
+            return {'message': f'Sofia Gateway: {detail}', 'level': 'danger', 'xml_document': edi_str}
+
+        gw_status = data.get('status')
+        if gw_status in ('ACCEPTED', 'ACCEPTED_WITH_OBS') and data.get('cdr_xml_base64'):
+            cdr_bytes = base64.b64decode(data['cdr_xml_base64'])
+            if gw_status == 'ACCEPTED_WITH_OBS':
+                notes = ', '.join(data.get('sunat_notes') or [])
+                self.message_post(body=self.env._('Aceptado por SUNAT con observaciones vía Sofia Gateway: %s', notes or data.get('sunat_message', '')))
+            return {'success': True, 'xml_document': edi_str, 'cdr': cdr_bytes}
+
+        if gw_status == 'REJECTED':
+            return {
+                'message': data.get('sunat_message') or self.env._('Comprobante rechazado por SUNAT.'),
+                'level': 'danger',
+                'code': data.get('sunat_code'),
+                'xml_document': edi_str,
+            }
+
+        # QUEUED / RETRY_SCHEDULED / RECOVERING_CDR: SUNAT saturado o caído -> cola resiliente activa
+        return {
+            'message': data.get('sunat_message') or self.env._(
+                'Comprobante firmado localmente y encolado en Sofia Gateway. Se enviará automáticamente a SUNAT y se recuperará el CDR.'
+            ),
+            'level': 'warning',
+            'code': data.get('sunat_code'),
+            'xml_document': edi_str,
+        }
+
     def _l10n_pe_edi_sign_invoices_sunat_estela(self, edi_str):
         credentials = self.company_id._l10n_pe_edi_get_credentials(
             sunat_wsdl=self._l10n_pe_edi_get_sunat_invoice_wsdl(),
@@ -547,10 +633,16 @@ class AccountMove(models.Model):
         if not self.company_id.sudo().l10n_pe_edi_certificate_id:
             return {'message': self.env._("No valid certificate found for %s company.", self.company_id.display_name)}
 
-        # Sign the document.
+        # Sign the document locally with the tenant's .pfx certificate.
         edi_tree = objectify.fromstring(edi_str)
         edi_tree = self._l10n_pe_edi_sign(self.company_id.sudo().l10n_pe_edi_certificate_id, edi_tree)
         edi_str = etree.tostring(edi_tree, xml_declaration=True, encoding='ISO-8859-1')
+
+        # Modo Híbrido: delegar transporte y cola resiliente a Sofia Gateway (con fallback a SUNAT directo)
+        if self.company_id.l10n_pe_edi_provider == 'sofia_gateway':
+            gw_result = self._l10n_pe_edi_send_via_sofia_gateway(edi_str)
+            if gw_result is not None:
+                return gw_result
 
         filename = self._l10n_pe_edi_generate_edi_filename()
         zip_edi_str = self._l10n_pe_edi_zip_edi_document([('%s.xml' % filename, edi_str)])
@@ -574,6 +666,46 @@ class AccountMove(models.Model):
         return {'success': True, 'xml_document': edi_str, 'cdr': cdr}
 
     def _l10n_pe_edi_get_status_cdr_sunat_estela(self):
+        if self.company_id.l10n_pe_edi_provider == 'sofia_gateway':
+            base_url, headers = self._l10n_pe_edi_get_sofia_gateway_config()
+            serie_folio = self._l10n_pe_edi_get_serie_folio()
+            try:
+                r = requests.get(
+                    f'{base_url}/api/v1/documents/lookup',
+                    params={
+                        'issuer_ruc': (self.company_id.vat or '').strip(),
+                        'doc_type': self.l10n_latam_document_type_id_code,
+                        'serie': serie_folio['serie'],
+                        'correlativo': str(serie_folio['folio']),
+                    },
+                    headers=headers,
+                    timeout=10,
+                )
+                if r.status_code == 200:
+                    data = r.json()
+                    if data.get('cdr_xml_base64'):
+                        code = data.get('sunat_code') or '0'
+                        msg = data.get('sunat_message') or 'CDR recuperado vía Sofia Gateway.'
+                        return {
+                            'cdr': base64.b64decode(data['cdr_xml_base64']),
+                            'status': f'{html_escape(code)}|{html_escape(msg)}',
+                            'code': code,
+                        }
+                    if data.get('document_id'):
+                        requests.post(
+                            f"{base_url}/api/v1/documents/{data['document_id']}/recover-cdr",
+                            headers=headers,
+                            timeout=5,
+                        )
+                    return {
+                        'message': data.get('sunat_message') or self.env._('En proceso en Sofia Gateway. Reintenta en unos segundos.'),
+                        'level': 'warning',
+                        'code': data.get('sunat_code'),
+                        'retry': True,
+                    }
+            except Exception as exc:
+                _logger.warning("No se pudo consultar CDR en Sofia Gateway (%s); usando SUNAT directo.", exc)
+
         credentials = self.company_id._l10n_pe_edi_get_credentials(
             sunat_wsdl=self._l10n_pe_edi_get_sunat_invoice_wsdl(cdr=True),
         )

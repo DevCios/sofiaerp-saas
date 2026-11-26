@@ -7,8 +7,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    APP_NAME: str = "SOFIA SUNAT Gateway"
-    APP_VERSION: str = "1.0.0"
+    APP_NAME: str = "Sofia Gateway"
+    APP_VERSION: str = "2.0.0"
     ENVIRONMENT: str = "production"
     PUBLIC_BASE_URL: str = "https://gateway.sofiaerp.com"
 
@@ -24,9 +24,11 @@ class Settings(BaseSettings):
     # Seguridad y Vault de secretos (.pfx / Claves SOL / GRE)
     SUNAT_VAULT_MASTER_KEY: str = "CHANGE_ME_GENERATE_32_BYTE_URLSAFE_KEY_IN_PROD"
     GATEWAY_JWT_SECRET: str = "CHANGE_ME_GATEWAY_JWT_SECRET_IN_PROD"
+    INTERNAL_SERVICE_KEY: str = "sofia_internal_mesh_key_change_in_prod"
     GATEWAY_ADMIN_EMAIL: str = "admin@sofiaerp.com"
     GATEWAY_ADMIN_PASSWORD: str = "SofiaGateway2026!"
     JWT_EXPIRE_MINUTES: int = 720
+    SYNC_DISPATCH_TIMEOUT_SECONDS: int = 12
 
     # Almacenamiento persistente de XML firmados y CDRs (.zip)
     STORAGE_DIR: str = "/var/lib/sofia-sunat/storage"

@@ -49,6 +49,7 @@ class EmitDocumentRequest(BaseModel):
     # Modo XML Passthrough (Odoo / sistemas externos)
     raw_xml_base64: Optional[str] = None
     already_signed: bool = False
+    try_sync: bool = False  # Si True, intenta un envío rápido a SUNAT antes de pasar a cola Celery
     total_amount_hint: Optional[Decimal] = None
     igv_amount_hint: Optional[Decimal] = None
 
@@ -75,6 +76,8 @@ class EmitDocumentResponse(BaseModel):
     qr_string: Optional[str] = None
     sunat_code: Optional[str] = None
     sunat_message: Optional[str] = None
+    sunat_notes: Optional[list[str]] = None
+    cdr_xml_base64: Optional[str] = None
     xml_url: str
     cdr_url: str
     status_url: str
@@ -96,6 +99,7 @@ class IssuerCreateRequest(BaseModel):
     pfx_base64: Optional[str] = None
     pfx_password: Optional[str] = None
     generate_demo_cert: bool = False
+    tenant_local_signing: bool = False  # Modo Híbrido SOFIA ERP: el .pfx vive solo en el tenant Odoo
     gre_client_id: Optional[str] = None
     gre_client_secret: Optional[str] = None
     alert_email: Optional[str] = None

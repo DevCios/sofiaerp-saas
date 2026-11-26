@@ -7,8 +7,8 @@
             <form string="Asistente de Configuración Rápida SUNAT">
                 <div class="alert alert-info mb-3" role="alert">
                     <strong>Configuración en 1 minuto:</strong> Completa los datos de tu empresa, elige tu proveedor
-                    (<strong>SUNAT Directo</strong> por defecto, Digiflow o NubeFact), sube tu certificado <code>.pfx</code>
-                    y define tus series (<code>FE01/BE01/FC01/BC01</code> o <code>FE02/BE02/FC02/BC02</code>).
+                    (<strong>Sofia Gateway</strong> recomendado con firma local + cola resiliente SUNAT, SUNAT Directo, Digiflow o NubeFact),
+                    sube tu certificado <code>.pfx</code> y define tus series (<code>FE01/BE01/FC01/BC01</code>).
                 </div>
 
                 <notebook>

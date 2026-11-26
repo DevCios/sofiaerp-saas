@@ -38,6 +38,7 @@ RUN addgroup --system --gid 1001 sofia && \
 
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="/app"
 
 COPY . /app
 RUN chown -R sofia:sofia /app

@@ -22,13 +22,15 @@ class ResCompany(models.Model):
         groups='base.group_system')
     l10n_pe_edi_provider = fields.Selection(
         selection=[
+            ('sofia_gateway', 'Sofia Gateway — Pasarela Resiliente SUNAT (Recomendado)'),
             ('sunat', 'SUNAT (Servidores Oficiales)'),
             ('digiflow', 'Estela / Digiflow OSE'),
             ('nubefact', 'NubeFact OSE'),
         ],
         string="Electronic Service Provider (ESP)", default="sunat",
         help="Selector for the service we are going to use to report the invoices:\n"
-             "- SUNAT: Envío directo a los servidores oficiales de SUNAT (por defecto).\n"
+             "- Sofia Gateway: Firma local con .pfx del tenant + cola resiliente y recuperación anti-1033.\n"
+             "- SUNAT: Envío directo a los servidores oficiales de SUNAT.\n"
              "- Estela / Digiflow OSE: Envío mediante OSE Digiflow.\n"
              "- NubeFact OSE: Envío mediante OSE NubeFact.")
     l10n_pe_edi_address_type_code = fields.Char(

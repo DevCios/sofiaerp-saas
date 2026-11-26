@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import base64
 import hmac
 import time
@@ -12,7 +13,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_api_client_or_admin, get_gateway_admin
+from app.api.deps import assert_ruc_access, get_api_client_or_admin, get_gateway_admin
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import (
@@ -38,6 +39,7 @@ from app.schemas import (
     EmitDocumentResponse,
     IssuerCreateRequest,
 )
+from app.services.sunat_soap import extract_cdr_xml_from_zip, send_bill_to_sunat
 from app.services.ubl_builder import build_ubl21_xml
 from app.services.validator import FiscalValidationError, validate_emit_request
 from app.services.xml_signer import (
@@ -48,7 +50,7 @@ from app.services.xml_signer import (
     save_artifact_file,
     sign_ubl_xml,
 )
-from app.tasks.dispatcher import dispatch_document_task, recover_cdr_task
+from app.tasks.dispatcher import _next_retry_time, dispatch_document_task, recover_cdr_task, send_webhook_task
 
 router = APIRouter(prefix="/api/v1")
 settings = get_settings()
@@ -107,13 +109,18 @@ async def admin_login(body: AdminLoginRequest):
 # ==============================================================================
 @router.get("/stats", tags=["Dashboard"])
 async def get_stats(
+    ruc: Optional[str] = Query(default=None),
     _admin: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    rows = await db.execute(select(Document.status, func.count(Document.id)).group_by(Document.status))
+    stmt = select(Document.status, func.count(Document.id)).group_by(Document.status)
+    if ruc:
+        stmt = stmt.where(Document.issuer_ruc == ruc)
+    rows = await db.execute(stmt)
     counts = {st.value: cnt for st, cnt in rows.all()}
     total = sum(counts.values())
     accepted = counts.get("ACCEPTED", 0) + counts.get("ACCEPTED_WITH_OBS", 0)
+    with_obs = counts.get("ACCEPTED_WITH_OBS", 0)
     queued = counts.get("QUEUED", 0) + counts.get("RETRY_SCHEDULED", 0) + counts.get("SENDING", 0) + counts.get("RECOVERING_CDR", 0)
     rejected = counts.get("REJECTED", 0) + counts.get("VALIDATION_ERROR", 0)
     at_risk = counts.get("EXPIRED_ALERT", 0)
@@ -124,6 +131,7 @@ async def get_stats(
     return {
         "total_documents": total,
         "accepted": accepted,
+        "accepted_with_obs": with_obs,
         "queued_or_retrying": queued,
         "rejected": rejected,
         "at_risk_deadline": at_risk,
@@ -132,6 +140,86 @@ async def get_stats(
         "active_clients": clients_count,
         "breakdown": counts,
     }
+
+
+@router.get("/observations", tags=["Dashboard"])
+async def list_observations(
+    ruc: Optional[str] = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=300),
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Resumen de Observaciones (>=4000) y Rechazos (2xxx/3xxx) estilo operador.pe."""
+    stmt = (
+        select(Document)
+        .where(Document.status.in_([DocumentStatus.ACCEPTED_WITH_OBS, DocumentStatus.REJECTED, DocumentStatus.VALIDATION_ERROR]))
+        .order_by(desc(Document.updated_at))
+        .limit(limit)
+    )
+    if ruc:
+        stmt = stmt.where(Document.issuer_ruc == ruc)
+    res = await db.execute(stmt)
+    return [
+        {
+            "id": d.id,
+            "issuer_ruc": d.issuer_ruc,
+            "doc_type": d.doc_type,
+            "number": f"{d.serie}-{d.correlativo}",
+            "issue_date": d.issue_date,
+            "status": d.status.value,
+            "sunat_code": d.sunat_code,
+            "sunat_message": d.sunat_message,
+            "sunat_notes": d.sunat_notes or [],
+            "updated_at": d.updated_at.isoformat(),
+        }
+        for d in res.scalars().all()
+    ]
+
+
+@router.get("/contingencies", tags=["Dashboard"])
+async def list_contingencies(
+    ruc: Optional[str] = Query(default=None),
+    limit: int = Query(default=100, ge=1, le=300),
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Bandeja de Contingencias: comprobantes en cola, reintento, recuperación 1033 o alerta de plazo legal."""
+    stmt = (
+        select(Document)
+        .where(
+            Document.status.in_([
+                DocumentStatus.QUEUED,
+                DocumentStatus.SENDING,
+                DocumentStatus.RETRY_SCHEDULED,
+                DocumentStatus.RECOVERING_CDR,
+                DocumentStatus.EXPIRED_ALERT,
+            ])
+        )
+        .order_by(Document.deadline_at.asc().nullslast(), desc(Document.created_at))
+        .limit(limit)
+    )
+    if ruc:
+        stmt = stmt.where(Document.issuer_ruc == ruc)
+    res = await db.execute(stmt)
+    now = datetime.now(timezone.utc)
+    items = []
+    for d in res.scalars().all():
+        hours_left = round((d.deadline_at - now).total_seconds() / 3600, 1) if d.deadline_at else None
+        items.append({
+            "id": d.id,
+            "issuer_ruc": d.issuer_ruc,
+            "doc_type": d.doc_type,
+            "number": f"{d.serie}-{d.correlativo}",
+            "issue_date": d.issue_date,
+            "status": d.status.value,
+            "sunat_code": d.sunat_code,
+            "sunat_message": d.sunat_message,
+            "attempt_count": d.attempt_count,
+            "next_retry_at": d.next_retry_at.isoformat() if d.next_retry_at else None,
+            "deadline_at": d.deadline_at.isoformat() if d.deadline_at else None,
+            "hours_left": hours_left,
+        })
+    return items
 
 
 # ==============================================================================
@@ -157,6 +245,7 @@ async def list_issuers(_admin: dict = Depends(get_gateway_admin), db: AsyncSessi
             "night_window_end": iss.night_window_end,
             "is_active": iss.is_active,
             "has_certificate": bool(iss.pfx_content_enc),
+            "signing_mode": "gateway_vault" if iss.pfx_content_enc else "tenant_local",
             "cert_is_demo": iss.cert_is_demo,
             "cert_subject": iss.cert_subject,
             "cert_expires_at": iss.cert_expires_at.isoformat() if iss.cert_expires_at else None,
@@ -207,7 +296,7 @@ async def upsert_issuer(
     if body.gre_client_secret:
         issuer.gre_client_secret_enc = encrypt_secret(body.gre_client_secret.strip())
 
-    # Certificado .pfx (subido o demo autofirmado en Beta)
+    # Certificado .pfx (subido o demo autofirmado en Beta; omitido si tenant_local_signing=True)
     if body.pfx_base64:
         try:
             pfx_bytes = base64.b64decode(body.pfx_base64)
@@ -219,7 +308,7 @@ async def upsert_issuer(
         issuer.cert_subject = subject[:255]
         issuer.cert_expires_at = expires
         issuer.cert_is_demo = False
-    elif body.is_beta and (body.generate_demo_cert or not issuer.pfx_content_enc):
+    elif not body.tenant_local_signing and body.is_beta and (body.generate_demo_cert or not issuer.pfx_content_enc):
         pfx_bytes, demo_pwd, subject, expires = generate_demo_pfx(body.ruc, body.business_name)
         issuer.pfx_content_enc = encrypt_bytes(pfx_bytes)
         issuer.pfx_password_enc = encrypt_secret(demo_pwd)
@@ -229,7 +318,13 @@ async def upsert_issuer(
 
     await db.commit()
     await db.refresh(issuer)
-    return {"id": issuer.id, "ruc": issuer.ruc, "is_beta": issuer.is_beta, "cert_is_demo": issuer.cert_is_demo}
+    return {
+        "id": issuer.id,
+        "ruc": issuer.ruc,
+        "is_beta": issuer.is_beta,
+        "cert_is_demo": issuer.cert_is_demo,
+        "signing_mode": "gateway_vault" if issuer.pfx_content_enc else "tenant_local",
+    }
 
 
 @router.delete("/issuers/{issuer_id}", tags=["Issuers"])
@@ -306,6 +401,16 @@ async def revoke_client(client_id: str, _admin: dict = Depends(get_gateway_admin
 # ==============================================================================
 # 6. Emisión Instantánea, Consulta, Reintento y Descarga XML/CDR
 # ==============================================================================
+def _read_cdr_xml_b64(cdr_path: Optional[str]) -> Optional[str]:
+    if not cdr_path or not Path(cdr_path).exists():
+        return None
+    try:
+        cdr_xml = extract_cdr_xml_from_zip(Path(cdr_path).read_bytes())
+        return base64.b64encode(cdr_xml).decode("ascii")
+    except Exception:
+        return None
+
+
 @router.post("/documents/emit", response_model=EmitDocumentResponse, tags=["Documents"])
 async def emit_document(
     body: EmitDocumentRequest,
@@ -313,8 +418,7 @@ async def emit_document(
     db: AsyncSession = Depends(get_db),
 ):
     api_client, _admin = auth
-    if api_client and api_client.allowed_rucs and body.issuer_ruc not in api_client.allowed_rucs:
-        raise HTTPException(status_code=403, detail=f"Esta API Key no tiene permiso para emitir por el RUC {body.issuer_ruc}.")
+    assert_ruc_access(api_client, body.issuer_ruc)
 
     # 1. Idempotencia estricta por (RUC, tipo, serie, correlativo)
     existing_q = await db.execute(
@@ -336,6 +440,8 @@ async def emit_document(
             qr_string=existing.qr_string,
             sunat_code=existing.sunat_code,
             sunat_message=existing.sunat_message,
+            sunat_notes=existing.sunat_notes or [],
+            cdr_xml_base64=_read_cdr_xml_b64(existing.cdr_path),
             xml_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{existing.id}/xml",
             cdr_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{existing.id}/cdr",
             status_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{existing.id}",
@@ -434,8 +540,70 @@ async def emit_document(
     await db.commit()
     await db.refresh(doc)
 
-    # Encolar envío asíncrono a SUNAT sin bloquear al POS/ERP
-    if dispatch_now:
+    # Encolar envío asíncrono a SUNAT o intento rápido síncrono (Modo Híbrido SOFIA ERP)
+    cdr_xml_b64 = None
+    response_msg = "Firmado y encolado en Sofia Gateway para envío a SUNAT."
+    if dispatch_now and body.try_sync:
+        sol_user = decrypt_secret(issuer.sol_username_enc) or ""
+        sol_pass = decrypt_secret(issuer.sol_password_enc) or ""
+        resp = await asyncio.to_thread(
+            send_bill_to_sunat,
+            issuer.ruc,
+            doc.xml_filename,
+            signed_xml,
+            sol_user,
+            sol_pass,
+            issuer.is_beta,
+            settings.SYNC_DISPATCH_TIMEOUT_SECONDS,
+        )
+        doc.attempt_count = 1
+        doc.last_attempt_at = datetime.now(timezone.utc)
+        doc.sunat_code = resp.sunat_code
+        doc.sunat_message = resp.sunat_message
+        if resp.notes:
+            doc.sunat_notes = resp.notes
+        db.add(DeliveryAttempt(
+            document_id=doc.id,
+            attempt_number=1,
+            action="sendBill",
+            endpoint_url=resp.endpoint_url,
+            http_status=resp.http_status,
+            sunat_code=resp.sunat_code,
+            sunat_message=resp.sunat_message,
+            latency_ms=resp.latency_ms,
+            outcome=resp.outcome,
+        ))
+        if resp.outcome in ("ACCEPTED", "ACCEPTED_WITH_OBS"):
+            if resp.cdr_zip_bytes:
+                cdr_filename = f"R-{doc.xml_filename[:-4]}.zip"
+                doc.cdr_path = save_artifact_file(doc.issuer_ruc, doc.issue_date, cdr_filename, resp.cdr_zip_bytes)
+                cdr_xml_b64 = _read_cdr_xml_b64(doc.cdr_path)
+            doc.status = DocumentStatus.ACCEPTED if resp.outcome == "ACCEPTED" else DocumentStatus.ACCEPTED_WITH_OBS
+            doc.accepted_at = datetime.now(timezone.utc)
+            doc.next_retry_at = None
+            response_msg = resp.sunat_message or "Aceptado por SUNAT."
+            await db.commit()
+            if doc.client_id:
+                send_webhook_task.delay(doc.id, "document.accepted")
+        elif resp.outcome == "RECOVER_CDR":
+            doc.status = DocumentStatus.RECOVERING_CDR
+            doc.next_retry_at = datetime.now(timezone.utc) + timedelta(seconds=15)
+            response_msg = "Comprobante ya registrado en SUNAT (1033). Recuperando CDR automáticamente."
+            await db.commit()
+            recover_cdr_task.apply_async(args=[doc.id], countdown=5)
+        elif resp.outcome == "REJECTED":
+            doc.status = DocumentStatus.REJECTED
+            doc.next_retry_at = None
+            response_msg = resp.sunat_message or "Comprobante rechazado por SUNAT."
+            await db.commit()
+            if doc.client_id:
+                send_webhook_task.delay(doc.id, "document.rejected")
+        else:
+            doc.status = DocumentStatus.RETRY_SCHEDULED
+            doc.next_retry_at = _next_retry_time(doc.attempt_count, issuer.night_window_start)
+            response_msg = "SUNAT saturado o sin respuesta. Encolado en Sofia Gateway para reintento automático."
+            await db.commit()
+    elif dispatch_now:
         dispatch_document_task.delay(doc.id)
 
     return EmitDocumentResponse(
@@ -446,11 +614,50 @@ async def emit_document(
         digest_value=doc.digest_value,
         qr_string=doc.qr_string,
         sunat_code=doc.sunat_code,
-        sunat_message="Firmado localmente y encolado para envío a SUNAT.",
+        sunat_message=response_msg,
+        sunat_notes=doc.sunat_notes or [],
+        cdr_xml_base64=cdr_xml_b64,
         xml_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{doc.id}/xml",
         cdr_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{doc.id}/cdr",
         status_url=f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{doc.id}",
     )
+
+
+@router.get("/documents/lookup", tags=["Documents"])
+async def lookup_document_by_number(
+    issuer_ruc: str = Query(..., pattern=r"^\d{11}$"),
+    doc_type: str = Query(..., min_length=2, max_length=2),
+    serie: str = Query(..., min_length=4, max_length=4),
+    correlativo: str = Query(..., min_length=1, max_length=12),
+    auth=Depends(get_api_client_or_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Consulta estado y CDR XML por (RUC, tipo, serie, correlativo) para sincronización desde SOFIA ERP."""
+    api_client, _admin = auth
+    assert_ruc_access(api_client, issuer_ruc)
+    clean_corr = (correlativo.strip().lstrip("0") or "1").zfill(8)
+    res = await db.execute(
+        select(Document).where(
+            Document.issuer_ruc == issuer_ruc,
+            Document.doc_type == doc_type,
+            Document.serie == serie.strip().upper(),
+            Document.correlativo == clean_corr,
+        )
+    )
+    doc = res.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Comprobante no encontrado en Sofia Gateway.")
+    return {
+        "document_id": doc.id,
+        "status": doc.status.value,
+        "sunat_code": doc.sunat_code,
+        "sunat_message": doc.sunat_message,
+        "sunat_notes": doc.sunat_notes or [],
+        "attempt_count": doc.attempt_count,
+        "has_cdr": bool(doc.cdr_path),
+        "cdr_xml_base64": _read_cdr_xml_b64(doc.cdr_path),
+        "next_retry_at": doc.next_retry_at.isoformat() if doc.next_retry_at else None,
+    }
 
 
 @router.get("/documents", tags=["Documents"])
@@ -458,11 +665,18 @@ async def list_documents(
     ruc: Optional[str] = Query(default=None),
     status_filter: Optional[str] = Query(default=None, alias="status"),
     limit: int = Query(default=50, ge=1, le=200),
-    _auth=Depends(get_api_client_or_admin),
+    auth=Depends(get_api_client_or_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    api_client, _admin = auth
     stmt = select(Document).order_by(desc(Document.created_at)).limit(limit)
-    if ruc:
+    if api_client and api_client.allowed_rucs:
+        if ruc:
+            assert_ruc_access(api_client, ruc)
+            stmt = stmt.where(Document.issuer_ruc == ruc)
+        else:
+            stmt = stmt.where(Document.issuer_ruc.in_(api_client.allowed_rucs))
+    elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
     if status_filter:
         stmt = stmt.where(Document.status == DocumentStatus(status_filter))
@@ -491,10 +705,12 @@ async def list_documents(
 
 
 @router.get("/documents/{doc_id}", tags=["Documents"])
-async def get_document(doc_id: str, _auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+async def get_document(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+    api_client, _admin = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
+    assert_ruc_access(api_client, doc.issuer_ruc)
     att_res = await db.execute(
         select(DeliveryAttempt).where(DeliveryAttempt.document_id == doc.id).order_by(desc(DeliveryAttempt.attempt_number))
     )
@@ -535,28 +751,34 @@ async def get_document(doc_id: str, _auth=Depends(get_api_client_or_admin), db: 
 
 
 @router.post("/documents/{doc_id}/retry", tags=["Documents"])
-async def retry_document(doc_id: str, _auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+async def retry_document(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+    api_client, _admin = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
+    assert_ruc_access(api_client, doc.issuer_ruc)
     dispatch_document_task.delay(doc.id, force=True)
     return {"document_id": doc.id, "queued": True, "action": "sendBill"}
 
 
 @router.post("/documents/{doc_id}/recover-cdr", tags=["Documents"])
-async def recover_document_cdr(doc_id: str, _auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+async def recover_document_cdr(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+    api_client, _admin = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
+    assert_ruc_access(api_client, doc.issuer_ruc)
     recover_cdr_task.delay(doc.id)
     return {"document_id": doc.id, "queued": True, "action": "getStatusCdr"}
 
 
 @router.get("/documents/{doc_id}/xml", tags=["Documents"])
-async def download_xml(doc_id: str, _auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+async def download_xml(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+    api_client, _admin = auth
     doc = await db.get(Document, doc_id)
     if not doc or not doc.xml_path or not Path(doc.xml_path).exists():
         raise HTTPException(status_code=404, detail="XML no disponible.")
+    assert_ruc_access(api_client, doc.issuer_ruc)
     return Response(
         content=Path(doc.xml_path).read_bytes(),
         media_type="application/xml",
@@ -565,10 +787,12 @@ async def download_xml(doc_id: str, _auth=Depends(get_api_client_or_admin), db: 
 
 
 @router.get("/documents/{doc_id}/cdr", tags=["Documents"])
-async def download_cdr(doc_id: str, _auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+async def download_cdr(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
+    api_client, _admin = auth
     doc = await db.get(Document, doc_id)
     if not doc or not doc.cdr_path or not Path(doc.cdr_path).exists():
         raise HTTPException(status_code=404, detail="CDR aún no emitido por SUNAT.")
+    assert_ruc_access(api_client, doc.issuer_ruc)
     cdr_name = Path(doc.cdr_path).name
     return Response(
         content=Path(doc.cdr_path).read_bytes(),

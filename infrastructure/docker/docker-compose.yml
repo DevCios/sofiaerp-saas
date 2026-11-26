@@ -191,6 +191,7 @@ services:
       - USER=${POSTGRES_USER}
       - PASSWORD=${POSTGRES_PASSWORD}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
+      - SOFIA_GATEWAY_URL=http://sunat-gateway-api:8010
     volumes:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro
@@ -222,6 +223,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/4
       - SUNAT_VAULT_MASTER_KEY=${SUNAT_VAULT_MASTER_KEY:-sofia_change_vault_master_key_in_env}
       - GATEWAY_JWT_SECRET=${GATEWAY_JWT_SECRET:-sofia_change_gateway_jwt_secret_in_env}
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
       - GATEWAY_ADMIN_EMAIL=${SOFIA_SUPERADMIN_EMAIL:-admin@sofiaerp.com}
       - GATEWAY_ADMIN_PASSWORD=${SOFIA_SUPERADMIN_PASSWORD:-SofiaAdmin2026!}
     volumes:

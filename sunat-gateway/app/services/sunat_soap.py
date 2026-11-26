@@ -95,13 +95,18 @@ def classify_sunat_code(code: Optional[str]) -> str:
     return "RETRYABLE"
 
 
-def parse_cdr_zip(cdr_zip_bytes: bytes) -> tuple[str, str, list[str]]:
-    """Extrae ResponseCode, Description y Notes del XML contenido dentro del CDR .zip de SUNAT."""
+def extract_cdr_xml_from_zip(cdr_zip_bytes: bytes) -> bytes:
+    """Extrae los bytes del archivo XML contenido dentro del CDR .zip de SUNAT."""
     with zipfile.ZipFile(io.BytesIO(cdr_zip_bytes), "r") as zf:
         xml_names = [n for n in zf.namelist() if n.lower().endswith(".xml")]
         if not xml_names:
             raise ValueError("El CDR .zip devuelto por SUNAT no contiene ningún archivo XML.")
-        cdr_xml = zf.read(xml_names[0])
+        return zf.read(xml_names[0])
+
+
+def parse_cdr_zip(cdr_zip_bytes: bytes) -> tuple[str, str, list[str]]:
+    """Extrae ResponseCode, Description y Notes del XML contenido dentro del CDR .zip de SUNAT."""
+    cdr_xml = extract_cdr_xml_from_zip(cdr_zip_bytes)
 
     root = etree.fromstring(cdr_xml)
     ns = {
@@ -145,6 +150,7 @@ def send_bill_to_sunat(
     sol_username: str,
     sol_password: str,
     is_beta: bool = True,
+    timeout_seconds: Optional[int] = None,
 ) -> SunatResponse:
     """Envía un comprobante firmado (sendBill) a SUNAT Beta o Producción."""
     url = settings.SUNAT_BILL_BETA_URL if is_beta else settings.SUNAT_BILL_PROD_URL
@@ -161,7 +167,7 @@ def send_bill_to_sunat(
 
     t0 = time.monotonic()
     try:
-        with httpx.Client(timeout=settings.SUNAT_TIMEOUT_SECONDS) as client:
+        with httpx.Client(timeout=timeout_seconds or settings.SUNAT_TIMEOUT_SECONDS) as client:
             resp = client.post(
                 url,
                 content=envelope,

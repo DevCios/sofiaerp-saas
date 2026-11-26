@@ -34,7 +34,7 @@ app.add_middleware(
     allow_origins=[settings.PUBLIC_BASE_URL, "https://sofiaerp.com", "https://admin.sofiaerp.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-API-Key"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-Internal-Service-Key"],
 )
 
 app.include_router(v1_router)

@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import base64
 import datetime
+import logging
+import os
 import re
+import requests
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -44,13 +47,14 @@ class SofiaSunatSetupWizard(models.TransientModel):
     # 2. Proveedor y Credenciales SUNAT / OSE
     provider = fields.Selection(
         selection=[
-            ('sunat', 'SUNAT (Servidores Oficiales — Por defecto)'),
+            ('sofia_gateway', 'Sofia Gateway — Pasarela Resiliente SUNAT (Recomendado)'),
+            ('sunat', 'SUNAT (Servidores Oficiales — Directo)'),
             ('digiflow', 'Estela / Digiflow OSE'),
             ('nubefact', 'NubeFact OSE'),
         ],
         string='Proveedor de Envío Electrónico',
         required=True,
-        default='sunat',
+        default='sofia_gateway',
     )
     test_env = fields.Boolean(
         string='Modo Pruebas (SUNAT Beta / Homologación)',
@@ -486,6 +490,12 @@ class SofiaSunatSetupWizard(models.TransientModel):
         if self.configure_series:
             self._configure_sales_journals(company)
 
+        # 4. Modo Híbrido: auto-sincronizar empresa y Clave SOL/GRE a Sofia Gateway (sin exportar .pfx)
+        gateway_note = ''
+        if self.provider == 'sofia_gateway':
+            synced, sync_detail = self._sync_issuer_to_sofia_gateway(company, clean_ruc, sol_user, sol_pass)
+            gateway_note = ' | Sincronizado con Sofia Gateway' if synced else f' | Sofia Gateway pendiente ({sync_detail})'
+
         env_label = "Pruebas (Beta)" if self.test_env else "Producción Real"
         provider_label = dict(self._fields['provider'].selection).get(self.provider, self.provider)
         return {
@@ -494,11 +504,12 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'params': {
                 'title': _('¡Facturación Electrónica SUNAT Activada!'),
                 'message': _(
-                    'Proveedor: %s (%s)%s | Series activas: %s / %s (NC: %s / %s).'
+                    'Proveedor: %s (%s)%s%s | Series activas: %s / %s (NC: %s / %s).'
                 ) % (
                     provider_label,
                     env_label,
                     cert_note,
+                    gateway_note,
                     self.serie_factura,
                     self.serie_boleta,
                     self.serie_nc_factura,
@@ -509,3 +520,49 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 'next': {'type': 'ir.actions.act_window_close'},
             },
         }
+
+    def _sync_issuer_to_sofia_gateway(self, company, clean_ruc, sol_user, sol_pass):
+        """Sincroniza RUC, entorno y credenciales SOL/GRE con Sofia Gateway sin exportar el .pfx."""
+        icp = self.env['ir.config_parameter'].sudo()
+        base_url = (
+            icp.get_param('sofia_gateway.url')
+            or os.environ.get('SOFIA_GATEWAY_URL')
+            or 'http://sunat-gateway-api:8010'
+        ).rstrip('/')
+        headers = {'Content-Type': 'application/json'}
+        internal_key = os.environ.get('INTERNAL_SERVICE_KEY')
+        if internal_key:
+            headers['X-Internal-Service-Key'] = internal_key
+
+        ubigeo = (self.zip_code or '').strip()
+        if not re.match(r'^\d{6}$', ubigeo):
+            ubigeo = '150101'
+        est_code = (self.address_type_code or '0000').strip()
+        if not re.match(r'^\d{4}$', est_code):
+            est_code = '0000'
+
+        payload = {
+            'ruc': clean_ruc,
+            'business_name': self.company_name.strip(),
+            'trade_name': self.company_name.strip(),
+            'address': (self.street or '').strip() or None,
+            'ubigeo': ubigeo,
+            'establishment_code': est_code,
+            'is_beta': bool(self.test_env),
+            'dispatch_policy': 'INSTANT_WITH_RETRY',
+            'sol_username': sol_user or None,
+            'sol_password': sol_pass or None,
+            'tenant_local_signing': True,
+            'generate_demo_cert': False,
+            'gre_client_id': (self.gre_client_id or '').strip() or None if self.configure_gre else None,
+            'gre_client_secret': (self.gre_client_secret or '').strip() or None if self.configure_gre else None,
+            'alert_email': company.email or None,
+        }
+        try:
+            resp = requests.post(f'{base_url}/api/v1/issuers', json=payload, headers=headers, timeout=8)
+            if resp.status_code in (200, 201):
+                return True, 'ok'
+            return False, f'HTTP {resp.status_code}'
+        except Exception as exc:
+            logging.getLogger(__name__).warning("Auto-sync Sofia Gateway omitido para %s: %s", clean_ruc, exc)
+            return False, 'sin conexión'
