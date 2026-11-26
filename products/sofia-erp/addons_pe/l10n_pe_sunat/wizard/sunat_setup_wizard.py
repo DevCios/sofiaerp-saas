@@ -19,8 +19,13 @@ class SofiaSunatSetupWizard(models.TransientModel):
 
     # 1. Datos Fiscales de la Empresa
     ruc = fields.Char(string='RUC (11 dígitos)', required=True, size=11)
+    sunat_lookup_status = fields.Char(string='Estado SUNAT', readonly=True)
     company_name = fields.Char(string='Razón Social', required=True)
     street = fields.Char(string='Dirección Fiscal')
+    zip_code = fields.Char(string='Ubigeo / ZIP', size=10)
+    state_id = fields.Many2one('res.country.state', string='Departamento')
+    city_id = fields.Many2one('res.city', string='Provincia')
+    l10n_pe_district = fields.Many2one('l10n_pe.res.city.district', string='Distrito')
     address_type_code = fields.Char(
         string='Código Establecimiento Anexo',
         default='0000',
@@ -96,6 +101,10 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'ruc': (company.vat or '').strip(),
             'company_name': company.name or '',
             'street': company.street or '',
+            'zip_code': company.zip or '',
+            'state_id': company.state_id.id if company.state_id else False,
+            'city_id': company.partner_id.city_id.id if getattr(company.partner_id, 'city_id', False) else False,
+            'l10n_pe_district': company.partner_id.l10n_pe_district.id if getattr(company.partner_id, 'l10n_pe_district', False) else False,
             'address_type_code': getattr(company, 'l10n_pe_edi_address_type_code', False) or '0000',
             'provider': getattr(company, 'l10n_pe_edi_provider', False) or 'sunat',
             'test_env': bool(getattr(company, 'l10n_pe_edi_test_env', True)),
@@ -105,6 +114,65 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'gre_sol_username': company.sudo().l10n_pe_edi_stock_client_username or '',
         })
         return vals
+
+    def _lookup_ruc_sunat(self):
+        """Consulta el RUC en vivo en SUNAT reutilizando el motor de sofiaerp_pe_vat."""
+        clean_ruc = (self.ruc or '').strip()
+        if not re.match(r'^\d{11}$', clean_ruc):
+            return False
+
+        Partner = self.env['res.partner']
+        if not hasattr(Partner, 'ConsultarRUC'):
+            self.sunat_lookup_status = 'Módulo sofiaerp_pe_vat no disponible.'
+            return False
+
+        pe_country = self.env.ref('base.pe', raise_if_not_found=False)
+        tmp_partner = Partner.new({
+            'country_id': pe_country.id if pe_country else False,
+            'vat': clean_ruc,
+        })
+        try:
+            tmp_partner.ConsultarRUC(clean_ruc)
+            if tmp_partner.name:
+                self.company_name = tmp_partner.name
+            if tmp_partner.street:
+                self.street = tmp_partner.street
+            if tmp_partner.zip:
+                self.zip_code = tmp_partner.zip
+            if tmp_partner.state_id:
+                self.state_id = tmp_partner.state_id
+            if getattr(tmp_partner, 'city_id', False):
+                self.city_id = tmp_partner.city_id
+            if getattr(tmp_partner, 'l10n_pe_district', False):
+                self.l10n_pe_district = tmp_partner.l10n_pe_district
+            estado = getattr(tmp_partner, 'state', '') or ''
+            cond = getattr(tmp_partner, 'condition', '') or ''
+            self.sunat_lookup_status = f'SUNAT OK — {estado} / {cond}'.strip(' /')
+            return True
+        except Exception as exc:
+            self.sunat_lookup_status = f'No se pudo consultar SUNAT: {exc}'
+            return False
+
+    @api.onchange('ruc')
+    def _onchange_ruc_lookup(self):
+        clean_ruc = (self.ruc or '').strip()
+        if len(clean_ruc) == 11 and clean_ruc.isdigit():
+            self._lookup_ruc_sunat()
+
+    def action_lookup_ruc(self):
+        """Botón manual 'Consultar SUNAT' dentro del Wizard manteniendo el modal abierto."""
+        self.ensure_one()
+        clean_ruc = (self.ruc or '').strip()
+        if not re.match(r'^\d{11}$', clean_ruc):
+            raise UserError(_("Ingresa un RUC válido de 11 dígitos antes de consultar SUNAT."))
+        self._lookup_ruc_sunat()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
     @api.onchange('series_preset')
     def _onchange_series_preset(self):
@@ -235,6 +303,8 @@ class SofiaSunatSetupWizard(models.TransientModel):
             'name': self.company_name.strip(),
             'vat': clean_ruc,
             'street': (self.street or '').strip(),
+            'zip': (self.zip_code or '').strip(),
+            'state_id': self.state_id.id if self.state_id else False,
             'l10n_pe_edi_address_type_code': (self.address_type_code or '0000').strip(),
             'l10n_pe_edi_provider': self.provider,
             'l10n_pe_edi_test_env': self.test_env,
@@ -257,6 +327,16 @@ class SofiaSunatSetupWizard(models.TransientModel):
                 company_vals['l10n_pe_edi_stock_client_password'] = self.gre_sol_password.strip()
 
         company.write(company_vals)
+
+        # Sincronizar provincia/distrito en el partner de la empresa
+        partner_vals = {}
+        if self.city_id:
+            partner_vals['city_id'] = self.city_id.id
+            partner_vals['city'] = self.city_id.name
+        if self.l10n_pe_district:
+            partner_vals['l10n_pe_district'] = self.l10n_pe_district.id
+        if partner_vals and company.partner_id:
+            company.partner_id.sudo().write(partner_vals)
 
         # 2. Registrar Certificado Digital (.pfx / .p12) si fue subido
         if self.certificate_file:

@@ -16,9 +16,21 @@
                         <group>
                             <group string="Datos Fiscales">
                                 <field name="company_id" readonly="1"/>
-                                <field name="ruc" placeholder="20123456789"/>
+                                <label for="ruc"/>
+                                <div class="o_row">
+                                    <field name="ruc" placeholder="20123456789"/>
+                                    <button name="action_lookup_ruc"
+                                            string="Consultar SUNAT"
+                                            type="object"
+                                            class="btn-secondary btn-sm"/>
+                                </div>
+                                <field name="sunat_lookup_status" invisible="not sunat_lookup_status" readonly="1"/>
                                 <field name="company_name" placeholder="MI EMPRESA S.A.C."/>
                                 <field name="street" placeholder="Av. Javier Prado 123, Lima"/>
+                                <field name="l10n_pe_district"/>
+                                <field name="city_id"/>
+                                <field name="state_id"/>
+                                <field name="zip_code"/>
                                 <field name="address_type_code"/>
                             </group>
                             <group string="Servidor y Credenciales SOL">
