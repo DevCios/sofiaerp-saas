@@ -1,3 +1,5 @@
 # -*- coding: utf-8 -*-
+from . import modules
 from . import models
 from . import services
+from .hooks import post_init_hook, uninstall_hook
