@@ -573,9 +573,9 @@ class SofiaCheckoutController(http.Controller):
             'tenant_host': tenant_host,
         })
 
-    @http.route('/mi-cuenta', type='http', auth='public', website=True)
+    @http.route('/mi-cuenta', type='http', auth='user', website=True)
     def my_account_portal(self, **kwargs):
-        """ Portal de Autogestión del Cliente: Upgrade de Plan, Usuarios Extra y Dominio Propio """
+        """ Portal de Autogestión del Cliente (requiere autenticación): Upgrade de Plan, Usuarios Extra y Dominio Propio """
         return request.render('sofia_website_theme.my_account_portal_page', {
             'tenant': (kwargs.get('tenant') or '').strip(),
         })
