@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_pe_retention" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.pe.retention</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='accounting']//group[@name='general']" position="after">
+                <group string="Retención del IGV (SUNAT)" name="pe_retention_group">
+                    <field name="pe_is_retention" string="Es Agente de Retención"/>
+                    <field name="pe_retention_percent"
+                           string="% de Retención"
+                           invisible="not pe_is_retention"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

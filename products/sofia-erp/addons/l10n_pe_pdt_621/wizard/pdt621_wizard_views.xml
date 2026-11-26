@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_l10n_pe_pdt621_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_pe.pdt621.wizard.form</field>
+        <field name="model">l10n_pe.pdt621.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Liquidación Mensual Declara Fácil 621 (IGV - Renta MYPE)">
+                <field name="state" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+
+                <!-- PASO 1: PARÁMETROS -->
+                <div invisible="state != 'draft'">
+                    <p class="text-muted">
+                        Selecciona el periodo tributario a liquidar para calcular el IGV y el Pago a Cuenta del Impuesto a la Renta MYPE correspondiente.
+                    </p>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                        <group>
+                            <field name="previous_igv_credit"/>
+                            <field name="renta_tasa"/>
+                        </group>
+                    </group>
+                </div>
+
+                <!-- PASO 2: RESULTADOS DE LA LIQUIDACIÓN CON CASILLAS SUNAT -->
+                <div invisible="state != 'calculated'">
+                    <div class="alert alert-info d-flex justify-content-between align-items-center" role="alert">
+                        <div>
+                            <strong>Periodo: <field name="month" readonly="1"/> / <field name="year" readonly="1"/></strong>
+                            <span class="ms-3 text-muted">Comprobantes procesados: <field name="invoice_count_sales"/> ventas / <field name="invoice_count_purchases"/> compras.</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- VENTAS Y DÉBITO FISCAL -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header bg-primary text-white fw-bold">
+                                    VENTAS E INGRESOS (DÉBITO FISCAL)
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><b>Casilla 100</b> - Ventas Netas Gravadas:</td>
+                                            <td class="text-end fw-bold"><field name="sales_taxable"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 105</b> - Exportaciones Facturadas:</td>
+                                            <td class="text-end"><field name="sales_export"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 109</b> - Ventas Exoneradas:</td>
+                                            <td class="text-end"><field name="sales_exempt"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 112</b> - Ventas Inafectas:</td>
+                                            <td class="text-end"><field name="sales_unaffected"/></td>
+                                        </tr>
+                                        <tr class="table-primary border-top">
+                                            <td><b>Casilla 101 - DÉBITO FISCAL IGV (18%):</b></td>
+                                            <td class="text-end fw-bold"><field name="igv_debito"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COMPRAS Y CRÉDITO FISCAL -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header bg-success text-white fw-bold">
+                                    COMPRAS Y ADQUISICIONES (CRÉDITO FISCAL)
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><b>Casilla 107</b> - Compras Destinadas a Vtas Gravadas:</td>
+                                            <td class="text-end fw-bold"><field name="purchases_taxable"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 110</b> - Compras Destinadas a Vtas Mixtas:</td>
+                                            <td class="text-end"><field name="purchases_mixed"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 113</b> - Compras Sin Derecho a Crédito:</td>
+                                            <td class="text-end"><field name="purchases_no_credit"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Compras No Gravadas / Exoneradas:</td>
+                                            <td class="text-end"><field name="purchases_exempt"/></td>
+                                        </tr>
+                                        <tr class="table-success border-top">
+                                            <td><b>Casilla 108 - CRÉDITO FISCAL IGV (18%):</b></td>
+                                            <td class="text-end fw-bold"><field name="igv_credito"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- DETERMINACIÓN IGV -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3 border-warning">
+                                <div class="card-header bg-warning text-dark fw-bold">
+                                    DETERMINACIÓN DE LA DEUDA - IGV
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><b>Casilla 140</b> - Impuesto Resultante:</td>
+                                            <td class="text-end fw-bold"><field name="igv_resultante"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 145</b> - Saldo a Favor Mes Anterior:</td>
+                                            <td class="text-end"><field name="previous_igv_credit"/></td>
+                                        </tr>
+                                        <tr class="table-warning border-top fs-6">
+                                            <td><b>Casilla 184 - TOTAL IGV A PAGAR:</b></td>
+                                            <td class="text-end fw-bolder text-danger"><field name="igv_a_pagar"/></td>
+                                        </tr>
+                                        <tr invisible="igv_saldo_favor_siguiente &lt;= 0" class="text-success">
+                                            <td><b>Saldo a Favor Próximo Mes:</b></td>
+                                            <td class="text-end fw-bold"><field name="igv_saldo_favor_siguiente"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RENTA MYPE (RMT) -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3 border-info">
+                                <div class="card-header bg-info text-dark fw-bold">
+                                    PAGO A CUENTA DEL IMPUESTO A LA RENTA MYPE
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><b>Casilla 301</b> - Ingresos Netos del Mes:</td>
+                                            <td class="text-end fw-bold"><field name="renta_base"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Casilla 312</b> - Tasa Régimen MYPE:</td>
+                                            <td class="text-end">1.0 %</td>
+                                        </tr>
+                                        <tr class="table-info border-top fs-6">
+                                            <td><b>Casilla 302 - PAGO A CUENTA RENTA MYPE:</b></td>
+                                            <td class="text-end fw-bolder text-danger"><field name="renta_a_pagar"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL A PAGAR A SUNAT -->
+                    <div class="alert alert-dark text-center p-3 fs-5 fw-bold" role="alert">
+                        TOTAL TRIBUTOS A PAGAR A SUNAT (IGV + Renta): 
+                        <span class="text-danger ms-2"><field name="total_tributos"/></span>
+                    </div>
+                </div>
+
+                <footer>
+                    <button name="action_calculate_pdt" string="Calcular Impuestos" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel" invisible="state != 'draft'"/>
+                    <button name="action_recalculate" string="Cambiar Periodo" type="object" class="btn-secondary" invisible="state != 'calculated'"/>
+                    <button string="Cerrar" class="btn-primary" special="cancel" invisible="state != 'calculated'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_l10n_pe_pdt621_wizard" model="ir.actions.act_window">
+        <field name="name">Declara Fácil 621 (IGV / Renta MYPE)</field>
+        <field name="res_model">l10n_pe.pdt621.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

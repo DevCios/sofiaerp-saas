@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<odoo>
+
+    <record id="view_account_journal_sequence_form" model="ir.ui.view">
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form" />
+        <field name="arch" type="xml">
+            <page name="bank_account" position="after">
+                <page name="sequence_latam" string="Secuencia de documentos" invisible="type != 'sale'" >
+                    <group invisible="sequence_latam_ids" >
+                        <button name="create_default_sequence_latam_ids" type="object" string="Crear secuencias por default" class="oe_highlight"  />
+                          
+                        <group>
+                            <field name="serial_number" />                        
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <field name="sequence_latam_ids" >
+                        <list editable="bottom" delete="0">
+                            <field name="name" />
+                            <field name="l10n_latam_document_type_id" />
+                            <field name="sequence_id" />
+                            <field name="number_next_actual" />                            
+                            <button name="create_sequence_latam" type="object" string="Crear Secuencia" class="oe_highlight" invisible="sequence_id != False" />
+                           <button name="unlink" type="object" string="x" confirm="Eliminar una secuencia que esta en uso puedo ocasionar conflictos." />
+                        </list>
+                    </field>
+                 </page>
+            </page>
+           
+        </field>
+    </record>
+
+</odoo>

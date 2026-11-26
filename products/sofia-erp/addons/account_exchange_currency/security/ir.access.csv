@@ -1,0 +1,4 @@
+id,name,model_id,group_id/id,operation,domain
+access_currency_rate_range_wizard_user,currency.rate.range.wizard,currency.rate.range.wizard,base.group_user,crud,
+access_currency_rate_range_wizard_account_user,currency.rate.range.wizard.account,currency.rate.range.wizard,account.group_account_invoice,crud,
+access_currency_rate_range_wizard_account_manager,currency.rate.range.wizard.manager,currency.rate.range.wizard,account.group_account_manager,crud,

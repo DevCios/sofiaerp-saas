@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_currency_rate_form_inherit_exchange_rate_buy" model="ir.ui.view">
+        <field name="name">res.currency.rate.form.inherit.exchange.rate.buy</field>
+        <field name="model">res.currency.rate</field>
+        <field name="inherit_id" ref="base.view_currency_rate_form"/>
+        <field name="arch" type="xml">
+            <field name="inverse_company_rate" position="after">
+                <field name="inverse_company_rate_buy" digits="[12,3]"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_currency_rate_tree_inherit_exchange_rate_buy" model="ir.ui.view">
+        <field name="name">res.currency.rate.list.inherit.exchange.rate.buy</field>
+        <field name="model">res.currency.rate</field>
+        <field name="inherit_id" ref="base.view_currency_rate_tree"/>
+        <field name="arch" type="xml">
+            <field name="inverse_company_rate" position="after">
+                <field name="inverse_company_rate_buy" digits="[12,3]"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_currency_form_inherit_embedded_rate_buy" model="ir.ui.view">
+        <field name="name">res.currency.form.inherit.embedded.rate.buy</field>
+        <field name="model">res.currency</field>
+        <field name="inherit_id" ref="base.view_currency_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rate_ids']/list/field[@name='inverse_company_rate']" position="after">
+                <field name="inverse_company_rate_buy" digits="[12,3]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- GRUPO: RESPONSABLE TRIBUTARIO SUNAT -->
+    <record id="group_sunat_user" model="res.groups">
+        <field name="name">Responsable Tributario SUNAT</field>
+        <field name="sequence">25</field>
+        <field name="comment">Acceso a la App SUNAT, generación de SIRE, PLE y Declaraciones 621.</field>
+        <field name="implied_ids" eval="[(4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <!-- ADMINISTRADOR CONTABLE INCLUYE ACCESO SUNAT AUTOMÁTICAMENTE -->
+    <record id="account.group_account_manager" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_sunat_user'))]"/>
+    </record>
+</odoo>

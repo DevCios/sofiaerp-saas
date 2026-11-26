@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_l10n_pe_sire_export_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_pe.sire.export.wizard.form</field>
+        <field name="model">l10n_pe.sire.export.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generador SIRE - SUNAT">
+                <field name="state" invisible="1"/>
+                <div invisible="state != 'draft'">
+                    <p class="text-muted">
+                        Selecciona el periodo tributario (año y mes) y los libros a exportar para el Sistema Integrado de Registros Electrónicos (SIRE).
+                    </p>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                        <group>
+                            <field name="report_type" widget="radio"/>
+                        </group>
+                    </group>
+                </div>
+                <div invisible="state != 'done'">
+                    <div class="alert alert-success" role="alert">
+                        <strong>¡Archivos generados exitosamente!</strong> El paquete comprimido está listo para descargar y presentar en SUNAT (vía portal o aplicativo cliente SIRE).
+                    </div>
+                    <group>
+                        <field name="file_name" invisible="1"/>
+                        <field name="file_data" filename="file_name"/>
+                    </group>
+                    <group string="Resumen de Comprobantes">
+                        <field name="log_info" nolabel="1"/>
+                    </group>
+                </div>
+                <footer>
+                    <button name="action_generate_sire" string="Generar Archivos SIRE" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel" invisible="state != 'draft'"/>
+                    <button string="Cerrar" class="btn-primary" special="cancel" invisible="state != 'done'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_l10n_pe_sire_export_wizard" model="ir.actions.act_window">
+        <field name="name">Exportar SIRE (RVIE / RCE)</field>
+        <field name="res_model">l10n_pe.sire.export.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

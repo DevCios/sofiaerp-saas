@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_l10n_pe_ple_diario_wizard_form" model="ir.ui.view">
+        <field name="name">l10n_pe.ple.diario.wizard.form</field>
+        <field name="model">l10n_pe.ple.diario.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generador de Libro Diario PLE SUNAT (5.1 / 5.2 Simplificado)">
+                <field name="state" invisible="1"/>
+                <field name="currency_id" invisible="1"/>
+
+                <!-- PASO 1: SELECCIONAR PARÁMETROS -->
+                <div invisible="state != 'draft'">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Libro Diario Electrónico (PLE SUNAT)</strong><br/>
+                        Para empresas del Régimen MYPE Tributario (RMT) con ingresos hasta 300 UIT, es obligatorio presentar el <b>Libro Diario de Formato Simplificado (5.2)</b> junto con el SIRE (Ventas y Compras).
+                    </div>
+                    <group>
+                        <group string="Periodo Tributario">
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="year"/>
+                            <field name="month"/>
+                        </group>
+                        <group string="Configuración del Libro">
+                            <field name="book_type"/>
+                            <field name="journal_ids" widget="many2many_tags" placeholder="Todos los diarios contables..."/>
+                        </group>
+                    </group>
+                </div>
+
+                <!-- PASO 2: RESULTADOS Y DESCARGA -->
+                <div invisible="state != 'generated'">
+                    <div class="alert alert-success d-flex justify-content-between align-items-center" role="alert">
+                        <div>
+                            <i class="oi oi-check me-2"/>
+                            <strong>¡Archivo PLE generado exitosamente!</strong>
+                            <span class="ms-3">Periodo: <field name="month" readonly="1"/> / <field name="year" readonly="1"/></span>
+                        </div>
+                    </div>
+
+                    <!-- RESUMEN DE BALANCE Y ASIENTOS -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header bg-primary text-white fw-bold">
+                                    RESUMEN DEL LIBRO DIARIO
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td>Tipo de Libro:</td>
+                                            <td class="text-end fw-bold"><field name="book_type" readonly="1"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Asientos Contables (CUO):</td>
+                                            <td class="text-end"><field name="moves_count"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Líneas de Apunte:</td>
+                                            <td class="text-end"><field name="lines_count"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header bg-dark text-white fw-bold">
+                                    BALANCE DE CUADRE CONTABLE
+                                </div>
+                                <div class="card-body p-2">
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td>Total Débito (Debe):</td>
+                                            <td class="text-end fw-bold"><field name="total_debit"/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Crédito (Haber):</td>
+                                            <td class="text-end fw-bold"><field name="total_credit"/></td>
+                                        </tr>
+                                        <tr class="table-light border-top">
+                                            <td>Diferencia (Debe - Haber):</td>
+                                            <td class="text-end fw-bolder"><field name="difference"/></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DESCARGA DE ARCHIVOS -->
+                    <div class="card shadow-sm mb-3 border-success">
+                        <div class="card-header bg-success text-white fw-bold">
+                            ARCHIVOS OFICIALES PARA EL PROGRAMA DE LIBROS ELECTRÓNICOS (PLE) SUNAT
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-6 mb-2">
+                                    <label for="zip_binary" string="Archivo Comprimido ZIP (Recomendado SUNAT):" class="fw-bold d-block text-muted"/>
+                                    <field name="zip_binary" filename="zip_filename" widget="binary"/>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label for="txt_binary" string="Archivo Plano TXT:" class="fw-bold d-block text-muted"/>
+                                    <field name="txt_binary" filename="txt_filename" widget="binary"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <footer>
+                    <button name="action_generate_ple" string="Generar Libro PLE" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel" invisible="state != 'draft'"/>
+                    <button name="action_reset" string="Cambiar Parámetros" type="object" class="btn-secondary" invisible="state != 'generated'"/>
+                    <button string="Cerrar" class="btn-primary" special="cancel" invisible="state != 'generated'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_l10n_pe_ple_diario_wizard" model="ir.actions.act_window">
+        <field name="name">Libro Diario PLE (5.1 y 5.2 Simplificado)</field>
+        <field name="res_model">l10n_pe.ple.diario.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

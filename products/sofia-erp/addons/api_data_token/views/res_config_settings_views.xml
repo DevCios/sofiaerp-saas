@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.api.data.token</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="0"/>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//widget[@name='res_config_dev_tool']" position="before">
+                <div id="api_integration">
+                    <h2>Proveedor de APIs</h2>
+                    <div class="row mt16 o_settings_container" name="api_data_integration">
+                        <div class="col-12 col-lg-6 o_setting_box" id="api_data_provider_credentials">
+                            <div class="o_setting_left_pane"/>
+                            <div class="o_setting_right_pane">
+                                <span class="o_form_label">Credenciales por operacion</span>
+                                <div class="text-muted">
+                                    Configure proveedor y token para documentos, tipo de cambio y AFP.
+                                </div>
+                                <button name="action_open_api_data_provider_credentials" type="object" string="Administrar credenciales" class="btn-link"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

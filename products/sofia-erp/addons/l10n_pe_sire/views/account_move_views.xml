@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_l10n_pe_sire" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.sire</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="SUNAT - SIRE" name="page_sire" invisible="country_code != 'PE'">
+                    <group>
+                        <group string="Datos del SIRE">
+                            <field name="l10n_pe_sire_car" readonly="1"/>
+                        </group>
+                        <group string="Compras - Crédito Fiscal (RCE)" invisible="move_type not in ('in_invoice', 'in_refund')">
+                            <field name="l10n_pe_sire_credit_type"/>
+                            <field name="l10n_pe_sire_classification"/>
+                            <field name="l10n_pe_sire_retention_flag"/>
+                        </group>
+                        <group string="Detracciones (SPOT)" invisible="move_type not in ('in_invoice', 'in_refund')">
+                            <field name="l10n_pe_sire_detraction_number"/>
+                            <field name="l10n_pe_sire_detraction_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

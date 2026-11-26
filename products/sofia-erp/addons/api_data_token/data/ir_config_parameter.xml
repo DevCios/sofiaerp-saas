@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="api_access_token_first" model="ir.config_parameter">
+        <field name="key">api.access_token_first</field>
+        <field name="value">RAcSGWD1TgC7VdjCTOZSVA==</field>
+    </record>
+
+    <record id="api_data_provider_vat_provider" model="ir.config_parameter">
+        <field name="key">api_data_provider.vat_provider</field>
+        <field name="value">migo</field>
+    </record>
+
+    <record id="api_data_provider_currency_provider" model="ir.config_parameter">
+        <field name="key">api_data_provider.currency_provider</field>
+        <field name="value">migo</field>
+    </record>
+
+    <record id="api_data_provider_afp_provider" model="ir.config_parameter">
+        <field name="key">api_data_provider.afp_provider</field>
+        <field name="value">migo</field>
+    </record>
+
+</odoo>
+
