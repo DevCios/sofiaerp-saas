@@ -81,7 +81,10 @@ class PosExpressController(http.Controller):
                 user = request.env['res.users'].sudo().browse(uid)
                 if not user.exists() or not user.active:
                     return None
-                return request.env(user=uid).with_context(allowed_company_ids=[cid])
+                return request.env(
+                    user=uid,
+                    context=dict(request.env.context, allowed_company_ids=[cid]),
+                )
             except Exception:
                 return None
 
@@ -135,22 +138,31 @@ class PosExpressController(http.Controller):
         if not login or not password:
             return self._json_response({'error': 'Ingresa correo/usuario y contraseña.'}, status=400)
 
+        user = request.env['res.users'].sudo().search(
+            [('login', '=', login), ('active', '=', True)], limit=1
+        )
+        if not user:
+            return self._json_response({'error': 'Usuario o contraseña incorrectos.'}, status=401)
+
         try:
             credential = {'login': login, 'password': password, 'type': 'password'}
-            try:
-                auth_info = request.session.authenticate(request.env, credential)
-            except TypeError:
-                auth_info = request.session.authenticate(request.db, credential)
-            uid = auth_info.get('uid') if isinstance(auth_info, dict) else auth_info
-            if not uid:
-                return self._json_response({'error': 'Credenciales incorrectas.'}, status=401)
+            user_check_env = request.env(user=user.id)
+            if hasattr(user_check_env['res.users'], '_check_credentials'):
+                user_check_env['res.users']._check_credentials(credential, {'interactive': False})
+            else:
+                request.env.cr.execute("SELECT password FROM res_users WHERE id = %s", (user.id,))
+                row = request.env.cr.fetchone()
+                if not row or not row[0] or not user._crypt_context().verify(password, row[0]):
+                    return self._json_response({'error': 'Usuario o contraseña incorrectos.'}, status=401)
         except Exception as exc:
             _logger.warning("POS Express app_login falló para '%s': %s", login, exc)
             return self._json_response({'error': 'Usuario o contraseña incorrectos.'}, status=401)
 
-        user = request.env['res.users'].sudo().browse(int(uid))
         company = user.company_id
-        user_env = request.env(user=user.id).with_context(allowed_company_ids=[company.id])
+        user_env = request.env(
+            user=user.id,
+            context=dict(request.env.context, allowed_company_ids=[company.id]),
+        )
 
         cfg = user_env['pos.express.config'].sudo().ensure_default_config(company)
         session = cfg.current_session_id
