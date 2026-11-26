@@ -8,6 +8,7 @@ _logger = logging.getLogger(__name__)
 class PosExpressConfig(models.Model):
     _name = 'pos.express.config'
     _description = 'Configuración de Caja POS Express'
+    _check_company_auto = True
 
     name = fields.Char(string='Nombre de la Caja', required=True, default='Caja Principal')
     header_title = fields.Char(

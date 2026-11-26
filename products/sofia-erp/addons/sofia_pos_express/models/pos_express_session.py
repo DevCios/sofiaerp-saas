@@ -12,6 +12,7 @@ class PosExpressSession(models.Model):
     _name = 'pos.express.session'
     _description = 'Turno de Caja POS Express'
     _order = 'id desc'
+    _check_company_auto = True
 
     name = fields.Char(string='Turno / Sesión', required=True, copy=False, readonly=True, default='/')
     config_id = fields.Many2one('pos.express.config', string='Caja', required=True, readonly=True)
