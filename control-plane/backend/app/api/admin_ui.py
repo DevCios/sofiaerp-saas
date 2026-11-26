@@ -682,8 +682,14 @@ HTML_CONTENT = """<!DOCTYPE html>
             `;
           }
 
+          const deleteBtn = `
+            <button onclick="deleteTenant('${t.id}', '${t.name}', '${t.slug}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 text-rose-600 hover:bg-rose-600 hover:text-white border border-slate-200 hover:border-rose-600 transition" title="Eliminar definitivamente empresa, BD y archivos">
+              <i class="fa-solid fa-trash-can text-[10px]"></i>
+            </button>
+          `;
+
           const cycleLabel = t.billing_cycle === 'ANNUAL' ? 'Anual' : 'Mensual';
-          const planDisplay = (t.plan_code || 'PRO').replace('SOFIA-ERP-', '');
+          const planDisplay = (t.plan_code || 'PRO').replace('SOFIA-ERP-', '').replace('SOFIA-PLAN-', '');
 
           return `
             <tr class="hover:bg-slate-50/70 transition">
@@ -714,6 +720,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                   ${backupBtn}
                   ${supportBtn}
                   ${actionButtons}
+                  ${deleteBtn}
                   <a href="${domainUrl}" target="_blank" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition">
                     Abrir ERP <i class="fa-solid fa-chevron-right text-[9px]"></i>
                   </a>
@@ -725,6 +732,30 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-rose-500">Error al cargar clientes: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function deleteTenant(tenantId, tenantName, tenantSlug) {
+      const typed = prompt(`🚨 ELIMINACIÓN DEFINITIVA E IRREVERSIBLE\n\nEsto borrará para siempre:\n• La base de datos física sofia_tenant_${tenantSlug}\n• Todos los comprobantes y archivos (filestore)\n• Sus dominios y suscripción (liberando 100% del disco)\n\nPara confirmar la eliminación de "${tenantName}", escribe exactamente el subdominio: ${tenantSlug}`);
+      if (typed === null) return;
+      if (typed.trim().toLowerCase() !== tenantSlug.toLowerCase()) {
+        alert('❌ Subdominio incorrecto. Eliminación cancelada por seguridad.');
+        return;
+      }
+
+      const token = sessionStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch(`/api/v1/tenants/${tenantId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Error al eliminar el cliente');
+
+        alert(`✅ ${data.message}`);
+        loadTenants();
+      } catch (err) {
+        alert('❌ Error: ' + err.message);
       }
     }
 

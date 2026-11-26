@@ -6,12 +6,13 @@ from datetime import datetime, timedelta, timezone
 import gzip
 import os
 import re
+import shutil
 import subprocess
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, Request, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import select, text
+from sqlalchemy import delete, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db_session
@@ -20,7 +21,7 @@ from app.api.deps import get_current_superadmin, verify_admin_or_internal
 from app.models.tenant import Tenant, TenantDomain
 from app.models.user import User, UserTenantMembership
 from app.models.product import ProductPlan, Subscription
-from app.models.audit import TenantAuditLog, SystemAnnouncement
+from app.models.audit import TenantAuditLog, CapacityRecord, SystemAnnouncement
 from app.schemas.tenant import (
     TenantCreate,
     TenantResponse,
@@ -33,6 +34,7 @@ from app.services.domain_service import (
     TenantNotFoundException,
     TenantSuspendedException,
 )
+from app.services.provisioning_service import ProvisioningService
 from app.tasks.provisioning import dispatch_tenant_provisioning
 
 router = APIRouter(prefix="/tenants", tags=["Tenants, Dominios & Resolución"])
@@ -204,6 +206,96 @@ async def get_tenant(
     if not tenant:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
     return tenant
+
+
+@router.delete("/{tenant_id}", summary="Eliminar definitivamente un tenant (BD física, filestore y registros)")
+async def delete_tenant(
+    tenant_id: UUID,
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+    admin: User = Depends(get_current_superadmin),
+):
+    """
+    Eliminación irreversible (Hard Delete) de un cliente:
+    1. Bloquea eliminación de instancias protegidas del sistema (sofiaerp, template).
+    2. Desconecta sesiones y ejecuta DROP DATABASE en PostgreSQL (libera 100% disco/RAM).
+    3. Elimina físicamente su filestore en disco.
+    4. Limpia registros asociados en la base central y registra auditoría inmutable.
+    """
+    tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
+    if not tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant no encontrado.")
+
+    protected_slugs = {"sofiaerp", "sofia", "template", "sofia_template_db", "postgres"}
+    if tenant.slug.lower() in protected_slugs or tenant.database_name in {"sofia_tenant_sofiaerp", "sofia_template_db", "sofia_central_db"}:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Esta instancia está protegida por el sistema y no puede eliminarse.",
+        )
+
+    pg_host = os.getenv("POSTGRES_HOST", "postgres")
+    pg_port = int(os.getenv("POSTGRES_PORT", "5432"))
+    pg_user = os.getenv("POSTGRES_USER", "sofia_admin")
+    pg_pass = os.getenv("POSTGRES_PASSWORD", "sofia_pass")
+
+    # 1. Eliminar base de datos física PostgreSQL
+    try:
+        ProvisioningService.drop_tenant_database(
+            db_name=tenant.database_name,
+            pg_host=pg_host,
+            pg_port=pg_port,
+            admin_user=pg_user,
+            admin_password=pg_pass,
+        )
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail=f"No se pudo eliminar la base de datos física: {str(ex)}")
+
+    # 2. Eliminar filestore físico del tenant (libera espacio de adjuntos/PDFs)
+    filestore_candidates = {
+        os.path.join(settings.SOFIA_FILESTORES_DIR, tenant.slug),
+        os.path.join(settings.SOFIA_FILESTORES_DIR, "filestore", tenant.database_name),
+    }
+    if tenant.filestore_path:
+        filestore_candidates.add(tenant.filestore_path)
+    for fdir in filestore_candidates:
+        if fdir and os.path.exists(fdir) and fdir not in {settings.SOFIA_FILESTORES_DIR, "/var/lib/sofia/filestores", "/var/lib/odoo"}:
+            shutil.rmtree(fdir, ignore_errors=True)
+
+    deleted_slug = tenant.slug
+    deleted_name = tenant.name
+    deleted_db = tenant.database_name
+
+    # 3. Limpiar relaciones dependientes en base central conservando logs de auditoría
+    await db.execute(update(TenantAuditLog).where(TenantAuditLog.tenant_id == tenant.id).values(tenant_id=None))
+    await db.execute(delete(SystemAnnouncement).where(SystemAnnouncement.target_tenant_id == tenant.id))
+    await db.execute(delete(CapacityRecord).where(CapacityRecord.tenant_id == tenant.id))
+    await db.execute(delete(Subscription).where(Subscription.tenant_id == tenant.id))
+    await db.execute(delete(TenantDomain).where(TenantDomain.tenant_id == tenant.id))
+    await db.execute(delete(UserTenantMembership).where(UserTenantMembership.tenant_id == tenant.id))
+    await db.delete(tenant)
+
+    # 4. Registrar evento inmutable de auditoría
+    client_ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "127.0.0.1")
+    db.add(TenantAuditLog(
+        tenant_id=None,
+        action="TENANT_DELETED",
+        ip_address=client_ip,
+        user_agent=request.headers.get("user-agent", "AdminUI"),
+        payload_json={
+            "deleted_slug": deleted_slug,
+            "deleted_name": deleted_name,
+            "database_dropped": deleted_db,
+            "admin_email": admin.email,
+        },
+    ))
+    await db.commit()
+
+    return {
+        "status": "DELETED",
+        "slug": deleted_slug,
+        "database_dropped": deleted_db,
+        "message": f"Cliente '{deleted_name}' y su base de datos '{deleted_db}' eliminados por completo.",
+    }
 
 
 @router.patch("/{tenant_id}/status", response_model=TenantResponse, summary="Actualizar estado del tenant (ACTIVE, SUSPENDED, ARCHIVED)")
