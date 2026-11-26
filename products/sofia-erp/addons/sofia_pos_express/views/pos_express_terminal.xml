@@ -7,6 +7,7 @@
             <meta charset="UTF-8"/>
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
             <title>POS Express — SOFIA ERP</title>
+            <link rel="icon" type="image/png" href="/sofia_pos_express/static/description/icon.png"/>
             <link rel="preconnect" href="https://fonts.googleapis.com"/>
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"/>
             <style>
@@ -127,7 +128,7 @@
         <body t-att-data-session-id="session_id" t-att-data-back-url="back_url">
             <header>
                 <div class="brand">
-                    <span class="brand-mark">S</span>
+                    <img src="/sofia_pos_express/static/description/icon.png" alt="POS Express" style="width:32px;height:32px;border-radius:7px;object-fit:cover;box-shadow:0 1px 3px rgba(0,0,0,.2)"/>
                     <div>
                         <span id="hdrTitle">POS Express</span>
                         <span id="hdrSub" style="display:block;font-size:11px;font-weight:400;opacity:.85">Cargando turno...</span>

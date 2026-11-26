@@ -209,7 +209,7 @@
         <field name="target">self</field>
     </record>
 
-    <menuitem id="menu_pos_express_root" name="POS Express" sequence="32"/>
+    <menuitem id="menu_pos_express_root" name="POS Express" web_icon="sofia_pos_express,static/description/icon.png" sequence="32"/>
     <menuitem id="menu_pos_express_dashboard" name="Cajas" parent="menu_pos_express_root" action="action_pos_express_config" sequence="10"/>
     <menuitem id="menu_pos_express_terminal" name="Abrir Terminal" parent="menu_pos_express_root" action="action_pos_express_open_url" sequence="15"/>
     <menuitem id="menu_pos_express_sessions" name="Turnos y Arqueos" parent="menu_pos_express_root" action="action_pos_express_session" sequence="20"/>
