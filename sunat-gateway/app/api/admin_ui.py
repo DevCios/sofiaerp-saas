@@ -38,35 +38,43 @@ PANEL_HTML = r"""<!DOCTYPE html>
     body { margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
     .hidden { display: none !important; }
 
-    /* Top Navbar Estilo Odoo 20 */
-    header { background: var(--o20-navbar); color: #FFFFFF; padding: 0 20px; min-height: 50px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; box-shadow: 0 1px 3px rgba(17,24,39,.12); position: sticky; top: 0; z-index: 30; }
-    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 9px; letter-spacing: -0.01em; color: #FFFFFF; }
-    .brand-mark { width: 28px; height: 28px; border-radius: 6px; background: rgba(255,255,255,.18); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
-    .nav-links { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
-    .tab { background: transparent; border: none; color: rgba(255,255,255,.86); padding: 7px 11px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 13px; transition: background .15s, color .15s; }
-    .tab:hover { background: rgba(255,255,255,.14); color: #FFFFFF; }
-    .tab.active { background: rgba(255,255,255,.22); color: #FFFFFF; font-weight: 600; }
+    /* Top Navbar Centrado Estilo SOFIA Platform / Odoo 20 */
+    header { background: var(--o20-navbar); color: #FFFFFF; box-shadow: 0 1px 3px rgba(17,24,39,.12); position: sticky; top: 0; z-index: 30; }
+    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.01em; color: #FFFFFF; }
+    .brand-mark { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.20); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; }
+    .brand-sub { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.78); margin-top: -1px; }
 
-    /* Control Panel Blanco Estilo Odoo 20 */
-    .subbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    /* Contenedor Principal Centrado (igual que SOFIA Platform max-w-7xl) */
+    .container { max-width: 1280px; margin: 28px auto; padding: 0 24px; }
+    .hero-banner { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 2px rgba(16,24,40,.03); }
+    .hero-banner h1 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+    .hero-banner p { margin: 4px 0 0 0; font-size: 13px; color: var(--muted); }
+
+    /* Tabs de Navegación (Pill Bar Estilo SOFIA Platform) */
+    .tabs { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { background: transparent; border: none; color: #4B5563; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12.5px; transition: background .15s, color .15s; }
+    .tab:hover { background: #EAECEF; color: var(--text); }
+    .tab.active { background: var(--o20-primary); color: #FFFFFF; box-shadow: 0 1px 2px rgba(113,75,103,.25); }
+
     .badge { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
     .b-ok { background: var(--o20-teal-soft); color: var(--ok); }
     .b-warn { background: #FDE8D7; color: var(--warn); }
     .b-err { background: #FDE2E2; color: var(--err); }
     .b-info { background: var(--o20-primary-soft); color: var(--info); }
     .b-nav { background: rgba(255,255,255,.16); color: #FFFFFF; }
-    .container { max-width: 1320px; margin: 20px auto; padding: 0 20px; }
 
     /* KPIs Pastel Estilo Odoo 20 */
-    .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; margin-bottom: 22px; }
     .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 22px; }
-    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+    .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
     .kpi-purple { background: #F4F1FB; border-color: #DED7F2; }
     .kpi-teal { background: #EBF8F6; border-color: #C4E8E2; }
     .kpi-peach { background: #FEF3E8; border-color: #F7D8BA; }
     .kpi-rose { background: #FDF0F0; border-color: #F6CECE; }
-    .kpi .lbl { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .kpi .lbl { color: #4B5563; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
     .kpi .val { font-size: 28px; font-weight: 700; margin-top: 6px; color: var(--text); }
+    .kpi .sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; font-weight: 500; }
 
     /* Tarjetas de Escritorio */
     .desk-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
@@ -132,53 +140,77 @@ PANEL_HTML = r"""<!DOCTYPE html>
 
 <div id="appView" class="hidden">
   <header>
-    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div class="nav-inner">
       <div class="brand">
         <span class="brand-mark">S</span>
-        <span>Sofia Gateway</span>
+        <div>
+          <span>Sofia Gateway</span>
+          <span class="brand-sub">Pasarela Resiliente SUNAT • Modo Híbrido</span>
+        </div>
       </div>
-      <nav class="nav-links">
-        <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
-        <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
-        <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
-        <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
-        <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
-        <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
-        <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
-        <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
-      </nav>
-    </div>
-    <div class="sunat-pill">
-      <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
-      <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
-      <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
-      <button class="btn btn-sm btn-nav" onclick="logout()">Salir</button>
+      <div class="sunat-pill">
+        <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
+        <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
+        <a href="https://api.sofiaerp.com/admin" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">SOFIA Platform</a>
+        <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
+        <button class="btn btn-sm btn-nav" onclick="logout()">Salir</button>
+      </div>
     </div>
   </header>
 
-  <div class="subbar">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:12.5px;font-weight:600;color:var(--text)">Empresa activa:</span>
-      <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:270px;padding:6px 10px">
-        <option value="">Todas las Empresas (Vista Global)</option>
-      </select>
-      <span id="activeEnvBadge" class="badge b-info">Global</span>
-    </div>
-    <div style="font-size:12px;color:var(--muted)">
-      <span class="badge b-ok" style="margin-right:6px">Modo Híbrido</span>
-      Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas pueden firmar en Bóveda Gateway
-    </div>
-  </div>
-
   <div class="container">
+    <!-- Banner Principal Centrado (idéntico a SOFIA Platform) -->
+    <div class="hero-banner">
+      <div>
+        <h1>Gestión de Emisión &amp; Cola SUNAT</h1>
+        <p>Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas pueden firmar en Bóveda Gateway.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:260px;padding:7px 12px">
+          <option value="">Todas las Empresas (Vista Global)</option>
+        </select>
+        <span id="activeEnvBadge" class="badge b-info">Global</span>
+      </div>
+    </div>
+
+    <!-- KPIs Pastel Siempre Visibles (idéntico a SOFIA Platform) -->
+    <div class="grid4">
+      <div class="kpi kpi-purple">
+        <div class="lbl">Comprobantes Totales</div>
+        <div class="val" id="kTotal">0</div>
+        <div class="sub">Procesados en pasarela</div>
+      </div>
+      <div class="kpi kpi-teal">
+        <div class="lbl">Aceptados SUNAT</div>
+        <div class="val" style="color:var(--ok)" id="kAccepted">0</div>
+        <div class="sub" style="color:var(--ok)">Con CDR oficial</div>
+      </div>
+      <div class="kpi kpi-peach">
+        <div class="lbl">En Cola / Contingencia</div>
+        <div class="val" style="color:var(--warn)" id="kQueued">0</div>
+        <div class="sub" style="color:var(--warn)">Reintento automático activo</div>
+      </div>
+      <div class="kpi kpi-rose">
+        <div class="lbl">Observados / Rechazados</div>
+        <div class="val" style="color:var(--err)" id="kRejected">0</div>
+        <div class="sub" style="color:var(--err)">Requieren revisión</div>
+      </div>
+    </div>
+
+    <!-- Barra de Pestañas Pill (idéntica a SOFIA Platform) -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
+      <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
+      <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
+      <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
+      <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
+      <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
+      <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
+      <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
+    </nav>
+
     <!-- TAB 1: ESCRITORIO -->
     <div id="tab-desk">
-      <div class="grid4">
-        <div class="kpi kpi-purple"><div class="lbl">Comprobantes Totales</div><div class="val" id="kTotal">0</div></div>
-        <div class="kpi kpi-teal"><div class="lbl">Aceptados SUNAT</div><div class="val" style="color:var(--ok)" id="kAccepted">0</div></div>
-        <div class="kpi kpi-peach"><div class="lbl">En Cola / Contingencia</div><div class="val" style="color:var(--warn)" id="kQueued">0</div></div>
-        <div class="kpi kpi-rose"><div class="lbl">Observados / Rechazados</div><div class="val" style="color:var(--err)" id="kRejected">0</div></div>
-      </div>
 
       <div class="grid3">
         <div class="desk-card" onclick="openTab('documents')">
