@@ -21,7 +21,7 @@ async def check_health(db: AsyncSession = Depends(get_db_session)):
         if result.scalar() == 1:
             db_status = "healthy"
     except Exception as e:
-        db_status = f"unreachable: {str(e)}"
+        db_status = "unreachable" if settings.ENVIRONMENT.lower() == "production" else f"unreachable: {str(e)}"
 
     return {
         "status": "online" if db_status == "healthy" else "degraded",

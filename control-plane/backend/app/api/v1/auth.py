@@ -9,6 +9,7 @@ from pydantic import BaseModel, EmailStr
 from app.core.database import get_db_session
 from app.core.security import verify_password, create_access_token, decode_token
 from app.core.config import settings
+from app.api.deps import get_current_user
 from app.models.user import User, UserTenantMembership
 from app.models.tenant import Tenant
 from app.schemas.user import UserLogin, Token
@@ -129,7 +130,14 @@ async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db_sessio
 # Endpoints de Multi-Factor Authentication (MFA)
 # ------------------------------------------------------------------------------
 @router.post("/mfa/setup", response_model=MFASetupResponse, summary="Generar configuración de MFA")
-async def mfa_setup(user_email: EmailStr, db: AsyncSession = Depends(get_db_session)):
+async def mfa_setup(
+    user_email: EmailStr,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.email != user_email and not current_user.is_superadmin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No autorizado para configurar MFA de otro usuario.")
+
     stmt = select(User).where(User.email == user_email)
     res = await db.execute(stmt)
     user = res.scalar_one_or_none()
@@ -148,7 +156,14 @@ async def mfa_setup(user_email: EmailStr, db: AsyncSession = Depends(get_db_sess
 
 
 @router.post("/mfa/enable", summary="Confirmar y activar MFA en la cuenta del usuario")
-async def mfa_enable(payload: MFAEnableRequest, db: AsyncSession = Depends(get_db_session)):
+async def mfa_enable(
+    payload: MFAEnableRequest,
+    db: AsyncSession = Depends(get_db_session),
+    current_user: User = Depends(get_current_user),
+):
+    if str(current_user.id) != str(payload.user_id) and not current_user.is_superadmin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No autorizado para activar MFA en otra cuenta.")
+
     # Validar que el código suministrado corresponda al secreto
     if not MFAService.verify_totp_code(payload.secret, payload.code):
         raise HTTPException(

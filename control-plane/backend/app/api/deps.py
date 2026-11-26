@@ -16,12 +16,12 @@ from app.models.user import User
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-async def get_current_superadmin(
+async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db_session),
 ) -> User:
     """
-    Valida que la petición incluya un token JWT válido perteneciente a un Superadministrador activo.
+    Valida que la petición incluya un token JWT válido perteneciente a un usuario activo.
     """
     if not credentials or not credentials.credentials:
         raise HTTPException(
@@ -45,7 +45,22 @@ async def get_current_superadmin(
 
     stmt = select(User).where(User.id == user_uuid)
     user = (await db.execute(stmt)).scalar_one_or_none()
-    if not user or not user.is_active or not user.is_superadmin:
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuario inactivo o no autorizado.",
+        )
+
+    return user
+
+
+async def get_current_superadmin(
+    user: User = Depends(get_current_user),
+) -> User:
+    """
+    Valida que el usuario autenticado posea privilegios de Superadministrador activo.
+    """
+    if not user.is_superadmin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Se requieren privilegios de Superadministrador activo.",

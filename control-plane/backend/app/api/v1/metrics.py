@@ -1,19 +1,49 @@
 """
 Endpoint de Métricas Abiertas para Prometheus (OpenMetrics).
-Expone métricas de infraestructura, salud de tenants, concurrencia y backups.
+Expone métricas reales de infraestructura, salud de tenants y backups.
 """
-from fastapi import APIRouter, Response
-from sqlalchemy import text
+import os
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy import func, select, text
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
+from app.core.database import get_db_session
+from app.api.deps import verify_admin_or_internal
+from app.models.tenant import Tenant
 
 router = APIRouter(prefix="/metrics", tags=["Observabilidad"])
 
 
 @router.get("", summary="Métricas de telemetría en formato estándar Prometheus")
-async def prometheus_metrics():
+async def prometheus_metrics(
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     """
-    Expone métricas en formato texto plano para raspado (scraping) periódico por Prometheus.
+    Expone métricas reales en formato texto plano OpenMetrics/Prometheus.
+    Protegido mediante JWT Superadmin o clave de servicio interna.
     """
+    db_healthy = 0
+    active_tenants = 0
+    suspended_tenants = 0
+
+    try:
+        if (await db.execute(text("SELECT 1"))).scalar() == 1:
+            db_healthy = 1
+        active_tenants = (
+            await db.execute(select(func.count(Tenant.id)).where(Tenant.status == "ACTIVE"))
+        ).scalar() or 0
+        suspended_tenants = (
+            await db.execute(select(func.count(Tenant.id)).where(Tenant.status == "SUSPENDED"))
+        ).scalar() or 0
+    except Exception:
+        db_healthy = 0
+
+    backups_count = 0
+    if os.path.exists(settings.SOFIA_BACKUPS_DIR):
+        for _, _, files in os.walk(settings.SOFIA_BACKUPS_DIR):
+            backups_count += sum(1 for f in files if f.endswith(".sql.gz") or f.endswith(".sql"))
+
     metrics_lines = [
         "# HELP sofia_platform_info Metadatos generales de SOFIA Platform",
         "# TYPE sofia_platform_info gauge",
@@ -21,20 +51,19 @@ async def prometheus_metrics():
         "",
         "# HELP sofia_active_tenants_total Total de tenants activos en la plataforma",
         "# TYPE sofia_active_tenants_total gauge",
-        'sofia_active_tenants_total{runtime="odoo-20"} 10',
+        f'sofia_active_tenants_total{{runtime="odoo-20"}} {active_tenants}',
         "",
-        "# HELP sofia_concurrent_sessions_active Total de sesiones concurrentes vivas",
-        "# TYPE sofia_concurrent_sessions_active gauge",
-        "sofia_concurrent_sessions_active 24",
+        "# HELP sofia_suspended_tenants_total Total de tenants suspendidos por mora",
+        "# TYPE sofia_suspended_tenants_total gauge",
+        f'sofia_suspended_tenants_total{{runtime="odoo-20"}} {suspended_tenants}',
         "",
-        "# HELP sofia_backup_operations_total Total de operaciones de backup ejecutadas",
-        "# TYPE sofia_backup_operations_total counter",
-        'sofia_backup_operations_total{driver="google_drive",status="success"} 42',
-        'sofia_backup_operations_total{driver="google_drive",status="failed"} 0',
+        "# HELP sofia_backup_files_total Total de archivos de respaldo almacenados localmente",
+        "# TYPE sofia_backup_files_total gauge",
+        f"sofia_backup_files_total {backups_count}",
         "",
         "# HELP sofia_database_health Estado de conexión a PostgreSQL (1=healthy, 0=unhealthy)",
         "# TYPE sofia_database_health gauge",
-        "sofia_database_health 1",
+        f"sofia_database_health {db_healthy}",
     ]
 
     content = "\n".join(metrics_lines) + "\n"
