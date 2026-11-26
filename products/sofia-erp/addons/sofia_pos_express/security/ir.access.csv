@@ -1,0 +1,10 @@
+id,name,model_id,group_id/id,operation,domain
+access_pos_express_config_user,pos.express.config user,pos.express.config,group_pos_express_user,cru,
+access_pos_express_config_manager,pos.express.config manager,pos.express.config,group_pos_express_manager,crud,
+access_pos_express_config_base,pos.express.config base,pos.express.config,base.group_user,cru,
+access_pos_express_session_user,pos.express.session user,pos.express.session,group_pos_express_user,cru,
+access_pos_express_session_manager,pos.express.session manager,pos.express.session,group_pos_express_manager,crud,
+access_pos_express_session_base,pos.express.session base,pos.express.session,base.group_user,cru,
+access_pos_express_cash_move_user,pos.express.cash.move user,pos.express.cash.move,group_pos_express_user,cru,
+access_pos_express_cash_move_manager,pos.express.cash.move manager,pos.express.cash.move,group_pos_express_manager,crud,
+access_pos_express_cash_move_base,pos.express.cash.move base,pos.express.cash.move,base.group_user,cru,

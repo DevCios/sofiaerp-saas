@@ -26,7 +26,7 @@ POS Express — Punto de Venta Ultraligero para SOFIA ERP (Odoo 20)
     ],
     'data': [
         'security/pos_express_security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/pos_express_sequence.xml',
         'views/pos_express_views.xml',
         'views/pos_express_terminal.xml',
