@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db_session
+from app.api.deps import get_current_superadmin, verify_admin_or_internal
 from app.models.tenant import Tenant
+from app.models.user import User
 from app.models.product import Subscription, ProductPlan
 from app.services.billing_service import BillingService, SubscriptionState
 
@@ -31,7 +33,11 @@ class RenewSubscriptionRequest(BaseModel):
 
 
 @router.get("/subscriptions/{tenant_id}", summary="Obtener estado de facturación y suscripción del tenant")
-async def get_tenant_billing_status(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def get_tenant_billing_status(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     stmt = (
         select(Subscription, ProductPlan, Tenant)
         .join(ProductPlan, Subscription.plan_id == ProductPlan.id)
@@ -85,6 +91,7 @@ async def update_subscription_addons(
     tenant_id: UUID,
     payload: AddonsUpdateRequest,
     db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
 ):
     stmt = select(Subscription).where(Subscription.tenant_id == tenant_id)
     res = await db.execute(stmt)
@@ -111,6 +118,7 @@ async def upgrade_subscription_plan(
     tenant_id: UUID,
     payload: UpgradePlanRequest,
     db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
 ):
     sub = (await db.execute(select(Subscription).where(Subscription.tenant_id == tenant_id))).scalar_one_or_none()
     if not sub:
@@ -139,6 +147,7 @@ async def renew_subscription(
     tenant_id: UUID,
     payload: RenewSubscriptionRequest,
     db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
 ):
     sub = (await db.execute(select(Subscription).where(Subscription.tenant_id == tenant_id))).scalar_one_or_none()
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
@@ -154,6 +163,11 @@ async def renew_subscription(
     sub.current_period_end = base_date + timedelta(days=days_to_add)
     sub.status = SubscriptionState.ACTIVE
 
+    tenant.subscription_expires_at = sub.current_period_end
+    tenant.payment_status = "PAID"
+    tenant.last_payment_date = now
+    if payload.payment_reference:
+        tenant.last_payment_reference = payload.payment_reference
     if tenant.status == "SUSPENDED":
         tenant.status = "ACTIVE"
 
@@ -171,7 +185,7 @@ async def renew_subscription(
 
 
 @router.post("/evaluate-dunning", summary="Disparar evaluación manual de morosidad y suspensiones (Admin)")
-async def trigger_dunning_evaluation():
+async def trigger_dunning_evaluation(_admin: User = Depends(get_current_superadmin)):
     """Encola inmediatamente la evaluación de vencimientos y suspensiones en Celery."""
     from app.tasks.billing_tasks import evaluate_all_subscriptions_task
 

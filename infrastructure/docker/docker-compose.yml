@@ -57,6 +57,11 @@ services:
     restart: unless-stopped
     environment:
       - ENVIRONMENT=production
+      - APP_SECRET_KEY=${APP_SECRET_KEY:-sofia_change_this_secret_key_in_env}
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-https://api.sofiaerp.com,https://sofiaerp.com,https://admin.sofiaerp.com}
+      - SOFIA_SUPERADMIN_EMAIL=${SOFIA_SUPERADMIN_EMAIL:-admin@sofiaerp.com}
+      - SOFIA_SUPERADMIN_PASSWORD=${SOFIA_SUPERADMIN_PASSWORD:-SofiaAdmin2026!}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/1
@@ -86,9 +91,10 @@ services:
       dockerfile: Dockerfile
     container_name: sofia-control-plane-worker
     restart: unless-stopped
-    command: celery -A app.tasks.celery_app worker --beat --loglevel=info --concurrency=2
+    command: celery -A app.tasks.celery_app worker --beat --loglevel=info --concurrency=1
     environment:
       - ENVIRONMENT=production
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
       - CELERY_BROKER_URL=redis://:${REDIS_PASSWORD}@redis:6379/1
@@ -100,6 +106,7 @@ services:
       - POSTGRES_PORT=5432
       - ODOO_DB_USER=${POSTGRES_USER}
     volumes:
+      - ../../control-plane/backend/app:/app/app
       - sofia_filestores:/var/lib/sofia/filestores
       - sofia_backups:/var/lib/sofia/backups
       - ./backups/rclone.conf:/etc/sofia/rclone/rclone.conf:ro
@@ -138,6 +145,7 @@ services:
     image: postgres:16-alpine
     container_name: sofia-postgres
     restart: unless-stopped
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -179,6 +187,7 @@ services:
       - PORT=5432
       - USER=${POSTGRES_USER}
       - PASSWORD=${POSTGRES_PASSWORD}
+      - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
     volumes:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro

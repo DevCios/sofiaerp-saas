@@ -63,26 +63,64 @@ async def lifespan(app: FastAPI):
             existing_admin.mfa_enabled = False
             await session.commit()
 
+        # Seed idempotente de Producto y Planes Comerciales SOFIA ERP
+        from app.models.product import Product, ProductPlan
+        prod_stmt = select(Product).where(Product.code == "SOFIA-ERP")
+        product = (await session.execute(prod_stmt)).scalar_one_or_none()
+        if not product:
+            product = Product(
+                code="SOFIA-ERP",
+                name="SOFIA ERP Cloud",
+                description="ERP Multi-Tenant con Facturación Electrónica SUNAT y GRE.",
+                is_active=True,
+            )
+            session.add(product)
+            await session.flush()
+
+        default_plans = [
+            ("SOFIA-PLAN-EMP", "Plan Emprendedor", "BASIC", 2, 2, 10, 9.90),
+            ("SOFIA-PLAN-PRO", "Plan Pyme Pro", "PROFESSIONAL", 5, 5, 25, 14.90),
+            ("SOFIA-PLAN-CORP", "Plan Corporativo", "ENTERPRISE", 15, 15, 100, 19.90),
+        ]
+        for code, name, tier, max_u, max_s, storage_gb, price in default_plans:
+            p_res = await session.execute(select(ProductPlan).where(ProductPlan.code == code))
+            if not p_res.scalar_one_or_none():
+                session.add(ProductPlan(
+                    product_id=product.id,
+                    code=code,
+                    name=name,
+                    tier=tier,
+                    max_users=max_u,
+                    max_concurrent_sessions=max_s,
+                    storage_gb_limit=storage_gb,
+                    base_price=price,
+                ))
+        await session.commit()
+
     yield
     # Cierre ordenado de conexiones
     await engine.dispose()
 
 
+_is_prod = settings.ENVIRONMENT.lower() == "production"
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description="Plataforma SaaS Central para Gestión Multiproducto, Multi-tenant y Licenciamiento de SOFIA ERP.",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
-    openapi_url="/api/openapi.json",
+    docs_url=None if _is_prod else "/api/docs",
+    redoc_url=None if _is_prod else "/api/redoc",
+    openapi_url=None if _is_prod else "/api/openapi.json",
     lifespan=lifespan,
 )
 
-# Configuración de CORS estricto
+# Configuración de CORS estricto (nunca combinar '*' con allow_credentials=True)
+_cors_origins = settings.allowed_hosts_list
+_allow_creds = "*" not in _cors_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_hosts_list,
-    allow_credentials=True,
+    allow_origins=_cors_origins,
+    allow_credentials=_allow_creds,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )

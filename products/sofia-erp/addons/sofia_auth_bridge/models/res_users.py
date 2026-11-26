@@ -63,8 +63,10 @@ class ResUsers(models.Model):
         db_name = self.env.cr.dbname
 
         try:
+            internal_key = os.getenv('INTERNAL_SERVICE_KEY', 'sofia_internal_mesh_key_change_in_prod')
             resp = requests.get(
                 f"{base_url}/api/v1/tenants/by-db/{db_name}/entitlements",
+                headers={"X-Internal-Service-Key": internal_key},
                 timeout=3,
             )
             if resp.status_code == 200:

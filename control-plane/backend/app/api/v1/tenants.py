@@ -3,6 +3,7 @@ Endpoints para Administración de Tenants, Dominios, Verificación DNS y Resoluc
 """
 from typing import List, Optional
 from datetime import datetime, timedelta, timezone
+import gzip
 import os
 import re
 import subprocess
@@ -15,8 +16,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db_session
 from app.core.security import get_password_hash, create_access_token
+from app.api.deps import get_current_superadmin, verify_admin_or_internal
 from app.models.tenant import Tenant, TenantDomain
 from app.models.user import User, UserTenantMembership
+from app.models.product import ProductPlan, Subscription
 from app.models.audit import TenantAuditLog, SystemAnnouncement
 from app.schemas.tenant import (
     TenantCreate,
@@ -81,8 +84,21 @@ async def check_slug_availability(slug: str, db: AsyncSession = Depends(get_db_s
     }
 
 
+def _normalize_plan_code(raw_code: Optional[str]) -> str:
+    code = (raw_code or "SOFIA-PLAN-PRO").upper()
+    if "EMP" in code:
+        return "SOFIA-PLAN-EMP"
+    if "CORP" in code or "ENT" in code:
+        return "SOFIA-PLAN-CORP"
+    return "SOFIA-PLAN-PRO"
+
+
 @router.post("", response_model=TenantResponse, status_code=status.HTTP_201_CREATED, summary="Registrar y aprovisionar un nuevo Tenant")
-async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db_session)):
+async def create_tenant(
+    payload: TenantCreate,
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     existing_tenant = await db.execute(select(Tenant).where(Tenant.slug == payload.slug))
     if existing_tenant.scalar_one_or_none():
         raise HTTPException(
@@ -95,7 +111,9 @@ async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db
 
     cycle = (payload.billing_cycle or "MONTHLY").upper()
     duration_days = 365 if cycle == "ANNUAL" else 30
-    expires_at = datetime.now(timezone.utc) + timedelta(days=duration_days)
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(days=duration_days)
+    normalized_plan = _normalize_plan_code(payload.plan_code)
 
     new_tenant = Tenant(
         name=payload.name,
@@ -104,15 +122,28 @@ async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db
         filestore_path=filestore_dir,
         status="PROVISIONING",
         runtime_mode=payload.runtime_mode or "SHARED_PROTECTED",
-        plan_code=payload.plan_code or "SOFIA-ERP-PRO",
+        plan_code=normalized_plan,
         billing_cycle=cycle,
         subscription_expires_at=expires_at,
         payment_status="PAID",
-        last_payment_date=datetime.now(timezone.utc),
+        last_payment_date=now,
         last_payment_reference=payload.payment_reference,
     )
     db.add(new_tenant)
     await db.flush()
+
+    # Crear suscripción vinculada en tabla subscriptions para Celery Beat y Entitlements
+    plan_obj = (await db.execute(select(ProductPlan).where(ProductPlan.code == normalized_plan))).scalar_one_or_none()
+    if plan_obj:
+        db.add(Subscription(
+            tenant_id=new_tenant.id,
+            plan_id=plan_obj.id,
+            status="ACTIVE",
+            current_period_start=now,
+            current_period_end=expires_at,
+            extra_users=0,
+            extra_storage_gb=0,
+        ))
 
     user_stmt = select(User).where(User.email == payload.admin_email)
     user_res = await db.execute(user_stmt)
@@ -145,14 +176,21 @@ async def create_tenant(payload: TenantCreate, db: AsyncSession = Depends(get_db
 
 
 @router.get("", response_model=List[TenantResponse], summary="Listar todos los tenants")
-async def list_tenants(db: AsyncSession = Depends(get_db_session)):
+async def list_tenants(
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     stmt = select(Tenant).order_by(Tenant.created_at.desc())
     result = await db.execute(stmt)
     return result.scalars().all()
 
 
 @router.get("/{tenant_id}", response_model=TenantResponse, summary="Obtener detalle de un tenant")
-async def get_tenant(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def get_tenant(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     stmt = select(Tenant).where(Tenant.id == tenant_id)
     result = await db.execute(stmt)
     tenant = result.scalar_one_or_none()
@@ -166,7 +204,8 @@ async def get_tenant(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)
 async def update_tenant_status(
     tenant_id: UUID,
     payload: TenantStatusUpdate,
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
 ):
     stmt = select(Tenant).where(Tenant.id == tenant_id)
     result = await db.execute(stmt)
@@ -192,13 +231,26 @@ async def update_tenant_status(
     elif payload.status == "SUSPENDED":
         tenant.payment_status = "OVERDUE"
 
+    # Sincronizar tabla subscriptions para consistencia con Celery Beat
+    sub = (await db.execute(select(Subscription).where(Subscription.tenant_id == tenant.id))).scalar_one_or_none()
+    if sub:
+        if tenant.status == "ACTIVE":
+            sub.status = "ACTIVE"
+            if tenant.subscription_expires_at:
+                sub.current_period_end = tenant.subscription_expires_at
+        elif tenant.status == "SUSPENDED":
+            sub.status = "SUSPENDED"
+
     await db.commit()
     await db.refresh(tenant)
     return tenant
 
 
 @router.post("/evaluate-subscriptions", summary="Verificar vigencia de suscripciones y suspender tenants morosos")
-async def evaluate_subscriptions(db: AsyncSession = Depends(get_db_session)):
+async def evaluate_subscriptions(
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     """
     Tarea ejecutada periódicamente (cron diario o webhook):
     - Revisa todos los tenants con suscripción activa.
@@ -249,6 +301,7 @@ async def register_domain(
     tenant_id: UUID,
     payload: TenantDomainCreate,
     db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
 ):
     # Verificar que el tenant exista
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
@@ -277,7 +330,11 @@ async def register_domain(
 
 
 @router.get("/{tenant_id}/domains", response_model=List[TenantDomainResponse], summary="Listar dominios del tenant")
-async def list_domains(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def list_domains(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     stmt = select(TenantDomain).where(TenantDomain.tenant_id == tenant_id)
     result = await db.execute(stmt)
     return result.scalars().all()
@@ -288,6 +345,7 @@ async def verify_domain(
     tenant_id: UUID,
     domain_id: UUID,
     db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
 ):
     stmt = select(TenantDomain).where(
         TenantDomain.id == domain_id,
@@ -351,11 +409,15 @@ async def resolve_host(host: str, response: Response, db: AsyncSession = Depends
 async def create_tenant_backup(
     tenant_id: UUID,
     request: Request,
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
 ):
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
+
+    if not re.match(r"^[a-z0-9_]+$", tenant.database_name):
+        raise HTTPException(status_code=400, detail="Nombre de base de datos inválido.")
 
     tenant_backup_dir = os.path.join(settings.SOFIA_BACKUPS_DIR, tenant.slug)
     os.makedirs(tenant_backup_dir, exist_ok=True)
@@ -365,7 +427,7 @@ async def create_tenant_backup(
     filepath = os.path.join(tenant_backup_dir, filename)
 
     pg_host = os.getenv("POSTGRES_HOST", "postgres")
-    pg_port = os.getenv("POSTGRES_PORT", "5432")
+    pg_port = str(os.getenv("POSTGRES_PORT", "5432"))
     pg_user = os.getenv("POSTGRES_USER", "sofia_admin")
     pg_pass = os.getenv("POSTGRES_PASSWORD", "sofia_pass")
 
@@ -373,8 +435,31 @@ async def create_tenant_backup(
     env["PGPASSWORD"] = pg_pass
 
     try:
-        cmd = f'pg_dump -h {pg_host} -p {pg_port} -U {pg_user} -d "{tenant.database_name}" --no-owner --no-acl | gzip -9 > "{filepath}"'
-        subprocess.run(cmd, shell=True, env=env, check=True)
+        # Ejecución segura sin shell=True (cero riesgo de Command Injection)
+        proc = subprocess.Popen(
+            [
+                "pg_dump",
+                "-h", pg_host,
+                "-p", pg_port,
+                "-U", pg_user,
+                "-d", tenant.database_name,
+                "--no-owner",
+                "--no-acl",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=env,
+        )
+        with gzip.open(filepath, "wb", compresslevel=6) as gz_out:
+            assert proc.stdout is not None
+            for chunk in iter(lambda: proc.stdout.read(65536), b""):
+                gz_out.write(chunk)
+        _, stderr_bytes = proc.communicate(timeout=300)
+        if proc.returncode != 0:
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            err_msg = stderr_bytes.decode("utf-8", errors="ignore").strip()
+            raise RuntimeError(err_msg or f"pg_dump retornó código {proc.returncode}")
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Error al generar backup: {str(ex)}")
 
@@ -383,7 +468,7 @@ async def create_tenant_backup(
     size_human = f"{size_mb} MB" if size_mb >= 1 else f"{round(size_bytes/1024, 1)} KB"
 
     # Registrar en auditoría
-    client_ip = request.client.host if request.client else "127.0.0.1"
+    client_ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "127.0.0.1")
     audit = TenantAuditLog(
         tenant_id=tenant.id,
         action="BACKUP_CREATED",
@@ -403,7 +488,11 @@ async def create_tenant_backup(
 
 
 @router.get("/{tenant_id}/backups", summary="Listar backups disponibles del tenant")
-async def list_tenant_backups(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def list_tenant_backups(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
@@ -431,7 +520,12 @@ async def list_tenant_backups(tenant_id: UUID, db: AsyncSession = Depends(get_db
 
 
 @router.get("/{tenant_id}/backups/{filename}/download", summary="Descargar archivo de backup")
-async def download_tenant_backup(tenant_id: UUID, filename: str, db: AsyncSession = Depends(get_db_session)):
+async def download_tenant_backup(
+    tenant_id: UUID,
+    filename: str,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
@@ -453,14 +547,21 @@ async def download_tenant_backup(tenant_id: UUID, filename: str, db: AsyncSessio
 # 2. Métricas Reales de Uso y Consumo
 # ------------------------------------------------------------------------------
 @router.get("/{tenant_id}/metrics", summary="Obtener métricas reales de uso y cuotas del tenant")
-async def get_tenant_metrics(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def get_tenant_metrics(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
 
     db_size_pretty = "72 MB"
     try:
-        size_res = await db.execute(text(f"SELECT pg_size_pretty(pg_database_size('{tenant.database_name}'));"))
+        size_res = await db.execute(
+            text("SELECT pg_size_pretty(pg_database_size(:db_name));"),
+            {"db_name": tenant.database_name},
+        )
         db_size_pretty = size_res.scalar() or "72 MB"
     except Exception:
         db_size_pretty = "Estimado ~75 MB"
@@ -480,7 +581,7 @@ async def get_tenant_metrics(tenant_id: UUID, db: AsyncSession = Depends(get_db_
         "database_name": tenant.database_name,
         "database_size": db_size_pretty,
         "filestore_size": f"{filestore_size_mb} MB",
-        "plan_code": tenant.plan_code or "SOFIA-ERP-PRO",
+        "plan_code": tenant.plan_code or "SOFIA-PLAN-PRO",
         "billing_cycle": tenant.billing_cycle or "MONTHLY",
         "status": tenant.status,
     }
@@ -493,30 +594,32 @@ async def get_tenant_metrics(tenant_id: UUID, db: AsyncSession = Depends(get_db_
 async def generate_support_token(
     tenant_id: UUID,
     request: Request,
-    db: AsyncSession = Depends(get_db_session)
+    db: AsyncSession = Depends(get_db_session),
+    admin: User = Depends(get_current_superadmin),
 ):
     tenant = (await db.execute(select(Tenant).where(Tenant.id == tenant_id))).scalar_one_or_none()
     if not tenant:
         raise HTTPException(status_code=404, detail="Tenant no encontrado.")
 
     token = create_access_token(
-        data={
-            "sub": "superadmin@sofiaerp.com",
-            "role": "SUPERADMIN_SUPPORT",
-            "tenant_id": str(tenant.id),
+        subject=str(admin.id),
+        tenant_id=str(tenant.id),
+        roles=["SUPERADMIN_SUPPORT"],
+        expires_delta=timedelta(minutes=30),
+        extra_claims={
+            "email": admin.email,
             "tenant_slug": tenant.slug,
             "target_db": tenant.database_name,
         },
-        expires_delta=timedelta(minutes=30)
     )
 
-    client_ip = request.client.host if request.client else "127.0.0.1"
+    client_ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "127.0.0.1")
     audit = TenantAuditLog(
         tenant_id=tenant.id,
         action="SUPERADMIN_IMPERSONATION_REQUEST",
         ip_address=client_ip,
         user_agent=request.headers.get("user-agent", "AdminUI"),
-        payload_json={"tenant_slug": tenant.slug, "expires_in_minutes": 30}
+        payload_json={"tenant_slug": tenant.slug, "admin_email": admin.email, "expires_in_minutes": 30}
     )
     db.add(audit)
     await db.commit()
@@ -533,7 +636,10 @@ async def generate_support_token(
 # 4. Logs de Auditoría y Seguridad
 # ------------------------------------------------------------------------------
 @router.get("/system/audit-logs", summary="Listar eventos de auditoría del sistema")
-async def get_system_audit_logs(db: AsyncSession = Depends(get_db_session)):
+async def get_system_audit_logs(
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     stmt = (
         select(TenantAuditLog, Tenant.slug, Tenant.name)
         .outerjoin(Tenant, TenantAuditLog.tenant_id == Tenant.id)
@@ -566,14 +672,21 @@ class AnnouncementCreate(BaseModel):
 
 
 @router.get("/system/announcements", summary="Listar comunicados activos del sistema")
-async def list_announcements(db: AsyncSession = Depends(get_db_session)):
+async def list_announcements(
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     stmt = select(SystemAnnouncement).where(SystemAnnouncement.is_active == True).order_by(SystemAnnouncement.created_at.desc())
     res = await db.execute(stmt)
     return res.scalars().all()
 
 
 @router.post("/system/announcements", summary="Crear un comunicado global para todos los clientes")
-async def create_announcement(payload: AnnouncementCreate, db: AsyncSession = Depends(get_db_session)):
+async def create_announcement(
+    payload: AnnouncementCreate,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     ann = SystemAnnouncement(
         title=payload.title,
         message=payload.message,
@@ -587,7 +700,11 @@ async def create_announcement(payload: AnnouncementCreate, db: AsyncSession = De
 
 
 @router.delete("/system/announcements/{announcement_id}", summary="Eliminar o archivar un comunicado")
-async def delete_announcement(announcement_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def delete_announcement(
+    announcement_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _admin: User = Depends(get_current_superadmin),
+):
     stmt = select(SystemAnnouncement).where(SystemAnnouncement.id == announcement_id)
     ann = (await db.execute(stmt)).scalar_one_or_none()
     if not ann:

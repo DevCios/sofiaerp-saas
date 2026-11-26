@@ -17,12 +17,13 @@ _logger = logging.getLogger(__name__)
 MP_PREFERENCE_API = "https://api.mercadopago.com/checkout/preferences"
 
 
-def trigger_control_plane_provisioning(subdomain, company_name, admin_email, plan_code="SOFIA-PLAN-PRO"):
+def trigger_control_plane_provisioning(subdomain, company_name, admin_email, plan_code="SOFIA-PLAN-PRO", billing_cycle="MONTHLY"):
     """
     Invoca la API del Control Plane de SOFIA ERP (FastAPI) para aprovisionar
     de forma inmediata la base de datos PostgreSQL aislada y filestore del tenant.
     """
     control_plane_url = os.getenv("CONTROL_PLANE_API_URL", "http://control-plane-api:8000").rstrip("/")
+    internal_key = os.getenv("INTERNAL_SERVICE_KEY", "sofia_internal_mesh_key_change_in_prod")
     endpoint = f"{control_plane_url}/api/v1/tenants"
 
     # Generar clave temporal robusta para el administrador del tenant
@@ -36,11 +37,17 @@ def trigger_control_plane_provisioning(subdomain, company_name, admin_email, pla
         "admin_email": admin_email.lower().strip(),
         "admin_password": temp_password,
         "plan_code": plan_code or "SOFIA-PLAN-PRO",
+        "billing_cycle": "ANNUAL" if str(billing_cycle).lower() in ("anual", "annual") else "MONTHLY",
     }
 
     try:
         _logger.info("SOFIA ERP: Solicitando aprovisionamiento automático a Control Plane para tenant '%s'...", subdomain)
-        resp = requests.post(endpoint, json=payload, timeout=12)
+        resp = requests.post(
+            endpoint,
+            json=payload,
+            headers={"X-Internal-Service-Key": internal_key},
+            timeout=12,
+        )
         if resp.status_code == 201:
             data = resp.json()
             _logger.info("SOFIA ERP: Tenant '%s' aprovisionado exitosamente en Control Plane (ID: %s)", subdomain, data.get('id'))
@@ -106,9 +113,13 @@ class SofiaCheckoutController(http.Controller):
         la preferencia de pago en Mercado Pago (Checkout Pro / Transparente).
         """
         try:
-            plan = post.get('plan', 'pyme-pro')
-            billing = post.get('billing', 'anual')
-            users = int(post.get('users', 1))
+            plan = (post.get('plan') or 'pyme-pro').strip().lower()
+            if plan not in ('emprendedor', 'pyme-pro', 'corporativo'):
+                plan = 'pyme-pro'
+            billing = (post.get('billing') or 'anual').strip().lower()
+            if billing not in ('anual', 'mensual'):
+                billing = 'anual'
+            users = max(1, min(500, int(post.get('users', 1))))
             client_name = (post.get('client_name') or '').strip()
             email = (post.get('email') or '').strip().lower()
             phone = (post.get('phone') or '').strip()
@@ -118,8 +129,18 @@ class SofiaCheckoutController(http.Controller):
             address = (post.get('address') or '').strip()
             city = (post.get('city') or '').strip()
             region = (post.get('region') or '').strip()
-            amount_total = float(post.get('amount_total', 0.0))
-            impl_cost = float(post.get('impl_cost', 0.0))
+
+            # SEGURIDAD: Recalcular el monto total 100% en el servidor (nunca confiar en amount_total del cliente)
+            raw_impl_cost = float(post.get('impl_cost', 0.0))
+            impl_cost = raw_impl_cost if raw_impl_cost in (0.0, 150.0, 350.0) else 0.0
+            server_rates = {
+                'emprendedor': {'anual': 9.90, 'mensual': 11.90},
+                'pyme-pro': {'anual': 14.90, 'mensual': 16.90},
+                'corporativo': {'anual': 19.90, 'mensual': 21.90},
+            }
+            unit_rate_srv = server_rates[plan][billing]
+            months_srv = 12 if billing == 'anual' else 1
+            amount_total = round((unit_rate_srv * users * months_srv) + impl_cost, 2)
 
             if not email or not fiscal_id:
                 return {
@@ -447,6 +468,7 @@ class SofiaCheckoutController(http.Controller):
                         company_name=company_name,
                         admin_email=email,
                         plan_code=plan_code,
+                        billing_cycle=metadata.get('billing', 'anual'),
                     )
 
         return Response(json.dumps({"status": "ok"}), status=200, mimetype='application/json')
@@ -492,6 +514,7 @@ class SofiaCheckoutController(http.Controller):
                     company_name=company or f"Empresa {subdomain.capitalize()}",
                     admin_email=email or f"admin@{subdomain}.sofiaerp.com",
                     plan_code=plan_code,
+                    billing_cycle=billing,
                 )
         else:
             # Solo permitir modo demo si está explícitamente habilitado en parámetros del sistema

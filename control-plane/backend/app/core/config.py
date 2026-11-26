@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
     APP_SECRET_KEY: str = "temporary_insecure_key_must_be_overridden_in_production"
+    INTERNAL_SERVICE_KEY: str = "sofia_internal_mesh_key_change_in_prod"
     
     # Dominios y CORS
     ALLOWED_HOSTS: str = "*"

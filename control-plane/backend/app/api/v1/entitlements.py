@@ -8,6 +8,7 @@ from pydantic import BaseModel, HttpUrl
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db_session
+from app.api.deps import verify_admin_or_internal
 from app.models.tenant import Tenant
 from app.services.entitlement_service import EntitlementService, EntitlementCode
 
@@ -22,13 +23,21 @@ class BrandingUpdateRequest(BaseModel):
 
 
 @router.get("/{tenant_id}/entitlements", summary="Consultar capacidades contratadas del tenant")
-async def get_tenant_entitlements(tenant_id: UUID, db: AsyncSession = Depends(get_db_session)):
+async def get_tenant_entitlements(
+    tenant_id: UUID,
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     entitlements_info = await EntitlementService.get_tenant_entitlements(tenant_id, db)
     return entitlements_info
 
 
 @router.get("/by-db/{db_name}/entitlements", summary="Consultar límites y capacidades por nombre de base de datos (Odoo Runtime)")
-async def get_tenant_entitlements_by_db(db_name: str, db: AsyncSession = Depends(get_db_session)):
+async def get_tenant_entitlements_by_db(
+    db_name: str,
+    db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
+):
     """
     Endpoint interno invocado por el runtime Odoo (sofia_auth_bridge) para validar
     cuotas activas de usuarios y almacenamiento sin depender del UUID del tenant.
@@ -53,6 +62,7 @@ async def update_tenant_branding(
     tenant_id: UUID,
     payload: BrandingUpdateRequest,
     db: AsyncSession = Depends(get_db_session),
+    _auth: str = Depends(verify_admin_or_internal),
 ):
     """
     Actualiza la configuración visual de la empresa validando las capacidades contratadas.
