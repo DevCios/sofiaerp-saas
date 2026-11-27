@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <!-- Group: User -->
-        <record id="group_wango_user" model="res.groups">
-            <field name="name">Mercado Wanka / Logística: Usuario</field>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Acceso operativo a Mercado Wanka y logística.</field>
+    <data noupdate="0">
+        <!-- Categoría Principal: Mercado Wanka -->
+        <record id="module_category_mercado_wanka" model="ir.module.category">
+            <field name="name">Mercado Wanka</field>
+            <field name="description">Gestión del ecosistema Marketplace y Logística de Mercado Wanka.</field>
+            <field name="sequence">25</field>
         </record>
 
-        <!-- Group: Manager -->
+        <!-- Privilegio Odoo 20: Logística (selector desplegable limpio) -->
+        <record id="privilege_wango_logistics" model="res.groups.privilege">
+            <field name="name">Logística</field>
+            <field name="category_id" ref="wango_core.module_category_mercado_wanka"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_wango_user" model="res.groups">
+            <field name="name">Operador</field>
+            <field name="privilege_id" ref="wango_core.privilege_wango_logistics"/>
+            <field name="sequence">10</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Acceso operativo a envíos, agencias y logística de Mercado Wanka.</field>
+        </record>
+
         <record id="group_wango_manager" model="res.groups">
-            <field name="name">Mercado Wanka / Logística: Administrador</field>
+            <field name="name">Administrador</field>
+            <field name="privilege_id" ref="wango_core.privilege_wango_logistics"/>
+            <field name="sequence">20</field>
             <field name="implied_ids" eval="[(4, ref('group_wango_user'))]"/>
-            <field name="comment">Acceso administrativo completo a configuración y reportes de Mercado Wanka.</field>
+            <field name="comment">Acceso administrativo completo a configuración logística y tarifas.</field>
         </record>
     </data>
 </odoo>
