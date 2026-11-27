@@ -25,9 +25,9 @@
     </record>
 
     <menuitem id="menu_mw_webhook_outbox"
-              name="Cola Sync ERP"
-              parent="wango_marketplace.menu_admin_marketplace"
+              name="Cola Sync SOFIA ERP"
+              parent="wango_marketplace.menu_mw_finance"
               action="action_mw_webhook_outbox"
-              sequence="40"
+              sequence="30"
               groups="wango_marketplace.group_marketplace_manager"/>
 </odoo>

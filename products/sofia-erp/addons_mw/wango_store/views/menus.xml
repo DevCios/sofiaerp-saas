@@ -1,92 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Menú principal dentro del ecosistema WanGO -->
+    <!-- Menú unificado de Portada y Diseño dentro de Mercado Wanka (sin duplicados en Sitio Web) -->
     <menuitem id="menu_wango_store_root"
-              name="Tienda &amp; Portada"
+              name="Portada y Diseño"
               parent="wango_core.menu_wango_root"
-              sequence="25"/>
+              groups="wango_marketplace.group_marketplace_manager"
+              sequence="60"/>
 
     <menuitem id="menu_wango_store_banners"
-              name="Banners Deslizantes"
+              name="Banners Hero"
               parent="menu_wango_store_root"
               action="action_wango_home_banner"
               sequence="10"/>
 
     <menuitem id="menu_wango_store_cards"
-              name="Tarjetas Rápidas"
+              name="Tarjetas Rápidas (6)"
               parent="menu_wango_store_root"
               action="action_wango_home_card"
               sequence="20"/>
-
-    <menuitem id="menu_wango_store_deals"
-              name="Ofertas del Día"
-              parent="menu_wango_store_root"
-              action="action_wango_daily_deals"
-              sequence="30"/>
-
-    <menuitem id="menu_wango_store_social_proof"
-              name="Social Proof de Productos"
-              parent="menu_wango_store_root"
-              action="action_wango_product_social_proof"
-              sequence="32"/>
-
-    <menuitem id="menu_wango_store_product_reviews"
-              name="Opiniones y Reseñas"
-              parent="menu_wango_store_root"
-              action="action_wango_product_review"
-              sequence="34"/>
 
     <menuitem id="menu_wango_store_categories"
               name="Categorías en Portada"
               parent="menu_wango_store_root"
               action="action_wango_featured_categories"
-              sequence="40"/>
+              sequence="30"/>
 
     <menuitem id="menu_wango_store_badges"
               name="Beneficios de Confianza"
               parent="menu_wango_store_root"
               action="action_wango_home_trust_badge"
-              sequence="50"/>
+              sequence="40"/>
 
-    <!-- Acceso secundario en Sitio Web > Configuración -->
-    <menuitem id="menu_wango_store_website_config"
-              name="WanGO Portada"
-              parent="website.menu_website_global_configuration"
-              sequence="35"/>
-
-    <menuitem id="menu_wango_store_website_banners"
-              name="Banners de Portada"
-              parent="menu_wango_store_website_config"
-              action="action_wango_home_banner"
-              sequence="10"/>
-
-    <menuitem id="menu_wango_store_website_cards"
-              name="Tarjetas Rápidas"
-              parent="menu_wango_store_website_config"
-              action="action_wango_home_card"
-              sequence="20"/>
-
-    <menuitem id="menu_wango_store_website_deals"
+    <!-- Reubicados en Catálogo (donde corresponden operativamente) -->
+    <menuitem id="menu_wango_store_deals"
               name="Ofertas del Día"
-              parent="menu_wango_store_website_config"
+              parent="wango_marketplace.menu_mw_catalog"
               action="action_wango_daily_deals"
               sequence="30"/>
 
-    <menuitem id="menu_wango_store_website_social_proof"
+    <menuitem id="menu_wango_store_social_proof"
               name="Social Proof de Productos"
-              parent="menu_wango_store_website_config"
+              parent="wango_marketplace.menu_mw_catalog"
               action="action_wango_product_social_proof"
-              sequence="32"/>
+              sequence="35"/>
 
-    <menuitem id="menu_wango_store_website_product_reviews"
+    <menuitem id="menu_wango_store_product_reviews"
               name="Opiniones y Reseñas"
-              parent="menu_wango_store_website_config"
+              parent="wango_marketplace.menu_mw_catalog"
               action="action_wango_product_review"
-              sequence="34"/>
-
-    <menuitem id="menu_wango_store_website_badges"
-              name="Beneficios de Confianza"
-              parent="menu_wango_store_website_config"
-              action="action_wango_home_trust_badge"
               sequence="40"/>
 </odoo>

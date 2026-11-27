@@ -93,10 +93,10 @@
         </field>
     </record>
 
-    <!-- Menú en Administración de WanGO -->
-    <menuitem id="menu_wango_claims" 
-              name="Libro de Reclamaciones" 
-              parent="wango_core.menu_wango_operations" 
+    <!-- Menú en Pedidos y Atención al Cliente -->
+    <menuitem id="menu_wango_claims"
+              name="Libro de Reclamaciones (INDECOPI)"
+              parent="wango_marketplace.menu_mw_orders"
               action="action_wango_claim" 
               sequence="50"/>
 </odoo>

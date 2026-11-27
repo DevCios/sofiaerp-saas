@@ -74,12 +74,12 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <!-- Menú en Marketplace -->
-    <menuitem id="menu_marketplace_settlements" 
-              name="Liquidaciones" 
-              parent="wango_marketplace.menu_admin_marketplace" 
-              action="action_marketplace_settlement" 
-              sequence="30"
+    <!-- Menú en Finanzas y Escrow -->
+    <menuitem id="menu_marketplace_settlements"
+              name="Liquidaciones Escrow"
+              parent="wango_marketplace.menu_mw_finance"
+              action="action_marketplace_settlement"
+              sequence="10"
               groups="wango_marketplace.group_marketplace_manager"/>
 
 </odoo>

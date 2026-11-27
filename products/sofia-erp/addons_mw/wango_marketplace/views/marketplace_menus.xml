@@ -1,11 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- MENÚS PARA VENDEDORES -->
+    <!-- ===================================================================== -->
+    <!-- 1. VENTAS Y PEDIDOS (Admin Marketplace)                               -->
+    <!-- ===================================================================== -->
+    <menuitem id="menu_mw_orders"
+              name="Pedidos"
+              parent="wango_core.menu_wango_root"
+              groups="wango_marketplace.group_marketplace_manager"
+              sequence="10"/>
+
+    <record id="action_admin_marketplace_orders" model="ir.actions.act_window">
+        <field name="name">Pedidos del Marketplace</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('marketplace_seller_id', '!=', False)]</field>
+    </record>
+
+    <menuitem id="menu_admin_marketplace_orders"
+              name="Todos los Pedidos"
+              parent="menu_mw_orders"
+              action="action_admin_marketplace_orders"
+              sequence="10"/>
+
+    <!-- ===================================================================== -->
+    <!-- 2. VENDEDORES & KYC (preserva XML ID menu_admin_marketplace)          -->
+    <!-- ===================================================================== -->
+    <menuitem id="menu_admin_marketplace"
+              name="Vendedores"
+              parent="wango_core.menu_wango_root"
+              groups="wango_marketplace.group_marketplace_manager"
+              sequence="20"/>
+
+    <record id="action_admin_approved_sellers" model="ir.actions.act_window">
+        <field name="name">Tiendas Activas / Aprobadas</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_marketplace_seller', '=', True), ('marketplace_seller_status', '=', 'approved')]</field>
+    </record>
+
+    <menuitem id="menu_admin_approved_sellers"
+              name="Tiendas Activas"
+              parent="menu_admin_marketplace"
+              action="action_admin_approved_sellers"
+              sequence="10"/>
+
+    <record id="action_admin_pending_sellers" model="ir.actions.act_window">
+        <field name="name">Solicitudes de Vendedores</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_marketplace_seller', '=', True), ('marketplace_seller_status', '=', 'pending')]</field>
+    </record>
+
+    <menuitem id="menu_admin_pending_sellers"
+              name="Solicitudes Pendientes"
+              parent="menu_admin_marketplace"
+              action="action_admin_pending_sellers"
+              sequence="20"/>
+
+    <record id="action_admin_bank_audit" model="ir.actions.act_window">
+        <field name="name">Auditoría de Cuentas Bancarias (KYC)</field>
+        <field name="res_model">mw.bank.audit</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_admin_bank_audit"
+              name="Auditoría Bancaria (KYC)"
+              parent="menu_admin_marketplace"
+              action="action_admin_bank_audit"
+              sequence="40"/>
+
+    <!-- ===================================================================== -->
+    <!-- 3. CATÁLOGO Y COMISIONES                                              -->
+    <!-- ===================================================================== -->
+    <menuitem id="menu_mw_catalog"
+              name="Catálogo"
+              parent="wango_core.menu_wango_root"
+              groups="wango_marketplace.group_marketplace_manager"
+              sequence="30"/>
+
+    <record id="action_admin_approved_products" model="ir.actions.act_window">
+        <field name="name">Productos Publicados</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('marketplace_status', '=', 'approved')]</field>
+    </record>
+
+    <menuitem id="menu_admin_approved_products"
+              name="Productos Publicados"
+              parent="menu_mw_catalog"
+              action="action_admin_approved_products"
+              sequence="10"/>
+
+    <record id="action_admin_pending_products" model="ir.actions.act_window">
+        <field name="name">Productos Pendientes de Revisión</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('marketplace_status', '=', 'pending')]</field>
+    </record>
+
+    <menuitem id="menu_admin_pending_products"
+              name="Productos Pendientes"
+              parent="menu_mw_catalog"
+              action="action_admin_pending_products"
+              sequence="20"/>
+
+    <record id="action_admin_categories" model="ir.actions.act_window">
+        <field name="name">Categorías y Comisiones (%)</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_admin_categories"
+              name="Categorías y Comisiones"
+              parent="menu_mw_catalog"
+              action="action_admin_categories"
+              sequence="50"/>
+
+    <!-- ===================================================================== -->
+    <!-- 4. FINANZAS, ESCROW Y SINCRONIZACIÓN ERP                              -->
+    <!-- ===================================================================== -->
+    <menuitem id="menu_mw_finance"
+              name="Finanzas y Escrow"
+              parent="wango_core.menu_wango_root"
+              groups="wango_marketplace.group_marketplace_manager"
+              sequence="40"/>
+
+    <record id="action_mw_commission_invoices" model="ir.actions.act_window">
+        <field name="name">Facturas de Comisión Mercado Wanka</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', '=', 'out_invoice'), ('invoice_origin', 'ilike', 'LIQ')]</field>
+    </record>
+
+    <menuitem id="menu_mw_commission_invoices"
+              name="Facturas de Comisión"
+              parent="menu_mw_finance"
+              action="action_mw_commission_invoices"
+              sequence="20"/>
+
+    <!-- ===================================================================== -->
+    <!-- 5. PORTAL INTERNO DEL VENDEDOR (Al final, solo rol Vendedor)          -->
+    <!-- ===================================================================== -->
     <menuitem id="menu_seller_store"
               name="Mi Tienda"
               parent="wango_core.menu_wango_root"
               groups="wango_marketplace.group_marketplace_seller"
-              sequence="10"/>
+              sequence="95"/>
 
     <record id="action_seller_products" model="ir.actions.act_window">
         <field name="name">Mis Productos</field>
@@ -32,80 +172,4 @@
               parent="menu_seller_store"
               action="action_seller_sales"
               sequence="20"/>
-
-    <!-- MENÚS PARA ADMINISTRADORES -->
-    <menuitem id="menu_admin_marketplace"
-              name="Administración"
-              parent="wango_core.menu_wango_root"
-              groups="wango_marketplace.group_marketplace_manager"
-              sequence="20"/>
-
-    <!-- Vendedores Pendientes -->
-    <record id="action_admin_pending_sellers" model="ir.actions.act_window">
-        <field name="name">Vendedores Pendientes</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('is_marketplace_seller', '=', True), ('marketplace_seller_status', '=', 'pending')]</field>
-    </record>
-
-    <menuitem id="menu_admin_pending_sellers"
-              name="Vendedores Pendientes"
-              parent="menu_admin_marketplace"
-              action="action_admin_pending_sellers"
-              sequence="10"/>
-
-    <!-- Vendedores Aprobados -->
-    <record id="action_admin_approved_sellers" model="ir.actions.act_window">
-        <field name="name">Vendedores Aprobados</field>
-        <field name="res_model">res.partner</field>
-        <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('is_marketplace_seller', '=', True), ('marketplace_seller_status', '=', 'approved')]</field>
-    </record>
-
-    <menuitem id="menu_admin_approved_sellers"
-              name="Vendedores Aprobados"
-              parent="menu_admin_marketplace"
-              action="action_admin_approved_sellers"
-              sequence="15"/>
-
-    <!-- Productos Pendientes -->
-    <record id="action_admin_pending_products" model="ir.actions.act_window">
-        <field name="name">Productos Pendientes</field>
-        <field name="res_model">product.template</field>
-        <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('marketplace_status', '=', 'pending')]</field>
-    </record>
-
-    <menuitem id="menu_admin_pending_products"
-              name="Productos Pendientes"
-              parent="menu_admin_marketplace"
-              action="action_admin_pending_products"
-              sequence="20"/>
-
-    <!-- Productos Aprobados -->
-    <record id="action_admin_approved_products" model="ir.actions.act_window">
-        <field name="name">Productos Aprobados</field>
-        <field name="res_model">product.template</field>
-        <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('marketplace_status', '=', 'approved')]</field>
-    </record>
-
-    <menuitem id="menu_admin_approved_products"
-              name="Productos Aprobados"
-              parent="menu_admin_marketplace"
-              action="action_admin_approved_products"
-              sequence="25"/>
-
-    <!-- Categorías y Comisiones -->
-    <record id="action_admin_categories" model="ir.actions.act_window">
-        <field name="name">Comisiones por Categoría</field>
-        <field name="res_model">product.category</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
-    <menuitem id="menu_admin_categories"
-              name="Categorías y Comisiones"
-              parent="menu_admin_marketplace"
-              action="action_admin_categories"
-              sequence="30"/>
 </odoo>
