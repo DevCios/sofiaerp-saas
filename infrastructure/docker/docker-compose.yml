@@ -221,7 +221,8 @@ services:
     restart: unless-stopped
     environment:
       - ENVIRONMENT=production
-      - PUBLIC_BASE_URL=https://gateway.sofiaerp.com
+      - APP_NAME=${SUNAT_GATEWAY_APP_NAME:-Sofia Gateway}
+      - PUBLIC_BASE_URL=${SUNAT_GATEWAY_PUBLIC_URL:-https://gateway.sofiaerp.com}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
@@ -232,6 +233,8 @@ services:
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
       - GATEWAY_ADMIN_EMAIL=${SOFIA_SUPERADMIN_EMAIL:-admin@sofiaerp.com}
       - GATEWAY_ADMIN_PASSWORD=${SOFIA_SUPERADMIN_PASSWORD:-SofiaAdmin2026!}
+      - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
+      - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
     volumes:
       - ../../sunat-gateway/app:/app/app
       - sofia_sunat_storage:/var/lib/sofia-sunat/storage
