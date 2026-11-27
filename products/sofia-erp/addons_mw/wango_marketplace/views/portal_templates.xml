@@ -61,7 +61,7 @@
 
     <!-- Menúú Desplegable (Navbar) -->
 
-    <template id="portal_user_dropdown_seller" inherit_id="portal.user_dropdown" name="Seller Portal Dropdown">
+    <template id="portal_user_dropdown_seller" inherit_id="portal.user_dropdown" name="Seller Portal Dropdown" active="False">
 
         <xpath expr="//a[@id='o_logout']" position="before">
 
