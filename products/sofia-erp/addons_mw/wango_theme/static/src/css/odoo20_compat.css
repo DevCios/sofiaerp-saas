@@ -37,11 +37,13 @@
     box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12);
 }
 
-/* Asegurar que el header sticky y el footer legal nunca se solapen con el Hero */
+/* Asegurar que el header sticky sea blanco sólido y nunca se transparente sobre el Hero */
 header#top.falabella-header-wrapper {
-    position: sticky;
+    position: sticky !important;
     top: 0;
     z-index: 1030;
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
 }
 footer .container {
     max-width: 1280px;
