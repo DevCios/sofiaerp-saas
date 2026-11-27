@@ -62,7 +62,7 @@
    ========================================================================== */
 html, body, #wrapwrap,
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
-p, span:not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fad):not(.oi),
+p, span:not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fad):not(.oi):not(.material-icons):not(.material-symbols-outlined):not([class*="oi-"]),
 a:not(.fa):not(.fas):not(.far):not(.fal):not(.fab),
 input, button, select, textarea, label,
 .btn, .badge, .card, .table, .dropdown-menu, .dropdown-item,
@@ -74,14 +74,24 @@ input, button, select, textarea, label,
     text-rendering: optimizeLegibility !important;
 }
 
-/* BLINDAJE DE ICONOS FONTAWESOME Y ODOO ICONS (Para que nunca se rompan) */
-.fa, .fas, .far, .fal, .fab, .fad, .oi,
-[class^="fa-"], [class*=" fa-"],
-[class^="oi-"], [class*=" oi-"] {
+/* BLINDAJE DE ICONOS FONTAWESOME 5 + 4 (sin tocar .oi ni Material Icons de Odoo 20) */
+.fa, .fas,
+[class^="fa-"], [class*=" fa-"] {
     font-family: "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 900;
     font-style: normal !important;
-    font-weight: normal !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+.far {
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    line-height: 1 !important;
+}
+.fab {
+    font-family: "Font Awesome 5 Brands", "FontAwesome" !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
     line-height: 1 !important;
 }
 
