@@ -4,7 +4,7 @@
     <!-- Mejora Premium de la Ficha de Producto (Mercado Libre Style) -->
     <template id="wango_product_detail_inherit" inherit_id="website_sale.product" name="WanGO Ficha de Producto Premium" priority="25">
         <!-- 1. Metadata y Social Proof antes del Título -->
-        <xpath expr="//h1[@itemprop='name']" position="before">
+        <xpath expr="//div[@id='product_details']//h1" position="before">
             <div class="wango-product-header-meta d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
                 <div class="d-flex align-items-center">
                     <span class="wango-badge-condition text-muted small fw-semibold">
