@@ -5,25 +5,18 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
-            
-            <xpath expr="//header" position="inside">
-                <button string="Aprobar en Marketplace" 
-                        type="object" 
-                        name="action_approve_product" 
-                        class="oe_highlight btn-success"
-                        groups="wango_marketplace.group_marketplace_manager"
-                        invisible="marketplace_status != 'pending'"/>
-                        
-                <button string="Rechazar Producto" 
-                        type="object" 
-                        name="action_reject_product" 
-                        class="btn-danger"
-                        groups="wango_marketplace.group_marketplace_manager"
-                        invisible="marketplace_status != 'pending'"/>
-            </xpath>
-
             <xpath expr="//notebook" position="inside">
                 <page string="Marketplace" name="marketplace_info">
+                    <div class="mb-3" groups="wango_marketplace.group_marketplace_manager" invisible="marketplace_status != 'pending'">
+                        <button string="Aprobar en Marketplace"
+                                type="object"
+                                name="action_approve_product"
+                                class="oe_highlight btn-success me-2"/>
+                        <button string="Rechazar Producto"
+                                type="object"
+                                name="action_reject_product"
+                                class="btn-danger"/>
+                    </div>
                     <group>
                         <group string="Vendedor Asignado">
                             <field name="marketplace_seller_id"/>
