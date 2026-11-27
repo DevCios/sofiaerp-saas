@@ -74,7 +74,7 @@
                 <filter string="Locales de Vendedores" name="filter_seller_stores" domain="[('point_type', '=', 'seller_store')]"/>
                 <separator/>
                 <filter string="Archivados" name="inactive" domain="[('active', '=', False)]"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter string="Tipo de Punto" name="group_by_type" context="{'group_by': 'point_type'}"/>
                     <filter string="Distrito" name="group_by_district" context="{'group_by': 'district_id'}"/>
                     <filter string="Provincia" name="group_by_province" context="{'group_by': 'province_id'}"/>

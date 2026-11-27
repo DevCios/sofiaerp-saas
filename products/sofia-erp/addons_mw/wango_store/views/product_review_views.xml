@@ -84,7 +84,7 @@
                 <filter string="Compra Verificada" name="filter_verified" domain="[('is_verified_purchase', '=', True)]"/>
                 <filter string="5 Estrellas" name="filter_rating_5" domain="[('rating', '=', '5')]"/>
                 <filter string="4 Estrellas" name="filter_rating_4" domain="[('rating', '=', '4')]"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter string="Estado de Moderación" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Producto" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>
                     <filter string="Calificación" name="group_rating" context="{'group_by': 'rating'}"/>

@@ -22,7 +22,7 @@
                 <field name="pickup_pin"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div class="oe_kanban_global_click p-2 shadow-sm" style="border-radius: 10px; border-left: 5px solid #00a650; background: #fff;">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <strong class="text-primary font-weight-bold" style="font-size: 1.05rem;">
@@ -209,7 +209,7 @@
                 <filter string="Listas para Despacho" name="registered" domain="[('state', '=', 'registered')]"/>
                 <filter string="En Tránsito" name="in_transit" domain="[('state', '=', 'in_transit')]"/>
                 <filter string="Entregadas" name="delivered" domain="[('state', '=', 'delivered')]"/>
-                <group expand="0" string="Agrupar Por">
+                <group>
                     <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
                     <filter string="Tipo de Entrega" name="group_type" context="{'group_by': 'delivery_type'}"/>
                     <filter string="Punto de Retiro" name="group_branch" context="{'group_by': 'store_branch_id'}"/>

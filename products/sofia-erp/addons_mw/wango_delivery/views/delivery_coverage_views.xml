@@ -67,7 +67,7 @@
                 <field name="department_id"/>
                 <field name="province_id"/>
                 <field name="district_id"/>
-                <group expand="0" string="Agrupar por">
+                <group>
                     <filter string="Origen" name="group_by_origin" context="{'group_by': 'origin_department_id'}"/>
                     <filter string="Departamento Destino" name="group_by_department" context="{'group_by': 'department_id'}"/>
                     <filter string="Provincia Destino" name="group_by_province" context="{'group_by': 'province_id'}"/>
