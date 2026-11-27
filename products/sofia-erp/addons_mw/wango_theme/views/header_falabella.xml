@@ -1379,7 +1379,7 @@
                             </div>
 
                             <!-- Formulario de Login directo a Odoo -->
-                            <form class="oe_login_form" role="form" method="post" action="/web/login" onsubmit="var l = document.getElementById('modal_login_email'); if(l) l.value = l.value.trim();">
+                            <form class="wango_mobile_login_form" role="form" method="post" action="/web/login" onsubmit="var l = document.getElementById('modal_login_email'); if(l) l.value = l.value.trim();">
                                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                 <input type="hidden" name="redirect" t-att-value="request.params.get('redirect') or ''"/>
 
