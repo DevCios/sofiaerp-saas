@@ -49,3 +49,37 @@ def test_plans_catalog_and_slugify():
     slug = _slugify("Workspace de Luis S.A.C.")
     assert slug.startswith("workspace-de-luis-s-a-c-")
     assert len(slug) > 24
+
+
+def test_sofia_sso_rs256_jwks_verification():
+    import json
+    from datetime import datetime, timedelta, timezone
+
+    import jwt
+    from cryptography.hazmat.primitives.asymmetric import rsa
+
+    from app.api.billing import verify_sofia_rs256_token
+
+    priv = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    pub_jwk = json.loads(jwt.algorithms.RSAAlgorithm.to_jwk(priv.public_key()))
+    pub_jwk["kid"] = "sofia-key-1"
+
+    token = jwt.encode(
+        {
+            "sub": "user-42",
+            "email": "cliente@sofiaerp.com",
+            "name": "Cliente Sofia",
+            "exp": int((datetime.now(timezone.utc) + timedelta(minutes=10)).timestamp()),
+        },
+        priv,
+        algorithm="RS256",
+        headers={"kid": "sofia-key-1"},
+    )
+    claims = verify_sofia_rs256_token(token, [pub_jwk])
+    assert claims is not None
+    assert claims["email"] == "cliente@sofiaerp.com"
+    assert claims["name"] == "Cliente Sofia"
+
+    # Token con firma manipulada debe ser rechazado
+    tampered = token[:-4] + "XXXX"
+    assert verify_sofia_rs256_token(tampered, [pub_jwk]) is None

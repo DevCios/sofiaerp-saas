@@ -235,6 +235,7 @@ services:
       - GATEWAY_ADMIN_PASSWORD=${SOFIA_SUPERADMIN_PASSWORD:-SofiaAdmin2026!}
       - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
       - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
+      - SOFIA_CONTROL_PLANE_URL=http://control-plane-api:8000
     volumes:
       - ../../sunat-gateway/app:/app/app
       - sofia_sunat_storage:/var/lib/sofia-sunat/storage

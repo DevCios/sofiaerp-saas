@@ -54,6 +54,7 @@ class Workspace(Base):
     slug: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
     plan_name: Mapped[str] = mapped_column(String(40), default="FREE", nullable=False)
     monthly_quota: Mapped[int] = mapped_column(Integer, default=50, nullable=False)
+    source: Mapped[str] = mapped_column(String(24), default="external", nullable=False)  # external | sofia_erp
     plan_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
@@ -68,6 +69,7 @@ class GatewayUser(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(160), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    auth_provider: Mapped[str] = mapped_column(String(24), default="local", nullable=False)  # local | sofia_sso
     role: Mapped[str] = mapped_column(String(32), default="workspace_owner", nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

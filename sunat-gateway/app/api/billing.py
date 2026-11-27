@@ -4,6 +4,7 @@ Registro Self-Service de Workspaces / Usuarios y Planes con Mercado Pago Checkou
 """
 import hashlib
 import hmac
+import json
 import logging
 import os
 import re
@@ -12,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import httpx
+import jwt
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
@@ -201,12 +203,165 @@ async def auth_me(actor: dict = Depends(get_gateway_admin), db: AsyncSession = D
             "id": ws.id,
             "name": ws.name,
             "slug": ws.slug,
+            "source": ws.source,
             "plan_name": ws.plan_name,
             "monthly_quota": ws.monthly_quota,
             "plan_expires_at": ws.plan_expires_at.isoformat() if ws.plan_expires_at else None,
         }
         if ws
         else None,
+    }
+
+
+# ==============================================================================
+# 1B. SSO con SOFIA Control Plane (Usuarios Internos de sofiaerp.com)
+# ==============================================================================
+_JWKS_CACHE: dict[str, object] = {"keys": [], "fetched_at": 0.0}
+
+
+def verify_sofia_rs256_token(token: str, jwks_keys: list[dict]) -> Optional[dict]:
+    """Verifica criptográficamente un JWT RS256 emitido por SOFIA Control Plane usando su JWKS."""
+    if not token or not jwks_keys:
+        return None
+    try:
+        header = jwt.get_unverified_header(token)
+        kid = header.get("kid")
+    except jwt.PyJWTError:
+        return None
+
+    candidates = [k for k in jwks_keys if not kid or k.get("kid") == kid] or jwks_keys
+    for jwk in candidates:
+        try:
+            pub_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(jwk))
+            return jwt.decode(
+                token,
+                pub_key,
+                algorithms=["RS256"],
+                options={"verify_aud": False},
+            )
+        except Exception:
+            continue
+    return None
+
+
+async def _fetch_sofia_jwks(force: bool = False) -> list[dict]:
+    import time
+
+    now = time.monotonic()
+    if not force and _JWKS_CACHE["keys"] and (now - float(_JWKS_CACHE["fetched_at"])) < 300:
+        return list(_JWKS_CACHE["keys"])  # type: ignore[arg-type]
+    base = settings.SOFIA_CONTROL_PLANE_URL.rstrip("/")
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            r = await client.get(f"{base}/api/v1/auth/.well-known/jwks.json")
+        if r.status_code == 200:
+            keys = r.json().get("keys") or []
+            _JWKS_CACHE["keys"] = keys
+            _JWKS_CACHE["fetched_at"] = now
+            return keys
+    except Exception as exc:
+        _logger.warning("No se pudo obtener JWKS de SOFIA Control Plane: %s", exc)
+    return list(_JWKS_CACHE["keys"])  # type: ignore[arg-type]
+
+
+class SofiaSSORequest(BaseModel):
+    sofia_token: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    mfa_code: Optional[str] = None
+
+
+@router.post("/auth/sofia-sso")
+async def sofia_sso_login(body: SofiaSSORequest, db: AsyncSession = Depends(get_db)):
+    """
+    Permite a usuarios registrados en sofiaerp.com ingresar directamente al Gateway
+    (con credenciales SOFIA ERP + MFA o mediante JWT RS256 ya emitido) con JIT Provisioning.
+    """
+    raw_token = (body.sofia_token or "").strip()
+
+    if not raw_token:
+        if not body.email or not body.password:
+            raise HTTPException(status_code=400, detail="Envía sofia_token o correo y contraseña de SOFIA ERP.")
+        base = settings.SOFIA_CONTROL_PLANE_URL.rstrip("/")
+        payload_login: dict[str, object] = {"email": body.email.strip().lower(), "password": body.password}
+        if body.mfa_code:
+            payload_login["mfa_code"] = body.mfa_code.strip()
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.post(f"{base}/api/v1/auth/login", json=payload_login)
+        except Exception as exc:
+            _logger.error("Error conectando con SOFIA Control Plane SSO: %s", exc)
+            raise HTTPException(status_code=503, detail="SOFIA Control Plane no disponible temporalmente.")
+        if resp.status_code != 200:
+            detail = "Credenciales de SOFIA ERP inválidas."
+            try:
+                detail = resp.json().get("detail") or detail
+            except Exception:
+                pass
+            raise HTTPException(status_code=resp.status_code, detail=detail)
+        raw_token = resp.json().get("access_token") or ""
+
+    keys = await _fetch_sofia_jwks(force=False)
+    claims = verify_sofia_rs256_token(raw_token, keys)
+    if not claims:
+        keys = await _fetch_sofia_jwks(force=True)
+        claims = verify_sofia_rs256_token(raw_token, keys)
+    if not claims or not claims.get("email"):
+        raise HTTPException(status_code=401, detail="Token SSO de SOFIA ERP inválido o expirado.")
+
+    email = str(claims["email"]).strip().lower()
+    full_name = str(claims.get("name") or email.split("@")[0]).strip()
+
+    # JIT Provisioning: crear o recuperar usuario + Workspace SOFIA ERP
+    user = (await db.execute(select(GatewayUser).where(GatewayUser.email == email))).scalar_one_or_none()
+    if user:
+        ws = await db.get(Workspace, user.workspace_id)
+        if not ws or not ws.is_active or not user.is_active:
+            raise HTTPException(status_code=403, detail="Cuenta o Workspace inactivo.")
+    else:
+        ws_name = f"SOFIA ERP — {full_name}"
+        ws = Workspace(
+            name=ws_name[:160],
+            slug=_slugify(ws_name),
+            source="sofia_erp",
+            plan_name="SOFIA_ERP",
+            monthly_quota=2000,
+        )
+        db.add(ws)
+        await db.flush()
+        user = GatewayUser(
+            workspace_id=ws.id,
+            email=email,
+            full_name=full_name[:160],
+            password_hash=hash_password(secrets.token_urlsafe(32)),
+            auth_provider="sofia_sso",
+            role="workspace_owner",
+        )
+        db.add(user)
+        await db.commit()
+
+    token = create_workspace_user_jwt(
+        email=user.email,
+        user_id=user.id,
+        workspace_id=ws.id,
+        workspace_name=ws.name,
+        full_name=user.full_name,
+    )
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "email": user.email,
+        "full_name": user.full_name,
+        "role": user.role,
+        "auth_provider": "sofia_sso",
+        "workspace": {
+            "id": ws.id,
+            "name": ws.name,
+            "slug": ws.slug,
+            "source": ws.source,
+            "plan_name": ws.plan_name,
+            "monthly_quota": ws.monthly_quota,
+        },
     }
 
 

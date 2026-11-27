@@ -127,7 +127,8 @@ PANEL_HTML = r"""<!DOCTYPE html>
     <p style="color:var(--muted);font-size:12.5px;text-align:center;margin:0 0 18px 0">API &amp; Pasarela Resiliente SUNAT · Remote MCP</p>
     <div style="display:flex;gap:6px;background:#F3F4F6;padding:4px;border-radius:8px;margin-bottom:16px">
       <button id="btnModeLogin" class="btn btn-sm" style="flex:1" onclick="setAuthMode('login')">Iniciar Sesión</button>
-      <button id="btnModeRegister" class="btn btn-sm btn-sec" style="flex:1;border:none;background:transparent" onclick="setAuthMode('register')">Crear Cuenta Gratis</button>
+      <button id="btnModeRegister" class="btn btn-sm btn-sec" style="flex:1;border:none;background:transparent" onclick="setAuthMode('register')">Crear Cuenta</button>
+      <button id="btnModeSofia" class="btn btn-sm btn-sec" style="flex:1;border:none;background:transparent" onclick="setAuthMode('sofia')">SOFIA ERP</button>
     </div>
 
     <div id="formLogin">
@@ -140,6 +141,25 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <input id="loginPass" type="password" placeholder="Contraseña" />
       </div>
       <button class="btn" style="width:100%;padding:10px" onclick="doLogin()">Ingresar a la Consola</button>
+    </div>
+
+    <div id="formSofia" class="hidden">
+      <div style="background:#F4F1FB;border:1px solid #DED7F2;color:#5B4B8A;border-radius:8px;padding:9px 11px;font-size:12px;margin-bottom:12px">
+        Ingresa con tu cuenta de <strong>sofiaerp.com</strong> (SSO verificado RS256 · cuota incluida).
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Correo de tu cuenta SOFIA ERP</label>
+        <input id="sofiaEmail" type="email" placeholder="usuario@tuempresa.com" />
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Contraseña SOFIA ERP</label>
+        <input id="sofiaPass" type="password" placeholder="••••••••" />
+      </div>
+      <div style="margin-bottom:16px">
+        <label>Código MFA (solo si tienes 2FA activo)</label>
+        <input id="sofiaMfa" type="text" placeholder="123456 (opcional)" maxlength="6" />
+      </div>
+      <button class="btn" style="width:100%;padding:10px;background:var(--o20-navbar)" onclick="doSofiaSso()">Ingresar con SOFIA ERP (SSO)</button>
     </div>
 
     <div id="formRegister" class="hidden">
@@ -650,18 +670,47 @@ async function api(path, opts = {}) {
 }
 
 function setAuthMode(mode) {
-  const isReg = mode === 'register';
-  document.getElementById('formLogin').classList.toggle('hidden', isReg);
-  document.getElementById('formRegister').classList.toggle('hidden', !isReg);
+  document.getElementById('formLogin').classList.toggle('hidden', mode !== 'login');
+  document.getElementById('formRegister').classList.toggle('hidden', mode !== 'register');
+  document.getElementById('formSofia').classList.toggle('hidden', mode !== 'sofia');
   document.getElementById('loginErr').textContent = '';
-  const bL = document.getElementById('btnModeLogin');
-  const bR = document.getElementById('btnModeRegister');
-  if (isReg) {
-    bR.className = 'btn btn-sm'; bR.style.cssText = 'flex:1';
-    bL.className = 'btn btn-sm btn-sec'; bL.style.cssText = 'flex:1;border:none;background:transparent';
-  } else {
-    bL.className = 'btn btn-sm'; bL.style.cssText = 'flex:1';
-    bR.className = 'btn btn-sm btn-sec'; bR.style.cssText = 'flex:1;border:none;background:transparent';
+  const map = { login: 'btnModeLogin', register: 'btnModeRegister', sofia: 'btnModeSofia' };
+  Object.entries(map).forEach(([k, id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (k === mode) {
+      el.className = 'btn btn-sm'; el.style.cssText = 'flex:1';
+    } else {
+      el.className = 'btn btn-sm btn-sec'; el.style.cssText = 'flex:1;border:none;background:transparent';
+    }
+  });
+}
+
+async function doSofiaSso(directToken) {
+  document.getElementById('loginErr').textContent = '';
+  try {
+    const payload = directToken
+      ? { sofia_token: directToken }
+      : {
+          email: document.getElementById('sofiaEmail').value.trim(),
+          password: document.getElementById('sofiaPass').value,
+          mfa_code: document.getElementById('sofiaMfa').value.trim() || null
+        };
+    const res = await fetch('/api/v1/auth/sofia-sso', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Error de autenticación SOFIA ERP');
+    TOKEN = data.access_token;
+    localStorage.setItem('sofia_gw_token', TOKEN);
+    if (directToken) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    bootApp();
+  } catch (e) {
+    document.getElementById('loginErr').textContent = e.message;
   }
 }
 
@@ -1173,7 +1222,12 @@ function bootApp() {
   refreshAll();
 }
 
-if (TOKEN) bootApp();
+const _urlSofiaToken = new URLSearchParams(window.location.search).get('sofia_token');
+if (_urlSofiaToken) {
+  doSofiaSso(_urlSofiaToken);
+} else if (TOKEN) {
+  bootApp();
+}
 </script>
 </body>
 </html>

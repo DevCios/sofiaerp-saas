@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     MP_ACCESS_TOKEN: str = ""
     MP_WEBHOOK_SECRET: str = ""
 
+    # SSO con SOFIA Control Plane (red interna Docker + validación JWKS RS256)
+    SOFIA_CONTROL_PLANE_URL: str = "http://control-plane-api:8000"
+
 
 @lru_cache()
 def get_settings() -> Settings:
