@@ -14,7 +14,7 @@
                     </span>
                     <span class="wango-meta-sep mx-2 text-muted" style="opacity: 0.5;">|</span>
                     <span class="wango-badge-sales text-muted small fw-semibold">
-                        <t t-esc="product.wango_sales_display or '+50 vendidos'"/>
+                        <t t-out="product.wango_sales_display or '+50 vendidos'"/>
                     </span>
                 </div>
                 <div class="wango-product-rating d-flex align-items-center">
@@ -26,10 +26,10 @@
                         </t>
                     </div>
                     <span class="wango-rating-score fw-bold text-dark me-1">
-                        <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                        <t t-out="'%.1f' % (product.wango_rating_avg or 4.9)"/>
                     </span>
                     <a href="#wango_product_reviews_section" class="wango-rating-count text-muted text-decoration-none small ms-1" style="cursor: pointer; margin-left: 6px !important;" onclick="event.preventDefault(); document.getElementById('wango_product_reviews_section')?.scrollIntoView({behavior: 'smooth'});">
-                        (<t t-esc="product.wango_rating_count or 24"/> opiniones)
+                        (<t t-out="product.wango_rating_count or 24"/> opiniones)
                     </a>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                     </span>
                     <span class="wango-installments-text">
                         <t t-if="product.deal_installments_text">
-                            <t t-esc="product.deal_installments_text"/>
+                            <t t-out="product.deal_installments_text"/>
                         </t>
                         <t t-else="">
                             Mismo precio en hasta 3 cuotas sin interés
@@ -154,7 +154,7 @@
                     </div>
                     <div class="flex-grow-1 overflow-hidden">
                         <h4 class="h6 mb-0 fw-bold text-truncate text-dark" style="font-size: 0.95rem;">
-                            <t t-esc="seller_card.name"/>
+                            <t t-out="seller_card.name"/>
                         </h4>
                         <div class="d-flex align-items-center gap-1 mt-1">
                             <div class="wango-seller-stars text-warning small" style="font-size: 0.8rem; letter-spacing: 0.5px;">
@@ -165,10 +165,10 @@
                                 </t>
                             </div>
                             <span class="fw-bold text-dark small ms-1" style="font-size: 0.82rem;">
-                                <t t-esc="'%.1f' % (seller_card.seller_rating_avg or 4.9)"/>
+                                <t t-out="'%.1f' % (seller_card.seller_rating_avg or 4.9)"/>
                             </span>
                             <span class="text-muted small ms-1" style="font-size: 0.78rem; margin-left: 6px !important;">
-                                (<t t-esc="seller_card.seller_rating_count or 128"/> opiniones)
+                                (<t t-out="seller_card.seller_rating_count or 128"/> opiniones)
                             </span>
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                 <div class="row g-2 text-center py-2 mb-2 border-top border-bottom" style="border-color: #f1f5f9 !important;">
                     <div class="col-4 border-end" style="border-color: #f1f5f9 !important;">
                         <span class="d-block fw-bold text-dark" style="font-size: 0.95rem;">
-                            +<t t-esc="seller_card.seller_sales_completed or 250"/>
+                            +<t t-out="seller_card.seller_sales_completed or 250"/>
                         </span>
                         <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
                             Ventas concretadas
@@ -203,7 +203,7 @@
                     </div>
                     <div class="col-4 border-end" style="border-color: #f1f5f9 !important;">
                         <span class="d-block fw-bold text-success" style="font-size: 0.95rem;">
-                            <t t-esc="seller_card.seller_good_service_pct or 100"/>%
+                            <t t-out="seller_card.seller_good_service_pct or 100"/>%
                         </span>
                         <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
                             Buena atención
@@ -211,7 +211,7 @@
                     </div>
                     <div class="col-4">
                         <span class="d-block fw-bold text-success" style="font-size: 0.95rem;">
-                            <t t-esc="seller_card.seller_on_time_delivery_pct or 99"/>%
+                            <t t-out="seller_card.seller_on_time_delivery_pct or 99"/>%
                         </span>
                         <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
                             Despacha a tiempo
@@ -302,7 +302,7 @@
                             </div>
                             <t t-if="seller_partner">
                                 <span class="badge bg-light text-muted border px-2 py-1 small rounded-pill d-none d-md-inline">
-                                    <i class="fa fa-store me-1 text-primary"/> <t t-esc="seller_partner.name"/>
+                                    <i class="fa fa-store me-1 text-primary"/> <t t-out="seller_partner.name"/>
                                 </span>
                             </t>
                         </div>
@@ -406,7 +406,7 @@
                         <div class="col-12 col-md-5 text-center text-md-start border-md-end pe-md-4">
                             <div class="d-flex align-items-baseline justify-content-center justify-content-md-start gap-2">
                                 <span class="fw-bolder text-dark" style="font-size: 3.5rem; line-height: 1; font-weight: 800;">
-                                    <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                                    <t t-out="'%.1f' % (product.wango_rating_avg or 4.9)"/>
                                 </span>
                                 <div class="text-warning" style="font-size: 1.4rem; letter-spacing: 2px;">
                                     <t t-foreach="product.get_wango_stars_list()" t-as="st">
@@ -417,7 +417,7 @@
                                 </div>
                             </div>
                             <p class="text-muted small mt-1 mb-2">
-                                Promedio general calculado entre <strong class="text-dark"><t t-esc="product.wango_rating_count or 24"/> calificaciones</strong>
+                                Promedio general calculado entre <strong class="text-dark"><t t-out="product.wango_rating_count or 24"/> calificaciones</strong>
                             </p>
                             <div class="p-2.5 rounded-3 d-inline-flex align-items-center gap-2 mt-1" style="background-color: #ecfdf5; border: 1px solid #d1fae5;">
                                 <i class="fa fa-thumbs-up text-success"/>
@@ -491,27 +491,27 @@
                                             </t>
                                         </div>
                                         <span class="text-muted small" style="font-size: 0.75rem;">
-                                            <t t-esc="rev.date_display or 'Reciente'"/>
+                                            <t t-out="rev.date_display or 'Reciente'"/>
                                         </span>
                                     </div>
                                     <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">
-                                        <t t-esc="rev.title"/>
+                                        <t t-out="rev.title"/>
                                     </h5>
                                     <p class="text-secondary small mb-2" style="line-height: 1.45;">
-                                        <t t-esc="rev.content"/>
+                                        <t t-out="rev.content"/>
                                     </p>
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="text-muted small fw-medium" style="font-size: 0.78rem;">
-                                                <t t-esc="rev.author_name"/>
-                                                <t t-if="rev.author_location"> (<t t-esc="rev.author_location"/>)</t>
+                                                <t t-out="rev.author_name"/>
+                                                <t t-if="rev.author_location"> (<t t-out="rev.author_location"/>)</t>
                                             </span>
                                             <span t-if="rev.is_verified_purchase" class="badge bg-light text-success border px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
                                                 <i class="fa fa-check-circle me-1"/> Compra verificada
                                             </span>
                                         </div>
                                         <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
-                                            <i class="fa fa-thumbs-up me-1"/> Es útil (<t t-esc="rev.helpful_count or 0"/>)
+                                            <i class="fa fa-thumbs-up me-1"/> Es útil (<t t-out="rev.helpful_count or 0"/>)
                                         </button>
                                     </div>
                                 </div>

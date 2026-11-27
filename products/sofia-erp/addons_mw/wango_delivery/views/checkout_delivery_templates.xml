@@ -120,25 +120,25 @@
                                     <t t-else="">--</t>
                                 </span>
                                 <h6 class="font-weight-bold text-dark mb-1" id="wango_delivery_title_desc">
-                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'">Retiro en tienda: <t t-esc="curr_order.store_branch_id.name if curr_order.store_branch_id else ''"/></t>
-                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'">Despacho a domicilio: <t t-esc="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/></t>
-                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'">Recibir en agencia: <t t-esc="curr_order.agency_id.name if curr_order.agency_id else ''"/></t>
+                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'">Retiro en tienda: <t t-out="curr_order.store_branch_id.name if curr_order.store_branch_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'">Despacho a domicilio: <t t-out="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'">Recibir en agencia: <t t-out="curr_order.agency_id.name if curr_order.agency_id else ''"/></t>
                                     <t t-else="">--</t>
                                 </h6>
                                 <p class="text-muted small mb-1" id="wango_delivery_sub_addr">
-                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'"><i class="fa fa-map-marker me-1 mr-1"/> <t t-esc="curr_order.store_branch_id.address if curr_order.store_branch_id else ''"/></t>
-                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'"><i class="fa fa-map-marker me-1 mr-1"/> Dirección de Envío (<t t-esc="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/>)</t>
-                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'"><i class="fa fa-building-o me-1 mr-1"/> Encomienda / Agencia (<t t-esc="curr_order.agency_id.name if curr_order.agency_id else ''"/>)</t>
+                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'"><i class="fa fa-map-marker me-1 mr-1"/> <t t-out="curr_order.store_branch_id.address if curr_order.store_branch_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'"><i class="fa fa-map-marker me-1 mr-1"/> Dirección de Envío (<t t-out="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/>)</t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'"><i class="fa fa-building-o me-1 mr-1"/> Encomienda / Agencia (<t t-out="curr_order.agency_id.name if curr_order.agency_id else ''"/>)</t>
                                     <t t-else="">--</t>
                                 </p>
                                 <p class="text-muted small mb-0" id="wango_delivery_sub_date" t-attf-class="#{'d-none' if not (curr_order and curr_order.estimated_delivery_date) else ''}">
-                                    <i class="fa fa-calendar me-1 mr-1"/> Entrega: <t t-esc="curr_order.estimated_delivery_date.strftime('%d/%m/%Y') if (curr_order and curr_order.estimated_delivery_date) else ''"/>
+                                    <i class="fa fa-calendar me-1 mr-1"/> Entrega: <t t-out="curr_order.estimated_delivery_date.strftime('%d/%m/%Y') if (curr_order and curr_order.estimated_delivery_date) else ''"/>
                                 </p>
                             </div>
                             <div class="text-right text-end">
                                 <span class="h5 font-weight-bold text-success d-block mb-2" id="wango_delivery_summary_cost">
                                     <t t-if="curr_order and curr_order.shipping_cost == 0">Gratis</t>
-                                    <t t-elif="curr_order and curr_order.shipping_cost">S/ <t t-esc="'%.2f' % curr_order.shipping_cost"/></t>
+                                    <t t-elif="curr_order and curr_order.shipping_cost">S/ <t t-out="'%.2f' % curr_order.shipping_cost"/></t>
                                     <t t-else="">--</t>
                                 </span>
                                 <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 font-weight-bold" id="wango_btn_change_shipping" data-toggle="modal" data-target="#wangoDeliveryModal" data-bs-toggle="modal" data-bs-target="#wangoDeliveryModal">

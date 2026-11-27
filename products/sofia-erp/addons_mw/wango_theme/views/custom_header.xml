@@ -43,7 +43,7 @@
                                 <a href="/my/home" class="wbl-header-action-item">
                                     <div class="text-start">
                                         <span class="small-text">Hola,</span>
-                                        <span class="bold-text"><t t-esc="user_id.name"/> <i class="fa fa-chevron-down" style="font-size: 0.7rem;"/></span>
+                                        <span class="bold-text"><t t-out="user_id.name"/> <i class="fa fa-chevron-down" style="font-size: 0.7rem;"/></span>
                                     </div>
                                 </a>
                             </t>
@@ -58,7 +58,7 @@
                                 <t t-set="website_sale_order" t-value="website.sale_get_order()" />
                                 <t t-if="website_sale_order and website_sale_order.cart_quantity">
                                     <span class="badg rounded-pill bg-success position-absolute top-0 start-100 translate-middle p-1" style="font-size: 0.6rem;">
-                                        <t t-esc="website_sale_order.cart_quantity"/>
+                                        <t t-out="website_sale_order.cart_quantity"/>
                                     </span>
                                 </t>
                             </a>

@@ -29,7 +29,7 @@
                     <!-- Mensaje de Error si aplica -->
                     <t t-if="error_msg">
                         <div class="alert alert-danger shadow-sm mb-4" role="alert" style="border-radius: 12px;">
-                            <i class="fa fa-exclamation-triangle mr-2"></i> <t t-esc="error_msg"/>
+                            <i class="fa fa-exclamation-triangle mr-2"></i> <t t-out="error_msg"/>
                         </div>
                     </t>
 
@@ -181,12 +181,12 @@
 
                         <div class="bg-light border rounded p-3 my-4">
                             <div class="small text-muted font-weight-bold">NÚMERO DE HOJA DE RECLAMACIÓN</div>
-                            <div class="h3 font-weight-bold text-danger my-1"><t t-esc="claim.name"/></div>
-                            <div class="small text-muted">Fecha: <t t-esc="claim.date.strftime('%d/%m/%Y %H:%M')"/></div>
+                            <div class="h3 font-weight-bold text-danger my-1"><t t-out="claim.name"/></div>
+                            <div class="small text-muted">Fecha: <t t-out="claim.date.strftime('%d/%m/%Y %H:%M')"/></div>
                         </div>
 
                         <div class="alert alert-info text-left small mb-4" style="border-radius: 10px;">
-                            <i class="fa fa-info-circle mr-1"></i> Se ha enviado una copia íntegra de la constancia al correo <b><t t-esc="claim.consumer_email"/></b>. Mercado Wanka responderá dentro del plazo legal máximo de <b>15 días hábiles</b>.
+                            <i class="fa fa-info-circle mr-1"></i> Se ha enviado una copia íntegra de la constancia al correo <b><t t-out="claim.consumer_email"/></b>. Mercado Wanka responderá dentro del plazo legal máximo de <b>15 días hábiles</b>.
                         </div>
 
                         <div class="d-flex flex-column flex-sm-row justify-content-center" style="gap: 10px;">
@@ -209,7 +209,7 @@
         <html>
             <head>
                 <meta charset="utf-8"/>
-                <title>Hoja de Reclamación - <t t-esc="claim.name"/></title>
+                <title>Hoja de Reclamación - <t t-out="claim.name"/></title>
                 <style>
                     body { font-family: 'Montserrat', Arial, sans-serif; padding: 20px; color: #222; font-size: 12px; }
                     .sheet { max-width: 750px; margin: auto; border: 2px solid #222; padding: 20px; border-radius: 6px; }
@@ -235,27 +235,27 @@
                     </div>
 
                     <div class="code-box">
-                        HOJA DE RECLAMACIÓN Nº: <span style="font-size: 16px; color: #d63031;"><t t-esc="claim.name"/></span> | 
-                        FECHA: <t t-esc="claim.date.strftime('%d/%m/%Y %H:%M')"/>
+                        HOJA DE RECLAMACIÓN Nº: <span style="font-size: 16px; color: #d63031;"><t t-out="claim.name"/></span> | 
+                        FECHA: <t t-out="claim.date.strftime('%d/%m/%Y %H:%M')"/>
                     </div>
 
                     <div class="section-title">1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE</div>
                     <table>
                         <tr>
                             <td style="width: 25%;"><strong>Nombre:</strong></td>
-                            <td><t t-esc="claim.consumer_name"/></td>
+                            <td><t t-out="claim.consumer_name"/></td>
                             <td style="width: 20%;"><strong>Documento:</strong></td>
-                            <td><t t-esc="claim.doc_type.upper()"/> <t t-esc="claim.doc_number"/></td>
+                            <td><t t-out="claim.doc_type.upper()"/> <t t-out="claim.doc_number"/></td>
                         </tr>
                         <tr>
                             <td><strong>Domicilio:</strong></td>
-                            <td colspan="3"><t t-esc="claim.consumer_address"/></td>
+                            <td colspan="3"><t t-out="claim.consumer_address"/></td>
                         </tr>
                         <tr>
                             <td><strong>Teléfono:</strong></td>
-                            <td><t t-esc="claim.consumer_phone"/></td>
+                            <td><t t-out="claim.consumer_phone"/></td>
                             <td><strong>Correo Electrónico:</strong></td>
-                            <td><t t-esc="claim.consumer_email"/></td>
+                            <td><t t-out="claim.consumer_email"/></td>
                         </tr>
                     </table>
 
@@ -263,17 +263,17 @@
                     <table>
                         <tr>
                             <td style="width: 25%;"><strong>Tipo de Bien:</strong></td>
-                            <td><t t-esc="'PRODUCTO' if claim.contracted_good == 'product' else 'SERVICIO'"/></td>
+                            <td><t t-out="'PRODUCTO' if claim.contracted_good == 'product' else 'SERVICIO'"/></td>
                             <td style="width: 20%;"><strong>Monto Reclamado:</strong></td>
-                            <td>S/ <t t-esc="'%.2f' % claim.claimed_amount"/></td>
+                            <td>S/ <t t-out="'%.2f' % claim.claimed_amount"/></td>
                         </tr>
                         <tr>
                             <td><strong>Nº Pedido / Orden:</strong></td>
-                            <td colspan="3"><t t-esc="claim.order_ref or 'No indicado'"/></td>
+                            <td colspan="3"><t t-out="claim.order_ref or 'No indicado'"/></td>
                         </tr>
                         <tr>
                             <td><strong>Descripción:</strong></td>
-                            <td colspan="3"><t t-esc="claim.good_description"/></td>
+                            <td colspan="3"><t t-out="claim.good_description"/></td>
                         </tr>
                     </table>
 
@@ -281,15 +281,15 @@
                     <table>
                         <tr>
                             <td style="width: 25%;"><strong>Tipo:</strong></td>
-                            <td colspan="3"><strong><t t-esc="'RECLAMO (Disconformidad con producto o servicio)' if claim.claim_type == 'claim' else 'QUEJA (Malestar en atención)'"/></strong></td>
+                            <td colspan="3"><strong><t t-out="'RECLAMO (Disconformidad con producto o servicio)' if claim.claim_type == 'claim' else 'QUEJA (Malestar en atención)'"/></strong></td>
                         </tr>
                         <tr>
                             <td><strong>Detalle:</strong></td>
-                            <td colspan="3"><t t-esc="claim.detail"/></td>
+                            <td colspan="3"><t t-out="claim.detail"/></td>
                         </tr>
                         <tr>
                             <td><strong>Pedido del Consumidor:</strong></td>
-                            <td colspan="3"><t t-esc="claim.consumer_request"/></td>
+                            <td colspan="3"><t t-out="claim.consumer_request"/></td>
                         </tr>
                     </table>
 

@@ -26,7 +26,7 @@
                 <a href="/my/seller/orders">Mis Ventas</a>
             </li>
             <li t-if="page_name == 'seller_order_detail'" class="breadcrumb-item active">
-                <t t-esc="order.name"/>
+                <t t-out="order.name"/>
             </li>
 
             
@@ -107,13 +107,13 @@
 
                                     <div class="mr-4 text-white">
 
-                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-esc="quotation_count or '0'"/></span> Cotizaciones
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-out="quotation_count or '0'"/></span> Cotizaciones
 
                                     </div>
 
                                     <div class="text-white">
 
-                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-esc="order_count or '0'"/></span> Pedidos Confirmados
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-out="order_count or '0'"/></span> Pedidos Confirmados
 
                                     </div>
 
@@ -170,16 +170,16 @@
                         <!-- Misión Activa -->
                         <div class="col-lg-6 mb-3 mb-lg-0 border-right-lg pr-lg-4">
                             <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 mb-2" style="font-size: 0.75rem; border-radius: 4px;">
-                                <t t-esc="current_mission['step_name']"/>
+                                <t t-out="current_mission['step_name']"/>
                             </span>
                             <h4 class="font-weight-bold text-dark mb-1" style="letter-spacing: -0.3px;">
-                                <t t-esc="current_mission['title']"/>
+                                <t t-out="current_mission['title']"/>
                             </h4>
                             <p class="text-muted small mb-3">
-                                <t t-esc="current_mission['desc']"/>
+                                <t t-out="current_mission['desc']"/>
                             </p>
                             <a t-att-href="current_mission['cta_url']" class="btn btn-dark font-weight-bold rounded-pill px-4 shadow-sm" style="background-color: #2c3e50; font-size: 0.9rem;">
-                                <t t-esc="current_mission['cta_text']"/> <i class="fa fa-arrow-right ml-1"></i>
+                                <t t-out="current_mission['cta_text']"/> <i class="fa fa-arrow-right ml-1"></i>
                             </a>
                         </div>
 
@@ -252,7 +252,7 @@
                                 <span t-if="pending_orders_count > 0" class="badge badge-danger px-2 py-1" style="border-radius: 12px;">Urgente</span>
                             </div>
                             <t t-if="pending_orders_count > 0">
-                                <h3 class="font-weight-bold text-danger mb-1"><t t-esc="pending_orders_count"/> orden(es)</h3>
+                                <h3 class="font-weight-bold text-danger mb-1"><t t-out="pending_orders_count"/> orden(es)</h3>
                                 <p class="text-muted small mb-3">Tienes pedidos listos para empaquetar o llevar al Agente Wanka.</p>
                                 <a href="/my/seller/orders" class="btn btn-sm btn-outline-danger font-weight-bold rounded-pill px-3">
                                     Atender Pedidos <i class="fa fa-arrow-right ml-1"></i>
@@ -279,7 +279,7 @@
                                 </span>
                                 <span class="badge badge-light text-primary border px-2 py-1" style="border-radius: 12px;">Catálogo</span>
                             </div>
-                            <h3 class="font-weight-bold text-dark mb-1"><t t-esc="products_count"/> producto(s)</h3>
+                            <h3 class="font-weight-bold text-dark mb-1"><t t-out="products_count"/> producto(s)</h3>
                             <p class="text-muted small mb-3">
                                 <t t-if="products_count > 0">Publicados y disponibles para compra en Mercado Wanka.</t>
                                 <t t-else="">Aún no has publicado productos en tu tienda.</t>
@@ -307,10 +307,10 @@
                                 <span class="badge badge-success px-2 py-1" style="border-radius: 12px;">Neto</span>
                             </div>
                             <h3 class="font-weight-bold text-success mb-1">
-                                <t t-esc="net_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/>
+                                <t t-out="net_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/>
                             </h3>
                             <p class="text-muted small mb-3">
-                                Ventas brutas: <strong><t t-esc="total_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/></strong>
+                                Ventas brutas: <strong><t t-out="total_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/></strong>
                             </p>
                             <a href="#mis-liquidaciones" class="btn btn-sm btn-outline-success font-weight-bold rounded-pill px-3">
                                 Ver Liquidaciones
@@ -324,10 +324,10 @@
             <div class="row mb-4">
                 <div class="col-12 d-flex flex-wrap" style="gap: 10px;">
                     <a href="/my/seller/products" class="btn btn-outline-primary font-weight-bold shadow-sm" style="border-radius: 8px;">
-                        <i class="fa fa-cubes mr-1"></i> Gestionar mi Catálogo (<t t-esc="products_count"/>)
+                        <i class="fa fa-cubes mr-1"></i> Gestionar mi Catálogo (<t t-out="products_count"/>)
                     </a>
                     <a href="/my/seller/orders" class="btn btn-outline-dark font-weight-bold shadow-sm" style="border-radius: 8px;">
-                        <i class="fa fa-shopping-cart mr-1"></i> Ver todas las Órdenes (<t t-esc="len(orders)"/>)
+                        <i class="fa fa-shopping-cart mr-1"></i> Ver todas las Órdenes (<t t-out="len(orders)"/>)
                     </a>
                     <a href="/my/seller/settings" class="btn btn-outline-secondary font-weight-bold shadow-sm" style="border-radius: 8px;">
                         <i class="fa fa-cogs mr-1"></i> Configuración de Mi Tienda
@@ -476,32 +476,32 @@
                             <a t-attf-href="/my/seller/orders?tab=today#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'today' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
                                 <span>Envíos de hoy</span>
                                 <span t-attf-class="badge rounded-pill #{ 'bg-danger text-white' if count_today > 0 and tab != 'today' else ('bg-white text-dark' if tab == 'today' else 'bg-secondary text-white') }" style="font-size: 0.75rem;">
-                                    <t t-esc="count_today"/>
+                                    <t t-out="count_today"/>
                                 </span>
                             </a>
 
                             <!-- Tab: Próximos días -->
                             <a t-attf-href="/my/seller/orders?tab=upcoming#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'upcoming' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
                                 <span>Próximos días</span>
-                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_upcoming"/></span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-out="count_upcoming"/></span>
                             </a>
 
                             <!-- Tab: En tránsito -->
                             <a t-attf-href="/my/seller/orders?tab=transit#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'transit' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
                                 <span>En tránsito</span>
-                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_transit"/></span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-out="count_transit"/></span>
                             </a>
 
                             <!-- Tab: Finalizadas -->
                             <a t-attf-href="/my/seller/orders?tab=done#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'done' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
                                 <span>Finalizadas</span>
-                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_done"/></span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-out="count_done"/></span>
                             </a>
 
                             <!-- Tab: Todas -->
                             <a t-attf-href="/my/seller/orders?tab=all#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'all' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
                                 <span>Todas</span>
-                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_all"/></span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-out="count_all"/></span>
                             </a>
                         </div>
                     </div>
@@ -523,7 +523,7 @@
                         </form>
                     </div>
                     <div class="col-md-6 text-md-right text-muted small">
-                        <span>Mostrando <strong><t t-esc="len(orders)"/></strong> ventas en esta sección</span>
+                        <span>Mostrando <strong><t t-out="len(orders)"/></strong> ventas en esta sección</span>
                     </div>
                 </div>
 
@@ -565,18 +565,18 @@
                                     <div class="col-md-4 mb-2 mb-md-0">
                                         <div class="d-flex align-items-center mb-1" style="gap: 8px;">
                                             <span class="badge badge-light border font-weight-bold text-dark px-2 py-1" style="font-size: 0.85rem;">
-                                                <t t-esc="order.name"/>
+                                                <t t-out="order.name"/>
                                             </span>
                                             <span class="text-muted small">
                                                 <i class="fa fa-clock-o mr-1"></i><span t-field="order.date_order" t-options="{'widget': 'date'}"/>
                                             </span>
                                         </div>
                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">
-                                            <t t-esc="order.partner_id.name"/>
+                                            <t t-out="order.partner_id.name"/>
                                         </div>
                                         <div class="text-muted small">
                                             <t t-if="order.partner_id.phone">
-                                                <i class="fa fa-phone mr-1"></i><t t-esc="order.partner_id.phone"/>
+                                                <i class="fa fa-phone mr-1"></i><t t-out="order.partner_id.phone"/>
                                             </t>
                                         </div>
                                     </div>
@@ -605,13 +605,13 @@
                                         <!-- Destino o Sucursal -->
                                         <div class="small text-dark font-weight-500 text-truncate" style="max-width: 300px;">
                                             <t t-if="order.delivery_type == 'store_pickup' and order.store_branch_id">
-                                                <span>Punto: <strong><t t-esc="order.store_branch_id.name"/></strong></span>
+                                                <span>Punto: <strong><t t-out="order.store_branch_id.name"/></strong></span>
                                             </t>
                                             <t t-elif="order.delivery_type == 'agency_shipping' and order.agency_id">
-                                                <span>Agencia: <strong><t t-esc="order.agency_id.name"/></strong> (<t t-esc="order.delivery_district_id.name if order.delivery_district_id else ''"/>)</span>
+                                                <span>Agencia: <strong><t t-out="order.agency_id.name"/></strong> (<t t-out="order.delivery_district_id.name if order.delivery_district_id else ''"/>)</span>
                                             </t>
                                             <t t-else="">
-                                                <span>Destino: <t t-esc="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/></span>
+                                                <span>Destino: <t t-out="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/></span>
                                             </t>
                                         </div>
 
@@ -685,8 +685,8 @@
 
                 <div class="col-md-6">
                     <ul class="nav nav-pills">
-                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if not show_archived else ''}" href="/my/seller/products">Activos <span class="badge badge-light" t-esc="count_active"/></a></li>
-                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if show_archived else ''}" href="/my/seller/products?archived=1">Archivados <span class="badge badge-light" t-esc="count_archived"/></a></li>
+                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if not show_archived else ''}" href="/my/seller/products">Activos <span class="badge badge-light" t-out="count_active"/></a></li>
+                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if show_archived else ''}" href="/my/seller/products?archived=1">Archivados <span class="badge badge-light" t-out="count_archived"/></a></li>
                     </ul>
                 </div>
                 <div class="col-md-6 text-right">
@@ -821,7 +821,7 @@
 
                             <h4 t-if="not product">Detalles del Nuevo Producto</h4>
 
-                            <h4 t-if="product">Editar Producto: <t t-esc="product.name"/></h4>
+                            <h4 t-if="product">Editar Producto: <t t-out="product.name"/></h4>
 
                         </div>
 
@@ -895,7 +895,7 @@
 
                                             <t t-foreach="public_categories" t-as="cat">
 
-                                                <option t-att-value="cat.id" t-att-selected="product and product.public_categ_ids and product.public_categ_ids[0].id == cat.id"><t t-esc="cat.display_name"/></option>
+                                                <option t-att-value="cat.id" t-att-selected="product and product.public_categ_ids and product.public_categ_ids[0].id == cat.id"><t t-out="cat.display_name"/></option>
 
                                             </t>
 
@@ -1068,7 +1068,7 @@
 
                                 <div class="form-group">
                                     <label for="description">Descripción</label>
-                                    <textarea class="form-control" name="description" id="description" rows="4" placeholder="Describe los beneficios y características de tu producto..."><t t-esc="product.description_sale if product else ''"/></textarea>
+                                    <textarea class="form-control" name="description" id="description" rows="4" placeholder="Describe los beneficios y características de tu producto..."><t t-out="product.description_sale if product else ''"/></textarea>
                                 </div>
 
                                 <div class="alert alert-info mt-3">
@@ -1255,10 +1255,10 @@
                             <i class="fa fa-arrow-left mr-1"></i> Volver a Ventas
                         </a>
                         <h2 class="font-weight-bold text-dark mt-1 mb-0" style="font-size: 1.6rem;">
-                            Orden <t t-esc="order.name"/>
+                            Orden <t t-out="order.name"/>
                         </h2>
                         <span class="text-muted small">
-                            Registrada el <strong class="text-dark"><t t-esc="order_date_str"/></strong>
+                            Registrada el <strong class="text-dark"><t t-out="order_date_str"/></strong>
                         </span>
                     </div>
                     <div class="d-flex align-items-center" style="gap: 8px;">
@@ -1288,7 +1288,7 @@
                                         </span>
                                     </t>
                                     <span class="text-muted small">
-                                        Compromiso de entrega: <strong class="text-dark"><t t-esc="delivery_date_str"/></strong>
+                                        Compromiso de entrega: <strong class="text-dark"><t t-out="delivery_date_str"/></strong>
                                     </span>
                                 </div>
                                 <h4 class="font-weight-bold text-dark mb-1" style="font-size: 1.25rem;">
@@ -1363,19 +1363,19 @@
                                                                 <img t-attf-src="/web/image/product.product/#{item['product_id']}/image_128" class="rounded border" style="width: 48px; height: 48px; object-fit: contain;"/>
                                                             </t>
                                                             <div>
-                                                                <div class="font-weight-bold text-dark small"><t t-esc="item['name']"/></div>
-                                                                <span class="text-muted" style="font-size: 0.75rem;">SKU: <t t-esc="item['default_code']"/></span>
+                                                                <div class="font-weight-bold text-dark small"><t t-out="item['name']"/></div>
+                                                                <span class="text-muted" style="font-size: 0.75rem;">SKU: <t t-out="item['default_code']"/></span>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td class="text-center align-middle font-weight-bold">
-                                                        <t t-esc="item['qty']"/>
+                                                        <t t-out="item['qty']"/>
                                                     </td>
                                                     <td class="text-right align-middle small text-muted">
-                                                        <t t-esc="item['price_unit_str']"/>
+                                                        <t t-out="item['price_unit_str']"/>
                                                     </td>
                                                     <td class="text-right align-middle font-weight-bold text-dark">
-                                                        <t t-esc="item['price_subtotal_str']"/>
+                                                        <t t-out="item['price_subtotal_str']"/>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -1389,15 +1389,15 @@
                                 <div class="px-2">
                                     <div class="d-flex justify-content-between text-muted small mb-1">
                                         <span>Subtotal Productos:</span>
-                                        <span><t t-esc="amount_untaxed_str"/></span>
+                                        <span><t t-out="amount_untaxed_str"/></span>
                                     </div>
                                     <div class="d-flex justify-content-between text-muted small mb-1">
                                         <span>Flete / Envío:</span>
-                                        <span><t t-esc="shipping_cost_str"/></span>
+                                        <span><t t-out="shipping_cost_str"/></span>
                                     </div>
                                     <div class="d-flex justify-content-between font-weight-bold text-dark border-top pt-2 mt-2" style="font-size: 1.15rem;">
                                         <span>Total de la Venta:</span>
-                                        <span class="text-success"><t t-esc="amount_total_str"/></span>
+                                        <span class="text-success"><t t-out="amount_total_str"/></span>
                                     </div>
                                 </div>
                             </div>
@@ -1419,15 +1419,15 @@
                             <div class="card-body p-3 small">
                                 <div class="mb-2">
                                     <strong class="text-muted d-block">Nombre:</strong>
-                                    <span class="font-weight-bold text-dark fs-6"><t t-esc="(order.partner_id and order.partner_id.name) or 'Cliente'"/></span>
+                                    <span class="font-weight-bold text-dark fs-6"><t t-out="(order.partner_id and order.partner_id.name) or 'Cliente'"/></span>
                                 </div>
                                 <div class="mb-2">
                                     <strong class="text-muted d-block">Teléfono / Móvil:</strong>
-                                    <span class="text-dark"><t t-esc="(order.partner_id and (order.partner_id.phone or order.partner_id.mobile)) or 'No especificado'"/></span>
+                                    <span class="text-dark"><t t-out="(order.partner_id and (order.partner_id.phone or order.partner_id.mobile)) or 'No especificado'"/></span>
                                 </div>
                                 <div>
                                     <strong class="text-muted d-block">Correo:</strong>
-                                    <span class="text-dark"><t t-esc="(order.partner_id and order.partner_id.email) or 'No registrado'"/></span>
+                                    <span class="text-dark"><t t-out="(order.partner_id and order.partner_id.email) or 'No registrado'"/></span>
                                 </div>
                             </div>
                         </div>
@@ -1443,18 +1443,18 @@
                                 <t t-if="delivery_type == 'store_pickup' and store_branch">
                                     <div class="mb-2">
                                         <span class="badge badge-success text-white mb-1">Punto de Retiro Oficial</span>
-                                        <div class="font-weight-bold text-dark"><t t-esc="store_branch.name"/></div>
-                                        <div class="text-muted"><t t-esc="store_branch.address"/></div>
-                                        <div class="text-muted mt-1"><i class="fa fa-clock-o mr-1"></i>Horario: <t t-esc="store_branch.schedule or 'Horario comercial'"/></div>
+                                        <div class="font-weight-bold text-dark"><t t-out="store_branch.name"/></div>
+                                        <div class="text-muted"><t t-out="store_branch.address"/></div>
+                                        <div class="text-muted mt-1"><i class="fa fa-clock-o mr-1"></i>Horario: <t t-out="store_branch.schedule or 'Horario comercial'"/></div>
                                     </div>
                                 </t>
                                 <t t-elif="delivery_type == 'agency_shipping' and agency">
                                     <div class="mb-2">
                                         <span class="badge badge-info text-white mb-1">Agencia de Encomiendas</span>
-                                        <div class="font-weight-bold text-dark"><t t-esc="agency.name"/></div>
+                                        <div class="font-weight-bold text-dark"><t t-out="agency.name"/></div>
                                         <div class="text-muted">Destino: 
-                                            <t t-if="district_name"><t t-esc="district_name"/>, </t>
-                                            <t t-if="province_name"><t t-esc="province_name"/></t>
+                                            <t t-if="district_name"><t t-out="district_name"/>, </t>
+                                            <t t-if="province_name"><t t-out="province_name"/></t>
                                         </div>
                                     </div>
                                 </t>
@@ -1462,20 +1462,20 @@
                                     <div class="mb-2">
                                         <span class="badge badge-primary text-white mb-1">Dirección del Cliente</span>
                                         <div class="font-weight-bold text-dark">
-                                            <t t-esc="street"/>
+                                            <t t-out="street"/>
                                         </div>
                                         <t t-if="street2">
-                                            <div class="text-muted">Ref: <t t-esc="street2"/></div>
+                                            <div class="text-muted">Ref: <t t-out="street2"/></div>
                                         </t>
                                         <div class="text-muted">
                                             <t t-if="district_name">
-                                                <t t-esc="district_name"/>
+                                                <t t-out="district_name"/>
                                             </t>
                                             <t t-elif="city">
-                                                <t t-esc="city"/>
+                                                <t t-out="city"/>
                                             </t>
                                             <t t-if="province_name">
-                                                , <t t-esc="province_name"/>
+                                                , <t t-out="province_name"/>
                                             </t>
                                         </div>
                                     </div>
@@ -1495,7 +1495,7 @@
         <t t-call="web.layout">
             <t t-set="html_data" t-value="{'style': 'background-color: #f1f2f6;'}"/>
             <t t-set="head">
-                <title>Rótulo de Envío - <t t-esc="order.name"/></title>
+                <title>Rótulo de Envío - <t t-out="order.name"/></title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
                 <style>
                     * { box-sizing: border-box; }
@@ -1605,41 +1605,41 @@
                 <div class="order-badge">
                     <div>
                         <span style="font-size:9px;color:#636e72;font-weight:bold;display:block;">NÚMERO DE ORDEN</span>
-                        <span style="font-size:23px;font-weight:900;color:#2d3436;letter-spacing:-0.5px;"><t t-esc="order.name"/></span>
+                        <span style="font-size:23px;font-weight:900;color:#2d3436;letter-spacing:-0.5px;"><t t-out="order.name"/></span>
                     </div>
                     <div style="text-align:right;">
-                        <span style="font-size:10px;color:#636e72;display:block;">FECHA: <t t-esc="order_date_str"/></span>
-                        <span style="font-size:11px;color:#00a650;font-weight:bold;">ENTREGA: <t t-esc="delivery_date_str"/></span>
+                        <span style="font-size:10px;color:#636e72;display:block;">FECHA: <t t-out="order_date_str"/></span>
+                        <span style="font-size:11px;color:#00a650;font-weight:bold;">ENTREGA: <t t-out="delivery_date_str"/></span>
                     </div>
                 </div>
 
                 <!-- DESTINATARIO -->
                 <div class="box-section box-recipient">
                     <span class="section-title" style="color:#00a650;"><i class="fa fa-user"></i> DESTINATARIO (ENTREGAR A):</span>
-                    <div style="font-size:16px;font-weight:800;color:#2d3436;"><t t-esc="recipient_name"/></div>
+                    <div style="font-size:16px;font-weight:800;color:#2d3436;"><t t-out="recipient_name"/></div>
                     <div style="font-size:13px;font-weight:700;color:#2d3436;margin-top:2px;">
-                        📞 Teléfono: <t t-esc="recipient_phone"/>
+                        📞 Teléfono: <t t-out="recipient_phone"/>
                     </div>
                     <div style="margin-top:6px;padding-top:6px;border-top:1px dashed #bbf7d0;">
                         <t t-if="delivery_type == 'store_pickup' and store_branch">
                             <div style="font-size:12px;color:#2d3436;">
-                                <strong>Punto Oficial:</strong> <t t-esc="store_branch.name"/>
+                                <strong>Punto Oficial:</strong> <t t-out="store_branch.name"/>
                             </div>
-                            <div style="font-size:11px;color:#636e72;"><t t-esc="store_branch.address"/></div>
+                            <div style="font-size:11px;color:#636e72;"><t t-out="store_branch.address"/></div>
                         </t>
                         <t t-elif="delivery_type == 'agency_shipping' and agency">
                             <div style="font-size:12px;color:#2d3436;">
-                                <strong>Agencia:</strong> <t t-esc="agency.name"/>
+                                <strong>Agencia:</strong> <t t-out="agency.name"/>
                             </div>
-                            <div style="font-size:11px;color:#636e72;">Destino: <t t-esc="district_name"/>, <t t-esc="province_name"/></div>
+                            <div style="font-size:11px;color:#636e72;">Destino: <t t-out="district_name"/>, <t t-out="province_name"/></div>
                         </t>
                         <t t-else="">
                             <div style="font-size:12px;font-weight:600;color:#2d3436;">
-                                📍 <t t-esc="street"/>
+                                📍 <t t-out="street"/>
                             </div>
-                            <div t-if="street2" style="font-size:11px;color:#636e72;">Ref: <t t-esc="street2"/></div>
+                            <div t-if="street2" style="font-size:11px;color:#636e72;">Ref: <t t-out="street2"/></div>
                             <div style="font-size:12px;font-weight:700;color:#00a650;margin-top:2px;">
-                                <t t-esc="district_name or city"/>, <t t-esc="province_name"/>
+                                <t t-out="district_name or city"/>, <t t-out="province_name"/>
                             </div>
                         </t>
                     </div>
@@ -1649,10 +1649,10 @@
                 <div class="box-section" style="background:#fafafa;">
                     <span class="section-title" style="color:#636e72;"><i class="fa fa-home"></i> REMITENTE (TIENDA):</span>
                     <div style="font-size:13px;font-weight:700;color:#2d3436;">
-                        <t t-esc="seller.name"/>
+                        <t t-out="seller.name"/>
                     </div>
                     <div style="font-size:11px;color:#636e72;">
-                        Tel: <t t-esc="seller.phone or seller.mobile or 'No registrado'"/>
+                        Tel: <t t-out="seller.phone or seller.mobile or 'No registrado'"/>
                     </div>
                 </div>
 
@@ -1670,9 +1670,9 @@
                         <tbody>
                             <t t-foreach="order_lines" t-as="item">
                                 <tr>
-                                    <td style="text-align:center;font-weight:800;font-size:12px;"><t t-esc="item['qty']"/></td>
-                                    <td><t t-esc="item['name']"/></td>
-                                    <td style="text-align:right;color:#636e72;"><t t-esc="item['default_code']"/></td>
+                                    <td style="text-align:center;font-weight:800;font-size:12px;"><t t-out="item['qty']"/></td>
+                                    <td><t t-out="item['name']"/></td>
+                                    <td style="text-align:right;color:#636e72;"><t t-out="item['default_code']"/></td>
                                 </tr>
                             </t>
                         </tbody>
@@ -1715,7 +1715,7 @@
             <div class="container py-4">
                 <t t-if="success_msg">
                     <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 8px;">
-                        <i class="fa fa-check-circle mr-2"></i> <t t-esc="success_msg"/>
+                        <i class="fa fa-check-circle mr-2"></i> <t t-out="success_msg"/>
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&amp;times;</span>
                         </button>
@@ -1830,7 +1830,7 @@
                                     <option value="">Selecciona Departamento...</option>
                                     <t t-foreach="departments" t-as="dept">
                                         <option t-att-value="dept.id" t-att-selected="'selected' if seller_branch and seller_branch.department_id and seller_branch.department_id.id == dept.id else None">
-                                            <t t-esc="dept.name"/>
+                                            <t t-out="dept.name"/>
                                         </option>
                                     </t>
                                 </select>
@@ -1841,7 +1841,7 @@
                                     <option value="">Selecciona Provincia...</option>
                                     <t t-foreach="provinces" t-as="prov">
                                         <option t-att-value="prov.id" t-att-selected="'selected' if seller_branch and seller_branch.province_id and seller_branch.province_id.id == prov.id else None">
-                                            <t t-esc="prov.name"/>
+                                            <t t-out="prov.name"/>
                                         </option>
                                     </t>
                                 </select>
@@ -1852,7 +1852,7 @@
                                     <option value="">Selecciona Distrito...</option>
                                     <t t-foreach="districts" t-as="dist">
                                         <option t-att-value="dist.id" t-att-selected="'selected' if seller_branch and seller_branch.district_id and seller_branch.district_id.id == dist.id else None">
-                                            <t t-esc="dist.name"/>
+                                            <t t-out="dist.name"/>
                                         </option>
                                     </t>
                                 </select>
@@ -1886,7 +1886,7 @@
                             <i class="fa fa-arrow-left mr-1"></i> Volver a Mis Compras
                         </a>
                         <h2 class="font-weight-bold text-dark mt-1 mb-0" style="font-size: 1.8rem; letter-spacing: -0.5px;">
-                            Seguimiento de Pedido #<t t-esc="order.name"/>
+                            Seguimiento de Pedido #<t t-out="order.name"/>
                         </h2>
                         <span class="text-muted small">
                             Comprado el <span t-field="order.date_order" t-options="{'widget': 'date'}"/>
@@ -2024,19 +2024,19 @@
                                 <t t-if="delivery_mode == 'store_pickup'">
                                     <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #00a650;">
                                         <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">
-                                            <t t-esc="order.store_branch_id.name if order.store_branch_id else 'Punto de Retiro del Vendedor'"/>
+                                            <t t-out="order.store_branch_id.name if order.store_branch_id else 'Punto de Retiro del Vendedor'"/>
                                         </div>
                                         <div class="text-muted small mt-1">
                                             <i class="fa fa-map-marker mr-1 text-danger"></i>
-                                            <t t-esc="order.store_branch_id.address if order.store_branch_id and order.store_branch_id.address else (seller.street or 'Dirección confirmada con el vendedor')"/>
+                                            <t t-out="order.store_branch_id.address if order.store_branch_id and order.store_branch_id.address else (seller.street or 'Dirección confirmada con el vendedor')"/>
                                         </div>
                                         <div t-if="order.store_branch_id and order.store_branch_id.opening_hours" class="text-muted small mt-1">
                                             <i class="fa fa-clock-o mr-1 text-info"></i>
-                                            Horario: <t t-esc="order.store_branch_id.opening_hours"/>
+                                            Horario: <t t-out="order.store_branch_id.opening_hours"/>
                                         </div>
                                     </div>
                                     <div class="alert alert-info py-2 px-3 small mb-0" style="border-radius: 8px;">
-                                        <i class="fa fa-info-circle mr-1"></i> Presenta tu DNI y el código de orden <strong>#<t t-esc="order.name"/></strong> para retirar.
+                                        <i class="fa fa-info-circle mr-1"></i> Presenta tu DNI y el código de orden <strong>#<t t-out="order.name"/></strong> para retirar.
                                     </div>
                                 </t>
 
@@ -2044,16 +2044,16 @@
                                 <t t-elif="delivery_mode == 'agency_shipping'">
                                     <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #0984e3;">
                                         <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">
-                                            <t t-esc="order.agency_id.name if order.agency_id else (shipment.destination_agency_id.name if shipment else 'Agencia WanGO')"/>
+                                            <t t-out="order.agency_id.name if order.agency_id else (shipment.destination_agency_id.name if shipment else 'Agencia WanGO')"/>
                                         </div>
                                         <div class="text-muted small mt-1">
                                             <i class="fa fa-map-marker mr-1 text-danger"></i>
-                                            <t t-esc="order.agency_id.address if order.agency_id else (shipment.destination_agency_id.address if shipment else 'Dirección de agencia asignada')"/>
+                                            <t t-out="order.agency_id.address if order.agency_id else (shipment.destination_agency_id.address if shipment else 'Dirección de agencia asignada')"/>
                                         </div>
                                         <t t-if="shipment">
                                             <div class="mt-2 pt-2 border-top">
-                                                <span class="badge badge-primary text-white">Guía: <t t-esc="shipment.name"/></span>
-                                                <span class="badge badge-light border ml-1">Estado Encomienda: <t t-esc="shipment.state"/></span>
+                                                <span class="badge badge-primary text-white">Guía: <t t-out="shipment.name"/></span>
+                                                <span class="badge badge-light border ml-1">Estado Encomienda: <t t-out="shipment.state"/></span>
                                             </div>
                                         </t>
                                     </div>
@@ -2064,16 +2064,16 @@
                                 <t t-else="">
                                     <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #f39c12;">
                                         <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">
-                                            <t t-esc="order.partner_shipping_id.street or order.partner_id.street or 'Dirección del Comprador'"/>
+                                            <t t-out="order.partner_shipping_id.street or order.partner_id.street or 'Dirección del Comprador'"/>
                                         </div>
                                         <t t-if="order.partner_shipping_id.street2">
                                             <div class="text-muted small mt-1">
-                                                <strong>Referencia:</strong> <t t-esc="order.partner_shipping_id.street2"/>
+                                                <strong>Referencia:</strong> <t t-out="order.partner_shipping_id.street2"/>
                                             </div>
                                         </t>
                                         <div class="text-muted small mt-1">
-                                            <t t-esc="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/>, 
-                                            <t t-esc="order.delivery_province_id.name if order.delivery_province_id else ''"/>
+                                            <t t-out="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/>, 
+                                            <t t-out="order.delivery_province_id.name if order.delivery_province_id else ''"/>
                                         </div>
                                     </div>
                                     <p class="text-muted small mb-0">Un repartidor entregará el paquete directamente en tu puerta.</p>
@@ -2089,13 +2089,13 @@
                                 <i class="fa fa-handshake-o text-warning mr-2"></i> Vendedor Responsable
                             </div>
                             <div class="card-body">
-                                <h5 class="font-weight-bold text-dark mb-1"><t t-esc="seller_name"/></h5>
+                                <h5 class="font-weight-bold text-dark mb-1"><t t-out="seller_name"/></h5>
                                 <span class="badge badge-success text-white font-weight-bold mb-3">Vendedor Oficial Mercado Wanka</span>
                                 
                                 <t t-if="seller_phone">
                                     <div class="mt-3">
                                         <a t-attf-href="https://wa.me/#{seller_phone}?text=Hola%2C%20te%20escribo%20por%20mi%20compra%20#{order.name}%20en%20Mercado%20Wanka.%20Quisiera%20consultar%20sobre%20mi%20entrega." target="_blank" class="btn btn-outline-success btn-block font-weight-bold rounded-pill shadow-sm">
-                                            <i class="fa fa-whatsapp mr-1"></i> WhatsApp: +<t t-esc="seller_phone"/>
+                                            <i class="fa fa-whatsapp mr-1"></i> WhatsApp: +<t t-out="seller_phone"/>
                                         </a>
                                     </div>
                                 </t>
@@ -2151,13 +2151,13 @@
                                                         </div>
                                                     </t>
                                                     <div>
-                                                        <span class="font-weight-bold text-dark d-block"><t t-esc="line.product_id.name"/></span>
-                                                        <small t-if="line.product_id.default_code" class="text-muted">SKU: <t t-esc="line.product_id.default_code"/></small>
+                                                        <span class="font-weight-bold text-dark d-block"><t t-out="line.product_id.name"/></span>
+                                                        <small t-if="line.product_id.default_code" class="text-muted">SKU: <t t-out="line.product_id.default_code"/></small>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="text-center font-weight-bold text-dark">
-                                                <t t-esc="int(line.product_uom_qty)"/>
+                                                <t t-out="int(line.product_uom_qty)"/>
                                             </td>
                                             <td class="text-right text-muted">
                                                 <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
@@ -2232,7 +2232,7 @@
                         </div>
                         <h3 class="font-weight-bold text-dark mb-2">No encontramos ese pedido</h3>
                         <p class="text-muted mb-4">
-                            No se encontró ningún despacho con la referencia <strong>"<t t-esc="searched_ref"/>"</strong>. Por favor verifica el número e inténtalo nuevamente.
+                            No se encontró ningún despacho con la referencia <strong>"<t t-out="searched_ref"/>"</strong>. Por favor verifica el número e inténtalo nuevamente.
                         </p>
                         <div>
                             <a href="/track" class="btn btn-warning font-weight-bold rounded-pill px-4 py-2 shadow-sm" style="background-color: #ffe600; border-color: #ffe600; color: #2d3436;">

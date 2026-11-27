@@ -13,8 +13,6 @@
     ],
     'assets': {
         'web.assets_frontend': [
-            'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;display=swap',
-            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css',
             'wango_theme/static/src/css/wango_design_system.css',
             'wango_theme/static/src/css/falabella_header.css',
             'wango_theme/static/src/css/marketplace_header.css',

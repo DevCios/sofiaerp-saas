@@ -27,9 +27,9 @@
                     <!-- Código y PIN -->
                     <div style="background-color: #f8f9fa; border: 1px dashed #2d3436; padding: 6px; text-align: center; margin-bottom: 10px; border-radius: 6px;">
                         <span style="font-size: 12px; font-weight: bold; display: block; color: #636e72;">GUÍA DE DESPACHO E-COMMERCE</span>
-                        <h1 style="margin: 2px 0; font-size: 26px; font-weight: 900; color: #00a650;"><t t-esc="doc.name"/></h1>
+                        <h1 style="margin: 2px 0; font-size: 26px; font-weight: 900; color: #00a650;"><t t-out="doc.name"/></h1>
                         <div style="font-size: 13px; font-weight: bold; color: #d63031;">
-                            PIN DE RETIRO: <span style="font-size: 16px; background-color: #ffe600; padding: 2px 8px; border-radius: 4px; color: #2d3436;"><t t-esc="doc.pickup_pin"/></span>
+                            PIN DE RETIRO: <span style="font-size: 16px; background-color: #ffe600; padding: 2px 8px; border-radius: 4px; color: #2d3436;"><t t-out="doc.pickup_pin"/></span>
                         </div>
                     </div>
 
@@ -37,28 +37,28 @@
                     <div style="border: 2px solid #00a650; padding: 8px; border-radius: 6px; margin-bottom: 10px; background-color: #f0fff4;">
                         <span style="font-size: 10px; font-weight: bold; color: #00a650; text-transform: uppercase;">DESTINO Y RECEPTOR:</span>
                         <div style="font-size: 16px; font-weight: 800; color: #2d3436; margin-top: 2px;">
-                            <t t-esc="doc.recipient_id.name"/>
+                            <t t-out="doc.recipient_id.name"/>
                         </div>
                         <div style="font-size: 12px; color: #2d3436; margin-top: 2px;">
-                            <strong>DNI/RUC:</strong> <t t-esc="doc.recipient_id.vat or 'No registrado'"/>
+                            <strong>DNI/RUC:</strong> <t t-out="doc.recipient_id.vat or 'No registrado'"/>
                         </div>
                         <div style="font-size: 12px; color: #2d3436; margin-top: 2px;">
-                            <strong>Teléfono:</strong> <t t-esc="doc.recipient_id.phone or doc.recipient_id.mobile or 'No registrado'"/>
+                            <strong>Teléfono:</strong> <t t-out="doc.recipient_id.phone or doc.recipient_id.mobile or 'No registrado'"/>
                         </div>
                         <div t-if="doc.store_branch_id" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #bbf7d0; font-size: 13px; font-weight: 700; color: #00a650;">
-                            🏪 PUNTO DE RETIRO: <t t-esc="doc.store_branch_id.name"/>
+                            🏪 PUNTO DE RETIRO: <t t-out="doc.store_branch_id.name"/>
                         </div>
                         <div t-if="doc.agency_id" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #bbf7d0; font-size: 13px; font-weight: 700; color: #00a650;">
-                            🏢 AGENCIA: <t t-esc="doc.agency_id.name"/>
+                            🏢 AGENCIA: <t t-out="doc.agency_id.name"/>
                         </div>
                         <div t-if="doc.delivery_district_id" style="font-size: 12px; color: #2d3436; margin-top: 2px;">
-                            <strong>Distrito:</strong> <t t-esc="doc.delivery_district_id.name"/>, <t t-esc="doc.delivery_province_id.name if doc.delivery_province_id else ''"/>
+                            <strong>Distrito:</strong> <t t-out="doc.delivery_district_id.name"/>, <t t-out="doc.delivery_province_id.name if doc.delivery_province_id else ''"/>
                         </div>
                     </div>
 
                     <!-- Remitente -->
                     <div style="border: 1px solid #dfe6e9; padding: 6px; border-radius: 6px; margin-bottom: 10px; font-size: 11px;">
-                        <span style="font-weight: bold; color: #636e72;">REMITENTE / TIENDA:</span> <t t-esc="doc.sender_id.name"/>
+                        <span style="font-weight: bold; color: #636e72;">REMITENTE / TIENDA:</span> <t t-out="doc.sender_id.name"/>
                     </div>
 
                     <!-- Carga y Pago -->
@@ -70,14 +70,14 @@
                             <th style="padding: 4px; border: 1px solid #ccc;">FLETE</th>
                         </tr>
                         <tr>
-                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-esc="doc.total_weight"/> kg</td>
-                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-esc="len(doc.package_ids)"/></td>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-out="doc.total_weight"/> kg</td>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-out="len(doc.package_ids)"/></td>
                             <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;">
                                 <t t-if="doc.payment_mode == 'cod'">CONTRAENTREGA</t>
                                 <t t-else="">PAGADO</t>
                             </td>
                             <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold; color: #00a650;">
-                                S/ <t t-esc="'%.2f' % doc.price"/>
+                                S/ <t t-out="'%.2f' % doc.price"/>
                             </td>
                         </tr>
                     </table>

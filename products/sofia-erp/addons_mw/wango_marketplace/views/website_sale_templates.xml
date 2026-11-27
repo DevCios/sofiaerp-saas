@@ -206,7 +206,7 @@
             <div class="mw-seller-badge-slot">
                 <div class="mt-2" t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
                     <span class="text-muted" style="font-size: 0.9rem;">
-                        <i class="fa fa-store"/> Vendido por: <strong><t t-esc="product.sudo().marketplace_seller_id.name"/></strong>
+                        <i class="fa fa-store"/> Vendido por: <strong><t t-out="product.sudo().marketplace_seller_id.name"/></strong>
                     </span>
                 </div>
             </div>
@@ -221,24 +221,24 @@
                     <t t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
                         <strong>
                             <a t-attf-href="/shop?seller_id={{ product.sudo().marketplace_seller_id.id }}" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
-                                <t t-esc="product.sudo().marketplace_seller_id.name"/>
+                                <t t-out="product.sudo().marketplace_seller_id.name"/>
                             </a>
                         </strong>
                         <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700;">
-                            <i class="fa fa-check-circle text-primary me-1"/> <t t-esc="'%.1f' % (product.sudo().marketplace_seller_id.seller_rating_avg or 4.9)"/> ★
+                            <i class="fa fa-check-circle text-primary me-1"/> <t t-out="'%.1f' % (product.sudo().marketplace_seller_id.seller_rating_avg or 4.9)"/> ★
                         </span>
                     </t>
                     <t t-else="">
                         <strong>
                             <a href="/shop" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
-                                <t t-esc="website.sudo().company_id.name or 'Mercado Wanka'"/>
+                                <t t-out="website.sudo().company_id.name or 'Mercado Wanka'"/>
                             </a>
                         </strong>
                         <span class="badge bg-success-subtle text-success border border-success px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700; background-color: #ecfdf5; color: #059669;">
                             <i class="fa fa-shield me-1"/> Tienda Oficial
                         </span>
                         <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-1" style="font-size: 0.72rem; font-weight: 700;">
-                            <i class="fa fa-check-circle text-primary me-1"/> <t t-esc="'%.1f' % (website.sudo().company_id.partner_id.seller_rating_avg or 4.9)"/> ★
+                            <i class="fa fa-check-circle text-primary me-1"/> <t t-out="'%.1f' % (website.sudo().company_id.partner_id.seller_rating_avg or 4.9)"/> ★
                         </span>
                     </t>
                 </span>
@@ -255,7 +255,7 @@
             <div class="mt-4 pt-3 border-top" t-if="product.description_sale">
                 <h5 class="text-muted mb-3"><i class="fa fa-info-circle"/> Acerca de este producto</h5>
                 <div class="text-justify text-muted" style="white-space: pre-line;">
-                    <t t-esc="product.description_sale"/>
+                    <t t-out="product.description_sale"/>
                 </div>
             </div>
         </xpath>
@@ -319,7 +319,7 @@
                                 <div>
                                     <div class="d-flex flex-wrap align-items-center mb-1">
                                         <h2 class="h4 fw-bold mb-0 text-dark me-2">
-                                            <t t-esc="seller.name"/>
+                                            <t t-out="seller.name"/>
                                         </h2>
                                         <span class="badge px-2 py-1 text-white" style="font-size: 0.75rem; border-radius: 6px; background-color: #28a745;">
                                             <i class="fa fa-check-circle me-1"/> Tienda Oficial Mercado Wanka
@@ -328,8 +328,8 @@
                                     <div class="text-muted small d-flex flex-wrap align-items-center" style="gap: 12px;">
                                         <span>
                                             <i class="fa fa-star text-warning me-1"/>
-                                            <strong t-esc="'%.1f' % (seller.seller_rating_avg or 4.9)"/>
-                                            (<t t-esc="seller.seller_rating_count or 128"/> opiniones)
+                                            <strong t-out="'%.1f' % (seller.seller_rating_avg or 4.9)"/>
+                                            (<t t-out="seller.seller_rating_count or 128"/> opiniones)
                                         </span>
                                         <span>
                                             <i class="fa fa-truck text-success me-1"/> Envíos locales y recojo en tienda

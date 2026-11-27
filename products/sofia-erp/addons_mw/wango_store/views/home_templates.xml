@@ -10,7 +10,7 @@
             <!-- Badge flotante de Descuento (Esquina superior izquierda) -->
             <t t-if="discount_pct &gt; 0">
                 <span class="wango-meli-card-badge-pill">
-                    -<t t-esc="discount_pct"/>%
+                    -<t t-out="discount_pct"/>%
                 </span>
             </t>
 
@@ -30,18 +30,18 @@
                         <!-- Precio Tachado -->
                         <div class="wango-meli-old-price" t-if="compare_price &gt; 0">
                             <span class="text-decoration-line-through">
-                                S/ <t t-esc="'%.2f' % compare_price"/>
+                                S/ <t t-out="'%.2f' % compare_price"/>
                             </span>
                         </div>
                         
                         <!-- Precio Actual + % OFF -->
                         <div class="wango-meli-current-price d-flex align-items-baseline gap-2">
                             <span class="wango-meli-price-amount">
-                                S/ <t t-esc="'%.2f' % product.list_price"/>
+                                S/ <t t-out="'%.2f' % product.list_price"/>
                             </span>
                             <t t-if="discount_pct &gt; 0">
                                 <span class="wango-meli-discount-badge">
-                                    <t t-esc="discount_pct"/>% OFF
+                                    <t t-out="discount_pct"/>% OFF
                                 </span>
                             </t>
                         </div>
@@ -50,7 +50,7 @@
                     <!-- Cuotas -->
                     <div class="wango-meli-installments mb-1">
                         <span class="wango-meli-installments-text">
-                            <t t-esc="product.deal_installments_text or '6 cuotas sin interés'"/>
+                            <t t-out="product.deal_installments_text or '6 cuotas sin interés'"/>
                         </span>
                     </div>
 
@@ -58,27 +58,27 @@
                     <t t-if="product.deal_coupon_badge">
                         <div class="wango-meli-coupon mb-1">
                             <span class="badge wango-badge-coupon">
-                                <t t-esc="product.deal_coupon_badge"/>
+                                <t t-out="product.deal_coupon_badge"/>
                             </span>
                         </div>
                     </t>
 
                     <!-- Título (Truncado a 2 líneas con altura uniforme) -->
                     <a t-att-href="product.website_url" class="wango-meli-title text-decoration-none mt-2 d-block" t-att-title="product.name">
-                        <t t-esc="product.name"/>
+                        <t t-out="product.name"/>
                     </a>
 
                     <!-- Micro Social Proof & Rating (Senior Mercado Libre Polish) -->
                     <div class="wango-card-rating-mini d-flex align-items-center gap-1 mt-1 mb-1">
                         <span class="text-warning small" style="font-size: 0.76rem;">
-                            <i class="fa fa-star text-warning"/> <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                            <i class="fa fa-star text-warning"/> <t t-out="'%.1f' % (product.wango_rating_avg or 4.9)"/>
                         </span>
                         <span class="text-muted" style="font-size: 0.72rem;">
-                            (<t t-esc="product.wango_rating_count or 24"/>)
+                            (<t t-out="product.wango_rating_count or 24"/>)
                         </span>
                         <span class="text-muted mx-1" style="font-size: 0.7rem; opacity: 0.5;">•</span>
                         <span class="text-muted small" style="font-size: 0.72rem;">
-                            <t t-esc="product.wango_sales_display or '+50 vendidos'"/>
+                            <t t-out="product.wango_sales_display or '+50 vendidos'"/>
                         </span>
                     </div>
                 </div>
@@ -123,20 +123,20 @@
 
                 <!-- Título -->
                 <a t-att-href="product.website_url" class="wango-highlight-title text-decoration-none fw-bold mt-2 d-block" t-att-title="product.name">
-                    <t t-esc="product.name"/>
+                    <t t-out="product.name"/>
                 </a>
 
                 <!-- Micro Social Proof & Rating -->
                 <div class="wango-card-rating-mini d-flex align-items-center gap-1 mt-1 mb-2">
                     <span class="text-warning small" style="font-size: 0.8rem;">
-                        <i class="fa fa-star text-warning"/> <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                        <i class="fa fa-star text-warning"/> <t t-out="'%.1f' % (product.wango_rating_avg or 4.9)"/>
                     </span>
                     <span class="text-muted" style="font-size: 0.74rem;">
-                        (<t t-esc="product.wango_rating_count or 24"/>)
+                        (<t t-out="product.wango_rating_count or 24"/>)
                     </span>
                     <span class="text-muted mx-1" style="font-size: 0.7rem; opacity: 0.5;">•</span>
                     <span class="text-muted small" style="font-size: 0.74rem;">
-                        <t t-esc="product.wango_sales_display or '+50 vendidos'"/>
+                        <t t-out="product.wango_sales_display or '+50 vendidos'"/>
                     </span>
                 </div>
 
@@ -147,23 +147,23 @@
                     
                     <div class="wango-meli-old-price" t-if="compare_price &gt; 0">
                         <span class="text-decoration-line-through">
-                            S/ <t t-esc="'%.2f' % compare_price"/>
+                            S/ <t t-out="'%.2f' % compare_price"/>
                         </span>
                     </div>
 
                     <div class="d-flex align-items-baseline gap-2">
                         <span class="wango-highlight-price-amount fw-bold">
-                            S/ <t t-esc="'%.2f' % product.list_price"/>
+                            S/ <t t-out="'%.2f' % product.list_price"/>
                         </span>
                         <t t-if="discount_pct &gt; 0">
                             <span class="wango-meli-discount-badge fw-bold">
-                                <t t-esc="discount_pct"/>% OFF
+                                <t t-out="discount_pct"/>% OFF
                             </span>
                         </t>
                     </div>
 
                     <div class="wango-meli-installments-text small fw-medium mt-1">
-                        <t t-esc="product.deal_installments_text or '6 cuotas sin interés'"/>
+                        <t t-out="product.deal_installments_text or '6 cuotas sin interés'"/>
                     </div>
 
                     <t t-if="product.deal_free_shipping">
@@ -289,10 +289,10 @@
                                 <div class="wango-quick-card-header">
                                     <h6 class="wango-quick-card-title fw-bold text-dark mb-1 text-start">
                                         <t t-if="card.card_type == 'login' and is_logged">
-                                            Hola, <t t-esc="(user_id.name or '').split()[0] if user_id.name else 'Usuario'"/>
+                                            Hola, <t t-out="(user_id.name or '').split()[0] if user_id.name else 'Usuario'"/>
                                         </t>
                                         <t t-else="">
-                                            <t t-esc="card.name"/>
+                                            <t t-out="card.name"/>
                                         </t>
                                     </h6>
                                     <p class="wango-quick-card-sub text-muted small mb-0 text-start">
@@ -300,7 +300,7 @@
                                             Revisa tus órdenes y estado de cuenta.
                                         </t>
                                         <t t-else="">
-                                            <t t-esc="card.subtitle"/>
+                                            <t t-out="card.subtitle"/>
                                         </t>
                                     </p>
                                 </div>
@@ -434,13 +434,13 @@
                                                 class="btn wango-btn-card-action w-100"
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#wangoProductLocationModal">
-                                            <t t-esc="card.button_text"/>
+                                            <t t-out="card.button_text"/>
                                         </button>
                                     </t>
                                     <t t-elif="card.card_type == 'categories'">
                                         <button type="button" 
                                                 class="btn wango-btn-card-action w-100 wbl-menu-btn-trigger">
-                                            <t t-esc="card.button_text"/>
+                                            <t t-out="card.button_text"/>
                                         </button>
                                     </t>
                                     <t t-else="">
@@ -449,7 +449,7 @@
                                                 Mi Cuenta
                                             </t>
                                             <t t-else="">
-                                                <t t-esc="card.button_text"/>
+                                                <t t-out="card.button_text"/>
                                             </t>
                                         </a>
                                     </t>
@@ -607,7 +607,7 @@
                                 </div>
                                 <div class="wango-cat-text-box overflow-hidden">
                                     <span class="wango-cat-name fw-semibold d-block">
-                                        <t t-esc="cat.name"/>
+                                        <t t-out="cat.name"/>
                                     </span>
                                     <span class="wango-cat-action-hint small text-muted">
                                         Ver productos <i class="fa fa-angle-right ms-1"/>
@@ -684,16 +684,16 @@
                             </div>
                             
                             <h5 class="wango-trust-title fw-bold text-dark mb-1">
-                                <t t-esc="badge.title"/>
+                                <t t-out="badge.title"/>
                             </h5>
                             
                             <p class="wango-trust-desc text-muted small mb-2">
-                                <t t-esc="badge.description"/>
+                                <t t-out="badge.description"/>
                             </p>
 
                             <t t-if="badge.link_text">
                                 <a t-att-href="badge.link_url or '#'" class="wango-trust-link text-decoration-none small fw-semibold">
-                                    <t t-esc="badge.link_text"/> <i class="fa fa-angle-right ms-1"/>
+                                    <t t-out="badge.link_text"/> <i class="fa fa-angle-right ms-1"/>
                                 </a>
                             </t>
                         </div>
