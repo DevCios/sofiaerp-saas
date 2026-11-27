@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import io
 import logging
+import os
 import unicodedata
 from zipfile import ZipFile
 
@@ -174,8 +175,32 @@ class ResPartner(models.Model):
             self.city_id = self.parent_id.city_id.id
             self.l10n_pe_district = self.parent_id.l10n_pe_district.id
 
+    def _sofia_gateway_headers(self):
+        headers = {'Accept': 'application/json'}
+        key = (os.environ.get('INTERNAL_SERVICE_KEY') or '').strip()
+        if key:
+            headers['X-Internal-Service-Key'] = key
+        return headers
+
     def ConsultarDNI(self, numeroDNI):
-        # consultamos el dni
+        # 1. Intentar primero mediante Sofia Gateway Hub centralizado (Decolecta + caché compartido)
+        gw_url = (os.environ.get('SOFIA_GATEWAY_URL') or '').strip().rstrip('/')
+        if gw_url:
+            try:
+                gw_res = requests.get(
+                    f'{gw_url}/api/v1/lookup/dni/{numeroDNI}',
+                    headers=self._sofia_gateway_headers(),
+                    timeout=SUNAT_TIMEOUT,
+                )
+                if gw_res.status_code == 200:
+                    gw_data = gw_res.json()
+                    if gw_data.get('full_name'):
+                        self.name = gw_data['full_name']
+                        return
+            except Exception as exc:
+                _logger.info("Sofia Gateway DNI %s fallback a proveedor directo: %s", numeroDNI, exc)
+
+        # 2. Fallback directo a apis.net.pe
         try:
             # realizamos la consulta a la api
             result = requests.get(f'https://api.apis.net.pe/v1/dni?numero={numeroDNI}', timeout=SUNAT_TIMEOUT)
@@ -594,8 +619,40 @@ class ResPartner(models.Model):
         return tipoRespuesta, mensajeRespuesta, response.status_code
 
     def ConsultarRUC_ApiNetPe(self, numeroRUC):
-        """Consulta RUC mediante API REST de alta disponibilidad (apis.net.pe).
-        Retorna True si obtuvo los datos exitosamente, o False para hacer fallback a SUNAT."""
+        """Consulta RUC mediante Sofia Gateway Hub (prioridad #1, caché compartido + Decolecta)
+        con fallback a apis.net.pe. Retorna True si obtuvo datos o False para fallback a SUNAT."""
+        gw_url = (os.environ.get('SOFIA_GATEWAY_URL') or '').strip().rstrip('/')
+        if gw_url:
+            try:
+                gw_res = requests.get(
+                    f'{gw_url}/api/v1/lookup/ruc/{numeroRUC}',
+                    headers=self._sofia_gateway_headers(),
+                    timeout=6,
+                )
+                if gw_res.status_code == 200:
+                    data = gw_res.json()
+                    if data.get('business_name'):
+                        self.name = data.get('business_name', '')
+                        self.street = data.get('address', '')
+                        self.state = data.get('status', '')
+                        self.condition = data.get('condition', '')
+                        country_pe = self.env['res.country'].search([('code', '=', 'PE')], limit=1)
+                        if country_pe:
+                            self.country_id = country_pe.id
+                        ubigeo = data.get('ubigeo', '')
+                        if ubigeo:
+                            district = self.env['l10n_pe.res.city.district'].search([('code', '=', ubigeo)], limit=1)
+                            if district:
+                                self.l10n_pe_district = district.id
+                                self.zip = district.code
+                                if district.city_id:
+                                    self.city_id = district.city_id.id
+                                    if district.city_id.state_id:
+                                        self.state_id = district.city_id.state_id.id
+                        return True
+            except Exception as e:
+                _logger.info("Sofia Gateway RUC %s fallback a apis.net.pe: %s", numeroRUC, e)
+
         try:
             result = requests.get(f'https://api.apis.net.pe/v1/ruc?numero={numeroRUC}', timeout=6)
             if result.status_code == 200:

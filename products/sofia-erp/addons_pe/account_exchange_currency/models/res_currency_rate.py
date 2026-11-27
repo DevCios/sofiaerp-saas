@@ -1,6 +1,7 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 from dateutil.relativedelta import relativedelta
+import os
 import requests
 import time
 import logging
@@ -128,7 +129,46 @@ class CurrencyRate(models.Model):
             return
 
         rate_date = fecha or fields.Date.context_today(self.with_context(tz='America/Lima'))
-        params = {'fecha': fields.Date.to_string(rate_date)}
+        date_str = fields.Date.to_string(rate_date)
+
+        # 1. Intentar primero mediante Sofia Gateway Hub (caché diario compartido + Decolecta, sin HTTP 429)
+        gw_url = (os.environ.get('SOFIA_GATEWAY_URL') or '').strip().rstrip('/')
+        if gw_url:
+            try:
+                gw_headers = {'Accept': 'application/json'}
+                gw_key = (os.environ.get('INTERNAL_SERVICE_KEY') or '').strip()
+                if gw_key:
+                    gw_headers['X-Internal-Service-Key'] = gw_key
+                gw_resp = requests.get(
+                    f'{gw_url}/api/v1/lookup/exchange-rate',
+                    params={'date': date_str},
+                    headers=gw_headers,
+                    timeout=10,
+                )
+                if gw_resp.status_code == 200:
+                    gw_data = gw_resp.json()
+                    buy = float(gw_data.get('buy_rate') or 0)
+                    sell = float(gw_data.get('sell_rate') or 0)
+                    if buy > 0 and sell > 0:
+                        existing = self.search([
+                            ('currency_id', '=', currency.id),
+                            ('name', '=', rate_date),
+                            ('company_id', '=', company.id),
+                        ], limit=1)
+                        vals = self._build_rate_vals(currency, rate_date, company, buy, sell)
+                        if existing:
+                            existing.write(vals)
+                        else:
+                            self.create(vals)
+                        _logger.info(
+                            "TC SUNAT sincronizado vía Sofia Gateway para %s (%s): compra %s, venta %s",
+                            currency.name, company.name, buy, sell,
+                        )
+                        return buy, sell
+            except Exception as exc:
+                _logger.info("Sofia Gateway TC fallback a apis.net.pe: %s", exc)
+
+        params = {'fecha': date_str}
         headers = {'User-Agent': APISNETPE_FREE_UA, 'Accept': 'application/json'}
 
         data = None
