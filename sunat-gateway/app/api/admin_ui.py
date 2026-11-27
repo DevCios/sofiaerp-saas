@@ -93,12 +93,14 @@ PANEL_HTML = r"""<!DOCTYPE html>
 
     .console-right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .topbar {
-      height: 54px; background: #FFFFFF; border-bottom: 1px solid var(--border);
-      padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      position: sticky; top: 0; z-index: 25;
+      min-height: 54px; background: #FFFFFF; border-bottom: 1px solid var(--border);
+      padding: 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 25; flex-wrap: nowrap;
     }
-    .topbar-left { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); min-width: 0; }
-    .topbar-left strong { color: var(--text); font-weight: 600; }
+    .topbar-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-left strong { color: var(--text); font-weight: 600; white-space: nowrap; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; flex-shrink: 0; }
+    .tb-status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
     .tb-icon-btn { background: transparent; border: 1px solid transparent; color: #4B5563; width: 30px; height: 30px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
     .tb-icon-btn:hover { background: #F3F4F6; border-color: var(--border); }
     .tb-search {
@@ -363,14 +365,14 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <span>Consola API</span>
         <span>›</span>
         <strong id="topbarCrumb">Inicio</strong>
-        <span id="sunatBetaStatus" class="badge b-info" style="margin-left:8px">Beta: ...</span>
-        <span id="sunatProdStatus" class="badge b-ok">Prod: ...</span>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;max-width:240px;padding:5px 10px;font-size:12px">
+      <div class="topbar-right">
+        <span id="sunatBetaStatus" class="tb-status-pill b-info" title="Estado SUNAT Beta">Beta</span>
+        <span id="sunatProdStatus" class="tb-status-pill b-ok" title="Estado SUNAT Producción">Prod</span>
+        <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:185px;padding:5px 8px;font-size:12px">
           <option value="">Todas las Empresas</option>
         </select>
-        <span id="activeEnvBadge" class="badge b-info hidden">Global</span>
+        <span id="activeEnvBadge" class="hidden"></span>
         <button class="tb-search" onclick="openCmdModal()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <span>Buscar</span>
@@ -378,7 +380,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
         </button>
         <button class="tb-icon-btn" onclick="refreshAll()" title="Actualizar">↻</button>
         <span id="userAvatar" class="tb-avatar" title="Usuario">A</span>
-        <button class="btn btn-sm btn-sec" onclick="logout()">Salir</button>
+        <button class="tb-icon-btn" onclick="logout()" title="Cerrar sesión" style="width:auto;padding:0 8px;font-size:12px;font-weight:600">Salir</button>
       </div>
     </div>
 
@@ -971,14 +973,10 @@ function selectedRuc() {
 
 function onRucFilterChange() {
   const ruc = selectedRuc();
-  const badge = document.getElementById('activeEnvBadge');
   const iss = ISSUERS_CACHE.find(i => i.ruc === ruc);
-  if (!iss) {
-    badge.className = 'badge b-info';
-    badge.textContent = 'Global';
-  } else {
-    badge.className = iss.is_beta ? 'badge b-warn' : 'badge b-ok';
-    badge.textContent = `${iss.is_beta ? 'BETA' : 'PRODUCCIÓN'} · ${iss.signing_mode === 'tenant_local' ? 'Firma en Tenant' : 'Bóveda Gateway'}`;
+  if (iss) {
+    document.getElementById('envBtnBeta').classList.toggle('active', iss.is_beta);
+    document.getElementById('envBtnProd').classList.toggle('active', !iss.is_beta);
   }
   refreshScopedData();
 }
@@ -988,10 +986,12 @@ async function refreshSunatHealth() {
     const h = await fetch('/api/v1/health/sunat').then(r => r.json());
     const b = document.getElementById('sunatBetaStatus');
     const p = document.getElementById('sunatProdStatus');
-    b.className = 'badge ' + (h.sunat_beta?.online ? 'b-ok' : 'b-err');
-    b.textContent = `SUNAT Beta: ${h.sunat_beta?.online ? 'ONLINE' : 'CAÍDO'} (${h.sunat_beta?.latency_ms || 0}ms)`;
-    p.className = 'badge ' + (h.sunat_prod?.online ? 'b-ok' : 'b-err');
-    p.textContent = `SUNAT Prod: ${h.sunat_prod?.online ? 'ONLINE' : 'CAÍDO'} (${h.sunat_prod?.latency_ms || 0}ms)`;
+    b.className = 'tb-status-pill ' + (h.sunat_beta?.online ? 'b-ok' : 'b-err');
+    b.textContent = `● Beta`;
+    b.title = `SUNAT Beta: ${h.sunat_beta?.online ? 'ONLINE' : 'CAÍDO'} (${h.sunat_beta?.latency_ms || 0}ms)`;
+    p.className = 'tb-status-pill ' + (h.sunat_prod?.online ? 'b-ok' : 'b-err');
+    p.textContent = `● Prod`;
+    p.title = `SUNAT Prod: ${h.sunat_prod?.online ? 'ONLINE' : 'CAÍDO'} (${h.sunat_prod?.latency_ms || 0}ms)`;
   } catch (e) {}
 }
 
