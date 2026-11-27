@@ -1,11 +1,11 @@
 {
-    'name': 'WanGO Core',
+    'name': 'Mercado Wanka — Core',
     'version': '20.0.1.0.0',
-    'summary': 'Core module for WanGO transport and logistics platform',
+    'summary': 'Núcleo de infraestructura y logística para Mercado Wanka',
     'description': """
-WanGO Core Infrastructure
-=========================
-Defines the base structure for the WanGO platform.
+Mercado Wanka Core Infrastructure
+=================================
+Defines the base structure for the Mercado Wanka platform.
 - Abstract base models (UUID, company, active)
 - Locations (Cities, Agencies, Points)
 - Vehicles & Drivers
@@ -13,16 +13,15 @@ Defines the base structure for the WanGO platform.
 - Audit System
     """,
     'category': 'Transport',
-    'author': 'Antigravity',
-    'website': 'https://wango.app',
-    'depends': ['base', 'mail', 'web', 'fleet'],
+    'author': 'SOFIA ERP / Mercado Wanka',
+    'website': 'https://tienda.sofiaerp.com',
+    'depends': ['base', 'mail', 'web', 'account', 'payment', 'fleet'],
     'data': [
         'security/wango_security.xml',
         'security/ir.access.csv',
         'views/wango_views.xml',
         'views/wango_menus.xml',
         'views/res_config_settings_views.xml',
-                'demo/demo_data.xml',
     ],
     'installable': True,
     'application': False,
