@@ -78,7 +78,8 @@ input, button, select, textarea, label,
 .fa, .fas, .far, .fal, .fab, .fad, .oi,
 [class^="fa-"], [class*=" fa-"],
 [class^="oi-"], [class*=" oi-"] {
-    font-family: 'FontAwesome' !important;
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900;
     font-style: normal !important;
     font-weight: normal !important;
     line-height: 1 !important;

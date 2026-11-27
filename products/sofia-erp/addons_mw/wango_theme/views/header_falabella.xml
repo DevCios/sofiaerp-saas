@@ -22,9 +22,11 @@
                         font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
                     }
                     .falabella-header-wrapper .fa,
+                    .falabella-header-wrapper .fas,
                     .falabella-header-wrapper i.fa,
                     .falabella-header-wrapper span.fa {
-                        font-family: 'FontAwesome' !important;
+                        font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+                        font-weight: 900 !important;
                     }
 
                     /* Sidebar Layout & Logic */
