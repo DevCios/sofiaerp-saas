@@ -2,7 +2,7 @@
 <odoo>
 
     <!-- Mejora Premium de la Ficha de Producto (Mercado Libre Style) -->
-    <template id="wango_product_detail_inherit" inherit_id="website_sale.product" name="WanGO Ficha de Producto Premium" priority="25">
+    <template id="wango_product_detail_inherit" inherit_id="website_sale.product" name="WanGO Ficha de Producto Premium" priority="25" active="False">
         <!-- 1. Metadata y Social Proof antes del Título -->
         <xpath expr="//div[@id='product_details']" position="inside">
             <div class="wango-product-header-meta d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
