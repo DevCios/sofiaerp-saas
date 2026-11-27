@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Bloque Producción Odoo 20: Selector de Entrega + Pago Seguro Mercado Pago (Tarjetas / Yape / Plin) -->
-    <template id="wango_cart_mercadopago_express" inherit_id="website_sale.cart" name="Mercado Wanka Checkout Express (Entrega + Mercado Pago)" priority="30">
-        <xpath expr="//div[@id='wrap']" position="inside">
+    <template id="wango_cart_mercadopago_express" inherit_id="website.layout" name="Mercado Wanka Checkout Express (Entrega + Mercado Pago)" priority="30">
+        <xpath expr="//main" position="inside">
+            <t t-if="request and request.httprequest and request.httprequest.path.rstrip('/') == '/shop/cart'">
             <t t-set="mw_order" t-value="website.sale_get_order()"/>
             <div class="container my-4" t-if="mw_order and mw_order.order_line">
                 <div class="card border-0 shadow-sm" style="border-radius: 16px; border: 1px solid #e2e8f0 !important; background: #ffffff;">
@@ -67,6 +68,7 @@
                     </div>
                 </div>
             </div>
+            </t>
         </xpath>
     </template>
 </odoo>
