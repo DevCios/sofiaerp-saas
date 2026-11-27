@@ -8,7 +8,7 @@ from odoo.fields import Date
 from odoo.http import request
 from odoo.tools import consteq
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
-from odoo.addons.web.controllers.main import Home
+from odoo.addons.web.controllers.home import Home
 
 _logger = logging.getLogger(__name__)
 
