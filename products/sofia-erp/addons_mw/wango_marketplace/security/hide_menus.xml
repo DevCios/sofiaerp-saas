@@ -5,22 +5,22 @@
         <record id="mail.menu_root_discuss" model="ir.ui.menu">
             <!-- Evaluamos grupos existentes y añadimos group_marketplace_manager, pero Odoo por defecto le da acceso a group_user.
                  La mejor manera de ocultarlo es sobrescribir los grupos para que SÓLO un admin o manager pueda verlo. -->
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
+            <field name="group_ids" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
         </record>
 
         <!-- Ocultar Contactos -->
         <record id="contacts.menu_contacts" model="ir.ui.menu">
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
+            <field name="group_ids" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
         </record>
 
         <!-- Ocultar Sitio Web -->
         <record id="website.menu_website_configuration" model="ir.ui.menu">
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
+            <field name="group_ids" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
         </record>
 
         <!-- Ocultar Seguidor de Enlaces -->
         <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
+            <field name="group_ids" eval="[(6, 0, [ref('base.group_system'), ref('wango_marketplace.group_marketplace_manager')])]"/>
         </record>
     </data>
 </odoo>
