@@ -6,7 +6,6 @@
         <field name="model">wango.shipment</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">wango_delivery.report_shipment_label_template</field>
-        <field name="report_file">wango_delivery.report_shipment_label_template</field>
         <field name="print_report_name">'Rotulo_Envio_' + (object.name or 'New')</field>
         <field name="binding_model_id" ref="model_wango_shipment"/>
         <field name="binding_type">report</field>
