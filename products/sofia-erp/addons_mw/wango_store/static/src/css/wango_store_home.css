@@ -18,10 +18,9 @@
     --meli-radius: 12px;
 }
 
-/* Unificación Tipográfica para componentes de la Tienda */
-.wango-home-page, 
-.wango-home-page *,
-.wango-home-box, 
+/* Unificación Tipográfica para componentes de la Tienda (sin pisar íconos FontAwesome .fa) */
+.wango-home-page,
+.wango-home-box,
 .wango-meli-card,
 .wango-quick-card,
 .wango-highlight-card,
@@ -29,7 +28,7 @@
 .wango-trust-badge,
 .wango-box-title,
 .wango-link-see-all {
-    font-family: var(--meli-font) !important;
+    font-family: var(--meli-font);
 }
 
 /* Fondo 100% Blanco para Toda la Web (evita recortes o cajas grises en imágenes de producto) */
