@@ -627,13 +627,19 @@
                                 <span class="d-none d-md-inline ms-1">Categorías</span>
                             </button>
 
-                            <!-- Brand Logo (Sincronizado con Backend de Odoo) -->
+                            <!-- Brand Logo (Mercado Wanka Oficial con Fallback Tipográfico Premium) -->
                             <a href="/" class="text-decoration-none order-2 order-md-1 d-flex align-items-center">
-                                <img t-att-src="'/logo.png?%s' % (res_company.write_date or '')" 
+                                <img src="/wango_theme/static/src/img/mercadowanka_logo.png" 
                                      alt="Mercado Wanka" 
                                      class="img-fluid" 
-                                     style="max-height: 42px; width: auto; object-fit: contain;"
-                                     onerror="this.onerror=null; this.src='/wango_theme/static/src/img/mercadowanka_logo.png';"/>
+                                     style="max-height: 40px; width: auto; object-fit: contain;"
+                                     onerror="this.style.display='none'; var b = document.getElementById('wango_header_brand_fallback'); if(b) b.style.setProperty('display', 'flex', 'important');"/>
+                                <div id="wango_header_brand_fallback" class="d-none flex-column lh-1" style="display: none;">
+                                    <span style="font-weight: 800; font-size: 1.35rem; color: #1E293B; letter-spacing: -0.03em;">
+                                        mercado<span style="color: #2D3277; background: #FFE600; padding: 2px 7px; border-radius: 6px; margin-left: 4px; font-size: 1.15rem; font-weight: 800;">wanka</span>
+                                    </span>
+                                    <span style="font-size: 0.68rem; color: #64748B; font-weight: 700; letter-spacing: 0.06em; margin-top: 2px;">TIENDA OFICIAL</span>
+                                </div>
                             </a>
                         </div>
 
@@ -641,7 +647,7 @@
                         <div class="flex-grow-1 mx-4 d-none d-md-block" style="max-width: 800px;">
                             <form method="get" action="/shop" class="falabella-search-form o_wsale_products_searchbar_form o_wait_lazy_js d-flex align-items-center border rounded-pill overflow-hidden" style="border-color: #ddd !important; height: 46px;" data-limit="5" data-display-image="true" data-display-description="true" data-display-price="true" data-display-extra-link="true" data-display-categories="true">
                                 <input type="search" name="search" class="search-query form-control border-0 shadow-none px-4 h-100" placeholder="Buscar en Mercado Wanka..." style="font-size: 1.1rem;" t-att-value="search"/>
-                                <button type="submit" class="btn border-0 shadow-none h-100 d-flex align-items-center justify-content-center px-4" style="background-color: #343a40; color: white;">
+                                <button type="submit" class="btn border-0 shadow-none h-100 d-flex align-items-center justify-content-center px-4" style="background-color: #3483FA; color: white; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#1A6BE6'" onmouseout="this.style.backgroundColor='#3483FA'">
                                     <i class="fa fa-search fs-5"/>
                                 </button>
                             </form>
@@ -735,7 +741,7 @@
                     <div class="d-block d-md-none mt-3">
                         <form method="get" action="/shop" class="falabella-search-form o_wsale_products_searchbar_form o_wait_lazy_js d-flex align-items-center border rounded-pill overflow-hidden" style="border-color: #ddd !important; height: 40px;" data-limit="5" data-display-image="true" data-display-description="true" data-display-price="true" data-display-extra-link="true" data-display-categories="true">
                             <input type="search" name="search" class="search-query form-control border-0 shadow-none px-3 h-100" placeholder="Buscar en Mercado Wanka..." style="font-size: 1.05rem;" t-att-value="search"/>
-                            <button type="submit" class="btn border-0 shadow-none h-100 px-3" style="background-color: #343a40; color: white;">
+                            <button type="submit" class="btn border-0 shadow-none h-100 px-3" style="background-color: #3483FA; color: white;">
                                 <i class="fa fa-search"/>
                             </button>
                         </form>

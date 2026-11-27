@@ -113,55 +113,7 @@
 
                 <div class="container px-lg-4">
                     
-                    <!-- 1. BARRA DE BENEFICIOS Y CONFIANZA (Estilo E-Commerce Mercado Libre) -->
-                    <div class="row g-3 mb-4 text-center">
-                        <div class="col-12 col-md-4">
-                            <div class="trust-card d-flex flex-column align-items-center justify-content-center">
-                                <div class="mb-2" style="font-size: 2rem; color: #714B67;">
-                                    <i class="fa fa-mobile-phone"></i>
-                                </div>
-                                <h6 class="mb-1">Paga con Yape, Plin o Tarjetas</h6>
-                                <p class="small text-muted mb-2" style="font-size: 0.82rem; line-height: 1.4;">
-                                    Paga rápido y seguro con billeteras móviles, transferencias o tarjetas sin comisiones ocultas.
-                                </p>
-                                <a href="/soporte" class="small fw-bold" style="color: #017E84; text-decoration: none;">
-                                    Cómo pagar con Yape y Plin &gt;
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <div class="trust-card d-flex flex-column align-items-center justify-content-center">
-                                <div class="mb-2" style="font-size: 2rem; color: #017E84;">
-                                    <i class="fa fa-truck"></i>
-                                </div>
-                                <h6 class="mb-1">Envíos rápidos y seguros</h6>
-                                <p class="small text-muted mb-2" style="font-size: 0.82rem; line-height: 1.4;">
-                                    Recibe tus compras a domicilio con seguimiento en tiempo real y despacho garantizado.
-                                </p>
-                                <a href="/soporte" class="small fw-bold" style="color: #017E84; text-decoration: none;">
-                                    Conoce las zonas de cobertura &gt;
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-12 col-md-4">
-                            <div class="trust-card d-flex flex-column align-items-center justify-content-center">
-                                <div class="mb-2" style="font-size: 2rem; color: #EAB308;">
-                                    <i class="fa fa-shield"></i>
-                                </div>
-                                <h6 class="mb-1">Seguridad, de principio a fin</h6>
-                                <p class="small text-muted mb-2" style="font-size: 0.82rem; line-height: 1.4;">
-                                    ¿Tuviste algún inconveniente? En nuestra plataforma tus compras y pagos están 100% protegidos.
-                                </p>
-                                <a href="/soporte" class="small fw-bold" style="color: #017E84; text-decoration: none;">
-                                    Cómo te protegemos &gt;
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. BANNER DESTACADO: LIBRO DE RECLAMACIONES DIGITAL (Idéntico a Mercado Libre) -->
+                    <!-- 1. BANNER DESTACADO: LIBRO DE RECLAMACIONES DIGITAL (Idéntico a Mercado Libre) -->
                     <div class="reclamaciones-banner">
                         <div class="d-flex align-items-center gap-3">
                             <div style="font-size: 2.4rem; color: #2563EB; flex-shrink: 0;">

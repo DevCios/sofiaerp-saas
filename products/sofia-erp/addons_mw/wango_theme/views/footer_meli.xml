@@ -168,45 +168,7 @@
 
                 <div class="container px-lg-4">
                     
-                    <!-- 1. BENEFICIOS / CONFIANZA -->
-                    <div class="wango-trust-row">
-                        <div class="row text-center g-3">
-                            <div class="col-12 col-md-4 wango-trust-col">
-                                <div class="wango-trust-icon" style="color: #714B67;">
-                                    <i class="fa fa-mobile-phone"></i>
-                                </div>
-                                <div class="wango-trust-title">Paga con Yape</div>
-                                <div class="wango-trust-desc">
-                                    Paga rápido y seguro con Yape, transferencias bancarias o tarjetas sin comisiones ocultas.
-                                </div>
-                                <a href="/ayuda" class="wango-trust-link">Cómo pagar con Yape &gt;</a>
-                            </div>
-
-                            <div class="col-12 col-md-4 wango-trust-col">
-                                <div class="wango-trust-icon" style="color: #017E84;">
-                                    <i class="fa fa-truck"></i>
-                                </div>
-                                <div class="wango-trust-title">Envío gratis desde S/ 50</div>
-                                <div class="wango-trust-desc">
-                                    Compra con envíos rápidos en el Valle del Mantaro y disfruta de envío gratis en compras mayores a 50 soles.
-                                </div>
-                                <a href="/ayuda" class="wango-trust-link">Zonas y tiempos de entrega &gt;</a>
-                            </div>
-
-                            <div class="col-12 col-md-4 wango-trust-col">
-                                <div class="wango-trust-icon" style="color: #EAB308;">
-                                    <i class="fa fa-shield"></i>
-                                </div>
-                                <div class="wango-trust-title">Seguridad, de principio a fin</div>
-                                <div class="wango-trust-desc">
-                                    ¿No te gusta? ¡Devuélvelo! En WanGO tus compras, pagos y envíos están 100% protegidos.
-                                </div>
-                                <a href="/ayuda" class="wango-trust-link">Cómo te protegemos &gt;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. BANNER LIBRO DE RECLAMACIONES DIGITAL (ESTILO MERCADO LIBRE) -->
+                    <!-- 1. BANNER LIBRO DE RECLAMACIONES DIGITAL (ESTILO MERCADO LIBRE) -->
                     <div class="wango-meli-reclama-banner">
                         <div class="d-flex align-items-center gap-3">
                             <div style="font-size: 2.8rem; color: #009EE3; flex-shrink: 0;">

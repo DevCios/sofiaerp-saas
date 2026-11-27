@@ -399,3 +399,152 @@ p {
 .modal-footer {
     border-top: 1px solid var(--mw-border-subtle) !important;
 }
+
+/* ==========================================================================
+   11. UNIFICACIÓN SENIOR UI/UX: FICHA DE PRODUCTO & BOTONES DE COMPRA
+   Inspirado en Mercado Libre / Mercado Pago (Consistencia Visual Global)
+   ========================================================================== */
+
+/* Botón Principal de Compra / Agregar al carrito en toda la tienda */
+#add_to_cart,
+.wango-btn-buy-now,
+.o_wsale_product_page .btn-primary,
+.oe_website_sale #add_to_cart,
+.o_wsale_product_page #add_to_cart {
+    background-color: #3483FA !important;
+    border-color: #3483FA !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1.75rem !important;
+    box-shadow: 0 2px 8px rgba(52, 131, 250, 0.25) !important;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    text-transform: none !important;
+    letter-spacing: -0.01em !important;
+}
+
+#add_to_cart:hover,
+.wango-btn-buy-now:hover,
+.o_wsale_product_page .btn-primary:hover,
+.oe_website_sale #add_to_cart:hover {
+    background-color: #1A6BE6 !important;
+    border-color: #1A6BE6 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(52, 131, 250, 0.35) !important;
+}
+
+/* Selector de Cantidad en Ficha de Producto */
+.css_quantity {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid #D1D5DB !important;
+}
+.css_quantity .btn {
+    background-color: #F8FAFC !important;
+    color: #334155 !important;
+    border: none !important;
+    font-weight: 700 !important;
+    padding: 0.4rem 0.75rem !important;
+}
+.css_quantity .btn:hover {
+    background-color: #E2E8F0 !important;
+}
+.css_quantity input.js_quantity {
+    border: none !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    color: #1E293B !important;
+}
+
+/* Ficha de Producto: Contenedor de Imagen y Detalles */
+.o_wsale_product_page .o_wsale_product_images {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+.o_wsale_product_page #product_details {
+    padding-left: 1.5rem !important;
+}
+
+.o_wsale_product_page #product_details h1 {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: #1E293B !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.o_wsale_product_page .product_price {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: #1E293B !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Tarjetas de Entrega y Confianza en Ficha de Producto */
+.wango-delivery-option-card,
+.wango-trust-guarantee-card,
+.wango-seller-reputation-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    padding: 1.25rem !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ==========================================================================
+   12. UNIFICACIÓN SENIOR UI/UX: CARRITO Y CHECKOUT (/shop/cart)
+   ========================================================================== */
+
+/* Tarjetas de Resumen y Checkout Express */
+.oe_cart .card,
+.wango-cart-summary-card,
+.wango-checkout-express-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Botón de Pago Principal de Checkout (Mercado Pago / Yape / Plin) */
+.btn-pay-mercadopago,
+#btn_wango_fast_pay,
+.wango-checkout-btn-primary {
+    background-color: #009EE3 !important;
+    border-color: #009EE3 !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    border-radius: 8px !important;
+    padding: 0.85rem 1.5rem !important;
+    box-shadow: 0 4px 14px rgba(0, 158, 227, 0.35) !important;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    letter-spacing: -0.01em !important;
+}
+
+.btn-pay-mercadopago:hover,
+#btn_wango_fast_pay:hover,
+.wango-checkout-btn-primary:hover {
+    background-color: #0081BA !important;
+    border-color: #0081BA !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(0, 158, 227, 0.45) !important;
+}
+
+/* Badges de Métodos de Pago (Yape, Plin, MP, Tarjetas) */
+.payment-badge-pill {
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 6px !important;
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+}
+
