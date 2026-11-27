@@ -1,66 +1,350 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Bloque Producción Odoo 20: Selector de Entrega + Pago Seguro Mercado Pago (Tarjetas / Yape / Plin) -->
+    <!-- Bloque Producción Odoo 20: Carrito Profesional + Selector de Entrega + Pago Seguro Mercado Pago (Tarjetas / Yape / Plin) -->
     <template id="wango_cart_mercadopago_express" inherit_id="website.layout" name="Mercado Wanka Checkout Express (Entrega + Mercado Pago)" priority="30">
         <xpath expr="//main" position="inside">
             <t t-if="request and request.httprequest and request.httprequest.path.rstrip('/') == '/shop/cart'">
             <t t-set="mw_order" t-value="website.sale_get_order()"/>
-            <div class="container my-4" t-if="mw_order and mw_order.order_line">
-                <div class="card border-0 shadow-sm" style="border-radius: 16px; border: 1px solid #e2e8f0 !important; background: #ffffff;">
-                    <div class="card-body p-4">
-                        <div class="row align-items-center g-4">
-                            <div class="col-lg-7">
-                                <h4 class="fw-bold mb-1" style="color: #0f172a;">
-                                    <i class="fa fa-shield text-success me-2"/> Finalizar Compra Segura en Mercado Wanka
+            <style>
+                /* === MERCADO WANKA: REDISENO PROFESIONAL DEL CARRITO (/shop/cart) === */
+                main {
+                    background-color: #f8fafc !important;
+                }
+                main #wrap,
+                main #wrap.oe_website_sale,
+                main .oe_website_sale {
+                    min-height: auto !important;
+                    flex-grow: 0 !important;
+                    padding-bottom: 16px !important;
+                }
+                /* Estilizar las tarjetas nativas de Odoo 20 en el carrito */
+                #wrap .oe_cart,
+                #wrap #o_cart_summary,
+                #wrap .o_total_card {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0 !important;
+                    border-radius: 16px !important;
+                    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+                }
+                #wrap .oe_cart {
+                    padding: 24px !important;
+                }
+                /* Quitar choque visual del boton morado nativo de Odoo: convertirlo en opcion secundaria limpia */
+                #wrap a[name="website_sale_main_button"],
+                #wrap a[href="/shop/checkout"],
+                #wrap a[href="/shop/checkout?express=1"] {
+                    background: #ffffff !important;
+                    background-color: #ffffff !important;
+                    border: 1.5px solid #cbd5e1 !important;
+                    color: #334155 !important;
+                    border-radius: 10px !important;
+                    font-weight: 600 !important;
+                    font-size: 0.9rem !important;
+                    box-shadow: none !important;
+                    transition: all 0.2s ease;
+                }
+                #wrap a[name="website_sale_main_button"]:hover,
+                #wrap a[href="/shop/checkout"]:hover {
+                    background-color: #f1f5f9 !important;
+                    border-color: #94a3b8 !important;
+                    color: #0f172a !important;
+                }
+
+                /* Tarjeta principal Checkout Express */
+                .mw-express-card {
+                    background: #ffffff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 18px;
+                    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+                    overflow: hidden;
+                }
+                .mw-express-header {
+                    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+                    border-bottom: 1px solid #e2e8f0;
+                    padding: 18px 24px;
+                }
+                .mw-delivery-option {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    width: 100%;
+                    padding: 13px 14px;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 12px;
+                    background: #ffffff;
+                    cursor: pointer;
+                    transition: all 0.18s ease;
+                    margin: 0;
+                }
+                .mw-delivery-option:hover {
+                    border-color: #93c5fd;
+                    background: #f8fafc;
+                }
+                .mw-delivery-option.mw-active,
+                .mw-delivery-option:has(input:checked) {
+                    border-color: #2563eb;
+                    background: #f0f7ff;
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+                }
+                .mw-delivery-option input[type="radio"] {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+                .mw-icon-box {
+                    width: 40px;
+                    height: 40px;
+                    min-width: 40px;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .mw-icon-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+                .mw-icon-green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+                .mw-icon-amber { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+                .mw-icon-purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+                .mw-notes-input-wrap {
+                    position: relative;
+                }
+                .mw-notes-input-wrap svg {
+                    position: absolute;
+                    left: 14px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #64748b;
+                    pointer-events: none;
+                }
+                .mw-notes-input {
+                    height: 46px;
+                    padding-left: 42px !important;
+                    padding-right: 14px !important;
+                    border-radius: 10px !important;
+                    border: 1.5px solid #cbd5e1 !important;
+                    font-size: 0.92rem !important;
+                    color: #0f172a !important;
+                    background: #ffffff !important;
+                    transition: all 0.2s ease;
+                }
+                .mw-notes-input:focus {
+                    border-color: #2563eb !important;
+                    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+                }
+
+                .mw-btn-pay-mp {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    width: 100%;
+                    min-height: 54px;
+                    padding: 13px 22px;
+                    border: none;
+                    border-radius: 12px;
+                    background: linear-gradient(135deg, #009ee3 0%, #0077b6 100%);
+                    color: #ffffff !important;
+                    font-weight: 700;
+                    font-size: 1.02rem;
+                    letter-spacing: -0.01em;
+                    box-shadow: 0 6px 18px rgba(0, 158, 227, 0.28);
+                    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+                    cursor: pointer;
+                }
+                .mw-btn-pay-mp:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 8px 22px rgba(0, 158, 227, 0.36);
+                    filter: brightness(1.03);
+                }
+                .mw-btn-pay-mp:active {
+                    transform: translateY(0);
+                }
+
+                .mw-pay-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                    padding: 4px 10px;
+                    border-radius: 999px;
+                    font-size: 0.76rem;
+                    font-weight: 700;
+                    border: 1px solid #e2e8f0;
+                    background: #ffffff;
+                    color: #334155;
+                }
+                .mw-pay-pill-yape { background: #faf5ff; border-color: #e9d5ff; color: #742284; }
+                .mw-pay-pill-plin { background: #f0fdfa; border-color: #99f6e4; color: #0f766e; }
+                .mw-pay-pill-mp { background: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+
+                .mw-trust-panel {
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 14px;
+                    padding: 18px;
+                    height: 100%;
+                }
+                .mw-trust-item {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 11px;
+                }
+                .mw-trust-dot {
+                    width: 32px;
+                    height: 32px;
+                    min-width: 32px;
+                    border-radius: 9px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-top: 1px;
+                }
+            </style>
+
+            <div class="container pb-5 pt-2" id="mw_cart_express_wrapper" t-if="mw_order and mw_order.order_line" style="max-width: 1140px;">
+                <t t-if="request.params.get('error') == 'mp_not_configured'">
+                    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" style="border-radius: 12px; font-size: 0.9rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <span>Mercado Pago aún no tiene credenciales configuradas en este entorno. Configura <code>MP_ACCESS_TOKEN</code> o usa el checkout clásico.</span>
+                    </div>
+                </t>
+
+                <div class="mw-express-card">
+                    <!-- Header -->
+                    <div class="mw-express-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="mw-icon-box mw-icon-green" style="width: 42px; height: 42px; border-radius: 12px;">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-0" style="color: #0f172a; font-size: 1.15rem;">
+                                    Finalizar Compra Segura en Mercado Wanka
                                 </h4>
-                                <p class="text-muted small mb-3">
-                                    Elige cómo deseas recibir tu pedido y paga al instante con <strong>Mercado Pago (Tarjetas, Yape o Plin)</strong>.
-                                    Cada tienda emitirá tu Boleta o Factura Electrónica SUNAT por sus productos.
-                                </p>
+                                <div class="text-muted" style="font-size: 0.85rem;">
+                                    Elige tu forma de entrega y paga al instante con <strong>Yape, Plin o Tarjetas</strong>.
+                                </div>
+                            </div>
+                        </div>
+                        <span class="badge rounded-pill px-3 py-2" style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-size: 0.78rem; font-weight: 700;">
+                            Pago 100% Protegido (Escrow)
+                        </span>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-4">
+                        <div class="row g-4 align-items-stretch">
+                            <!-- Columna Izquierda: Entrega + CTA Pago -->
+                            <div class="col-lg-7 d-flex flex-column justify-content-between">
                                 <form action="/shop/mercadopago/set_delivery" method="post" id="mw_express_checkout_form">
+                                    <div class="fw-bold mb-2" style="font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">
+                                        1. ¿Cómo deseas recibir tu pedido?
+                                    </div>
                                     <div class="row g-2 mb-3">
                                         <div class="col-md-4">
-                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                            <label class="mw-delivery-option mw-active" data-mode="home_delivery">
                                                 <input type="radio" name="delivery_mode" value="home_delivery" checked="checked"/>
-                                                <span class="small fw-bold"><i class="fa fa-truck text-primary me-1"/> Delivery</span>
+                                                <div class="mw-icon-box mw-icon-blue">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                                                </div>
+                                                <div class="lh-sm">
+                                                    <div class="fw-bold" style="font-size: 0.88rem; color: #0f172a;">Delivery</div>
+                                                    <div style="font-size: 0.74rem; color: #64748b;">A tu domicilio</div>
+                                                </div>
                                             </label>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                            <label class="mw-delivery-option" data-mode="store_pickup">
                                                 <input type="radio" name="delivery_mode" value="store_pickup"/>
-                                                <span class="small fw-bold"><i class="fa fa-shopping-bag text-success me-1"/> Retiro Tienda</span>
+                                                <div class="mw-icon-box mw-icon-green">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+                                                </div>
+                                                <div class="lh-sm">
+                                                    <div class="fw-bold d-flex align-items-center gap-1" style="font-size: 0.88rem; color: #0f172a;">
+                                                        Retiro
+                                                        <span style="font-size: 0.68rem; color: #059669; background: #ecfdf5; padding: 1px 6px; border-radius: 99px; font-weight: 700;">Gratis</span>
+                                                    </div>
+                                                    <div style="font-size: 0.74rem; color: #64748b;">Tienda o Agente</div>
+                                                </div>
                                             </label>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                            <label class="mw-delivery-option" data-mode="agency_shipping">
                                                 <input type="radio" name="delivery_mode" value="agency_shipping"/>
-                                                <span class="small fw-bold"><i class="fa fa-cube text-warning me-1"/> Agencia</span>
+                                                <div class="mw-icon-box mw-icon-amber">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                                                </div>
+                                                <div class="lh-sm">
+                                                    <div class="fw-bold" style="font-size: 0.88rem; color: #0f172a;">Agencia</div>
+                                                    <div style="font-size: 0.74rem; color: #64748b;">Shalom / Olva</div>
+                                                </div>
                                             </label>
                                         </div>
                                     </div>
+
                                     <div class="mb-3">
-                                        <input type="text" name="delivery_notes" class="form-control form-control-sm"
-                                               placeholder="Dirección de entrega, referencia o agencia preferida (Shalom / Olva / Marvisur)..."/>
+                                        <label for="mw_delivery_notes_input" id="mw_delivery_notes_label" class="fw-bold mb-1 d-block" style="font-size: 0.83rem; color: #334155;">
+                                            2. Dirección de entrega y referencia
+                                        </label>
+                                        <div class="mw-notes-input-wrap">
+                                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                            <input type="text" id="mw_delivery_notes_input" name="delivery_notes" class="form-control mw-notes-input"
+                                                   placeholder="Ej. Av. Ferrocarril 1240, Huancayo — frente al parque..."/>
+                                        </div>
                                     </div>
-                                    <button type="submit" class="btn btn-lg w-100 fw-bold text-white shadow-sm"
-                                            style="background: linear-gradient(135deg, #009ee3 0%, #007eb5 100%); border-radius: 10px; padding: 12px 20px;">
-                                        <i class="fa fa-lock me-2"/> Pagar S/ <t t-out="'%.2f' % (mw_order.amount_total or 0.0)"/> con Mercado Pago (Tarjetas / Yape / Plin)
+
+                                    <button type="submit" class="mw-btn-pay-mp">
+                                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        <span>Pagar S/ <t t-out="'%.2f' % (mw_order.amount_total or 0.0)"/> con Mercado Pago</span>
                                     </button>
+
+                                    <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mt-3">
+                                        <span class="mw-pay-pill mw-pay-pill-yape">Yape</span>
+                                        <span class="mw-pay-pill mw-pay-pill-plin">Plin</span>
+                                        <span class="mw-pay-pill mw-pay-pill-mp">Mercado Pago</span>
+                                        <span class="mw-pay-pill">Visa / Mastercard</span>
+                                        <span class="mw-pay-pill">PagoEfectivo</span>
+                                    </div>
                                 </form>
                             </div>
-                            <div class="col-lg-5 border-start ps-lg-4">
-                                <div class="d-flex flex-column gap-2 small">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fa fa-check-circle text-success"/>
-                                        <span><strong>Compra Protegida:</strong> tu dinero se custodia (Escrow) hasta confirmar la entrega.</span>
+
+                            <!-- Columna Derecha: Garantías y Confianza -->
+                            <div class="col-lg-5">
+                                <div class="mw-trust-panel d-flex flex-column justify-content-between gap-3">
+                                    <div class="fw-bold" style="font-size: 0.85rem; color: #0f172a; text-transform: uppercase; letter-spacing: 0.04em;">
+                                        Tu compra está respaldada
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fa fa-check-circle text-success"/>
-                                        <span><strong>Pago 100% Encriptado SSL</strong> procesado por Mercado Pago.</span>
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="mw-trust-item">
+                                            <div class="mw-trust-dot mw-icon-green">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                                            </div>
+                                            <div style="font-size: 0.84rem; color: #475569; line-height: 1.4;">
+                                                <strong style="color: #0f172a;">Compra Protegida (Escrow):</strong>
+                                                custodiamos tu pago hasta que recibas tu producto conforme.
+                                            </div>
+                                        </div>
+                                        <div class="mw-trust-item">
+                                            <div class="mw-trust-dot mw-icon-blue">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                            </div>
+                                            <div style="font-size: 0.84rem; color: #475569; line-height: 1.4;">
+                                                <strong style="color: #0f172a;">Pago 100% Encriptado SSL:</strong>
+                                                procesado directamente en los servidores seguros de Mercado Pago.
+                                            </div>
+                                        </div>
+                                        <div class="mw-trust-item">
+                                            <div class="mw-trust-dot mw-icon-purple">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                                            </div>
+                                            <div style="font-size: 0.84rem; color: #475569; line-height: 1.4;">
+                                                <strong style="color: #0f172a;">Comprobante Electrónico SUNAT:</strong>
+                                                cada tienda verificada emite tu Boleta o Factura electrónica.
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="fa fa-check-circle text-success"/>
-                                        <span><strong>Comprobante SUNAT garantizado</strong> por cada tienda verificada.</span>
+                                    <div class="pt-2 border-top d-flex align-items-center justify-content-between" style="font-size: 0.78rem; color: #64748b;">
+                                        <span>¿Necesitas factura con RUC paso a paso?</span>
+                                        <a href="/shop/checkout" class="fw-bold text-decoration-none" style="color: #2563eb;">Usar checkout clásico</a>
                                     </div>
                                 </div>
                             </div>
@@ -68,6 +352,58 @@
                     </div>
                 </div>
             </div>
+
+            <script type="text/javascript">
+            // <![CDATA[
+            (function () {
+                function initMwCartExpress() {
+                    var options = document.querySelectorAll('#mw_express_checkout_form .mw-delivery-option');
+                    var label = document.getElementById('mw_delivery_notes_label');
+                    var input = document.getElementById('mw_delivery_notes_input');
+                    var copyMap = {
+                        home_delivery: {
+                            label: '2. Dirección de entrega y referencia',
+                            placeholder: 'Ej. Av. Ferrocarril 1240, Huancayo — frente al parque...'
+                        },
+                        store_pickup: {
+                            label: '2. Tienda o Agente Wanka preferido y persona que recoge',
+                            placeholder: 'Ej. Recoge Juan Pérez (DNI 72345678) en Agente Centro...'
+                        },
+                        agency_shipping: {
+                            label: '2. Agencia preferida (Shalom / Olva / Marvisur) y ciudad destino',
+                            placeholder: 'Ej. Shalom — Agencia Lima Norte / Teléfono de contacto...'
+                        }
+                    };
+                    options.forEach(function (opt) {
+                        opt.addEventListener('click', function () {
+                            options.forEach(function (o) { o.classList.remove('mw-active'); });
+                            opt.classList.add('mw-active');
+                            var radio = opt.querySelector('input[type="radio"]');
+                            if (radio) {
+                                radio.checked = true;
+                                var cfg = copyMap[radio.value];
+                                if (cfg && label && input) {
+                                    label.textContent = cfg.label;
+                                    input.placeholder = cfg.placeholder;
+                                }
+                            }
+                        });
+                    });
+
+                    // Renombrar el botón secundario nativo de Odoo para evitar confusión con el CTA principal
+                    var nativeBtn = document.querySelector('#wrap a[name="website_sale_main_button"], #wrap a[href="/shop/checkout"]');
+                    if (nativeBtn && nativeBtn.textContent.indexOf('Finalizar') !== -1) {
+                        nativeBtn.textContent = 'Checkout con dirección / factura';
+                    }
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initMwCartExpress);
+                } else {
+                    initMwCartExpress();
+                }
+            })();
+            // ]]>
+            </script>
             </t>
         </xpath>
     </template>
