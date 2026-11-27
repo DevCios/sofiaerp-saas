@@ -10,6 +10,7 @@
     'depends': ['website_sale'],
     'data': [
         'views/header_falabella.xml',
+        'views/footer_meli.xml',
     ],
     'assets': {
         'web.assets_frontend': [

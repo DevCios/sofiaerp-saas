@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Pie de Página (Footer) Estilo Mercado Libre Perú para WanGO / Mercado Wanka -->
+    <template id="wango_footer_meli" inherit_id="website.layout" name="WanGO Footer Mercado Libre" priority="60">
+        <xpath expr="//footer" position="replace">
+            <footer id="bottom" data-anchor="true" class="wango-meli-footer bg-white">
+                
+                <style type="text/css">
+                    <![CDATA[
+                    .wango-meli-footer {
+                        background-color: #FFFFFF !important;
+                        border-top: 1px solid #E5E7EB !important;
+                        color: #333333 !important;
+                        padding-top: 2.5rem !important;
+                        padding-bottom: 2rem !important;
+                        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    }
+                    
+                    /* Tarjetas de Beneficios y Confianza */
+                    .wango-trust-row {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 12px;
+                        padding: 1.75rem 1rem;
+                        margin-bottom: 2rem;
+                        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+                    }
+                    .wango-trust-col {
+                        padding: 0.5rem 1.25rem;
+                    }
+                    @media (min-width: 768px) {
+                        .wango-trust-col:not(:last-child) {
+                            border-right: 1px solid #F0F0F0;
+                        }
+                    }
+                    .wango-trust-icon {
+                        font-size: 2.2rem;
+                        margin-bottom: 0.6rem;
+                    }
+                    .wango-trust-title {
+                        font-weight: 700;
+                        font-size: 0.96rem;
+                        color: #111827;
+                        margin-bottom: 0.35rem;
+                    }
+                    .wango-trust-desc {
+                        font-size: 0.83rem;
+                        color: #6B7280;
+                        line-height: 1.45;
+                        margin-bottom: 0.45rem;
+                    }
+                    .wango-trust-link {
+                        font-size: 0.82rem;
+                        color: #009EE3;
+                        font-weight: 600;
+                        text-decoration: none;
+                        transition: color 0.15s;
+                    }
+                    .wango-trust-link:hover {
+                        color: #007BB0;
+                        text-decoration: underline;
+                    }
+
+                    /* Banner Libro de Reclamaciones (Mercado Libre) */
+                    .wango-meli-reclama-banner {
+                        background: #FFFFFF;
+                        border: 1px solid #E5E7EB;
+                        border-radius: 12px;
+                        padding: 1.5rem 2.25rem;
+                        margin-bottom: 2.5rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        gap: 1.25rem;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+                    }
+                    .wango-meli-reclama-title {
+                        font-size: 1.25rem;
+                        font-weight: 700;
+                        color: #1F2937;
+                        letter-spacing: -0.01em;
+                        line-height: 1.2;
+                    }
+                    .wango-meli-btn-cyan {
+                        background-color: #009EE3 !important;
+                        color: #FFFFFF !important;
+                        font-weight: 700 !important;
+                        padding: 0.7rem 2.5rem !important;
+                        border-radius: 8px !important;
+                        text-decoration: none !important;
+                        font-size: 1rem !important;
+                        display: inline-block !important;
+                        transition: background-color 0.2s, transform 0.15s !important;
+                        box-shadow: 0 2px 6px rgba(0, 158, 227, 0.3) !important;
+                        border: none !important;
+                    }
+                    .wango-meli-btn-cyan:hover {
+                        background-color: #0081BA !important;
+                        color: #FFFFFF !important;
+                        transform: translateY(-1px);
+                    }
+
+                    /* Columnas de Navegación */
+                    .wango-meli-col-title {
+                        font-weight: 700 !important;
+                        font-size: 0.9rem !important;
+                        color: #111827 !important;
+                        margin-bottom: 1.1rem !important;
+                    }
+                    .wango-meli-links-list {
+                        list-style: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                    }
+                    .wango-meli-links-list li {
+                        margin-bottom: 0.55rem !important;
+                    }
+                    .wango-meli-links-list a {
+                        color: #6B7280 !important;
+                        text-decoration: none !important;
+                        font-size: 0.84rem !important;
+                        transition: color 0.15s !important;
+                    }
+                    .wango-meli-links-list a:hover {
+                        color: #009EE3 !important;
+                        text-decoration: underline !important;
+                    }
+
+                    /* Redes Sociales */
+                    .wango-social-btn {
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        background: #F3F4F6;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #4B5563;
+                        text-decoration: none;
+                        transition: all 0.2s;
+                        font-size: 0.95rem;
+                    }
+                    .wango-social-btn:hover {
+                        background: #009EE3;
+                        color: #FFFFFF;
+                        transform: translateY(-2px);
+                    }
+
+                    /* Barra Legal Inferior */
+                    .wango-meli-bottom-legal {
+                        border-top: 1px solid #E5E7EB;
+                        padding-top: 1.5rem;
+                        font-size: 0.8rem;
+                        color: #6B7280;
+                    }
+                    .wango-meli-bottom-links a {
+                        color: #374151;
+                        text-decoration: none;
+                        transition: color 0.15s;
+                    }
+                    .wango-meli-bottom-links a:hover {
+                        color: #009EE3;
+                        text-decoration: underline;
+                    }
+                    ]]>
+                </style>
+
+                <div class="container px-lg-4">
+                    
+                    <!-- 1. BENEFICIOS / CONFIANZA -->
+                    <div class="wango-trust-row">
+                        <div class="row text-center g-3">
+                            <div class="col-12 col-md-4 wango-trust-col">
+                                <div class="wango-trust-icon" style="color: #714B67;">
+                                    <i class="fa fa-mobile-phone"></i>
+                                </div>
+                                <div class="wango-trust-title">Paga con Yape</div>
+                                <div class="wango-trust-desc">
+                                    Paga rápido y seguro con Yape, transferencias bancarias o tarjetas sin comisiones ocultas.
+                                </div>
+                                <a href="/ayuda" class="wango-trust-link">Cómo pagar con Yape &gt;</a>
+                            </div>
+
+                            <div class="col-12 col-md-4 wango-trust-col">
+                                <div class="wango-trust-icon" style="color: #017E84;">
+                                    <i class="fa fa-truck"></i>
+                                </div>
+                                <div class="wango-trust-title">Envío gratis desde S/ 50</div>
+                                <div class="wango-trust-desc">
+                                    Compra con envíos rápidos en el Valle del Mantaro y disfruta de envío gratis en compras mayores a 50 soles.
+                                </div>
+                                <a href="/ayuda" class="wango-trust-link">Zonas y tiempos de entrega &gt;</a>
+                            </div>
+
+                            <div class="col-12 col-md-4 wango-trust-col">
+                                <div class="wango-trust-icon" style="color: #EAB308;">
+                                    <i class="fa fa-shield"></i>
+                                </div>
+                                <div class="wango-trust-title">Seguridad, de principio a fin</div>
+                                <div class="wango-trust-desc">
+                                    ¿No te gusta? ¡Devuélvelo! En WanGO tus compras, pagos y envíos están 100% protegidos.
+                                </div>
+                                <a href="/ayuda" class="wango-trust-link">Cómo te protegemos &gt;</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. BANNER LIBRO DE RECLAMACIONES DIGITAL (ESTILO MERCADO LIBRE) -->
+                    <div class="wango-meli-reclama-banner">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="font-size: 2.8rem; color: #009EE3; flex-shrink: 0;">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div>
+                                <div class="wango-meli-reclama-title">
+                                    Ponemos a tu disposición el Libro de Reclamaciones digital
+                                </div>
+                                <div class="text-muted small mt-1" style="font-size: 0.82rem;">
+                                    Conforme a lo establecido en el Código de Protección y Defensa del Consumidor (Ley N° 29571) • Indecopi
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <a href="/libro-de-reclamaciones" class="wango-meli-btn-cyan">
+                                Ingresar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 3. COLUMNAS DE NAVEGACIÓN LIMPIAS -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-6 col-md-2">
+                            <div class="wango-meli-col-title">Acerca de</div>
+                            <ul class="wango-meli-links-list">
+                                <li><a href="/aboutus">Quiénes somos</a></li>
+                                <li><a href="/vender">Vender en WanGO</a></li>
+                                <li><a href="/terminos">Términos y condiciones</a></li>
+                                <li><a href="/privacidad">Cómo cuidamos tu privacidad</a></li>
+                                <li><a href="/contacto">Contacto</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-md-2">
+                            <div class="wango-meli-col-title">Mi cuenta</div>
+                            <ul class="wango-meli-links-list">
+                                <li><a href="/my/home">Resumen de mi cuenta</a></li>
+                                <li><a href="/my/orders">Mis compras</a></li>
+                                <li><a href="/shop/cart">Mi carrito</a></li>
+                                <li><a href="/my/invoices">Comprobantes de pago</a></li>
+                                <li><a href="/web/login">Iniciar sesión</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-md-2">
+                            <div class="wango-meli-col-title">Ayuda</div>
+                            <ul class="wango-meli-links-list">
+                                <li><a href="/ayuda">Cómo comprar</a></li>
+                                <li><a href="/ayuda">Métodos de pago</a></li>
+                                <li><a href="/ayuda">Costos y zonas de envío</a></li>
+                                <li><a href="/ayuda">Cambios y devoluciones</a></li>
+                                <li><a href="/ayuda">Resolución de problemas</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-6 col-md-3">
+                            <div class="wango-meli-col-title">Temporadas &amp; Ofertas</div>
+                            <ul class="wango-meli-links-list">
+                                <li><a href="/shop">Catálogo completo</a></li>
+                                <li><a href="/shop">Cyber Wow &amp; Días Wanka</a></li>
+                                <li><a href="/shop">Ofertas del día</a></li>
+                                <li><a href="/shop">Novedades</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="col-12 col-md-3">
+                            <div class="wango-meli-col-title">Contáctanos</div>
+                            <div class="small text-muted mb-2" style="line-height: 1.8;">
+                                <div>
+                                    <i class="fa fa-envelope me-2" style="color: #009EE3;"></i>
+                                    <span t-esc="res_company.email or 'contacto@mercadowanka.pe'"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-phone me-2" style="color: #017E84;"></i>
+                                    <span t-esc="res_company.phone or '+51 984 000 000'"/>
+                                </div>
+                                <div>
+                                    <i class="fa fa-map-marker me-2" style="color: #DC2626;"></i>
+                                    Valle del Mantaro, Junín, Perú
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-3">
+                                <a href="https://facebook.com" target="_blank" rel="noopener" class="wango-social-btn" aria-label="Facebook">
+                                    <i class="fa fa-facebook"></i>
+                                </a>
+                                <a href="https://instagram.com" target="_blank" rel="noopener" class="wango-social-btn" aria-label="Instagram">
+                                    <i class="fa fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/" target="_blank" rel="noopener" class="wango-social-btn" aria-label="WhatsApp">
+                                    <i class="fa fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. LÍNEA LEGAL (MERCADO LIBRE STYLE) -->
+                    <div class="wango-meli-bottom-legal">
+                        <div class="wango-meli-bottom-links d-flex flex-wrap gap-2 gap-md-3 mb-2">
+                            <a href="/contacto">Trabaja con nosotros</a>
+                            <span class="text-muted">·</span>
+                            <a href="/terminos">Términos y condiciones</a>
+                            <span class="text-muted">·</span>
+                            <a href="/privacidad">Cómo cuidamos tu privacidad</a>
+                            <span class="text-muted">·</span>
+                            <a href="/ayuda">Cambios y devoluciones</a>
+                            <span class="text-muted">·</span>
+                            <a href="/libro-de-reclamaciones">Libro de Reclamaciones</a>
+                            <span class="text-muted">·</span>
+                            <a href="/ayuda">Ayuda</a>
+                        </div>
+                        
+                        <div class="mb-1 text-muted">
+                            Copyright © 2026 Mercado Wanka S.A.C. Todos los derechos reservados. Comercio Electrónico y Logística Regional.
+                        </div>
+
+                        <div class="text-muted small" style="font-size: 0.74rem;">
+                            Razón Social: <t t-esc="res_company.name or 'Mercado Wanka S.A.C.'"/> • 
+                            RUC: <t t-esc="res_company.vat or '20608558451'"/> • 
+                            <t t-if="res_company.street"><t t-esc="res_company.street"/>, </t>
+                            <t t-if="res_company.city"><t t-esc="res_company.city"/>, </t>
+                            Valle del Mantaro, Junín, Perú.
+                        </div>
+                    </div>
+
+                </div>
+            </footer>
+        </xpath>
+    </template>
+</odoo>
