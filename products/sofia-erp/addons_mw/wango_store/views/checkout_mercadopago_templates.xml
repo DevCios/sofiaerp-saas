@@ -28,13 +28,13 @@
                                         <div class="col-md-4">
                                             <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
                                                 <input type="radio" name="delivery_mode" value="store_pickup"/>
-                                                <span class="small fw-bold"><i class="fa fa-store text-success me-1"/> Retiro Tienda</span>
+                                                <span class="small fw-bold"><i class="fa fa-shopping-bag text-success me-1"/> Retiro Tienda</span>
                                             </label>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
                                                 <input type="radio" name="delivery_mode" value="agency_shipping"/>
-                                                <span class="small fw-bold"><i class="fa fa-box text-warning me-1"/> Agencia</span>
+                                                <span class="small fw-bold"><i class="fa fa-cube text-warning me-1"/> Agencia</span>
                                             </label>
                                         </div>
                                     </div>

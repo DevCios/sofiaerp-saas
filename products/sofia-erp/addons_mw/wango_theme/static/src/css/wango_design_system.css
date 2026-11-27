@@ -74,24 +74,12 @@ input, button, select, textarea, label,
     text-rendering: optimizeLegibility !important;
 }
 
-/* BLINDAJE DE ICONOS FONTAWESOME 5 + 4 (sin tocar .oi ni Material Icons de Odoo 20) */
-.fa, .fas,
+/* BLINDAJE DE ICONOS FONTAWESOME LOCAL DE ODOO 20 (sin CDN externo ni tocar .oi/.material-icons) */
+.fa, .fas, .far, .fab,
 [class^="fa-"], [class*=" fa-"] {
-    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-family: 'FontAwesome' !important;
     font-style: normal !important;
-    font-weight: 900 !important;
-    line-height: 1 !important;
-}
-.far {
-    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    line-height: 1 !important;
-}
-.fab {
-    font-family: "Font Awesome 5 Brands", "FontAwesome" !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
+    font-weight: normal !important;
     line-height: 1 !important;
 }
 

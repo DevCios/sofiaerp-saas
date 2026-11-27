@@ -51,7 +51,7 @@
                         <!-- Option: Agency / Pickup point -->
                         <div class="wango-widget-option-row d-flex align-items-start py-2" id="wango_opt_agency">
                             <div class="mr-3 mt-1" style="font-size: 1.3rem; color: #2d3436; width: 24px; text-align: center;">
-                                <i class="fa fa-box"/>
+                                <i class="fa fa-cube"/>
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between">

@@ -49,16 +49,8 @@ footer .container {
     max-width: 1280px;
 }
 
-/* Soporte unificado FontAwesome 5 Free + FontAwesome 4 (Odoo) sin cuadros vacíos */
-.fa, .fas {
-    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 900;
-}
-.far {
-    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
-    font-weight: 400;
-}
-.fab {
-    font-family: "Font Awesome 5 Brands", "FontAwesome" !important;
-    font-weight: 400;
+/* Fuente FontAwesome local de Odoo 20 (100% offline/Brave-safe, sin cuadros vacíos) */
+.fa, .fas, .far, .fab {
+    font-family: 'FontAwesome' !important;
+    font-weight: normal !important;
 }
