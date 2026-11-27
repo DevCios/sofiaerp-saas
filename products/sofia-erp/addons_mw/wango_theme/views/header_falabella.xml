@@ -7,7 +7,7 @@
             <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;display=swap"/>
         </xpath>
         <xpath expr="//header" position="replace">
-            <header class="falabella-header-wrapper bg-white border-bottom">
+            <header id="top" data-anchor="true" data-name="Header" class="falabella-header-wrapper bg-white border-bottom o_header_standard">
                 
                 <style type="text/css">
                     <![CDATA[
