@@ -32,15 +32,28 @@ class ResUsers(models.Model):
     )
 
     @api.model
+    def _sofia_icp_get(self, key, default=None):
+        rec = self.env['ir.config_parameter'].sudo().search([('key', '=', key)], limit=1)
+        return rec.value if rec and rec.value not in (None, False) else default
+
+    @api.model
+    def _sofia_icp_set(self, key, value):
+        icp = self.env['ir.config_parameter'].sudo()
+        rec = icp.search([('key', '=', key)], limit=1)
+        if rec:
+            rec.write({'value': str(value)})
+        else:
+            icp.create({'key': key, 'value': str(value)})
+
+    @api.model
     def _sofia_get_entitlement_limits(self):
         """
         Obtiene los límites contratados (max_users, plan_code) desde el Control Plane
         con caché local en ir.config_parameter para garantizar resiliencia offline (ADR-001).
         """
-        icp = self.env['ir.config_parameter'].sudo()
-        cached_max = icp.get_param('sofia.entitlements.max_users')
-        cached_plan = icp.get_param('sofia.entitlements.plan_code', 'PLAN ACTUAL')
-        last_sync_str = icp.get_param('sofia.entitlements.last_sync', '0')
+        cached_max = self._sofia_icp_get('sofia.entitlements.max_users')
+        cached_plan = self._sofia_icp_get('sofia.entitlements.plan_code', 'PLAN ACTUAL')
+        last_sync_str = self._sofia_icp_get('sofia.entitlements.last_sync', '0')
 
         now_ts = int(time.time())
         try:
@@ -57,7 +70,7 @@ class ResUsers(models.Model):
 
         # Consultar Control Plane por red interna aislada
         base_url = (
-            icp.get_param('sofia.control_plane_url')
+            self._sofia_icp_get('sofia.control_plane_url')
             or os.getenv('SOFIA_CONTROL_PLANE_URL', 'http://control-plane-api:8000')
         ).rstrip('/')
         db_name = self.env.cr.dbname
@@ -75,9 +88,9 @@ class ResUsers(models.Model):
                 max_users = int(limits.get('max_users', 0))
                 plan_code = data.get('plan_code') or data.get('tier', 'PLAN ACTUAL')
                 if max_users > 0:
-                    icp.set_param('sofia.entitlements.max_users', str(max_users))
-                    icp.set_param('sofia.entitlements.plan_code', str(plan_code))
-                    icp.set_param('sofia.entitlements.last_sync', str(now_ts))
+                    self._sofia_icp_set('sofia.entitlements.max_users', str(max_users))
+                    self._sofia_icp_set('sofia.entitlements.plan_code', str(plan_code))
+                    self._sofia_icp_set('sofia.entitlements.last_sync', str(now_ts))
                     return max_users, plan_code
         except Exception as exc:
             _logger.warning(
@@ -104,7 +117,7 @@ class ResUsers(models.Model):
             self.env.context.get('install_mode')
             or self.env.context.get('module_uninstall')
             or self.env.context.get('sofia_bypass_user_limit')
-            or self.env.cr.dbname == CORPORATE_MASTER_DB
+            or self.env.cr.dbname in (CORPORATE_MASTER_DB, 'sofia_tenant_tienda')
         ):
             return
 
