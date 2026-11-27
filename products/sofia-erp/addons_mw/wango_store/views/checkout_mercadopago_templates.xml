@@ -7,7 +7,10 @@
             <t t-set="mw_order" t-value="website.sale_get_order()"/>
             <style>
                 /* === MERCADO WANKA: REDISENO PROFESIONAL DEL CARRITO (/shop/cart) === */
-                main {
+                main,
+                main #wrap,
+                main #wrap.oe_website_sale,
+                main .oe_website_sale {
                     background-color: #f8fafc !important;
                 }
                 main #wrap,
@@ -15,16 +18,23 @@
                 main .oe_website_sale {
                     min-height: auto !important;
                     flex-grow: 0 !important;
-                    padding-bottom: 16px !important;
+                    padding-bottom: 24px !important;
+                }
+                /* Alinear tarjetas superiores sin estirar vacio el Resumen de la orden */
+                #wrap .oe_website_sale .row,
+                #wrap .row:has(.oe_cart) {
+                    align-items: flex-start !important;
                 }
                 /* Estilizar las tarjetas nativas de Odoo 20 en el carrito */
                 #wrap .oe_cart,
                 #wrap #o_cart_summary,
                 #wrap .o_total_card {
-                    background: #ffffff;
+                    background: #ffffff !important;
                     border: 1px solid #e2e8f0 !important;
                     border-radius: 16px !important;
                     box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+                    min-height: auto !important;
+                    height: auto !important;
                 }
                 #wrap .oe_cart {
                     padding: 24px !important;
@@ -201,7 +211,7 @@
                 }
             </style>
 
-            <div class="container pb-5 pt-2" id="mw_cart_express_wrapper" t-if="mw_order and mw_order.order_line" style="max-width: 1140px;">
+            <div class="container pb-5 pt-2" id="mw_cart_express_wrapper" t-if="mw_order and mw_order.order_line">
                 <t t-if="request.params.get('error') == 'mp_not_configured'">
                     <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" style="border-radius: 12px; font-size: 0.9rem;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -389,6 +399,18 @@
                             }
                         });
                     });
+
+                    // Alinear el bloque Checkout Express al mismo grid/ancho exacto que Resumen de la orden + Total
+                    var wrapper = document.getElementById('mw_cart_express_wrapper');
+                    var cartEl = document.querySelector('#wrap .oe_cart');
+                    if (wrapper && cartEl) {
+                        var cartRow = cartEl.closest('.row');
+                        if (cartRow && cartRow.parentElement) {
+                            wrapper.classList.remove('container', 'pt-2');
+                            wrapper.classList.add('mt-4', 'px-0');
+                            cartRow.parentElement.insertBefore(wrapper, cartRow.nextSibling);
+                        }
+                    }
 
                     // Renombrar el botón secundario nativo de Odoo para evitar confusión con el CTA principal
                     var nativeBtn = document.querySelector('#wrap a[name="website_sale_main_button"], #wrap a[href="/shop/checkout"]');
