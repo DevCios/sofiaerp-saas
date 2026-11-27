@@ -212,7 +212,7 @@
     </template>
 
     <template id="product_inherit_wango_marketplace" inherit_id="website_sale.product">
-        <xpath expr="//div[@id='product_details']//h1" position="after">
+        <xpath expr="//div[@id='product_details']" position="inside">
             <div class="mt-2 mb-3">
                 <span class="text-muted d-inline-flex align-items-center flex-wrap" style="font-size: 0.92rem;">
                     <i class="fa fa-store text-primary me-1.5"/> Vendido y entregado por:&amp;nbsp;
