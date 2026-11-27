@@ -24,6 +24,7 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.models import ApiClient, ApiRequestLog, Document, DocumentStatus, Issuer
 from app.schemas import CustomerSchema, DocumentItemSchema, EmitDocumentRequest
+from app.services.lookup_service import get_exchange_rate_cached, lookup_dni_cached, lookup_ruc_cached
 from app.services.sunat_soap import classify_sunat_code
 
 router = APIRouter()
@@ -243,6 +244,38 @@ MCP_TOOLS: list[dict[str, Any]] = [
         },
     },
     {
+        "name": "lookup_ruc",
+        "description": "Consulta los datos oficiales SUNAT de un RUC peruano (11 dígitos): razón social, dirección, ubigeo, estado y condición (con caché compartido).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ruc": {"type": "string", "description": "RUC peruano de 11 dígitos (ej. 20100047218)."},
+            },
+            "required": ["ruc"],
+        },
+    },
+    {
+        "name": "lookup_dni",
+        "description": "Consulta los nombres y apellidos de un DNI peruano (8 dígitos) en RENIEC (con caché compartido).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "dni": {"type": "string", "description": "DNI peruano de 8 dígitos."},
+            },
+            "required": ["dni"],
+        },
+    },
+    {
+        "name": "get_exchange_rate",
+        "description": "Obtiene el Tipo de Cambio oficial SUNAT (USD a PEN: compra y venta) del día o de una fecha específica (YYYY-MM-DD).",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "date": {"type": "string", "description": "Fecha opcional YYYY-MM-DD (por defecto hoy en Lima)."},
+            },
+        },
+    },
+    {
         "name": "emit_document",
         "description": (
             "Emite una Factura (01) o Boleta (03) electrónica a SUNAT vía Sofia Gateway con idempotencia estricta por (RUC, tipo, serie, correlativo). "
@@ -397,6 +430,15 @@ async def _execute_mcp_tool(
             "xml_url": f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{doc.id}/xml",
             "cdr_url": f"{settings.PUBLIC_BASE_URL}/api/v1/documents/{doc.id}/cdr" if doc.cdr_path else None,
         }
+
+    if tool_name == "lookup_ruc":
+        return await lookup_ruc_cached(db, str(arguments.get("ruc", "")))
+
+    if tool_name == "lookup_dni":
+        return await lookup_dni_cached(db, str(arguments.get("dni", "")))
+
+    if tool_name == "get_exchange_rate":
+        return await get_exchange_rate_cached(db, rate_date=arguments.get("date"))
 
     if tool_name == "emit_document":
         req_items = [
@@ -664,6 +706,30 @@ async def openapi_ai_schema():
                         {"name": "sunat_code", "in": "path", "required": True, "schema": {"type": "string"}}
                     ],
                     "responses": {"200": {"description": "Explicación y acción correctiva"}},
+                }
+            },
+            "/api/v1/lookup/ruc/{ruc}": {
+                "get": {
+                    "operationId": "lookupPeruRuc",
+                    "summary": "Consultar RUC peruano en SUNAT (razón social, dirección, estado, condición)",
+                    "parameters": [{"name": "ruc", "in": "path", "required": True, "schema": {"type": "string"}}],
+                    "responses": {"200": {"description": "Datos oficiales del RUC"}},
+                }
+            },
+            "/api/v1/lookup/dni/{dni}": {
+                "get": {
+                    "operationId": "lookupPeruDni",
+                    "summary": "Consultar DNI peruano en RENIEC (nombres y apellidos)",
+                    "parameters": [{"name": "dni", "in": "path", "required": True, "schema": {"type": "string"}}],
+                    "responses": {"200": {"description": "Datos del DNI"}},
+                }
+            },
+            "/api/v1/lookup/exchange-rate": {
+                "get": {
+                    "operationId": "getSunatExchangeRate",
+                    "summary": "Consultar Tipo de Cambio oficial SUNAT (USD -> PEN compra y venta)",
+                    "parameters": [{"name": "date", "in": "query", "required": False, "schema": {"type": "string"}}],
+                    "responses": {"200": {"description": "Tipo de cambio del día"}},
                 }
             },
             "/api/v1/documents/emit": {

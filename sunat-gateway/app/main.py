@@ -9,6 +9,7 @@ from sqlalchemy import text
 from app.api.admin_ui import router as admin_ui_router
 from app.api.billing import router as billing_router
 from app.api.docs_portal import router as docs_portal_router
+from app.api.lookup_routes import router as lookup_router
 from app.api.mcp_server import router as mcp_router
 from app.api.oauth_mcp import router as oauth_mcp_router
 from app.api.public_portal import router as public_portal_router
@@ -58,7 +59,7 @@ app.add_middleware(
 @app.middleware("http")
 async def audit_rest_api_middleware(request: Request, call_next):
     path = request.url.path
-    should_log = path.startswith("/api/v1/documents") or path.startswith("/api/v1/ai/")
+    should_log = path.startswith("/api/v1/documents") or path.startswith("/api/v1/ai/") or path.startswith("/api/v1/lookup/")
     if not should_log:
         return await call_next(request)
     t0 = time.monotonic()
@@ -84,6 +85,7 @@ async def audit_rest_api_middleware(request: Request, call_next):
 
 
 app.include_router(v1_router)
+app.include_router(lookup_router)
 app.include_router(billing_router)
 app.include_router(mcp_router)
 app.include_router(oauth_mcp_router)

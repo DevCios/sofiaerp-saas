@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     # SSO con SOFIA Control Plane (red interna Docker + validación JWKS RS256)
     SOFIA_CONTROL_PLANE_URL: str = "http://control-plane-api:8000"
 
+    # Hub Central de Consultas Perú (RUC, DNI, Tipo de Cambio SUNAT)
+    APIS_NET_PE_TOKEN: str = ""
+    APISPERU_TOKEN: str = ""
+    RUC_CACHE_TTL_DAYS: int = 7
+    DNI_CACHE_TTL_DAYS: int = 30
+
 
 @lru_cache()
 def get_settings() -> Settings:

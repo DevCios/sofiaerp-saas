@@ -303,3 +303,21 @@ def check_deadline_alerts():
                 send_webhook_task.delay(doc.id, "document.deadline_warning")
         db.commit()
     return {"flagged": flagged}
+
+
+@celery_app.task(name="app.tasks.dispatcher.sync_daily_exchange_rate_task")
+def sync_daily_exchange_rate_task():
+    """Sincroniza diariamente el Tipo de Cambio oficial SUNAT (USD -> PEN) a las 07:30 AM Lima (ADR-013)."""
+    import asyncio
+    from app.core.database import AsyncSessionLocal
+    from app.services.lookup_service import get_exchange_rate_cached
+
+    async def _run():
+        async with AsyncSessionLocal() as db:
+            return await get_exchange_rate_cached(db, force_refresh=True)
+
+    try:
+        res = asyncio.run(_run())
+        return {"ok": True, "rate": res}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)[:200]}

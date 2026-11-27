@@ -291,3 +291,35 @@ class OAuthAuthCode(Base):
     used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class IdentityCache(Base):
+    """Caché compartido de consultas RUC (SUNAT) y DNI (RENIEC) (ADR-013)."""
+    __tablename__ = "identity_cache"
+    __table_args__ = (
+        UniqueConstraint("doc_type", "doc_number", name="uq_identity_cache_doc"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    doc_type: Mapped[str] = mapped_column(String(8), index=True, nullable=False)  # RUC | DNI
+    doc_number: Mapped[str] = mapped_column(String(16), index=True, nullable=False)
+    payload: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    source: Mapped[str] = mapped_column(String(60), default="apis.net.pe", nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+
+
+class ExchangeRate(Base):
+    """Historial oficial diario de Tipo de Cambio SUNAT (USD -> PEN) (ADR-013)."""
+    __tablename__ = "exchange_rates"
+    __table_args__ = (
+        UniqueConstraint("rate_date", "currency", name="uq_exchange_rate_date_curr"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    rate_date: Mapped[str] = mapped_column(String(10), index=True, nullable=False)  # YYYY-MM-DD (Lima)
+    currency: Mapped[str] = mapped_column(String(3), default="USD", nullable=False)
+    buy_rate: Mapped[float] = mapped_column(Numeric(10, 4), nullable=False)
+    sell_rate: Mapped[float] = mapped_column(Numeric(10, 4), nullable=False)
+    source: Mapped[str] = mapped_column(String(60), default="sunat", nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

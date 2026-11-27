@@ -325,6 +325,9 @@ PANEL_HTML = r"""<!DOCTYPE html>
         </button>
 
         <div class="sb-group-lbl">Desarrollador</div>
+        <button class="sb-item tab" data-tab="lookup" onclick="showTab('lookup', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consultas RUC/DNI/TC</span>
+        </button>
         <button class="sb-item tab" data-tab="clients" onclick="showTab('clients', this)">
           <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>API Keys</span>
         </button>
@@ -774,6 +777,39 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         </table>
       </div>
     </div>
+
+    <!-- TAB 11: HUB DE CONSULTAS PERÚ (RUC / DNI / TIPO DE CAMBIO SUNAT) -->
+    <div id="tab-lookup" class="hidden">
+      <div class="grid3">
+        <div class="card">
+          <h3>Consulta RUC (SUNAT)</h3>
+          <p style="font-size:12px;color:var(--muted);margin-top:0"><code>GET /api/v1/lookup/ruc/{ruc}</code> · Caché compartido 7 días.</p>
+          <div style="display:flex;gap:8px">
+            <input id="lkRuc" placeholder="20100047218" maxlength="11" />
+            <button class="btn btn-sm" onclick="runLookup('ruc')">Consultar</button>
+          </div>
+          <pre id="lkRucOut" class="hidden" style="margin-top:10px"></pre>
+        </div>
+        <div class="card">
+          <h3>Consulta DNI (RENIEC)</h3>
+          <p style="font-size:12px;color:var(--muted);margin-top:0"><code>GET /api/v1/lookup/dni/{dni}</code> · Caché compartido 30 días.</p>
+          <div style="display:flex;gap:8px">
+            <input id="lkDni" placeholder="8 dígitos" maxlength="8" />
+            <button class="btn btn-sm" onclick="runLookup('dni')">Consultar</button>
+          </div>
+          <pre id="lkDniOut" class="hidden" style="margin-top:10px"></pre>
+        </div>
+        <div class="card">
+          <h3>Tipo de Cambio SUNAT (USD → PEN)</h3>
+          <p style="font-size:12px;color:var(--muted);margin-top:0"><code>GET /api/v1/lookup/exchange-rate</code> · Cron diario 07:30 Lima.</p>
+          <div style="display:flex;gap:8px">
+            <input id="lkTcDate" type="date" />
+            <button class="btn btn-sm btn-teal" onclick="runLookup('tc')">Consultar</button>
+          </div>
+          <pre id="lkTcOut" class="hidden" style="margin-top:10px"></pre>
+        </div>
+      </div>
+    </div>
     </main>
   </div>
 </div>
@@ -905,6 +941,7 @@ const TAB_LABELS = {
   contingencies: 'Contingencias',
   observations: 'Observaciones',
   clients: 'API Keys',
+  lookup: 'Consultas RUC / DNI / TC',
   logs: 'Logs API / MCP',
   billing: 'Facturación y Planes',
   tester: 'Probador Rápido'
@@ -946,7 +983,7 @@ document.addEventListener('keydown', e => {
 });
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -1372,6 +1409,26 @@ async function testMcp(method, params) {
     });
     const data = await r.json();
     out.textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    out.textContent = 'ERROR: ' + e.message;
+  }
+}
+
+async function runLookup(kind) {
+  const outId = kind === 'ruc' ? 'lkRucOut' : (kind === 'dni' ? 'lkDniOut' : 'lkTcOut');
+  const out = document.getElementById(outId);
+  out.classList.remove('hidden');
+  out.textContent = 'Consultando Sofia Gateway...';
+  try {
+    let path = '/lookup/exchange-rate';
+    if (kind === 'ruc') path = '/lookup/ruc/' + encodeURIComponent(document.getElementById('lkRuc').value.trim());
+    else if (kind === 'dni') path = '/lookup/dni/' + encodeURIComponent(document.getElementById('lkDni').value.trim());
+    else {
+      const dt = document.getElementById('lkTcDate').value.trim();
+      if (dt) path += '?date=' + encodeURIComponent(dt);
+    }
+    const res = await api(path);
+    out.textContent = JSON.stringify(res, null, 2);
   } catch (e) {
     out.textContent = 'ERROR: ' + e.message;
   }

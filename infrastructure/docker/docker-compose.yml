@@ -236,6 +236,8 @@ services:
       - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
       - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
       - SOFIA_CONTROL_PLANE_URL=http://control-plane-api:8000
+      - APIS_NET_PE_TOKEN=${APIS_NET_PE_TOKEN:-}
+      - APISPERU_TOKEN=${APISPERU_TOKEN:-}
     volumes:
       - ../../sunat-gateway/app:/app/app
       - sofia_sunat_storage:/var/lib/sofia-sunat/storage

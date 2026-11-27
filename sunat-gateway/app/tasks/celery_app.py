@@ -27,6 +27,7 @@ celery_app.conf.update(
         "app.tasks.dispatcher.send_webhook_task": {"queue": "sunat_webhooks"},
         "app.tasks.dispatcher.sweep_retry_and_night_queue": {"queue": "sunat_night_batch"},
         "app.tasks.dispatcher.check_deadline_alerts": {"queue": "sunat_night_batch"},
+        "app.tasks.dispatcher.sync_daily_exchange_rate_task": {"queue": "sunat_night_batch"},
     },
     beat_schedule={
         # Barrido de cola de reintentos y ventana nocturna cada 2 minutos
@@ -38,6 +39,11 @@ celery_app.conf.update(
         "check-sunat-deadline-alerts": {
             "task": "app.tasks.dispatcher.check_deadline_alerts",
             "schedule": crontab(minute="*/30"),
+        },
+        # Sincronización diaria del Tipo de Cambio oficial SUNAT (07:30 AM hora Lima)
+        "sync-daily-sunat-exchange-rate": {
+            "task": "app.tasks.dispatcher.sync_daily_exchange_rate_task",
+            "schedule": crontab(hour=7, minute=30),
         },
     },
 )

@@ -33,7 +33,9 @@ Instalar este paquete activa de una sola vez la suite completa.
         'l10n_pe_pdt_621',
         'l10n_pe_sunat',
     ],
-    'data': [],
+    'data': [
+        'data/ir_cron_exchange_rate.xml',
+    ],
     'installable': True,
     'application': True,
     'auto_install': False,
