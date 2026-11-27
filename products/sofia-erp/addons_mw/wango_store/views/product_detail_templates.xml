@@ -315,9 +315,8 @@
                             <div id="wangoSellerTrack" class="wango-products-slider-track d-flex gap-3 overflow-auto py-2">
                                 <t t-foreach="seller_prods" t-as="p">
                                     <div class="wango-slider-item">
-                                        <t t-call="wango_store.wango_product_card_meli">
-                                            <t t-set="product" t-value="p"/>
-                                        </t>
+                                        <t t-set="product" t-value="p"/>
+                                        <t t-call="wango_store.wango_product_card_meli"/>
                                     </div>
                                 </t>
                             </div>

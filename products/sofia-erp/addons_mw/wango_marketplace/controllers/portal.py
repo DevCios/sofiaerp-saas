@@ -301,14 +301,17 @@ class MarketplaceSellerPortal(CustomerPortal):
             if not name:
                 return request.redirect('/my/seller/products/new')
 
-            # 1. Asignar categoría interna por defecto ("Todos" / All)
+            # 1. Asignar categoría interna por defecto ("Todos" / All) — Odoo 20 usa 'consu' + is_storable=True
             default_internal_categ = request.env.ref('product.product_category_all', raise_if_not_found=False)
-            product_type = post.get('type') if post.get('type') in ('consu', 'product', 'service') else 'consu'
+            raw_type = post.get('type')
+            is_storable = raw_type == 'product'
+            product_type = 'service' if raw_type == 'service' else 'consu'
 
             product_vals = {
                 'name': name,
                 'list_price': _to_float(post.get('list_price')),
                 'type': product_type,
+                'is_storable': is_storable,
                 'description_sale': post.get('description'),
                 'categ_id': default_internal_categ.id if default_internal_categ else False,
             }
@@ -349,7 +352,7 @@ class MarketplaceSellerPortal(CustomerPortal):
 
             # 5. Fijar Stock Inicial (si es almacenable)
             stock_qty = _to_float(post.get('stock_qty'))
-            if new_product.type == 'product' and stock_qty > 0:
+            if new_product.type == 'consu' and getattr(new_product, 'is_storable', False) and stock_qty > 0:
                 _set_stock_quantity(new_product, stock_qty)
 
             return request.redirect('/my/seller/products')
@@ -372,13 +375,16 @@ class MarketplaceSellerPortal(CustomerPortal):
             return request.redirect('/my/seller/products')
             
         if request.httprequest.method == 'POST':
-            product_type = post.get('type') if post.get('type') in ('consu', 'product', 'service') else product.type
+            raw_type = post.get('type')
+            product_type = 'service' if raw_type == 'service' else ('consu' if raw_type in ('consu', 'product') else product.type)
             product_vals = {
                 'name': (post.get('name') or '').strip() or product.name,
                 'list_price': _to_float(post.get('list_price'), product.list_price),
                 'type': product_type,
                 'description_sale': post.get('description'),
             }
+            if raw_type == 'product':
+                product_vals['is_storable'] = True
 
             # Re-asignar Categoría de eCommerce (Pública) validada
             categ_ids = _valid_public_categ_ids(post.get('public_categ_id'))
@@ -425,7 +431,7 @@ class MarketplaceSellerPortal(CustomerPortal):
                 _logger.exception("Error actualizando fotos extra del producto %s", product.id)
 
             # Fijar Stock (reemplaza el valor actual, ya no lo suma)
-            if product.type == 'product' and post.get('stock_qty') not in (None, ''):
+            if product.type == 'consu' and getattr(product, 'is_storable', False) and post.get('stock_qty') not in (None, ''):
                 _set_stock_quantity(product, _to_float(post.get('stock_qty')))
 
             return request.redirect('/my/seller/products')

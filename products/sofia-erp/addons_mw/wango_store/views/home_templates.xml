@@ -489,9 +489,8 @@
                 </button>
 
                 <div id="wangoRecentTrack" class="wango-products-slider-track d-flex gap-3 overflow-auto py-2">
-                    <t t-call="wango_store.recently_viewed_items_template">
-                        <t t-set="products" t-value="initial_recent_prods"/>
-                    </t>
+                    <t t-set="products" t-value="initial_recent_prods"/>
+                    <t t-call="wango_store.recently_viewed_items_template"/>
                 </div>
 
                 <button type="button" class="wango-slider-btn wango-slider-next" data-target="#wangoRecentTrack" aria-label="Siguiente">

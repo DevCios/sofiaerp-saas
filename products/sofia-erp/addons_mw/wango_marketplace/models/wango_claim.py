@@ -49,7 +49,7 @@ class WangoClaim(models.Model):
         ('in_process', 'En Investigación'),
         ('responded', 'Respondido'),
         ('closed', 'Cerrado')
-    ], string='Estado', default='draft', tracking=True)
+    ], string='Estado', default='draft')
     response = fields.Text(string='Respuesta Oficial al Consumidor')
     response_date = fields.Datetime(string='Fecha de Respuesta')
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)

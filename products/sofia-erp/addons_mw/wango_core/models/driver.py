@@ -10,7 +10,7 @@ class WangoDriver(models.Model):
         ('license_number_uniq', 'UNIQUE(license_number)', 'El número de licencia debe ser único por conductor.')
     ]
 
-    partner_id = fields.Many2one('res.partner', string='Contacto', required=True, auto_join=True)
+    partner_id = fields.Many2one('res.partner', string='Contacto', required=True)
     name = fields.Char(related='partner_id.name', store=True)
     license_number = fields.Char(string='Número de Licencia', required=True)
     license_expiry = fields.Date(string='Vencimiento Licencia')

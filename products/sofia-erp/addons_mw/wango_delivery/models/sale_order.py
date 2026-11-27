@@ -162,7 +162,7 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
         errors = []
-        for line in self.order_line.filtered(lambda l: not l.is_delivery and l.product_id.type == 'product'):
+        for line in self.order_line.filtered(lambda l: not l.is_delivery and l.product_id.type == 'consu' and getattr(l.product_id, 'is_storable', True)):
             product = line.product_id
             qty_needed = line.product_uom_qty
             

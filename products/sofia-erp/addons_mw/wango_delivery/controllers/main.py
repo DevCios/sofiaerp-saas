@@ -286,7 +286,7 @@ class WangoDeliveryController(http.Controller):
 
             # Para Agente Wanka o almacenes sin inventario Odoo forzado:
             has_stock = True
-            if getattr(branch, 'warehouse_id', False) and product.type == 'product':
+            if getattr(branch, 'warehouse_id', False) and product.type == 'consu' and getattr(product, 'is_storable', True):
                 try:
                     avail_qty = product.with_context(warehouse=branch.warehouse_id.id).free_qty
                     has_stock = avail_qty >= qty

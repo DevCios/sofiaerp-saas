@@ -27,7 +27,7 @@ class MarketplaceSettlement(models.Model):
         ('draft', 'Borrador'),
         ('confirmed', 'Confirmado'),
         ('paid', 'Pagado'),
-    ], string='Estado', default='draft', tracking=True)
+    ], string='Estado', default='draft')
 
     line_ids = fields.One2many('sale.order.line', 'marketplace_settlement_id', string='Líneas de Venta')
 

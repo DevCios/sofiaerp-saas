@@ -214,7 +214,7 @@ class WangoDeliveryWizard(models.TransientModel):
     _description = 'Registrar Entrega de Paquete'
 
     shipment_id = fields.Many2one('wango.shipment', string='Guía de Envío', required=True)
-    signature = fields.Binary(string='Firma del Receptor', widget="signature")
+    signature = fields.Binary(string='Firma del Receptor')
     proof_of_delivery = fields.Image(string='Foto de Entrega', max_width=1024, max_height=1024)
     delivered_to = fields.Char(string='Recibido Por (Nombre Completo y DNI)', required=True)
     notes = fields.Text(string='Notas / Observaciones')

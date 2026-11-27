@@ -118,7 +118,10 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             if order.exists():
                 self._verify_and_confirm_order(order, payment_id)
                 request.session['sale_last_order_id'] = order.id
-                request.website.sale_reset()
+                if hasattr(request.website, 'sale_reset'):
+                    request.website.sale_reset()
+                else:
+                    request.session.pop('sale_order_id', None)
                 return request.redirect('/shop/confirmation')
         return request.redirect('/shop/cart')
 
