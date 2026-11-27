@@ -467,7 +467,7 @@ class WangoDeliveryController(http.Controller):
         if not district_id:
             return []
             
-        order = request.website.sale_get_order()
+        order = getattr(request, 'cart', None) or (getattr(request, 'website', None) or request.env['website'].get_current_website()).sale_get_order()
         if not order:
             return []
 
@@ -500,7 +500,7 @@ class WangoDeliveryController(http.Controller):
     @http.route('/shop/delivery/calculate', type='jsonrpc', auth='public', website=True)
     def calculate_delivery(self, department_id, province_id, district_id, **kw):
         """Calcula el costo y tiempos estimados para Domicilio y Agencias en la ubicación."""
-        order = request.website.sale_get_order()
+        order = getattr(request, 'cart', None) or (getattr(request, 'website', None) or request.env['website'].get_current_website()).sale_get_order()
         if not order:
             return {'error': _('No se encontró orden activa')}
 
@@ -596,7 +596,7 @@ class WangoDeliveryController(http.Controller):
     @http.route('/shop/delivery/select', type='jsonrpc', auth='public', website=True)
     def select_delivery(self, delivery_type, department_id=False, province_id=False, district_id=False, store_branch_id=False, agency_id=False, **kw):
         """Asigna la opción de entrega seleccionada al Sale Order y actualiza el carrito."""
-        order = request.website.sale_get_order()
+        order = getattr(request, 'cart', None) or (getattr(request, 'website', None) or request.env['website'].get_current_website()).sale_get_order()
         if not order:
             return {'error': _('No se encontró orden activa')}
 

@@ -62,10 +62,29 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
         expected = hmac.new(secret.encode("utf-8"), manifest.encode("utf-8"), hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected, v1)
 
+    def _get_current_website(self):
+        return getattr(request, 'website', None) or request.env['website'].get_current_website()
+
+    def _get_current_order(self):
+        order = getattr(request, 'cart', None)
+        if order and order.exists():
+            return order
+        website = self._get_current_website()
+        if website and hasattr(website, 'sale_get_order'):
+            order = website.sale_get_order()
+            if order and order.exists():
+                return order
+        order_id = request.session.get('sale_order_id')
+        if order_id:
+            so = request.env['sale.order'].sudo().browse(order_id)
+            if so.exists() and so.state in ('draft', 'sent'):
+                return so
+        return request.env['sale.order']
+
     @http.route('/shop/mercadopago/set_delivery', type='http', auth='public', website=True, methods=['POST'], csrf=False)
     def set_delivery_preference(self, delivery_mode='home_delivery', delivery_notes='', **kwargs):
         """Guarda la modalidad de entrega elegida por el comprador antes de pagar en Mercado Pago."""
-        order = request.website.sale_get_order()
+        order = self._get_current_order()
         if order and order.exists():
             vals = {}
             if 'delivery_type' in order._fields and delivery_mode in ('store_pickup', 'home_delivery', 'agency_shipping'):
@@ -78,7 +97,7 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
 
     @http.route('/shop/mercadopago/pay', type='http', auth='public', website=True, csrf=False)
     def start_mercadopago_payment(self, **kwargs):
-        order = request.website.sale_get_order()
+        order = self._get_current_order()
         if not order or not order.order_line:
             return request.redirect('/shop/cart')
 
@@ -175,8 +194,9 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             if order.exists():
                 self._verify_and_confirm_order(order, payment_id)
                 request.session['sale_last_order_id'] = order.id
-                if hasattr(request.website, 'sale_reset'):
-                    request.website.sale_reset()
+                website = self._get_current_website()
+                if website and hasattr(website, 'sale_reset'):
+                    website.sale_reset()
                 else:
                     request.session.pop('sale_order_id', None)
                 return request.redirect('/shop/confirmation')

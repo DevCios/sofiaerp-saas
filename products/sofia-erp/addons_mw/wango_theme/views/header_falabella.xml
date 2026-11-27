@@ -715,14 +715,16 @@
                                 <i class="fa fa-heart-o fs-4"/>
                             </a>
                             
-                            <!-- Cart con Badge visible y responsive -->
-                            <a href="/shop/cart" id="wango_header_cart" data-wango-header="v3" class="o_wsale_my_cart text-dark text-decoration-none position-relative d-inline-flex align-items-center justify-content-center p-2" style="min-width: 44px; min-height: 44px;" title="Mi Carrito">
-                                <i class="fa fa-shopping-cart" style="font-size: 1.55rem; color: #333F48;"/>
-                                <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
-                                <span class="position-absolute badge rounded-pill bg-success text-white my_cart_quantity my-cart-qty font-weight-bold" style="top: 2px; right: 0; font-size: 11px; padding: 2px 6px; border: 2px solid #ffffff; background-color: #00a650 !important; line-height: 1;">
-                                    <t t-out="website_sale_order and website_sale_order.cart_quantity or '0'"/>
-                                </span>
-                            </a>
+                            <!-- Cart con Badge visible y responsive (wrapper .o_wsale_my_cart con <a> descendiente requerido por Odoo 20 updateCartNavBar) -->
+                            <div class="o_wsale_my_cart d-inline-flex align-items-center">
+                                <a href="/shop/cart" id="wango_header_cart" data-wango-header="v3" class="text-dark text-decoration-none position-relative d-inline-flex align-items-center justify-content-center p-2" style="min-width: 44px; min-height: 44px;" title="Mi Carrito">
+                                    <i class="fa fa-shopping-cart" style="font-size: 1.55rem; color: #333F48;"/>
+                                    <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                                    <span class="position-absolute badge rounded-pill bg-success text-white my_cart_quantity my-cart-qty font-weight-bold" style="top: 2px; right: 0; font-size: 11px; padding: 2px 6px; border: 2px solid #ffffff; background-color: #00a650 !important; line-height: 1;">
+                                        <t t-out="website_sale_order and website_sale_order.cart_quantity or '0'"/>
+                                    </span>
+                                </a>
+                            </div>
                         </div>
 
                     </div>

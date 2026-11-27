@@ -8,7 +8,7 @@ class WangoStoreController(http.Controller):
     def get_recently_viewed(self, product_ids=None):
         """Retorna el HTML renderizado de los productos vistos recientemente con fallback a destacados."""
         product_obj = request.env['product.template'].sudo()
-        website = request.website
+        website = getattr(request, 'website', None) or request.env['website'].get_current_website()
         is_fallback = False
 
         products = product_obj.browse()
