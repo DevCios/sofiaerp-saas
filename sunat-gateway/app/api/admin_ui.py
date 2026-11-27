@@ -154,6 +154,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <div class="sunat-pill">
         <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
         <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
+        <a href="/docs-portal" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">Documentación</a>
         <a href="/consulta" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">Consulta Pública</a>
         <a href="https://api.sofiaerp.com/admin" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">SOFIA Platform</a>
         <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
@@ -211,11 +212,27 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
       <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
       <button class="tab" data-tab="connectors" onclick="showTab('connectors', this)">Conectores IA (MCP)</button>
+      <button class="tab" data-tab="logs" onclick="showTab('logs', this)">Logs API / MCP</button>
       <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
     </nav>
 
     <!-- TAB 1: ESCRITORIO -->
     <div id="tab-desk">
+      <!-- Medidor Visual de Cuota Mensual (Estilo Developer Console en Design System Odoo 20) -->
+      <div class="card" style="padding:18px 22px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+          <div>
+            <span id="quotaHeadline" style="font-weight:700;font-size:15px;color:var(--text)">500 operaciones restantes este mes</span>
+            <span id="quotaPlanBadge" class="badge b-info" style="margin-left:8px">STARTER</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <a href="/docs-portal" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Ver Documentación</a>
+            <button class="btn btn-sm btn-teal" onclick="openTab('connectors')">Conectar Claude / ChatGPT</button>
+          </div>
+        </div>
+        <div id="quotaTicks" style="display:flex;gap:3px;height:18px;align-items:center;overflow:hidden"></div>
+        <div id="quotaSub" style="font-size:12px;color:var(--muted);margin-top:8px">0 de 500 comprobantes usados este mes</div>
+      </div>
 
       <div class="grid3">
         <div class="desk-card" onclick="openTab('documents')">
@@ -244,7 +261,11 @@ PANEL_HTML = r"""<!DOCTYPE html>
         </div>
         <div class="desk-card" onclick="openTab('connectors')">
           <div class="title">Conectores IA (Claude / ChatGPT / MCP)</div>
-          <div class="desc">Conecta Claude, ChatGPT, Cursor o n8n vía Remote MCP (<code>/mcp</code>) y OpenAPI AI (<code>/openapi-ai.json</code>).</div>
+          <div class="desc">Conecta Claude, ChatGPT, Cursor o n8n vía Remote MCP (<code>/mcp</code>), OAuth 2.1 PKCE y OpenAPI AI.</div>
+        </div>
+        <div class="desk-card" onclick="openTab('logs')">
+          <div class="title">Logs API / MCP</div>
+          <div class="desc">Auditoría en vivo de llamadas REST y herramientas MCP con latencia, RUC y códigos de respuesta.</div>
         </div>
         <div class="desk-card" onclick="openTab('tester')">
           <div class="title">Probador Rápido (Beta)</div>
@@ -448,7 +469,24 @@ PANEL_HTML = r"""<!DOCTYPE html>
           <div class="row-actions">
             <button class="btn btn-nav" onclick="copyText(window.location.origin + '/mcp', this)">Copiar URL MCP</button>
             <button class="btn btn-nav" onclick="copyText(window.location.origin + '/openapi-ai.json', this)">Copiar OpenAPI AI</button>
+            <a href="/docs-portal" target="_blank" class="btn btn-nav" style="text-decoration:none">Ver Documentación</a>
             <button class="btn" style="background:#FFFFFF;color:#714B67" onclick="openTab('clients')">Crear API Key para IA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="background:#F4F1FB;border-color:#DED7F2">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <h3 style="margin:0 0 4px 0;color:var(--o20-primary)">OAuth 2.1 + PKCE (Conexión 1-clic en Claude.ai &amp; ChatGPT)</h3>
+            <div style="font-size:12.5px;color:#4B5563">
+              Habilitado <strong>Dynamic Client Registration (RFC 7591)</strong> + Discovery <strong>RFC 8414 / 9728</strong>.
+              Solo pega <code>https://gateway.sofiaerp.com/mcp</code> en Claude.ai o ChatGPT Connectors y autoriza con tu cuenta sin copiar API Keys.
+            </div>
+          </div>
+          <div class="row-actions">
+            <a href="/.well-known/oauth-authorization-server" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Discovery OAuth</a>
+            <a href="/.well-known/oauth-protected-resource" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Protected Resource</a>
           </div>
         </div>
       </div>
@@ -502,6 +540,38 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         <pre id="mcpTestOut" class="hidden"></pre>
       </div>
     </div>
+
+    <!-- TAB 9: LOGS API / MCP -->
+    <div id="tab-logs" class="hidden">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <h3 style="margin:0">Logs de Peticiones API &amp; Herramientas MCP</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="logSourceFilter" onchange="refreshScopedData()" style="width:auto;min-width:150px;padding:6px 10px">
+              <option value="">Todos (REST + MCP)</option>
+              <option value="MCP">Solo MCP (IA)</option>
+              <option value="REST">Solo API REST</option>
+            </select>
+            <button class="btn btn-sm btn-sec" onclick="refreshScopedData()">Actualizar Logs</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha (UTC)</th>
+              <th>Origen</th>
+              <th>Acción / Tool</th>
+              <th>RUC</th>
+              <th>Cliente</th>
+              <th>Estado</th>
+              <th>Latencia</th>
+              <th>Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="logsTable"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -548,7 +618,7 @@ function logout() {
 }
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'logs', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -600,13 +670,46 @@ async function refreshSunatHealth() {
 async function refreshScopedData() {
   const ruc = selectedRuc();
   const q = ruc ? `?ruc=${encodeURIComponent(ruc)}` : '';
-  const [stats, docs, summaries, conts, obs] = await Promise.all([
+  const srcFilter = document.getElementById('logSourceFilter') ? document.getElementById('logSourceFilter').value : '';
+  const logQs = new URLSearchParams();
+  if (ruc) logQs.set('ruc', ruc);
+  if (srcFilter) logQs.set('source', srcFilter);
+  const [stats, docs, summaries, conts, obs, quota, logs] = await Promise.all([
     api('/stats' + q),
     api('/documents' + (ruc ? `?ruc=${encodeURIComponent(ruc)}&limit=50` : '?limit=50')),
     api('/summaries' + q),
     api('/contingencies' + q),
     api('/observations' + q),
+    api('/quota' + q),
+    api('/logs' + (logQs.toString() ? '?' + logQs.toString() : '')),
   ]);
+
+  if (quota) {
+    document.getElementById('quotaHeadline').textContent = `${quota.remaining} operaciones restantes este mes`;
+    document.getElementById('quotaPlanBadge').textContent = `${quota.plan_name} · ${quota.month}`;
+    document.getElementById('quotaSub').textContent = `${quota.used_this_month} de ${quota.monthly_quota} comprobantes usados (${quota.usage_pct}%)`;
+    const totalTicks = 60;
+    const filled = Math.min(totalTicks, Math.round((quota.usage_pct / 100) * totalTicks));
+    let ticksHtml = '';
+    for (let i = 0; i < totalTicks; i++) {
+      const color = i < filled ? '#714B67' : '#D5DAE5';
+      ticksHtml += `<span style="flex:1;height:14px;border-radius:2px;background:${color}"></span>`;
+    }
+    document.getElementById('quotaTicks').innerHTML = ticksHtml;
+  }
+
+  document.getElementById('logsTable').innerHTML = (logs || []).map(l => `
+    <tr>
+      <td style="font-size:12px;color:var(--muted)">${(l.created_at || '').slice(0,19).replace('T',' ')}</td>
+      <td><span class="badge ${l.source === 'MCP' ? 'b-info' : 'b-ok'}">${l.source}</span></td>
+      <td><code>${l.action}</code></td>
+      <td><code>${l.issuer_ruc || '-'}</code></td>
+      <td style="font-size:12px">${l.client_label || '-'}</td>
+      <td><span class="badge ${l.status_code < 400 ? 'b-ok' : 'b-err'}">${l.status_code}</span></td>
+      <td style="font-size:12px">${l.latency_ms} ms</td>
+      <td style="font-size:12px;color:var(--muted);max-width:240px">${l.error_summary || 'OK'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="8" style="color:var(--muted);text-align:center">Sin registros de API o MCP aún. Prueba un tool desde Conectores IA.</td></tr>';
 
   document.getElementById('kTotal').textContent = stats.total_documents;
   document.getElementById('kAccepted').textContent = stats.accepted;

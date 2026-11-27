@@ -106,3 +106,41 @@ def verify_public_download_token(token: str, doc_id: str) -> bool:
         return payload.get("scope") == "public_doc_download" and hmac.compare_digest(str(payload.get("sub", "")), doc_id)
     except jwt.PyJWTError:
         return False
+
+
+def verify_pkce_s256(code_verifier: str, code_challenge: str) -> bool:
+    """Verifica PKCE S256 (RFC 7636): BASE64URL(SHA256(code_verifier)) == code_challenge."""
+    if not code_verifier or not code_challenge:
+        return False
+    digest = hashlib.sha256(code_verifier.encode("ascii")).digest()
+    computed = base64.urlsafe_b64encode(digest).rstrip(b"=").decode("ascii")
+    return hmac.compare_digest(computed, code_challenge.strip())
+
+
+def create_mcp_oauth_jwt(
+    subject: str,
+    client_id: str,
+    allowed_rucs: Optional[list[str]] = None,
+    ttl_days: int = 30,
+) -> str:
+    """Emite un access_token OAuth 2.1 JWT acotado a MCP y opcionalmente a una lista de RUCs."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": subject,
+        "cid": client_id,
+        "scope": "mcp:sunat",
+        "allowed_rucs": allowed_rucs,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(days=ttl_days)).timestamp()),
+    }
+    return jwt.encode(payload, settings.GATEWAY_JWT_SECRET, algorithm="HS256")
+
+
+def verify_mcp_oauth_jwt(token: str) -> Optional[dict]:
+    try:
+        payload = jwt.decode(token, settings.GATEWAY_JWT_SECRET, algorithms=["HS256"])
+        if payload.get("scope") != "mcp:sunat":
+            return None
+        return payload
+    except jwt.PyJWTError:
+        return None

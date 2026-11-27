@@ -26,6 +26,7 @@ from app.core.security import (
 )
 from app.models import (
     ApiClient,
+    ApiRequestLog,
     DeliveryAttempt,
     DispatchPolicy,
     Document,
@@ -141,6 +142,74 @@ async def get_stats(
         "active_clients": clients_count,
         "breakdown": counts,
     }
+
+
+@router.get("/quota", tags=["Dashboard"])
+async def get_monthly_quota(
+    ruc: Optional[str] = Query(default=None),
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Consumo mensual de comprobantes vs cuota configurada por empresa o global (ADR-011)."""
+    now_lima = datetime.now(timezone.utc).astimezone(ZoneInfo(settings.LIMA_TZ))
+    month_start = now_lima.replace(day=1, hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+
+    iss_stmt = select(Issuer).where(Issuer.is_active.is_(True))
+    if ruc:
+        iss_stmt = iss_stmt.where(Issuer.ruc == ruc)
+    issuers = list((await db.execute(iss_stmt)).scalars().all())
+
+    doc_stmt = select(func.count(Document.id)).where(Document.created_at >= month_start)
+    if ruc:
+        doc_stmt = doc_stmt.where(Document.issuer_ruc == ruc)
+    used_this_month = (await db.execute(doc_stmt)).scalar() or 0
+
+    total_quota = sum(max(1, int(i.monthly_quota or 500)) for i in issuers) if issuers else 500
+    remaining = max(0, total_quota - used_this_month)
+    plan_label = issuers[0].plan_name if len(issuers) == 1 else ("MULTI-EMPRESA" if issuers else "STARTER")
+    pct = min(100.0, round((used_this_month / total_quota) * 100, 1)) if total_quota else 0.0
+
+    return {
+        "month": now_lima.strftime("%Y-%m"),
+        "ruc": ruc,
+        "plan_name": plan_label,
+        "monthly_quota": total_quota,
+        "used_this_month": used_this_month,
+        "remaining": remaining,
+        "usage_pct": pct,
+    }
+
+
+@router.get("/logs", tags=["Dashboard"])
+async def list_api_logs(
+    ruc: Optional[str] = Query(default=None),
+    source: Optional[str] = Query(default=None),
+    limit: int = Query(default=80, ge=1, le=200),
+    _admin: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Visor de Logs de peticiones REST y herramientas MCP (ADR-011)."""
+    stmt = select(ApiRequestLog).order_by(desc(ApiRequestLog.created_at)).limit(limit)
+    if ruc:
+        stmt = stmt.where(ApiRequestLog.issuer_ruc == ruc)
+    if source and source.upper() in ("REST", "MCP"):
+        stmt = stmt.where(ApiRequestLog.source == source.upper())
+    res = await db.execute(stmt)
+    return [
+        {
+            "id": lg.id,
+            "source": lg.source,
+            "method": lg.method,
+            "action": lg.action,
+            "issuer_ruc": lg.issuer_ruc,
+            "client_label": lg.client_label,
+            "status_code": lg.status_code,
+            "latency_ms": lg.latency_ms,
+            "error_summary": lg.error_summary,
+            "created_at": lg.created_at.isoformat(),
+        }
+        for lg in res.scalars().all()
+    ]
 
 
 @router.get("/observations", tags=["Dashboard"])

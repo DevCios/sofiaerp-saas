@@ -9,6 +9,7 @@ Compatible con:
 - Cursor, Windsurf, VS Code Copilot, Gemini CLI, n8n, Make y Zapier
 """
 import json
+import time
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Any, Optional
 
@@ -21,7 +22,7 @@ from app.api.deps import assert_ruc_access, get_api_client_or_admin
 from app.api.v1.routes import emit_document as v1_emit_document
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.models import ApiClient, Document, DocumentStatus, Issuer
+from app.models import ApiClient, ApiRequestLog, Document, DocumentStatus, Issuer
 from app.schemas import CustomerSchema, DocumentItemSchema, EmitDocumentRequest
 from app.services.sunat_soap import classify_sunat_code
 
@@ -514,8 +515,24 @@ async def mcp_jsonrpc_endpoint(
         arguments = params.get("arguments") or {}
         if not tool_name:
             return _jsonrpc_err(req_id, -32602, "Parámetro 'name' requerido en tools/call.")
+        t0 = time.monotonic()
+        api_client, admin = auth
+        client_label = api_client.name if api_client else (admin.get("sub") if admin else "gateway")
+        arg_ruc = arguments.get("issuer_ruc") or arguments.get("ruc")
         try:
             result_data = await _execute_mcp_tool(tool_name, arguments, auth, db)
+            db.add(
+                ApiRequestLog(
+                    source="MCP",
+                    method="TOOL",
+                    action=f"mcp:{tool_name}",
+                    issuer_ruc=str(arg_ruc)[:11] if arg_ruc else None,
+                    client_label=str(client_label)[:120],
+                    status_code=200,
+                    latency_ms=int((time.monotonic() - t0) * 1000),
+                )
+            )
+            await db.commit()
             return _jsonrpc_ok(
                 req_id,
                 {
@@ -526,6 +543,19 @@ async def mcp_jsonrpc_endpoint(
             )
         except HTTPException as exc:
             err_payload = {"error": exc.detail, "http_status": exc.status_code}
+            db.add(
+                ApiRequestLog(
+                    source="MCP",
+                    method="TOOL",
+                    action=f"mcp:{tool_name}",
+                    issuer_ruc=str(arg_ruc)[:11] if arg_ruc else None,
+                    client_label=str(client_label)[:120],
+                    status_code=exc.status_code,
+                    latency_ms=int((time.monotonic() - t0) * 1000),
+                    error_summary=str(exc.detail)[:280],
+                )
+            )
+            await db.commit()
             return _jsonrpc_ok(
                 req_id,
                 {
@@ -535,6 +565,19 @@ async def mcp_jsonrpc_endpoint(
             )
         except Exception as exc:
             err_payload = {"error": str(exc)}
+            db.add(
+                ApiRequestLog(
+                    source="MCP",
+                    method="TOOL",
+                    action=f"mcp:{tool_name}",
+                    issuer_ruc=str(arg_ruc)[:11] if arg_ruc else None,
+                    client_label=str(client_label)[:120],
+                    status_code=400,
+                    latency_ms=int((time.monotonic() - t0) * 1000),
+                    error_summary=str(exc)[:280],
+                )
+            )
+            await db.commit()
             return _jsonrpc_ok(
                 req_id,
                 {

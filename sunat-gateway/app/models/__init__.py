@@ -81,6 +81,8 @@ class Issuer(Base):
     gre_client_secret_enc: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     alert_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    plan_name: Mapped[str] = mapped_column(String(40), default="STARTER", nullable=False)
+    monthly_quota: Mapped[int] = mapped_column(Integer, default=500, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow, nullable=False)
 
@@ -196,4 +198,47 @@ class WebhookLog(Base):
     http_status: Mapped[int | None] = mapped_column(Integer, nullable=True)
     response_body: Mapped[str | None] = mapped_column(Text, nullable=True)
     delivered: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class ApiRequestLog(Base):
+    """Bitácora auditable de peticiones REST y herramientas MCP (ADR-011)."""
+    __tablename__ = "api_request_logs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    source: Mapped[str] = mapped_column(String(16), default="REST", index=True, nullable=False)  # REST | MCP
+    method: Mapped[str] = mapped_column(String(12), default="POST", nullable=False)
+    action: Mapped[str] = mapped_column(String(160), index=True, nullable=False)  # ej. /api/v1/documents/emit o mcp:emit_document
+    issuer_ruc: Mapped[str | None] = mapped_column(String(11), index=True, nullable=True)
+    client_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    status_code: Mapped[int] = mapped_column(Integer, default=200, nullable=False)
+    latency_ms: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    error_summary: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+
+
+class OAuthClient(Base):
+    """Cliente OAuth 2.1 registrado dinámicamente (RFC 7591) para Claude.ai / ChatGPT Connectors."""
+    __tablename__ = "oauth_clients"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    client_name: Mapped[str] = mapped_column(String(160), default="MCP AI Client", nullable=False)
+    redirect_uris: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
+    token_endpoint_auth_method: Mapped[str] = mapped_column(String(40), default="none", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class OAuthAuthCode(Base):
+    """Código de autorización OAuth 2.1 PKCE (un solo uso, TTL 5 min)."""
+    __tablename__ = "oauth_auth_codes"
+
+    code: Mapped[str] = mapped_column(String(128), primary_key=True)
+    client_id: Mapped[str] = mapped_column(String(64), index=True, nullable=False)
+    redirect_uri: Mapped[str] = mapped_column(String(500), nullable=False)
+    code_challenge: Mapped[str] = mapped_column(String(256), nullable=False)
+    code_challenge_method: Mapped[str] = mapped_column(String(16), default="S256", nullable=False)
+    subject: Mapped[str] = mapped_column(String(160), nullable=False)
+    allowed_rucs: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

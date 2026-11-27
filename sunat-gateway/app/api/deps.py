@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.core.security import hash_api_key, verify_admin_jwt
+from app.core.security import hash_api_key, verify_admin_jwt, verify_mcp_oauth_jwt
 from app.models import ApiClient
 
 settings = get_settings()
@@ -55,6 +55,18 @@ async def get_api_client_or_admin(
             admin = verify_admin_jwt(candidate)
             if admin:
                 return None, admin
+            oauth_payload = verify_mcp_oauth_jwt(candidate)
+            if oauth_payload:
+                # Cliente virtual OAuth 2.1 con aislamiento estricto de allowed_rucs
+                virtual_client = ApiClient(
+                    id=None,
+                    name=f"OAuth MCP ({oauth_payload.get('sub', 'ai')})",
+                    key_prefix="oauth_mcp",
+                    key_hash="",
+                    is_active=True,
+                    allowed_rucs=oauth_payload.get("allowed_rucs"),
+                )
+                return virtual_client, oauth_payload
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token JWT inválido o expirado.")
 
     if not raw_key:
