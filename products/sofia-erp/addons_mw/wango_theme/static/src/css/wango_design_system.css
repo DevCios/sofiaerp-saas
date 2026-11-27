@@ -74,14 +74,7 @@ input, button, select, textarea, label,
     text-rendering: optimizeLegibility !important;
 }
 
-/* BLINDAJE DE ICONOS FONTAWESOME LOCAL DE ODOO 20 (sin CDN externo ni tocar .oi/.material-icons) */
-.fa, .fas, .far, .fab,
-[class^="fa-"], [class*=" fa-"] {
-    font-family: 'FontAwesome' !important;
-    font-style: normal !important;
-    font-weight: normal !important;
-    line-height: 1 !important;
-}
+/* Los íconos (.fa, .oi, .material-icons) usan las fuentes nativas de Odoo 20 sin sobrescrituras */
 
 /* Base de Cuerpo y Lienzo */
 body {

@@ -11,21 +11,13 @@
                 
                 <style type="text/css">
                     <![CDATA[
-                    /* Tipografía Montserrat Unificada para Cabecera */
+                    /* Tipografía Montserrat Unificada para Cabecera (sin tocar fuentes de íconos nativos de Odoo 20) */
                     .falabella-header-wrapper,
-                    .falabella-header-wrapper *,
                     .falabella-header-wrapper input,
                     .falabella-header-wrapper button,
                     .falabella-header-wrapper a,
-                    .falabella-header-wrapper span:not(.fa) {
+                    .falabella-header-wrapper span:not(.fa):not(.fas):not(.far):not(.fab):not(.oi):not(.material-icons) {
                         font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-                    }
-                    .falabella-header-wrapper .fa,
-                    .falabella-header-wrapper .fas,
-                    .falabella-header-wrapper i.fa,
-                    .falabella-header-wrapper span.fa {
-                        font-family: 'FontAwesome' !important;
-                        font-weight: normal !important;
                     }
 
                     /* Sidebar Layout & Logic */

@@ -49,8 +49,4 @@ footer .container {
     max-width: 1280px;
 }
 
-/* Fuente FontAwesome local de Odoo 20 (100% offline/Brave-safe, sin cuadros vacíos) */
-.fa, .fas, .far, .fab {
-    font-family: 'FontAwesome' !important;
-    font-weight: normal !important;
-}
+/* No sobrescribir font-family de .fa / .oi / .material-icons: Odoo 20 carga sus propias fuentes nativas */
