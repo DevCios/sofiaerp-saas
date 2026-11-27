@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Form View -->
+    <record id="view_delivery_dashboard_form" model="ir.ui.view">
+        <field name="name">delivery.dashboard.form</field>
+        <field name="model">delivery.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Tablero de Logística" create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title mb-4">
+                        <h1>Tablero de Logística de Entregas</h1>
+                        <p class="text-muted">Visualización en tiempo real del estado de despachos e-commerce de la compañía.</p>
+                    </div>
+                    
+                    <div class="row text-center mt-3" style="gap: 1.5rem 0;">
+                        <!-- Card 1 -->
+                        <div class="col-md-4">
+                            <div class="card p-3 shadow-sm text-white" style="border-radius: 12px; background-color: #17a2b8 !important; border: none;">
+                                <div class="card-body">
+                                    <h2 class="mb-2 fw-bold"><field name="kpi_pickup_count" readonly="1"/></h2>
+                                    <h6 class="m-0 text-uppercase fw-bold" style="font-size: 0.8rem; opacity: 0.9;">Recojos en tienda pendientes</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="col-md-4">
+                            <div class="card p-3 shadow-sm text-white" style="border-radius: 12px; background-color: #28a745 !important; border: none;">
+                                <div class="card-body">
+                                    <h2 class="mb-2 fw-bold"><field name="kpi_delivery_count" readonly="1"/></h2>
+                                    <h6 class="m-0 text-uppercase fw-bold" style="font-size: 0.8rem; opacity: 0.9;">Deliverys a domicilio pendientes</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="col-md-4">
+                            <div class="card p-3 shadow-sm text-white" style="border-radius: 12px; background-color: #ffc107 !important; border: none; color: #212529 !important;">
+                                <div class="card-body">
+                                    <h2 class="mb-2 fw-bold"><field name="kpi_agency_count" readonly="1"/></h2>
+                                    <h6 class="m-0 text-uppercase fw-bold" style="font-size: 0.8rem; opacity: 0.9;">Envíos por agencia pendientes</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center mt-4">
+                        <!-- Card 4 -->
+                        <div class="col-md-6">
+                            <div class="card p-4 shadow-sm text-white" style="border-radius: 12px; background-color: #007bff !important; border: none;">
+                                <div class="card-body">
+                                    <h1 class="mb-2 fw-bold"><field name="kpi_total_cost" readonly="1"/></h1>
+                                    <h6 class="m-0 text-uppercase fw-bold" style="font-size: 0.85rem; opacity: 0.9;">Total Fletes/Envío Recaudados (S/)</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Card 5 -->
+                        <div class="col-md-6">
+                            <div class="card p-4 shadow-sm text-white" style="border-radius: 12px; background-color: #6c757d !important; border: none;">
+                                <div class="card-body">
+                                    <h1 class="mb-2 fw-bold"><field name="kpi_average_time" readonly="1"/> días</h1>
+                                    <h6 class="m-0 text-uppercase fw-bold" style="font-size: 0.85rem; opacity: 0.9;">Plazo Promedio de Entrega</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action calling Python method to create/open Transient Dashboard record -->
+    <record id="action_delivery_dashboard_open" model="ir.actions.server">
+        <field name="name">Tablero Logístico</field>
+        <field name="model_id" ref="model_delivery_dashboard"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = model.action_open_dashboard()
+        </field>
+    </record>
+
+    <!-- Menu Item for Dashboard -->
+    <menuitem id="menu_delivery_dashboard" name="Tablero Logístico" parent="wango_core.menu_wango_operations" action="action_delivery_dashboard_open" sequence="40"/>
+</odoo>

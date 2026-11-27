@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="wbl_custom_header" inherit_id="website.layout" name="Custom Marketplace Header" priority="50">
+        
+        <!-- Replace the Standard Header -->
+        <xpath expr="//header" position="replace">
+            <header class="wbl-custom-header-wrapper">
+                <!-- Top Bar -->
+                <div class="wbl-custom-header container-fluid">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Left: Logo (Sincronizado con Backend de Odoo) -->
+                        <div class="d-flex align-items-center">
+                            <a href="/" class="wbl-logo me-4 text-decoration-none d-flex align-items-center">
+                                <img t-att-src="'/logo.png?%s' % (res_company.write_date or '')" 
+                                     alt="Mercado Wanka" 
+                                     class="img-fluid" 
+                                     style="max-height: 42px; width: auto; object-fit: contain;"
+                                     onerror="this.onerror=null; this.src='/wango_theme/static/src/img/mercadowanka_logo.png';"/>
+                            </a>
+                        </div>
+
+                        <!-- Center: Search -->
+                        <div class="wbl-header-search">
+                            <form method="get" class="o_wsale_products_searchbar_form o_wait_lazy_js input-group" action="/shop">
+                                <input type="search" name="search" class="form-control" placeholder="Buscar en Mercado Wanka" t-att-value="search"/>
+                                <button type="submit" class="btn">
+                                    <i class="fa fa-search"/>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right: User Actions -->
+                        <div class="wbl-header-actions">
+                            <t t-if="user_id._is_public()">
+                                <a href="/web/login" class="wbl-header-action-item">
+                                    <div class="text-start">
+                                        <span class="small-text">Hola,</span>
+                                        <span class="bold-text">Inicia sesión <i class="fa fa-chevron-down" style="font-size: 0.7rem;"/></span>
+                                    </div>
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <a href="/my/home" class="wbl-header-action-item">
+                                    <div class="text-start">
+                                        <span class="small-text">Hola,</span>
+                                        <span class="bold-text"><t t-esc="user_id.name"/> <i class="fa fa-chevron-down" style="font-size: 0.7rem;"/></span>
+                                    </div>
+                                </a>
+                            </t>
+
+                            <a href="/my/orders" class="wbl-header-action-item">
+                                <span>Mis</span>
+                                <span>Compras</span>
+                            </a>
+                            
+                            <a href="/shop/cart" class="wbl-header-action-item position-relative">
+                                <i class="fa fa-shopping-cart"/>
+                                <t t-set="website_sale_order" t-value="website.sale_get_order()" />
+                                <t t-if="website_sale_order and website_sale_order.cart_quantity">
+                                    <span class="badg rounded-pill bg-success position-absolute top-0 start-100 translate-middle p-1" style="font-size: 0.6rem;">
+                                        <t t-esc="website_sale_order.cart_quantity"/>
+                                    </span>
+                                </t>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub Header (Info Bar) -->
+                <div class="wbl-sub-header">
+                    <div class="container-fluid d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                             <i class="fa fa-map-marker text-success me-2"/>
+                             <span class="text-muted">Ingresa tu ubicación</span>
+                        </div>
+                        <div class="d-flex">
+                             <a href="#">Tarjeta CMR <i class="fa fa-chevron-down" style="font-size: 0.6rem;"/></a>
+                             <a href="#">Vende y comisiona</a>
+                             <a href="#">Venta telefónica <i class="fa fa-chevron-down" style="font-size: 0.6rem;"/></a>
+                             <a href="#">Ayuda <i class="fa fa-chevron-down" style="font-size: 0.6rem;"/></a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </xpath>
+    </template>
+</odoo>

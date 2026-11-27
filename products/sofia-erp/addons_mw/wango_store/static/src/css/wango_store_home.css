@@ -1,0 +1,1493 @@
+/* ======================================================
+   WanGO Store - Estilo Mercado Libre Homepage CSS
+   100% Ultraligero - Sin dependencias pesadas
+   ====================================================== */
+
+:root {
+    --meli-font: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --meli-bg: #ffffff;
+    --meli-white: #ffffff;
+    --meli-text-dark: #0f172a;
+    --meli-text-muted: #64748b;
+    --meli-text-gray: #94a3b8;
+    --meli-blue: #3483fa;
+    --meli-blue-light: #eaf1fc;
+    --meli-green: #00a650;
+    --meli-green-light: #e6f7ee;
+    --meli-card-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+    --meli-radius: 12px;
+}
+
+/* Unificación Tipográfica para componentes de la Tienda */
+.wango-home-page, 
+.wango-home-page *,
+.wango-home-box, 
+.wango-meli-card,
+.wango-quick-card,
+.wango-highlight-card,
+.wango-category-circle-card,
+.wango-trust-badge,
+.wango-box-title,
+.wango-link-see-all {
+    font-family: var(--meli-font) !important;
+}
+
+/* Fondo 100% Blanco para Toda la Web (evita recortes o cajas grises en imágenes de producto) */
+body, 
+#wrap, 
+.wango-home-page, 
+.oe_website_sale, 
+#product_detail,
+.product_detail_img {
+    background-color: #ffffff !important;
+}
+
+.wango-home-box {
+    background-color: var(--meli-white);
+    border-radius: var(--meli-radius);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03), 0 6px 18px rgba(0, 0, 0, 0.04);
+    border: 1px solid #eaedf2;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.wango-box-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--meli-text-dark);
+    letter-spacing: -0.02em;
+    margin-right: 18px !important;
+    display: inline-block;
+}
+
+.wango-link-see-all {
+    color: var(--meli-blue);
+    font-weight: 600;
+    font-size: 0.88rem;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px !important;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.wango-link-see-all:hover {
+    color: #1a6be6;
+    text-decoration: none !important;
+}
+
+.wango-link-see-all i {
+    transition: transform 0.2s ease;
+}
+
+.wango-link-see-all:hover i {
+    transform: translateX(3px);
+}
+
+/* ======================================================
+   PARTE 1: Banner Deslizante & 6 Tarjetas en Portada
+   ====================================================== */
+
+.wango-hero-section {
+    position: relative;
+    background-color: var(--meli-bg);
+}
+
+#wangoHeroCarousel {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Imagen de Banner 100% Responsive sin recorte forzado */
+.wango-hero-banner-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1600 / 420;
+    max-height: 460px;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+@media (max-width: 992px) {
+    .wango-hero-banner-img {
+        aspect-ratio: 1600 / 460;
+        max-height: 380px;
+    }
+}
+
+@media (max-width: 768px) {
+    .wango-hero-banner-img {
+        /* Proporción 4:3 para la imagen móvil de 800x600 px */
+        aspect-ratio: 4 / 3;
+        height: auto;
+        max-height: 380px;
+        object-position: center center;
+    }
+}
+
+.wango-default-hero-banner {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%);
+    min-height: 360px;
+}
+
+/* Difuminado suave en la base del banner estilo Mercado Libre */
+.wango-hero-gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 40%, #ffffff 100%);
+    pointer-events: none;
+    z-index: 4;
+}
+
+@media (max-width: 768px) {
+    .wango-hero-gradient-overlay {
+        display: none;
+    }
+}
+
+.wango-hero-ctrl {
+    width: 46px;
+    height: 46px;
+    top: 45%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    color: var(--meli-blue) !important;
+    opacity: 0.9;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.22);
+    margin: 0 15px;
+    z-index: 8;
+}
+
+.wango-hero-ctrl:hover {
+    opacity: 1;
+    background-color: #ffffff !important;
+}
+
+.wango-hero-ctrl .carousel-control-prev-icon,
+.wango-hero-ctrl .carousel-control-next-icon {
+    filter: invert(34%) sepia(91%) saturate(2311%) hue-rotate(206deg) brightness(98%) contrast(98%);
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 768px) {
+    .wango-hero-ctrl {
+        display: none;
+    }
+}
+
+#wangoHeroCarousel .carousel-indicators {
+    bottom: 30px;
+    z-index: 6;
+    margin-bottom: 0;
+}
+
+#wangoHeroCarousel .carousel-indicators button {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.85);
+    border: none;
+    margin: 0 4px;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+#wangoHeroCarousel .carousel-indicators button.active {
+    background-color: #ffffff;
+    opacity: 1;
+    transform: scale(1.25);
+}
+
+/* Contenedor de las tarjetas de acceso rápido */
+.wango-quick-cards-wrapper {
+    margin-top: -24px;
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .wango-quick-cards-wrapper {
+        margin-top: 14px !important;
+    }
+}
+
+.wango-cards-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    padding: 8px 4px 16px 4px !important;
+    margin: 0 !important;
+}
+
+.wango-cards-track::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Tarjeta individual con separación exacta y diseño de tarjeta flotante - Senior Polish */
+.wango-quick-card {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid #eaedf2 !important;
+    height: 268px !important;
+    padding: 16px 14px 14px 14px !important;
+    transition: transform 0.28s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.28s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.28s ease !important;
+    scroll-snap-align: start;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.wango-quick-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(52, 131, 250, 0.45) !important;
+}
+
+/* EN PANTALLAS GRANDES: EXACTAMENTE 6 TARJETAS VISIBLES CON 16px DE ESPACIO */
+@media (min-width: 1200px) {
+    .wango-quick-card {
+        flex: 0 0 calc((100% - 80px) / 6) !important;
+        width: calc((100% - 80px) / 6) !important;
+        min-width: calc((100% - 80px) / 6) !important;
+        max-width: calc((100% - 80px) / 6) !important;
+        margin-right: 16px !important;
+    }
+    .wango-quick-card:last-child {
+        margin-right: 0 !important;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    /* 5 tarjetas visibles */
+    .wango-quick-card {
+        flex: 0 0 calc((100% - 56px) / 5) !important;
+        width: calc((100% - 56px) / 5) !important;
+        min-width: calc((100% - 56px) / 5) !important;
+        max-width: calc((100% - 56px) / 5) !important;
+        margin-right: 14px !important;
+    }
+    .wango-quick-card:last-child {
+        margin-right: 0 !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    /* 4 tarjetas visibles */
+    .wango-quick-card {
+        flex: 0 0 calc((100% - 36px) / 4) !important;
+        width: calc((100% - 36px) / 4) !important;
+        min-width: calc((100% - 36px) / 4) !important;
+        max-width: calc((100% - 36px) / 4) !important;
+        margin-right: 12px !important;
+    }
+    .wango-quick-card:last-child {
+        margin-right: 0 !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    /* Móvil: tarjetas deslizables */
+    .wango-quick-card {
+        flex: 0 0 165px !important;
+        width: 165px !important;
+        min-width: 165px !important;
+        max-width: 165px !important;
+        margin-right: 12px !important;
+        height: 255px !important;
+    }
+    .wango-quick-card:last-child {
+        margin-right: 0 !important;
+    }
+}
+
+.wango-quick-card-header {
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.wango-quick-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.25;
+    min-height: 36px;
+    display: flex;
+    align-items: flex-start;
+    letter-spacing: -0.2px;
+}
+
+.wango-quick-card-sub {
+    font-size: 0.80rem;
+    line-height: 1.35;
+    color: #64748b;
+    min-height: 32px;
+}
+
+.wango-quick-card-icon {
+    height: 84px;
+    margin: auto 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wango-quick-card-icon svg {
+    width: 70px;
+    height: 70px;
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.06));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+}
+
+.wango-quick-card:hover .wango-quick-card-icon svg {
+    transform: scale(1.08) translateY(-2px);
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.10));
+}
+
+.wango-card-icon-fallback {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    color: var(--meli-blue);
+    background-color: #f0f4f9;
+}
+
+.wango-btn-card-action {
+    background-color: #f0f5ff !important;
+    color: var(--meli-blue) !important;
+    font-weight: 600 !important;
+    font-size: 0.82rem !important;
+    border: 1px solid rgba(52, 131, 250, 0.18) !important;
+    border-radius: 8px !important;
+    padding: 7px 10px !important;
+    transition: all 0.22s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    text-align: center;
+    width: 100%;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.wango-quick-card:hover .wango-btn-card-action {
+    background-color: var(--meli-blue) !important;
+    color: #ffffff !important;
+    border-color: var(--meli-blue) !important;
+    box-shadow: 0 4px 12px rgba(52, 131, 250, 0.35) !important;
+}
+
+.wango-btn-card-action:hover {
+    background-color: #1a6be6 !important;
+    color: #ffffff !important;
+}
+
+/* ======================================================
+   Botones de Flechas de Slider (Comunes)
+   ====================================================== */
+
+.wango-slider-wrapper {
+    position: relative;
+}
+
+.wango-slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    color: var(--meli-blue);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 25;
+    transition: background-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.wango-slider-btn:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.wango-slider-prev {
+    left: -18px;
+}
+
+.wango-slider-next {
+    right: -18px;
+}
+
+@media (max-width: 576px) {
+    .wango-slider-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+    .wango-slider-prev { left: -8px; }
+    .wango-slider-next { right: -8px; }
+}
+
+/* ======================================================
+   PARTE 2 y 3: Tarjetas de Producto Mercado Libre
+   ====================================================== */
+
+.wango-products-slider-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 8px 4px 16px 4px !important;
+    margin: 0 !important;
+}
+
+.wango-products-slider-track::-webkit-scrollbar {
+    display: none;
+}
+
+.wango-slider-item {
+    flex: 0 0 210px !important;
+    width: 210px !important;
+    max-width: 210px !important;
+    scroll-snap-align: start;
+    margin-right: 16px !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.wango-slider-item:last-child {
+    margin-right: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .wango-slider-item {
+        flex: 0 0 170px !important;
+        width: 170px !important;
+        max-width: 170px !important;
+        margin-right: 12px !important;
+    }
+    .wango-slider-item:last-child {
+        margin-right: 0 !important;
+    }
+}
+
+.wango-meli-card {
+    border-radius: 12px !important;
+    border: 1px solid #eaedf2 !important;
+    background: #ffffff !important;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03) !important;
+    transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.25s ease !important;
+}
+
+.wango-meli-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-4px) !important;
+    border-color: rgba(52, 131, 250, 0.4) !important;
+}
+
+.wango-meli-card-badge-pill {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 2px 6px;
+    z-index: 3;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
+}
+
+.wango-meli-card-img-link {
+    height: 195px;
+    background-color: #ffffff !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.wango-meli-img {
+    max-height: 175px;
+    max-width: 175px;
+    object-fit: contain;
+    transition: transform 0.25s ease-in-out;
+}
+
+.wango-meli-card:hover .wango-meli-img {
+    transform: scale(1.05);
+}
+
+.wango-meli-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+    line-height: 1.35;
+    height: 2.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s ease;
+}
+
+.wango-meli-card:hover .wango-meli-title {
+    color: var(--meli-blue);
+}
+
+.wango-meli-old-price {
+    font-size: 0.75rem;
+    line-height: 1;
+    color: var(--meli-text-gray);
+}
+
+.wango-meli-price-amount {
+    font-size: 1.38rem;
+    font-weight: 700;
+    color: var(--meli-text-dark);
+    line-height: 1.2;
+}
+
+.wango-meli-discount-badge {
+    color: var(--meli-green);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.wango-meli-installments-text {
+    font-size: 0.78rem;
+    color: var(--meli-green);
+    font-weight: 600;
+}
+
+.wango-badge-coupon {
+    background-color: var(--meli-blue-light) !important;
+    color: var(--meli-blue) !important;
+    font-weight: 600 !important;
+    font-size: 0.72rem !important;
+    border-radius: 4px;
+    padding: 3px 6px;
+}
+
+.wango-meli-shipping-footer {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+.wango-meli-free-shipping {
+    color: var(--meli-green);
+    font-size: 0.80rem;
+    font-weight: 700;
+}
+
+.wango-meli-full-tag {
+    background: var(--meli-green);
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 800;
+    font-style: italic;
+    padding: 1px 5px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+/* ======================================================
+   PARTE 3: Tarjeta Destacada de Oferta (Columna Izquierda)
+   ====================================================== */
+
+.wango-highlight-card {
+    padding: 4px;
+}
+
+.wango-highlight-img-box {
+    height: 220px;
+    background-color: #ffffff !important;
+    border: 1px solid #eaedf2;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.wango-highlight-img {
+    max-height: 195px;
+    max-width: 195px;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+.wango-highlight-card:hover .wango-highlight-img {
+    transform: scale(1.05);
+}
+
+.wango-highlight-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.3;
+    min-height: 2.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s ease;
+}
+
+.wango-highlight-card:hover .wango-highlight-title {
+    color: var(--meli-blue);
+}
+
+.wango-highlight-price-amount {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--meli-text-dark);
+}
+
+.wango-btn-highlight-deal {
+    background-color: #ffe600 !important;
+    color: #1e293b !important;
+    font-weight: 700 !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.wango-btn-highlight-deal:hover {
+    background-color: #ffd000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(255, 230, 0, 0.4) !important;
+}
+
+.wango-deal-badge-timer {
+    color: #ef4444;
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+/* ======================================================
+   PARTE 4: Categorías en Cuadrícula 4x3
+   ====================================================== */
+
+.wango-categories-track {
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.wango-categories-track::-webkit-scrollbar {
+    display: none;
+}
+
+.wango-category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 14px;
+}
+
+@media (max-width: 992px) {
+    .wango-category-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .wango-category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+.wango-category-card {
+    background-color: #ffffff;
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    transition: all 0.22s cubic-bezier(0.165, 0.84, 0.44, 1);
+    height: 74px;
+    overflow: hidden;
+}
+
+.wango-category-card:hover {
+    border-color: var(--meli-blue);
+    box-shadow: 0 6px 18px rgba(52, 131, 250, 0.12);
+    transform: translateY(-2px);
+    background-color: #fcfdfe;
+}
+
+.wango-cat-thumb-box {
+    width: 52px;
+    height: 52px;
+    background-color: #ffffff !important;
+    border: 1px solid #eaedf2;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.wango-cat-img {
+    max-height: 44px;
+    max-width: 44px;
+    object-fit: contain;
+    transition: transform 0.2s ease;
+}
+
+.wango-category-card:hover .wango-cat-img {
+    transform: scale(1.08);
+}
+
+.wango-cat-icon-fallback {
+    width: 100%;
+    height: 100%;
+    background: #eff6ff;
+    color: var(--meli-blue);
+    font-size: 1.25rem;
+}
+
+.wango-cat-name {
+    font-size: 0.90rem;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s ease;
+}
+
+.wango-category-card:hover .wango-cat-name {
+    color: var(--meli-blue);
+}
+
+.wango-cat-action-hint {
+    font-size: 0.74rem;
+    color: #94a3b8;
+    display: none;
+}
+
+/* ======================================================
+   PARTE 5: Beneficios de Confianza
+   ====================================================== */
+
+.wango-trust-box {
+    border-radius: var(--meli-radius);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.wango-trust-item {
+    padding: 12px;
+    transition: transform 0.2s ease;
+}
+
+.wango-trust-item:hover {
+    transform: translateY(-3px);
+}
+
+.wango-trust-icon-box {
+    height: 64px;
+    margin-bottom: 12px;
+}
+
+.wango-trust-icon-box svg {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wango-trust-item:hover .wango-trust-icon-box svg {
+    transform: scale(1.10);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.08));
+}
+
+.wango-trust-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.2px;
+}
+
+.wango-trust-desc {
+    color: var(--meli-text-muted);
+    line-height: 1.4;
+    font-size: 0.84rem;
+}
+
+.wango-trust-link {
+    color: var(--meli-blue);
+    font-weight: 600;
+    font-size: 0.84rem;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.wango-trust-link:hover {
+    color: #1a6be6;
+}
+
+.wango-trust-link i {
+    transition: transform 0.2s ease;
+}
+
+.wango-trust-link:hover i {
+    transform: translateX(3px);
+}
+
+@media (min-width: 768px) {
+    .wango-trust-col-border {
+        border-right: 1px solid #f1f5f9;
+    }
+}
+
+/* ======================================================
+   PARTE 6: Ficha de Producto Senior (UX / UI de Alta Conversión)
+   ====================================================== */
+
+/* Galería y Contenedor de Imagen de Producto */
+#o-carousel-product,
+#o-carousel-product .carousel-inner,
+#o-carousel-product .carousel-item {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+}
+
+#o-carousel-product {
+    border: 1px solid #eaedf2 !important;
+    padding: 24px !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 460px !important;
+}
+
+#o-carousel-product .product_detail_img {
+    max-height: 480px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    background: #ffffff !important;
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+}
+
+#o-carousel-product:hover .product_detail_img {
+    transform: scale(1.03);
+}
+
+/* Indicadores de miniatura a la izquierda */
+#o-carousel-product .o_carousel_product_indicators li {
+    border-radius: 10px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+#o-carousel-product .o_carousel_product_indicators li.active,
+#o-carousel-product .o_carousel_product_indicators li:hover {
+    border-color: var(--meli-blue) !important;
+    box-shadow: 0 0 0 1px var(--meli-blue) !important;
+    transform: scale(1.05) !important;
+}
+
+/* ======================================================
+   REDUCCIÓN DE ESPACIO VERTICAL SUPERIOR (FICHA DE PRODUCTO)
+   Elimina el espacio en blanco innecesario entre navbar y contenido
+   ====================================================== */
+#wrap:has(#product_detail),
+.oe_website_sale {
+    padding-top: 0 !important;
+}
+
+#oe_structure_website_sale_product_1 {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+}
+
+#product_detail {
+    padding-top: 6px !important;
+    padding-bottom: 24px !important;
+    margin-top: 0 !important;
+}
+
+#product_detail > .row:first-of-type {
+    margin-top: 0 !important;
+    margin-bottom: 4px !important;
+}
+
+#product_detail > .row:nth-of-type(2),
+#product_detail #o-carousel-product,
+#product_details {
+    margin-top: 0 !important;
+}
+
+/* Breadcrumb moderno, compacto y legible */
+.o_wsale_breadcrumb,
+nav.breadcrumb,
+.oe_website_sale .breadcrumb,
+#product_detail .breadcrumb {
+    background: transparent !important;
+    padding: 2px 0 6px 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+    font-size: 0.875rem !important;
+}
+
+.o_wsale_breadcrumb a,
+nav.breadcrumb a,
+.oe_website_sale .breadcrumb a {
+    color: #6b7280 !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+}
+
+.o_wsale_breadcrumb a:hover,
+nav.breadcrumb a:hover,
+.oe_website_sale .breadcrumb a:hover {
+    color: var(--meli-blue) !important;
+}
+
+.o_wsale_breadcrumb .active,
+nav.breadcrumb .active,
+.oe_website_sale .breadcrumb .active {
+    color: #111827 !important;
+    font-weight: 600 !important;
+}
+
+/* ======================================================
+   ORDENAMIENTO FLEXBOX UNIFICADO EN FICHA DE PRODUCTO
+   Garantiza el flujo visual perfecto:
+   1. Precio -> 2. Cuotas y Stock -> 3. Cantidad -> 
+   4. Comprar ahora -> 5. Añadir al carrito -> 6. Garantías
+   ====================================================== */
+#product_details .js_product {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#product_details .js_product > * {
+    order: 10;
+}
+
+#product_details .js_product > div:first-child,
+#product_details .js_product > .product_price {
+    order: 1 !important;
+}
+
+#product_details .wango-price-meta-box {
+    order: 2 !important;
+}
+
+#product_details .css_quantity {
+    order: 3 !important;
+}
+
+#product_details #add_to_cart {
+    order: 4 !important;
+}
+
+#product_details #wango_whatsapp_btn {
+    order: 5 !important;
+}
+
+#product_details .wango-trust-guarantee-card {
+    order: 6 !important;
+}
+
+/* Pre-header: Social Proof & Calificación */
+.wango-product-header-meta {
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.3;
+}
+
+.wango-badge-condition {
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.wango-meta-sep {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+}
+
+.wango-badge-sales {
+    color: #6b7280;
+}
+
+.wango-stars-row {
+    font-size: 0.9rem;
+    color: #f59e0b !important;
+    letter-spacing: 1px;
+}
+
+.wango-rating-score {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.wango-rating-count {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Título de Producto (Jerarquía Senior Prominente) */
+#product_details h1[itemprop="name"] {
+    font-size: 1.65rem !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    line-height: 1.25 !important;
+    margin-bottom: 8px !important;
+    letter-spacing: -0.015em;
+}
+
+/* Bloque de Vendedor (wango_marketplace) */
+#product_details .mt-2.mb-3 span,
+#product_details .mt-2.mb-3 span.text-muted {
+    font-size: 0.92rem !important;
+    color: #4b5563 !important;
+}
+
+#product_details .mt-2.mb-3 a {
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    color: var(--meli-blue) !important;
+    text-decoration: underline !important;
+}
+
+/* Precios (Héroe Visual de la Ficha) */
+#product_details div[itemprop="offers"] {
+    margin-top: 10px !important;
+    margin-bottom: 4px !important;
+}
+
+#product_details .oe_price {
+    font-size: 2.15rem !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.4px;
+}
+
+#product_details .oe_default_price {
+    font-size: 1.15rem !important;
+    color: #94a3b8 !important;
+    margin-left: 10px;
+}
+
+/* Beneficio de Cuotas */
+.wango-installments-badge {
+    font-size: 1rem !important;
+    font-weight: 600;
+    color: var(--meli-green);
+    line-height: 1.35;
+}
+
+.wango-icon-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    font-size: 1.05rem;
+    color: var(--meli-green);
+    flex-shrink: 0;
+}
+
+.wango-link-action {
+    font-size: 0.92rem !important;
+    color: var(--meli-blue);
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+.wango-link-action:hover {
+    color: #1a6be6;
+    text-decoration: underline !important;
+}
+
+/* Pulso de Stock Disponible */
+.wango-stock-status {
+    font-size: 0.92rem !important;
+    line-height: 1.35;
+}
+
+.wango-stock-pulse {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 50%;
+    background-color: var(--meli-green);
+    box-shadow: 0 0 0 0 rgba(0, 166, 80, 0.7);
+    animation: wangoPulse 2s infinite;
+    flex-shrink: 0;
+}
+
+.wango-stock-title {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #111827;
+}
+
+.wango-stock-sub {
+    font-size: 0.92rem !important;
+    color: #15803d;
+}
+
+@keyframes wangoPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 166, 80, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(0, 166, 80, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 166, 80, 0);
+    }
+}
+
+/* Selector de Cantidad Estilo Stepper con Etiqueta */
+#product_details .css_quantity {
+    position: relative !important;
+    border-radius: 8px !important;
+    border: 1px solid #d1d5db !important;
+    background: #ffffff !important;
+    max-width: 125px !important;
+    height: 40px !important;
+    margin-top: 24px !important;
+    margin-bottom: 14px !important;
+    box-shadow: none !important;
+}
+
+#product_details .css_quantity::before {
+    content: "Cantidad:";
+    display: block;
+    position: absolute;
+    top: -22px;
+    left: 0;
+    font-size: 0.875rem !important;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+#product_details .css_quantity .btn {
+    background: #f9fafb !important;
+    color: #374151 !important;
+    border: none !important;
+    width: 38px !important;
+    height: 100% !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.15s !important;
+}
+
+#product_details .css_quantity .input-group-prepend .btn {
+    border-radius: 7px 0 0 7px !important;
+}
+
+#product_details .css_quantity .input-group-append .btn {
+    border-radius: 0 7px 7px 0 !important;
+}
+
+#product_details .css_quantity .btn:hover {
+    background-color: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+#product_details .css_quantity input.quantity {
+    background: #ffffff !important;
+    border: none !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    font-size: 0.95rem !important;
+    padding: 0 !important;
+}
+
+/* ======================================================
+   BOTONES DE ACCIÓN: COMPRAR AHORA Y AÑADIR AL CARRITO
+   Dimensiones y tipografía uniformes estilo Mercado Libre
+   ====================================================== */
+.wango-btn-buy-now {
+    background-color: var(--meli-blue) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 6px rgba(52, 131, 250, 0.28) !important;
+    transition: all 0.2s ease !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.wango-btn-buy-now:hover {
+    background-color: #2968c8 !important;
+    box-shadow: 0 4px 12px rgba(52, 131, 250, 0.38) !important;
+    color: #ffffff !important;
+}
+
+/* Botón de Compra por WhatsApp (Alta Conversión / Social Selling) */
+.wango-btn-whatsapp {
+    background-color: #25d366 !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    margin-bottom: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.30) !important;
+    transition: all 0.2s ease !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+}
+
+.wango-btn-whatsapp:hover {
+    background-color: #1ebd5b !important;
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.45) !important;
+    color: #ffffff !important;
+}
+
+.wango-btn-whatsapp i {
+    font-size: 1.3rem !important;
+    margin-right: 8px !important;
+}
+
+#product_details #add_to_cart {
+    background-color: var(--meli-blue) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    transition: all 0.2s ease !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 2px 6px rgba(52, 131, 250, 0.28) !important;
+    text-decoration: none !important;
+}
+
+#product_details #add_to_cart i,
+#product_details #add_to_cart .fa {
+    font-size: 1.15rem !important;
+    margin-right: 10px !important;
+}
+
+#product_details #add_to_cart:hover {
+    background-color: #2968c8 !important;
+    box-shadow: 0 4px 12px rgba(52, 131, 250, 0.38) !important;
+    color: #ffffff !important;
+}
+
+/* Caja de Garantía y Confianza (Mercado Libre Clean Card) */
+.wango-trust-guarantee-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 16px 18px !important;
+    box-shadow: none !important;
+}
+
+.wango-trust-badge-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+}
+
+.bg-blue-subtle {
+    background-color: #eff6ff !important;
+    color: var(--meli-blue) !important;
+}
+
+.bg-green-subtle {
+    background-color: #f0fdf4 !important;
+    color: var(--meli-green) !important;
+}
+
+.bg-amber-subtle {
+    background-color: #fefce8 !important;
+    color: #ca8a04 !important;
+}
+
+.wango-trust-title {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    line-height: 1.25;
+    margin-bottom: 2px;
+}
+
+.wango-trust-desc {
+    font-size: 0.86rem !important;
+    line-height: 1.35 !important;
+    color: #4b5563 !important;
+    display: block;
+}
+
+/* Widget de Entrega Refinado */
+.wango-delivery-widget {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    padding: 16px 18px !important;
+    margin-top: 14px !important;
+}
+
+.wango-delivery-widget #wango_widget_selected_location {
+    font-size: 0.92rem !important;
+    color: var(--meli-blue) !important;
+}
+
+.wango-delivery-widget .wango-widget-option-row {
+    padding: 10px 4px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    transition: background-color 0.15s ease !important;
+}
+
+.wango-delivery-widget .wango-widget-option-row:hover {
+    background-color: #f9fafb !important;
+}
+
+.wango-delivery-widget .wango-widget-option-row span.font-weight-bold,
+.wango-delivery-widget .wango-widget-option-row span.text-dark {
+    font-size: 0.92rem !important;
+    color: #111827 !important;
+    font-weight: 600 !important;
+}
+
+.wango-delivery-widget .wango-widget-option-row p.text-muted {
+    font-size: 0.86rem !important;
+    color: #4b5563 !important;
+    margin-top: 2px !important;
+}
+
+.wango-delivery-widget .wango-widget-option-row span.text-success {
+    font-size: 0.92rem !important;
+    color: var(--meli-green) !important;
+    font-weight: 700 !important;
+}
+
+/* Ocultar bloque desordenado de términos por defecto e iconos viejos de compartir */
+#product_details #o_product_terms_and_share,
+#product_details .s_share {
+    display: none !important;
+}
+
+/* Optimización Móvil */
+@media (max-width: 767.98px) {
+    #o-carousel-product {
+        min-height: 300px !important;
+        padding: 12px !important;
+        margin-bottom: 16px !important;
+    }
+    
+    #product_details h1[itemprop="name"] {
+        font-size: 1.4rem !important;
+    }
+    
+    #product_details .oe_price {
+        font-size: 1.85rem !important;
+    }
+
+    #sticky_mobile_cart_bar {
+        background: #ffffff !important;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08) !important;
+        border-top: 1px solid #e5e7eb !important;
+    }
+
+    #sticky_mobile_cart_bar .btn {
+        background-color: var(--meli-blue) !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+}
+
+/* ==========================================================================
+   WANGO SENIOR SOCIAL PROOF, SELLER REPUTATION & REVIEWS SYSTEM
+   ========================================================================== */
+.wango-seller-reputation-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    order: 7 !important;
+}
+
+.wango-seller-reputation-card .wango-reputation-thermometer span {
+    transition: all 0.2s ease;
+}
+
+.wango-card-rating-mini {
+    line-height: 1.25;
+}
+
+#wango_product_reviews_section {
+    scroll-margin-top: 100px;
+}
+
+.wango-reviews-feed .wango-review-item:last-child {
+    border-bottom: none !important;
+}
+
+.wango-rating-bars-list .progress {
+    overflow: hidden;
+}
+
+

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Delivery Coverage Form View -->
+    <record id="view_delivery_coverage_form" model="ir.ui.view">
+        <field name="name">delivery.coverage.form</field>
+        <field name="model">delivery.coverage</field>
+        <field name="arch" type="xml">
+            <form string="Cobertura de Delivery">
+                <sheet>
+                    <group>
+                        <group string="Ubicación Cobertura">
+                            <field name="origin_department_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="department_id" options="{'no_create': True, 'no_open': True}" string="Departamento Destino"/>
+                            <field name="province_id" options="{'no_create': True, 'no_open': True}" string="Provincia Destino" readonly="not department_id"/>
+                            <field name="district_id" options="{'no_create': True, 'no_open': True}" string="Distrito Destino" readonly="not province_id"/>
+                            <field name="excluded_district_ids" widget="many2many_tags" options="{'no_create': True, 'no_open': True}" string="Distritos Excluidos" invisible="not province_id or district_id" placeholder="Selecciona distritos a los que NO llega el reparto..."/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Costo y Tiempos">
+                            <label for="time_min" string="Plazo Estimado de Entrega"/>
+                            <div class="o_row">
+                                <span>De</span>
+                                <field name="time_min" class="oe_inline"/>
+                                <span>a</span>
+                                <field name="time_max" class="oe_inline"/>
+                                <field name="time_unit" class="oe_inline"/>
+                            </div>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="free_shipping_min" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Delivery Coverage List View -->
+    <record id="view_delivery_coverage_tree" model="ir.ui.view">
+        <field name="name">delivery.coverage.tree</field>
+        <field name="model">delivery.coverage</field>
+        <field name="arch" type="xml">
+            <list string="Cobertura de Delivery">
+                <field name="origin_department_id"/>
+                <field name="department_id" string="Departamento Destino"/>
+                <field name="province_id" string="Provincia Destino"/>
+                <field name="district_id" string="Distrito Destino"/>
+                <field name="excluded_district_ids" widget="many2many_tags" string="Excluidos" optional="show"/>
+                <field name="cost"/>
+                <field name="free_shipping_min"/>
+                <field name="time_min"/>
+                <field name="time_max"/>
+                <field name="time_unit"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Delivery Coverage Search View -->
+    <record id="view_delivery_coverage_search" model="ir.ui.view">
+        <field name="name">delivery.coverage.search</field>
+        <field name="model">delivery.coverage</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Cobertura">
+                <field name="origin_department_id"/>
+                <field name="department_id"/>
+                <field name="province_id"/>
+                <field name="district_id"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Origen" name="group_by_origin" context="{'group_by': 'origin_department_id'}"/>
+                    <filter string="Departamento Destino" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                    <filter string="Provincia Destino" name="group_by_province" context="{'group_by': 'province_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Delivery Coverage Action -->
+    <record id="action_delivery_coverage" model="ir.actions.act_window">
+        <field name="name">Cobertura de Delivery</field>
+        <field name="res_model">delivery.coverage</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_delivery_coverage_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configura los costos y tiempos de delivery a domicilio.
+            </p>
+            <p>
+                Define tarifas por distrito y montos mínimos de compra para habilitar envíos gratis.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item (Prioridad 1 en Configuración) -->
+    <menuitem id="menu_delivery_coverage" name="Cobertura de Delivery" parent="wango_core.menu_wango_config" action="action_delivery_coverage" sequence="10"/>
+</odoo>

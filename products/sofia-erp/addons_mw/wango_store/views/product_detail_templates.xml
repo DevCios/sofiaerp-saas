@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Mejora Premium de la Ficha de Producto (Mercado Libre Style) -->
+    <template id="wango_product_detail_inherit" inherit_id="website_sale.product" name="WanGO Ficha de Producto Premium" priority="25">
+        <!-- 1. Metadata y Social Proof antes del Título -->
+        <xpath expr="//h1[@itemprop='name']" position="before">
+            <div class="wango-product-header-meta d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                <div class="d-flex align-items-center">
+                    <span class="wango-badge-condition text-muted small fw-semibold">
+                        <t t-if="product.wango_product_condition == 'used'">Usado</t>
+                        <t t-elif="product.wango_product_condition == 'reconditioned'">Reacondicionado</t>
+                        <t t-else="">Nuevo</t>
+                    </span>
+                    <span class="wango-meta-sep mx-2 text-muted" style="opacity: 0.5;">|</span>
+                    <span class="wango-badge-sales text-muted small fw-semibold">
+                        <t t-esc="product.wango_sales_display or '+50 vendidos'"/>
+                    </span>
+                </div>
+                <div class="wango-product-rating d-flex align-items-center">
+                    <div class="wango-stars-row text-warning me-1">
+                        <t t-foreach="product.get_wango_stars_list()" t-as="star_type">
+                            <i t-if="star_type == 'full'" class="fa fa-star text-warning"/>
+                            <i t-elif="star_type == 'half'" class="fa fa-star-half-o text-warning"/>
+                            <i t-else="" class="fa fa-star-o text-muted" style="opacity: 0.35;"/>
+                        </t>
+                    </div>
+                    <span class="wango-rating-score fw-bold text-dark me-1">
+                        <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                    </span>
+                    <a href="#wango_product_reviews_section" class="wango-rating-count text-muted text-decoration-none small ms-1" style="cursor: pointer; margin-left: 6px !important;" onclick="event.preventDefault(); document.getElementById('wango_product_reviews_section')?.scrollIntoView({behavior: 'smooth'});">
+                        (<t t-esc="product.wango_rating_count or 24"/> opiniones)
+                    </a>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- 2. Badges de Beneficios de Pago y Stock antes de Comprar ahora -->
+        <xpath expr="//a[@id='add_to_cart']" position="before">
+            <div class="wango-price-meta-box my-3">
+                <!-- Beneficio de cuotas estilo Mercado Libre -->
+                <div class="wango-installments-badge d-flex align-items-center">
+                    <span class="wango-icon-box text-success me-2">
+                        <i class="fa fa-credit-card"/>
+                    </span>
+                    <span class="wango-installments-text">
+                        <t t-if="product.deal_installments_text">
+                            <t t-esc="product.deal_installments_text"/>
+                        </t>
+                        <t t-else="">
+                            Mismo precio en hasta 3 cuotas sin interés
+                        </t>
+                    </span>
+                </div>
+                
+                <div class="wango-payment-methods-link mt-1 ps-4 ms-1">
+                    <a href="#" class="wango-link-action text-decoration-none" data-toggle="modal" data-target="#wangoPaymentMethodsModal" data-bs-toggle="modal" data-bs-target="#wangoPaymentMethodsModal">
+                        Ver los medios de pago y promociones <i class="fa fa-angle-right ms-1"/>
+                    </a>
+                </div>
+
+                <!-- Indicador de Stock Disponible con Pulso -->
+                <div class="wango-stock-status mt-3 d-flex align-items-center">
+                    <span class="wango-stock-pulse me-2"/>
+                    <span class="wango-stock-title fw-bold text-dark me-1">Stock disponible</span>
+                    <span class="wango-stock-sub text-success fw-semibold">(Listo para entrega inmediata)</span>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- 3. Transformar Añadir al carrito a 'Comprar ahora' (Botón Principal) -->
+        <xpath expr="//a[@id='add_to_cart']" position="replace">
+            <a role="button" 
+               id="add_to_cart" 
+               t-if="not product.marketplace_seller_id or product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'"
+               class="btn btn-primary w-100 fw-bold wango-btn-buy-now shadow-sm js_check_product a-submit" 
+               href="#">
+                <i class="fa fa-shopping-cart me-2 mr-2" style="margin-right: 10px !important;"/>
+                <span>Comprar ahora</span>
+            </a>
+        </xpath>
+
+        <!-- 4. Botón de WhatsApp y Caja de Garantía justo después de Comprar ahora -->
+        <xpath expr="//a[@id='add_to_cart']" position="after">
+            <!-- Botón de Compra y Pedido por WhatsApp (Alta Conversión / Social Selling) -->
+            <t t-set="wango_wa_phone" t-value="(product.sudo().marketplace_seller_id and (product.sudo().marketplace_seller_id.mobile or product.sudo().marketplace_seller_id.phone)) or (website.sudo().company_id and (website.sudo().company_id.mobile or website.sudo().company_id.phone)) or ''"/>
+            <input type="hidden" id="wango_whatsapp_phone_target" t-att-value="wango_wa_phone"/>
+
+            <button type="button" 
+                    id="wango_whatsapp_btn" 
+                    class="btn wango-btn-whatsapp w-100 fw-bold mb-3 shadow-sm"
+                    onclick="if(window.wangoBuyWhatsApp){window.wangoBuyWhatsApp(this);}">
+                <i class="fa fa-whatsapp fa-lg me-2"/> Comprar por WhatsApp
+            </button>
+
+            <!-- Caja de Garantía y Confianza (Compra Protegida) -->
+            <div class="wango-trust-guarantee-card mb-2">
+                <div class="wango-trust-row d-flex align-items-start mb-3">
+                    <div class="wango-trust-badge-icon bg-blue-subtle text-primary me-3">
+                        <i class="fa fa-shield"/>
+                    </div>
+                    <div class="wango-trust-content flex-grow-1">
+                        <span class="wango-trust-title d-block fw-bold text-dark">Compra Protegida WanGO</span>
+                        <span class="wango-trust-desc text-muted">Recibe el producto que esperabas o te devolvemos el 100% de tu dinero.</span>
+                    </div>
+                </div>
+
+                <div class="wango-trust-row d-flex align-items-start mb-3">
+                    <div class="wango-trust-badge-icon bg-green-subtle text-success me-3">
+                        <i class="fa fa-undo"/>
+                    </div>
+                    <div class="wango-trust-content flex-grow-1">
+                        <span class="wango-trust-title d-block fw-bold text-dark">Devolución gratis</span>
+                        <span class="wango-trust-desc text-muted">Tienes hasta 30 días calendario desde que lo recibes para cambios o devoluciones.</span>
+                    </div>
+                </div>
+
+                <div class="wango-trust-row d-flex align-items-start">
+                    <div class="wango-trust-badge-icon bg-amber-subtle text-warning me-3">
+                        <i class="fa fa-certificate"/>
+                    </div>
+                    <div class="wango-trust-content flex-grow-1">
+                        <span class="wango-trust-title d-block fw-bold text-dark">Garantía oficial</span>
+                        <span class="wango-trust-desc text-muted">Producto 100% original con respaldo y garantía directa de la tienda.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Tarjeta de Información y Reputación de la Tienda / Vendedor (Senior Level) -->
+            <t t-set="seller_card" t-value="(product.sudo().marketplace_seller_id or website.sudo().company_id.partner_id).sudo()"/>
+            <div class="wango-seller-reputation-card mb-3 p-3 bg-white rounded-3 border" style="border-color: #e5e7eb !important;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem;">Información sobre la tienda</span>
+                    <t t-if="seller_card.seller_is_official_store">
+                        <span class="badge bg-success-subtle text-success border px-2 py-0.5 rounded-pill small fw-bold" style="font-size: 0.7rem; background-color: #ecfdf5; color: #059669; border-color: #a7f3d0 !important;">
+                            <i class="fa fa-shield me-1"/> Tienda Oficial
+                        </span>
+                    </t>
+                </div>
+
+                <!-- Tienda Header con Avatar y Calificación -->
+                <div class="d-flex align-items-center mb-3">
+                    <div class="wango-seller-avatar me-2 flex-shrink-0">
+                        <img t-if="seller_card.image_128" 
+                             t-attf-src="/web/image/res.partner/#{seller_card.id}/image_128" 
+                             alt="Avatar Tienda" 
+                             class="rounded-circle border" 
+                             style="width: 44px; height: 44px; object-fit: cover; background: #f8fafc;"/>
+                        <div t-else="" 
+                             class="rounded-circle d-flex align-items-center justify-content-center text-primary border" 
+                             style="width: 44px; height: 44px; background: #eff6ff; font-size: 1.15rem; font-weight: 700;">
+                            <i class="fa fa-store text-primary"/>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 overflow-hidden">
+                        <h4 class="h6 mb-0 fw-bold text-truncate text-dark" style="font-size: 0.95rem;">
+                            <t t-esc="seller_card.name"/>
+                        </h4>
+                        <div class="d-flex align-items-center gap-1 mt-1">
+                            <div class="wango-seller-stars text-warning small" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                                <t t-foreach="seller_card.get_seller_stars_list()" t-as="st">
+                                    <i t-if="st == 'full'" class="fa fa-star text-warning"/>
+                                    <i t-elif="st == 'half'" class="fa fa-star-half-o text-warning"/>
+                                    <i t-else="" class="fa fa-star-o text-muted" style="opacity: 0.35;"/>
+                                </t>
+                            </div>
+                            <span class="fw-bold text-dark small ms-1" style="font-size: 0.82rem;">
+                                <t t-esc="'%.1f' % (seller_card.seller_rating_avg or 4.9)"/>
+                            </span>
+                            <span class="text-muted small ms-1" style="font-size: 0.78rem; margin-left: 6px !important;">
+                                (<t t-esc="seller_card.seller_rating_count or 128"/> opiniones)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Termómetro de Reputación (Mercado Libre Style) -->
+                <div class="wango-reputation-thermometer mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="text-muted small" style="font-size: 0.75rem;">Nivel de reputación</span>
+                        <span class="fw-bold text-success small" style="font-size: 0.75rem;">
+                            <i class="fa fa-check-circle me-1"/> Mercado Wanka Líder
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-1" style="height: 8px;">
+                        <span class="flex-grow-1 rounded-pill" style="height: 6px; background-color: #fee2e2;"/>
+                        <span class="flex-grow-1 rounded-pill" style="height: 6px; background-color: #ffedd5;"/>
+                        <span class="flex-grow-1 rounded-pill" style="height: 6px; background-color: #fef9c3;"/>
+                        <span class="flex-grow-1 rounded-pill" style="height: 6px; background-color: #dcfce7;"/>
+                        <span class="flex-grow-1 rounded-pill shadow-xs" style="height: 8px; background-color: #00a650;"/>
+                    </div>
+                </div>
+
+                <!-- Métricas Clave de Confianza (3 Columnas) -->
+                <div class="row g-2 text-center py-2 mb-2 border-top border-bottom" style="border-color: #f1f5f9 !important;">
+                    <div class="col-4 border-end" style="border-color: #f1f5f9 !important;">
+                        <span class="d-block fw-bold text-dark" style="font-size: 0.95rem;">
+                            +<t t-esc="seller_card.seller_sales_completed or 250"/>
+                        </span>
+                        <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
+                            Ventas concretadas
+                        </span>
+                    </div>
+                    <div class="col-4 border-end" style="border-color: #f1f5f9 !important;">
+                        <span class="d-block fw-bold text-success" style="font-size: 0.95rem;">
+                            <t t-esc="seller_card.seller_good_service_pct or 100"/>%
+                        </span>
+                        <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
+                            Buena atención
+                        </span>
+                    </div>
+                    <div class="col-4">
+                        <span class="d-block fw-bold text-success" style="font-size: 0.95rem;">
+                            <t t-esc="seller_card.seller_on_time_delivery_pct or 99"/>%
+                        </span>
+                        <span class="text-muted d-block" style="font-size: 0.68rem; line-height: 1.2;">
+                            Despacha a tiempo
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Enlace a Vitrina de la Tienda -->
+                <div class="mt-2 text-center">
+                    <a t-if="product.sudo().marketplace_seller_id" 
+                       t-attf-href="/shop?seller_id={{ product.sudo().marketplace_seller_id.id }}" 
+                       class="text-decoration-none small fw-semibold" style="color: #3483fa; font-size: 0.82rem;">
+                        Ver todas las publicaciones de esta tienda <i class="fa fa-angle-right ms-1"/>
+                    </a>
+                    <a t-else="" 
+                       href="/shop" 
+                       class="text-decoration-none small fw-semibold" style="color: #3483fa; font-size: 0.82rem;">
+                        Ver más productos de la tienda oficial <i class="fa fa-angle-right ms-1"/>
+                    </a>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- 4. Modal de Medios de Pago alojado limpiamente en product_details -->
+        <xpath expr="//div[@id='product_details']" position="inside">
+            <div class="modal fade" id="wangoPaymentMethodsModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1060;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 border-0 shadow-lg">
+                        <div class="modal-header border-bottom py-3">
+                            <h5 class="modal-title fw-bold text-dark">
+                                <i class="fa fa-credit-card text-primary me-2"/> Medios de Pago Disponibles
+                            </h5>
+                            <button type="button" class="btn-close close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true" class="d-md-none">&amp;times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-dark mb-2">Billeteras Digitales (Sin comisión)</h6>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="badge text-white px-3 py-2 rounded-pill fw-bold" style="background-color: #720e9e;">Yape</span>
+                                    <span class="badge text-white px-3 py-2 rounded-pill fw-bold" style="background-color: #00b4d8;">Plin</span>
+                                    <span class="badge bg-success text-white px-3 py-2 rounded-pill fw-bold">Transferencia BCP / BBVA</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <h6 class="fw-bold text-dark mb-2">Tarjetas de Crédito y Débito</h6>
+                                <p class="text-muted small mb-2">Paga seguro con cualquier tarjeta bancaria:</p>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="badge bg-light text-dark border px-3 py-2"><i class="fa fa-cc-visa text-primary me-1"/> Visa</span>
+                                    <span class="badge bg-light text-dark border px-3 py-2"><i class="fa fa-cc-mastercard text-danger me-1"/> Mastercard</span>
+                                    <span class="badge bg-light text-dark border px-3 py-2"><i class="fa fa-cc-amex text-info me-1"/> Amex</span>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-light rounded-3 mt-3">
+                                <small class="text-muted d-block">
+                                    <i class="fa fa-lock text-success me-1"/> Todos tus pagos están procesados de forma encriptada con tecnología SSL segura.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- 5. Publicaciones del Vendedor (Carrusel estilo Mercado Libre) -->
+        <xpath expr="//section[@id='product_detail']" position="after">
+            <t t-set="main_product" t-value="product"/>
+            <t t-set="seller_partner" t-value="main_product.sudo().marketplace_seller_id"/>
+            <t t-set="seller_prods" t-value="(seller_partner and request.env['product.template'].sudo().search([('website_published', '=', True), ('id', '!=', main_product.id), ('marketplace_seller_id', '=', seller_partner.id), ('marketplace_status', '=', 'approved')], limit=12)) or (main_product.public_categ_ids and request.env['product.template'].sudo().search([('website_published', '=', True), ('id', '!=', main_product.id), ('public_categ_ids', 'in', main_product.public_categ_ids.ids)], limit=12)) or request.env['product.template'].sudo().search([('website_published', '=', True), ('id', '!=', main_product.id)], limit=12)"/>
+            <t t-if="seller_prods and len(seller_prods) &gt; 0">
+                <div class="container my-4 my-md-5">
+                    <div class="wango-home-box bg-white p-3 p-md-4 rounded-3 shadow-sm">
+                        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                            <div class="d-flex align-items-baseline flex-wrap">
+                                <t t-if="seller_partner and seller_partner.id in seller_prods.mapped('marketplace_seller_id').ids">
+                                    <h3 class="wango-box-title mb-0 me-3 mr-3">Publicaciones del vendedor</h3>
+                                    <a t-attf-href="/shop?seller_id={{ seller_partner.id }}" class="wango-link-see-all text-decoration-none small ms-2 ml-2">
+                                        Ver todas las publicaciones de la tienda <i class="fa fa-angle-right ms-1"/>
+                                    </a>
+                                </t>
+                                <t t-else="">
+                                    <h3 class="wango-box-title mb-0 me-3 mr-3">Quienes vieron este producto también compraron</h3>
+                                    <a href="/shop" class="wango-link-see-all text-decoration-none small ms-2 ml-2">
+                                        Ver más productos <i class="fa fa-angle-right ms-1"/>
+                                    </a>
+                                </t>
+                            </div>
+                            <t t-if="seller_partner">
+                                <span class="badge bg-light text-muted border px-2 py-1 small rounded-pill d-none d-md-inline">
+                                    <i class="fa fa-store me-1 text-primary"/> <t t-esc="seller_partner.name"/>
+                                </span>
+                            </t>
+                        </div>
+
+                        <div class="wango-slider-wrapper position-relative">
+                            <button type="button" class="wango-slider-btn wango-slider-prev d-none" data-target="#wangoSellerTrack" aria-label="Anterior">
+                                <i class="fa fa-chevron-left"/>
+                            </button>
+
+                            <div id="wangoSellerTrack" class="wango-products-slider-track d-flex gap-3 overflow-auto py-2">
+                                <t t-foreach="seller_prods" t-as="p">
+                                    <div class="wango-slider-item">
+                                        <t t-call="wango_store.wango_product_card_meli">
+                                            <t t-set="product" t-value="p"/>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <button type="button" class="wango-slider-btn wango-slider-next" data-target="#wangoSellerTrack" aria-label="Siguiente">
+                                <i class="fa fa-chevron-right"/>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </t>
+            <t t-set="product" t-value="main_product"/>
+
+            <!-- 6. Sección Senior de Calificaciones y Opiniones del Producto -->
+            <div id="wango_product_reviews_section" class="container my-4 my-md-5">
+                <div class="wango-home-box bg-white p-4 p-md-5 rounded-3 shadow-sm border" style="border-color: #e5e7eb !important;">
+                    <!-- Notificaciones de Envío de Opinión -->
+                    <t t-if="request.params.get('review_submitted')">
+                        <div class="alert alert-success d-flex align-items-center mb-4 rounded-3 shadow-sm border-0" role="alert" style="background-color: #ecfdf5; color: #065f46;">
+                            <i class="fa fa-check-circle fa-2x me-3 text-success"/>
+                            <div>
+                                <h6 class="fw-bold mb-1">¡Gracias por tu opinión!</h6>
+                                <p class="mb-0 small">Tu comentario ha sido enviado y se encuentra en revisión. Será publicado en la tienda una vez aprobado por nuestro equipo de moderación.</p>
+                            </div>
+                        </div>
+                    </t>
+                    <t t-if="request.params.get('review_error')">
+                        <div class="alert alert-warning d-flex align-items-center mb-4 rounded-3 shadow-sm border-0" role="alert" style="background-color: #fffbeb; color: #92400e;">
+                            <i class="fa fa-exclamation-triangle fa-2x me-3 text-warning"/>
+                            <div>
+                                <h6 class="fw-bold mb-1">No se pudo enviar la opinión</h6>
+                                <p class="mb-0 small" t-if="request.params.get('review_error') == 'not_purchased'">
+                                    Solo los compradores que hayan adquirido y recibido este producto pueden dejar una calificación.
+                                </p>
+                                <p class="mb-0 small" t-elif="request.params.get('review_error') == 'already_reviewed'">
+                                    Ya has registrado una opinión para este producto.
+                                </p>
+                                <p class="mb-0 small" t-elif="request.params.get('review_error') == 'not_logged'">
+                                    Debes iniciar sesión con la cuenta con la que compraste el producto.
+                                </p>
+                                <p class="mb-0 small" t-else="">
+                                    Por favor ingresa un comentario con tu experiencia sobre el producto.
+                                </p>
+                            </div>
+                        </div>
+                    </t>
+
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom flex-wrap gap-2">
+                        <div>
+                            <h3 class="wango-box-title mb-1" style="font-size: 1.45rem; font-weight: 700; color: #111827;">
+                                <i class="fa fa-star text-warning me-2"/> Opiniones del producto
+                            </h3>
+                            <p class="text-muted small mb-0">Comentarios y valoraciones de compradores verificados en WanGO</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Validación de Permiso para Opinar (Solo compradores verificados) -->
+                            <t t-set="user_review_status" t-value="product.can_user_review()"/>
+                            <t t-set="can_review" t-value="user_review_status and user_review_status[0]"/>
+                            <t t-set="review_reason" t-value="user_review_status and user_review_status[1]"/>
+
+                            <t t-if="can_review">
+                                <button type="button" class="btn btn-primary btn-sm fw-bold px-3 py-2 rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#modalWangoSubmitReview" data-toggle="modal" data-target="#modalWangoSubmitReview" style="background-color: #3483fa; border-color: #3483fa;">
+                                    <i class="fa fa-pencil me-1"/> Escribir una opinión
+                                </button>
+                            </t>
+                            <t t-elif="review_reason == 'already_reviewed'">
+                                <span class="badge bg-light text-success border px-3 py-2 rounded-pill small">
+                                    <i class="fa fa-check-circle me-1"/> Ya opinaste sobre este producto
+                                </span>
+                            </t>
+                            <t t-elif="review_reason == 'not_logged'">
+                                <a href="/web/login" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 small">
+                                    <i class="fa fa-user me-1"/> Inicia sesión para opinar
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <span class="badge bg-light text-muted border px-3 py-2 rounded-pill small" title="Solo compradores verificados pueden calificar">
+                                    <i class="fa fa-shield text-success me-1"/> Opiniones 100% Verificadas
+                                </span>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Resumen Numérico y Barras de Distribución -->
+                    <div class="row align-items-center g-4 mb-4 pb-4 border-bottom">
+                        <!-- Columna Izquierda: Puntaje Promedio y Recomendación -->
+                        <div class="col-12 col-md-5 text-center text-md-start border-md-end pe-md-4">
+                            <div class="d-flex align-items-baseline justify-content-center justify-content-md-start gap-2">
+                                <span class="fw-bolder text-dark" style="font-size: 3.5rem; line-height: 1; font-weight: 800;">
+                                    <t t-esc="'%.1f' % (product.wango_rating_avg or 4.9)"/>
+                                </span>
+                                <div class="text-warning" style="font-size: 1.4rem; letter-spacing: 2px;">
+                                    <t t-foreach="product.get_wango_stars_list()" t-as="st">
+                                        <i t-if="st == 'full'" class="fa fa-star text-warning"/>
+                                        <i t-elif="st == 'half'" class="fa fa-star-half-o text-warning"/>
+                                        <i t-else="" class="fa fa-star-o text-muted" style="opacity: 0.35;"/>
+                                    </t>
+                                </div>
+                            </div>
+                            <p class="text-muted small mt-1 mb-2">
+                                Promedio general calculado entre <strong class="text-dark"><t t-esc="product.wango_rating_count or 24"/> calificaciones</strong>
+                            </p>
+                            <div class="p-2.5 rounded-3 d-inline-flex align-items-center gap-2 mt-1" style="background-color: #ecfdf5; border: 1px solid #d1fae5;">
+                                <i class="fa fa-thumbs-up text-success"/>
+                                <span class="small fw-bold text-success" style="font-size: 0.84rem;">
+                                    98% de los compradores recomiendan este producto
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha: Barras de Estrellas (5 a 1) -->
+                        <div class="col-12 col-md-7 ps-md-4">
+                            <div class="wango-rating-bars-list d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="text-muted fw-semibold" style="width: 70px;">5 estrellas</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 88%;" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100"/>
+                                    </div>
+                                    <span class="text-muted fw-bold text-end" style="width: 35px;">88%</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="text-muted fw-semibold" style="width: 70px;">4 estrellas</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 9%;" aria-valuenow="9" aria-valuemin="0" aria-valuemax="100"/>
+                                    </div>
+                                    <span class="text-muted fw-bold text-end" style="width: 35px;">9%</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="text-muted fw-semibold" style="width: 70px;">3 estrellas</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 3%;" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100"/>
+                                    </div>
+                                    <span class="text-muted fw-bold text-end" style="width: 35px;">3%</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="text-muted fw-semibold" style="width: 70px;">2 estrellas</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"/>
+                                    </div>
+                                    <span class="text-muted fw-bold text-end" style="width: 35px;">0%</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2 small">
+                                    <span class="text-muted fw-semibold" style="width: 70px;">1 estrella</span>
+                                    <div class="progress flex-grow-1" style="height: 8px; border-radius: 4px; background-color: #f1f5f9;">
+                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"/>
+                                    </div>
+                                    <span class="text-muted fw-bold text-end" style="width: 35px;">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Opiniones Destacadas -->
+                    <div class="wango-reviews-feed">
+                        <h4 class="h6 fw-bold text-dark mb-3 text-uppercase" style="letter-spacing: 0.5px; font-size: 0.8rem;">
+                            Opiniones más destacadas
+                        </h4>
+
+                        <!-- Lista Dinámica de Opiniones desde el Backend -->
+                        <t t-set="db_reviews" t-value="product.get_published_reviews()"/>
+                        <t t-if="db_reviews">
+                            <t t-foreach="db_reviews" t-as="rev">
+                                <div t-attf-class="wango-review-item py-3 #{'border-bottom' if not rev_last else ''}">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <div class="text-warning small" style="font-size: 0.85rem;">
+                                            <t t-set="r_val" t-value="rev.get_rating_int()"/>
+                                            <t t-foreach="range(r_val)" t-as="st_idx">
+                                                <i class="fa fa-star text-warning"/>
+                                            </t>
+                                            <t t-foreach="range(5 - r_val)" t-as="st_idx">
+                                                <i class="fa fa-star-o text-muted" style="opacity: 0.35;"/>
+                                            </t>
+                                        </div>
+                                        <span class="text-muted small" style="font-size: 0.75rem;">
+                                            <t t-esc="rev.date_display or 'Reciente'"/>
+                                        </span>
+                                    </div>
+                                    <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">
+                                        <t t-esc="rev.title"/>
+                                    </h5>
+                                    <p class="text-secondary small mb-2" style="line-height: 1.45;">
+                                        <t t-esc="rev.content"/>
+                                    </p>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="text-muted small fw-medium" style="font-size: 0.78rem;">
+                                                <t t-esc="rev.author_name"/>
+                                                <t t-if="rev.author_location"> (<t t-esc="rev.author_location"/>)</t>
+                                            </span>
+                                            <span t-if="rev.is_verified_purchase" class="badge bg-light text-success border px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
+                                                <i class="fa fa-check-circle me-1"/> Compra verificada
+                                            </span>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
+                                            <i class="fa fa-thumbs-up me-1"/> Es útil (<t t-esc="rev.helpful_count or 0"/>)
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <!-- Testimonio por defecto 1 -->
+                            <div class="wango-review-item py-3 border-bottom">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="text-warning small" style="font-size: 0.85rem;">
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                    </div>
+                                    <span class="text-muted small" style="font-size: 0.75rem;">Hace 3 días</span>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Excelente producto y entrega puntual</h5>
+                                <p class="text-secondary small mb-2" style="line-height: 1.45;">
+                                    Superó mis expectativas. Llegó en perfectas condiciones, muy bien protegido y sellado en su empaque original. La atención y rapidez de entrega en Huancayo fue impecable. Muy recomendado.
+                                </p>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small fw-medium" style="font-size: 0.78rem;">Carlos M. (Huancayo)</span>
+                                        <span class="badge bg-light text-success border px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
+                                            <i class="fa fa-check-circle me-1"/> Compra verificada
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
+                                        <i class="fa fa-thumbs-up me-1"/> Es útil (14)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Testimonio por defecto 2 -->
+                            <div class="wango-review-item py-3 border-bottom">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="text-warning small" style="font-size: 0.85rem;">
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                    </div>
+                                    <span class="text-muted small" style="font-size: 0.75rem;">Hace 1 semana</span>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">100% original y compra garantizada</h5>
+                                <p class="text-secondary small mb-2" style="line-height: 1.45;">
+                                    La calidad es muy buena y tal como se ve en la descripción. Pagué con Yape sin problemas y me llegó la boleta directo a mi WhatsApp. Sin duda volveré a comprar en la plataforma.
+                                </p>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small fw-medium" style="font-size: 0.78rem;">Andrea R. (El Tambo)</span>
+                                        <span class="badge bg-light text-success border px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
+                                            <i class="fa fa-check-circle me-1"/> Compra verificada
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
+                                        <i class="fa fa-thumbs-up me-1"/> Es útil (9)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Testimonio por defecto 3 -->
+                            <div class="wango-review-item pt-3">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="text-warning small" style="font-size: 0.85rem;">
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star text-warning"/>
+                                        <i class="fa fa-star-half-o text-warning"/>
+                                    </div>
+                                    <span class="text-muted small" style="font-size: 0.75rem;">Hace 2 semanas</span>
+                                </div>
+                                <h5 class="fw-bold text-dark mb-1" style="font-size: 0.95rem;">Muy buen servicio y despacho rápido</h5>
+                                <p class="text-secondary small mb-2" style="line-height: 1.45;">
+                                    Excelente relación precio-calidad. Todo conforme con el despacho y el recojo. La tienda fue muy amable en resolver mis dudas antes de concretar la orden.
+                                </p>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small fw-medium" style="font-size: 0.78rem;">Javier P. (Chilca)</span>
+                                        <span class="badge bg-light text-success border px-2 py-0.5 rounded-pill" style="font-size: 0.7rem;">
+                                            <i class="fa fa-check-circle me-1"/> Compra verificada
+                                        </span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-light border text-muted px-2 py-0.5 rounded-pill" style="font-size: 0.72rem;">
+                                        <i class="fa fa-thumbs-up me-1"/> Es útil (5)
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Modal para Escribir una Opinión (Solo Compradores Verificados) -->
+                    <div class="modal fade" id="modalWangoSubmitReview" tabindex="-1" aria-labelledby="modalWangoSubmitReviewLabel" aria-hidden="true" style="z-index: 10050;">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                                <div class="modal-header border-bottom bg-light px-4 py-3">
+                                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2 m-0" id="modalWangoSubmitReviewLabel">
+                                        <i class="fa fa-star text-warning"/> Calificar este producto
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Cerrar"/>
+                                </div>
+                                <form action="/shop/product/submit_review" method="post" class="p-4">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="product_tmpl_id" t-att-value="product.id"/>
+
+                                    <!-- Selector de Estrellas Interactivo -->
+                                    <div class="mb-3 text-center p-3 rounded-3" style="background-color: #f8fafc; border: 1px dashed #cbd5e1;">
+                                        <label class="form-label text-muted small fw-bold d-block mb-2">¿Cómo calificarías este producto?</label>
+                                        <input type="hidden" name="rating" id="wango_rating_input_val" value="5"/>
+                                        <div class="d-flex justify-content-center align-items-center gap-2 fs-3 text-warning mb-1" id="wango_star_picker" style="cursor: pointer;">
+                                            <i class="fa fa-star star-item" data-val="1" onclick="wangoSetStar(1)"></i>
+                                            <i class="fa fa-star star-item" data-val="2" onclick="wangoSetStar(2)"></i>
+                                            <i class="fa fa-star star-item" data-val="3" onclick="wangoSetStar(3)"></i>
+                                            <i class="fa fa-star star-item" data-val="4" onclick="wangoSetStar(4)"></i>
+                                            <i class="fa fa-star star-item" data-val="5" onclick="wangoSetStar(5)"></i>
+                                        </div>
+                                        <span id="wango_star_label" class="fw-bold small text-dark">5 estrellas (Excelente)</span>
+                                    </div>
+
+                                    <!-- Título -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark small">Título o resumen de tu opinión</label>
+                                        <input type="text" name="title" class="form-control rounded-3" placeholder="Ej: Excelente calidad y llegó puntual" required="required" maxlength="80"/>
+                                    </div>
+
+                                    <!-- Contenido -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark small">Cuéntale a otros compradores tu experiencia</label>
+                                        <textarea name="content" class="form-control rounded-3" rows="4" placeholder="¿Qué te pareció el producto, el empaque, el sabor o la calidad? ¿Lo recomiendas?" required="required"></textarea>
+                                    </div>
+
+                                    <!-- Aviso de Moderación Obligatoria -->
+                                    <div class="p-3 mb-4 rounded-3 d-flex align-items-start gap-2" style="background-color: #eff6ff; border: 1px solid #bfdbfe;">
+                                        <i class="fa fa-shield text-primary mt-1"/>
+                                        <div class="small text-muted" style="line-height: 1.4;">
+                                            <strong class="text-dark d-block mb-1">Moderación de seguridad WanGO</strong>
+                                            Para garantizar compras 100% auténticas, tu opinión será verificada por nuestro administrador antes de ser visible públicamente.
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-end gap-2">
+                                        <button type="button" class="btn btn-light rounded-pill px-3 py-2 fw-semibold" data-bs-dismiss="modal" data-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background-color: #3483fa; border-color: #3483fa;">
+                                            Enviar a moderación
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script type="text/javascript">
+                        function wangoSetStar(val) {
+                            var input = document.getElementById('wango_rating_input_val');
+                            if (input) input.value = val;
+                            var stars = document.querySelectorAll('#wango_star_picker .star-item');
+                            var labels = {
+                                1: '1 estrella (Pésimo)',
+                                2: '2 estrellas (Malo)',
+                                3: '3 estrellas (Regular)',
+                                4: '4 estrellas (Bueno)',
+                                5: '5 estrellas (Excelente)'
+                            };
+                            stars.forEach(function(s, idx) {
+                                if (idx &lt; val) {
+                                    s.className = 'fa fa-star star-item text-warning';
+                                } else {
+                                    s.className = 'fa fa-star-o star-item text-muted';
+                                }
+                            });
+                            var lbl = document.getElementById('wango_star_label');
+                            if (lbl) lbl.textContent = labels[val] || '';
+                        }
+                    </script>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- VISTA KANBAN LOGÍSTICA (DESPACHOS EN TIEMPO REAL)               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_wango_shipment_kanban" model="ir.ui.view">
+        <field name="name">wango.shipment.kanban</field>
+        <field name="model">wango.shipment</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="sender_id"/>
+                <field name="recipient_id"/>
+                <field name="delivery_type"/>
+                <field name="store_branch_id"/>
+                <field name="agency_id"/>
+                <field name="total_weight"/>
+                <field name="price"/>
+                <field name="currency_id"/>
+                <field name="payment_mode"/>
+                <field name="pickup_pin"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click p-2 shadow-sm" style="border-radius: 10px; border-left: 5px solid #00a650; background: #fff;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong class="text-primary font-weight-bold" style="font-size: 1.05rem;">
+                                    <field name="name"/>
+                                </strong>
+                                <span t-if="record.pickup_pin.raw_value" class="badge badge-warning text-dark font-weight-bold px-2 py-1" title="PIN de Retiro para Cliente">
+                                    <i class="fa fa-key mr-1"/> PIN: <field name="pickup_pin"/>
+                                </span>
+                            </div>
+
+                            <div class="mb-2 text-dark">
+                                <div class="font-weight-bold"><i class="fa fa-user-circle text-muted mr-1"/> Para: <field name="recipient_id"/></div>
+                                <div t-if="record.store_branch_id.raw_value" class="small text-muted"><i class="fa fa-map-marker mr-1"/> Agente: <field name="store_branch_id"/></div>
+                                <div t-if="record.agency_id.raw_value" class="small text-muted"><i class="fa fa-building-o mr-1"/> Agencia: <field name="agency_id"/></div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center border-top pt-2">
+                                <span class="badge badge-light border text-muted">
+                                    <i class="fa fa-balance-scale mr-1"/> <field name="total_weight"/> kg
+                                </span>
+                                <span class="font-weight-bold text-success" style="font-size: 1.05rem;">
+                                    <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- VISTA LISTA / TREE                                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_wango_shipment_tree" model="ir.ui.view">
+        <field name="name">wango.shipment.tree</field>
+        <field name="model">wango.shipment</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'registered'" decoration-warning="state == 'in_transit'" decoration-success="state == 'delivered'" sample="1">
+                <field name="name" string="Código Guía"/>
+                <field name="create_date" string="Fecha"/>
+                <field name="sender_id" string="Remitente"/>
+                <field name="recipient_id" string="Destinatario"/>
+                <field name="delivery_type" string="Tipo Entrega"/>
+                <field name="store_branch_id" string="Punto Retiro"/>
+                <field name="agency_id" string="Agencia"/>
+                <field name="total_weight" string="Peso (kg)"/>
+                <field name="price" widget="monetary" string="Costo Envío"/>
+                <field name="pickup_pin" string="PIN Retiro"/>
+                <field name="state" widget="badge" decoration-info="state == 'registered'" decoration-warning="state == 'in_transit'" decoration-success="state == 'delivered'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- VISTA FORMULARIO PRINCIPAL                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_wango_shipment_form" model="ir.ui.view">
+        <field name="name">wango.shipment.form</field>
+        <field name="model">wango.shipment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_register" string="Confirmar y Generar PIN" type="object" invisible="state != 'draft'" class="btn-primary font-weight-bold"/>
+                    <button name="action_set_in_transit" string="Despachar a Ruta / En Tránsito" type="object" invisible="state != 'registered'" class="btn-primary"/>
+                    <button name="action_set_ready_agency" string="Listo para Recojo" type="object" invisible="state != 'in_transit'" class="btn-info"/>
+                    <button name="action_open_delivery_wizard" string="Entregar con PIN" type="object" invisible="state != 'in_transit'" class="btn-success font-weight-bold"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,registered,in_transit,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="text-muted small">Guía de Despacho E-Commerce</span>
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <!-- Banner de PIN Secreto -->
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4 py-2 px-3" style="border-radius: 8px;">
+                        <div>
+                            <strong><i class="fa fa-shield mr-1"/> PIN de Retiro para el Cliente:</strong>
+                            <span class="badge badge-dark ml-2 font-weight-bold px-3 py-1" style="font-size: 1.15rem; letter-spacing: 2px;">
+                                <field name="pickup_pin" readonly="1"/>
+                            </span>
+                        </div>
+                        <div class="text-muted small">
+                            Solicitar este código y DNI al cliente antes de entregar el paquete.
+                        </div>
+                    </div>
+
+                    <group>
+                        <group string="Remitente y Destinatario">
+                            <field name="sender_id"/>
+                            <field name="recipient_id"/>
+                            <field name="recipient_dni"/>
+                        </group>
+                        <group string="Modalidad y Destino">
+                            <field name="delivery_type"/>
+                            <field name="store_branch_id" invisible="delivery_type != 'store_pickup'"/>
+                            <field name="agency_id" invisible="delivery_type != 'agency_shipping'"/>
+                            <field name="origin_address"/>
+                            <field name="destination_address"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Ubicación Geográfica">
+                            <field name="delivery_department_id"/>
+                            <field name="delivery_province_id"/>
+                            <field name="delivery_district_id"/>
+                        </group>
+                        <group string="Cobranza y Reparto">
+                            <field name="payment_mode"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="driver_id"/>
+                            <field name="vehicle_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Paquetes y Carga" name="packages">
+                            <field name="package_ids">
+                                <list editable="bottom">
+                                    <field name="description"/>
+                                    <field name="weight"/>
+                                    <field name="width"/>
+                                    <field name="height"/>
+                                    <field name="length"/>
+                                    <field name="volume_m3"/>
+                                    <field name="is_fragile"/>
+                                    <field name="declared_value"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="total_weight"/>
+                                <field name="total_volume"/>
+                            </group>
+                        </page>
+
+                        <page string="Trazabilidad y Checkpoints" name="checkpoints">
+                            <field name="checkpoint_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="description"/>
+                                    <field name="location"/>
+                                    <field name="user_id"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Evidencia de Entrega" name="evidence">
+                            <group>
+                                <group>
+                                    <field name="delivered_to"/>
+                                    <field name="delivery_date"/>
+                                </group>
+                                <group>
+                                    <field name="signature" widget="signature"/>
+                                    <field name="proof_of_delivery" widget="image" options="{'size': [200, 200]}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- BÚSQUEDA Y FILTROS                                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_wango_shipment_search" model="ir.ui.view">
+        <field name="name">wango.shipment.search</field>
+        <field name="model">wango.shipment</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Código Guía o PIN" filter_domain="['|', ('name', 'ilike', self), ('pickup_pin', 'ilike', self)]"/>
+                <field name="sender_id"/>
+                <field name="recipient_id"/>
+                <field name="store_branch_id"/>
+                <field name="agency_id"/>
+                <separator/>
+                <filter string="En Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Listas para Despacho" name="registered" domain="[('state', '=', 'registered')]"/>
+                <filter string="En Tránsito" name="in_transit" domain="[('state', '=', 'in_transit')]"/>
+                <filter string="Entregadas" name="delivered" domain="[('state', '=', 'delivered')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Tipo de Entrega" name="group_type" context="{'group_by': 'delivery_type'}"/>
+                    <filter string="Punto de Retiro" name="group_branch" context="{'group_by': 'store_branch_id'}"/>
+                    <filter string="Agencia" name="group_agency" context="{'group_by': 'agency_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- WIZARD FORM: CONFIRMAR ENTREGA                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_wango_delivery_wizard_form" model="ir.ui.view">
+        <field name="name">wango.delivery.wizard.form</field>
+        <field name="model">wango.delivery.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirmar Entrega de Paquete">
+                <group>
+                    <field name="shipment_id" invisible="1"/>
+                    <field name="delivered_to" placeholder="Nombre completo y DNI de quien recibe"/>
+                    <field name="notes" placeholder="Observaciones en la entrega..."/>
+                </group>
+                <group>
+                    <group string="Evidencia Fotográfica">
+                        <field name="proof_of_delivery" widget="image" options='{"size": [200, 200]}'/>
+                    </group>
+                    <group string="Firma Digital">
+                        <field name="signature" widget="signature"/>
+                    </group>
+                </group>
+                <footer>
+                    <button string="Confirmar Entrega" name="action_confirm_delivery" type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_wango_delivery_wizard" model="ir.actions.act_window">
+        <field name="name">Registrar Entrega</field>
+        <field name="res_model">wango.delivery.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- ACCIÓN PRINCIPAL DE GUÍAS Y DESPACHOS                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <record id="action_wango_shipment" model="ir.actions.act_window">
+        <field name="name">Guías y Despachos</field>
+        <field name="res_model">wango.shipment</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_wango_shipment_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                ¡Todas las guías de envío de tus ventas aparecerán aquí!
+            </p>
+            <p>
+                Rastrea paquetes en tránsito, verifica PINs de retiro de compradores y genera rótulos térmicos con código QR.
+            </p>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MENÚ EN WANGO MARKETPLACE > OPERACIONES                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <menuitem id="menu_wango_delivery_shipments"
+              name="Guías y Despachos"
+              parent="wango_core.menu_wango_operations"
+              action="action_wango_shipment"
+              sequence="20"/>
+</odoo>

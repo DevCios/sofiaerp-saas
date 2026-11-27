@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Agency Custom Form View -->
+    <record id="view_wango_agency_form_inherit" model="ir.ui.view">
+        <field name="name">wango.agency.form.inherit</field>
+        <field name="model">wango.agency</field>
+        <field name="arch" type="xml">
+            <form string="Agencia de Transporte">
+                <sheet>
+                    <field name="logo" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Ej: Shalom, Olva Courier..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Información de Contacto">
+                            <field name="city_id" options="{'no_create': True}"/>
+                            <field name="address"/>
+                            <field name="phone"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Seguimiento">
+                            <field name="tracking_url" placeholder="Ej: https://shalom.pe/tracking/?order={}"/>
+                            <p class="text-muted" colspan="2">
+                                Usa {} en la URL para indicar dónde se debe inyectar el número de tracking.
+                            </p>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Agency Tree View -->
+    <record id="view_wango_agency_tree_inherit" model="ir.ui.view">
+        <field name="name">wango.agency.tree.inherit</field>
+        <field name="model">wango.agency</field>
+        <field name="arch" type="xml">
+            <list string="Agencias de Transporte">
+                <field name="name"/>
+                <field name="city_id"/>
+                <field name="address"/>
+                <field name="phone"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Action for Agencies -->
+    <record id="action_wango_agency_delivery" model="ir.actions.act_window">
+        <field name="name">Agencias de Transporte</field>
+        <field name="res_model">wango.agency</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registra las agencias de transporte habilitadas para provincias.
+            </p>
+        </field>
+    </record>
+
+    <!-- Agency Cost Form View -->
+    <record id="view_delivery_agency_cost_form" model="ir.ui.view">
+        <field name="name">delivery.agency.cost.form</field>
+        <field name="model">delivery.agency.cost</field>
+        <field name="arch" type="xml">
+            <form string="Tarifa de Agencia">
+                <sheet>
+                    <group>
+                        <group string="Agencia y Ubicación">
+                            <field name="agency_id" options="{'no_create': True}"/>
+                            <field name="department_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="province_id" options="{'no_create': True, 'no_open': True}" readonly="not department_id"/>
+                            <field name="district_id" options="{'no_create': True, 'no_open': True}" readonly="not province_id"/>
+                        </group>
+                        <group string="Dimensiones Máximas">
+                            <field name="weight_max"/>
+                            <field name="volume_max"/>
+                        </group>
+                    </group>
+                    <group string="Costo y Plazos">
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                        <group>
+                            <label for="time_min" string="Plazo de Entrega"/>
+                            <div class="o_row">
+                                <field name="time_min" class="oe_inline"/>
+                                <span>a</span>
+                                <field name="time_max" class="oe_inline"/>
+                                <span>días útiles</span>
+                            </div>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Agency Cost Tree View -->
+    <record id="view_delivery_agency_cost_tree" model="ir.ui.view">
+        <field name="name">delivery.agency.cost.tree</field>
+        <field name="model">delivery.agency.cost</field>
+        <field name="arch" type="xml">
+            <list string="Tarifas de Agencias">
+                <field name="agency_id"/>
+                <field name="department_id"/>
+                <field name="province_id"/>
+                <field name="district_id"/>
+                <field name="weight_max"/>
+                <field name="volume_max"/>
+                <field name="cost"/>
+                <field name="time_min"/>
+                <field name="time_max"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Agency Cost Action -->
+    <record id="action_delivery_agency_cost" model="ir.actions.act_window">
+        <field name="name">Tarifas de Agencias</field>
+        <field name="res_model">delivery.agency.cost</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea reglas de tarifas por agencia y destino.
+            </p>
+            <p>
+                Permite asociar costos específicos basados en el destino del envío y dimensiones máximas de peso y volumen.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Items (Prioridad 4 en Configuración, agrupada con Agencias) -->
+    <menuitem id="menu_delivery_agency_cost" name="Tarifas de Agencias" parent="wango_core.menu_wango_config" action="action_delivery_agency_cost" sequence="40"/>
+</odoo>

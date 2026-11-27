@@ -1,0 +1,936 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="product_delivery_widget_template" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='product_details']" position="inside">
+            <!-- Falabella-style Delivery Widget -->
+            <div class="wango-delivery-widget mt-4 p-3 border rounded shadow-sm bg-white" id="wango_product_delivery_widget" t-att-data-product-id="product.id">
+                <!-- Location Header -->
+                <div class="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                    <span class="text-dark font-weight-bold" style="font-size: 0.9rem;">
+                        <i class="fa fa-map-marker text-success mr-2" style="font-size: 1.1rem;"/> Entrega en 
+                        <span id="wango_widget_selected_location" class="text-primary font-weight-bold" style="cursor: pointer; text-decoration: underline;" data-toggle="modal" data-target="#wangoProductLocationModal" data-bs-toggle="modal" data-bs-target="#wangoProductLocationModal">
+                            Seleccionar Ubicación
+                        </span>
+                    </span>
+                    <a href="#" id="wango_widget_change_location_link" class="text-success font-weight-bold btn-sm" style="font-size: 0.85rem; text-decoration: none;" data-toggle="modal" data-target="#wangoProductLocationModal" data-bs-toggle="modal" data-bs-target="#wangoProductLocationModal">Cambiar</a>
+                </div>
+
+                <!-- Shipping Options Rows -->
+                <div class="wango-delivery-options-body">
+                    <!-- Options list container (always visible, initial placeholders) -->
+                    <div id="wango_widget_options_container" class="mt-2">
+                        <!-- Option: Store Pickup -->
+                        <div class="wango-widget-option-row d-flex align-items-start py-2 border-bottom" id="wango_opt_pickup">
+                            <div class="mr-3 mt-1" style="font-size: 1.3rem; color: #2d3436; width: 24px; text-align: center;">
+                                <i class="fa fa-shopping-bag"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Retiro en Agente Wanka o Tienda</span>
+                                    <span class="text-success font-weight-bold" style="font-size: 0.85rem;">Gratis</span>
+                                </div>
+                                <p class="text-muted mb-0 small" id="wango_pickup_status_msg">Ingresa tu ubicación para ver disponibilidad.</p>
+                                <a href="#" id="wango_widget_view_branches" class="small text-primary d-none" style="text-decoration: underline; font-size: 0.75rem;">Ver puntos de retiro y Agentes Wanka</a>
+                            </div>
+                        </div>
+
+                        <!-- Option: Home Delivery -->
+                        <div class="wango-widget-option-row d-flex align-items-start py-2 border-bottom" id="wango_opt_home">
+                            <div class="mr-3 mt-1" style="font-size: 1.3rem; color: #2d3436; width: 24px; text-align: center;">
+                                <i class="fa fa-truck"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Despacho a domicilio</span>
+                                    <span class="font-weight-bold text-success" id="wango_home_delivery_cost" style="font-size: 0.85rem;">--</span>
+                                </div>
+                                <p class="text-muted mb-0 small" id="wango_home_delivery_time">Ingresa tu ubicación para ver costos y plazos.</p>
+                            </div>
+                        </div>
+
+                        <!-- Option: Agency / Pickup point -->
+                        <div class="wango-widget-option-row d-flex align-items-start py-2" id="wango_opt_agency">
+                            <div class="mr-3 mt-1" style="font-size: 1.3rem; color: #2d3436; width: 24px; text-align: center;">
+                                <i class="fa fa-box"/>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Recibir en agencia</span>
+                                    <span class="font-weight-bold text-dark" id="wango_agency_cost" style="font-size: 0.85rem;">--</span>
+                                </div>
+                                <p class="text-muted mb-0 small" id="wango_agency_time">Ingresa tu ubicación para ver agencias de envío.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Branch Stock Detail Modal -->
+            <div class="modal fade" id="wangoProductBranchesModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1060;">
+                <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+                    <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                        <div class="modal-header border-bottom py-3">
+                            <h5 class="modal-title font-weight-bold text-dark" style="font-size: 1.1rem;">Puntos de Retiro y Agentes Wanka (Gratis)</h5>
+                            <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; outline: none; border: none; background: transparent; padding: 0 1rem;">
+                                <span aria-hidden="true">&amp;times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-4" style="max-height: 400px; overflow-y: auto;" id="wango_product_branches_list_body">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Custom Checkout Payment Delivery View -->
+    <template id="wango_payment_delivery_inherit" inherit_id="website_sale.payment">
+        <xpath expr="//div[@id='payment_method']" position="before">
+            <!-- Custom Falabella-style Shipping Selector Card -->
+            <div class="card mb-4" id="wango_delivery_checkout_card">
+                <style>
+                    #delivery_carrier, div#delivery_carrier { display: none !important; }
+                </style>
+                <div class="card-body">
+                    <!-- Header -->
+                    <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
+                        <h5 class="card-title mb-0 font-weight-bold text-dark">
+                            <i class="fa fa-truck text-success mr-2" style="font-size: 1.2rem;"/> Método de Envío
+                        </h5>
+                    </div>
+                    
+                    <t t-set="curr_order" t-value="website_sale_order or order or website.sale_get_order()"/>
+                    <!-- Empty State: No option selected -->
+                    <div id="wango_delivery_empty_state" t-attf-class="text-center py-4 #{'d-none' if (curr_order and curr_order.delivery_type) else ''}">
+                        <p class="text-muted mb-3">Aún no has seleccionado un método de entrega para tu compra.</p>
+                        <button type="button" class="btn btn-success rounded-pill px-4 font-weight-bold" id="wango_btn_select_shipping" data-toggle="modal" data-target="#wangoDeliveryModal" data-bs-toggle="modal" data-bs-target="#wangoDeliveryModal" style="background-color: #00a650; border: none;">
+                            Seleccionar Envío
+                        </button>
+                    </div>
+                    
+                    <!-- Summary State: Option selected -->
+                    <div id="wango_delivery_summary" t-attf-class="#{'d-none' if not (curr_order and curr_order.delivery_type) else ''}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="badge badge-success mb-2" id="wango_delivery_badge_type" style="font-size: 0.8rem; padding: 5px 10px; border-radius: 20px;">
+                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'">Retiro en tienda</t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'">Despacho a domicilio</t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'">Recibir en agencia</t>
+                                    <t t-else="">--</t>
+                                </span>
+                                <h6 class="font-weight-bold text-dark mb-1" id="wango_delivery_title_desc">
+                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'">Retiro en tienda: <t t-esc="curr_order.store_branch_id.name if curr_order.store_branch_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'">Despacho a domicilio: <t t-esc="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'">Recibir en agencia: <t t-esc="curr_order.agency_id.name if curr_order.agency_id else ''"/></t>
+                                    <t t-else="">--</t>
+                                </h6>
+                                <p class="text-muted small mb-1" id="wango_delivery_sub_addr">
+                                    <t t-if="curr_order and curr_order.delivery_type == 'store_pickup'"><i class="fa fa-map-marker me-1 mr-1"/> <t t-esc="curr_order.store_branch_id.address if curr_order.store_branch_id else ''"/></t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'home_delivery'"><i class="fa fa-map-marker me-1 mr-1"/> Dirección de Envío (<t t-esc="curr_order.delivery_district_id.name if curr_order.delivery_district_id else ''"/>)</t>
+                                    <t t-elif="curr_order and curr_order.delivery_type == 'agency_shipping'"><i class="fa fa-building-o me-1 mr-1"/> Encomienda / Agencia (<t t-esc="curr_order.agency_id.name if curr_order.agency_id else ''"/>)</t>
+                                    <t t-else="">--</t>
+                                </p>
+                                <p class="text-muted small mb-0" id="wango_delivery_sub_date" t-attf-class="#{'d-none' if not (curr_order and curr_order.estimated_delivery_date) else ''}">
+                                    <i class="fa fa-calendar me-1 mr-1"/> Entrega: <t t-esc="curr_order.estimated_delivery_date.strftime('%d/%m/%Y') if (curr_order and curr_order.estimated_delivery_date) else ''"/>
+                                </p>
+                            </div>
+                            <div class="text-right text-end">
+                                <span class="h5 font-weight-bold text-success d-block mb-2" id="wango_delivery_summary_cost">
+                                    <t t-if="curr_order and curr_order.shipping_cost == 0">Gratis</t>
+                                    <t t-elif="curr_order and curr_order.shipping_cost">S/ <t t-esc="'%.2f' % curr_order.shipping_cost"/></t>
+                                    <t t-else="">--</t>
+                                </span>
+                                <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 font-weight-bold" id="wango_btn_change_shipping" data-toggle="modal" data-target="#wangoDeliveryModal" data-bs-toggle="modal" data-bs-target="#wangoDeliveryModal">
+                                    Cambiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Modal -->
+            <div class="modal fade" id="wangoDeliveryModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1055;">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius: 15px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                        <div class="modal-header border-bottom py-3">
+                            <h5 class="modal-title font-weight-bold text-dark"><i class="fa fa-map-marker text-success mr-2 me-2"/>¿Cómo quieres recibir tu pedido?</h5>
+                            <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; outline: none; border: none; background: transparent; padding: 0 1rem;">
+                                <span aria-hidden="true">&amp;times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <!-- Location Selection Form (3 levels) -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase;">Departamento</label>
+                                    <select class="form-control select-clean" id="sel_department" style="border-radius: 10px;">
+                                        <option value="">Selecciona Departamento...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase;">Provincia</label>
+                                    <select class="form-control select-clean" id="sel_province" disabled="disabled" style="border-radius: 10px;">
+                                        <option value="">Selecciona Provincia...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase;">Distrito</label>
+                                    <select class="form-control select-clean" id="sel_district" disabled="disabled" style="border-radius: 10px;">
+                                        <option value="">Selecciona Distrito...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <ul class="nav nav-tabs nav-justified mb-4" id="deliveryTabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active font-weight-bold" id="tab-pickup" data-toggle="tab" data-bs-toggle="tab" href="#content-pickup" role="tab" aria-selected="true">
+                                        <i class="fa fa-shopping-bag mr-2 me-2"/> Retiro en Agente Wanka o Tienda
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link font-weight-bold" id="tab-home" data-toggle="tab" data-bs-toggle="tab" href="#content-home" role="tab" aria-selected="false">
+                                        <i class="fa fa-truck mr-2 me-2"/> Despacho a domicilio
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link font-weight-bold" id="tab-agency" data-toggle="tab" data-bs-toggle="tab" href="#content-agency" role="tab" aria-selected="false">
+                                        <i class="fa fa-building-o mr-2 me-2"/> Recibir en agencia
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content" id="deliveryTabContent">
+                                <!-- Retiro en Tienda Tab -->
+                                <div class="tab-pane fade show active" id="content-pickup" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-6" id="wango_branch_list" style="max-height: 380px; overflow-y: auto;">
+                                            <div class="text-center py-4 text-muted">
+                                                <i class="fa fa-info-circle fs-3 mb-2 d-block"/>Selecciona ubicación geográfica para ver opciones.
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="wango_leaflet_map" style="height: 380px; border-radius: 12px; width: 100%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Envío a Domicilio Tab -->
+                                <div class="tab-pane fade" id="content-home" role="tabpanel">
+                                    <div id="wango_home_delivery_result">
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fa fa-info-circle fs-3 mb-2 d-block"/>Selecciona ubicación geográfica para ver opciones.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Retiro en Agencia Tab -->
+                                <div class="tab-pane fade" id="content-agency" role="tabpanel">
+                                    <div id="wango_agency_result">
+                                        <div class="text-center py-4 text-muted">
+                                            <i class="fa fa-info-circle fs-3 mb-2 d-block"/>Selecciona ubicación geográfica para ver opciones.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Global Location Selector Modal (Mercado Libre Style with GPS) -->
+    <template id="wango_global_location_modal" inherit_id="website.layout" name="Global Delivery Location Modal" priority="50">
+        <xpath expr="//footer" position="after">
+            <div class="modal fade" id="wangoProductLocationModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 1055;">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+                        <div class="modal-header border-bottom py-3">
+                            <h5 class="modal-title font-weight-bold text-dark" style="font-size: 1.1rem;">
+                                <i class="fa fa-map-marker text-success me-2 mr-2"/>¿Dónde quieres recibir tu compra?
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close" style="font-size: 1.5rem; outline: none; border: none; background: transparent; padding: 0 1rem;">
+                                <span aria-hidden="true">&amp;times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <!-- 1. Saved Addresses Section (For Logged In Users) -->
+                            <div id="wango_user_saved_addresses_container" class="mb-4 d-none">
+                                <label class="font-weight-bold text-dark small mb-2 d-flex align-items-center justify-content-between" style="text-transform: uppercase; letter-spacing: 0.5px;">
+                                    <span><i class="fa fa-bookmark text-success me-1 mr-1"/>Tus direcciones guardadas</span>
+                                    <span class="badge bg-light text-muted border font-weight-normal" id="wango_saved_addrs_count" style="font-size: 0.75rem;"></span>
+                                </label>
+                                <div id="wango_user_saved_addresses_list" class="d-flex flex-column" style="gap: 8px; max-height: 180px; overflow-y: auto;">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                                <div class="d-flex align-items-center my-3 text-muted">
+                                    <hr class="flex-grow-1 my-0" style="border-color: #e5e7eb;"/>
+                                    <span class="px-3 small font-weight-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem; color: #9ca3af;">O usa otra ubicación</span>
+                                    <hr class="flex-grow-1 my-0" style="border-color: #e5e7eb;"/>
+                                </div>
+                            </div>
+
+                            <!-- 2. Automatic GPS Option (Mercado Libre Style) -->
+                            <div class="mb-3">
+                                <button type="button" class="btn w-100 py-2.5 px-3 d-flex align-items-center justify-content-center font-weight-bold" id="btn_detect_gps_location" style="background-color: #f0fdf4; border: 1.5px solid #86efac; color: #166534; border-radius: 12px; gap: 8px; font-size: 0.95rem; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.08); transition: all 0.2s ease; cursor: pointer;">
+                                    <i class="fa fa-crosshairs text-success" id="btn_detect_gps_icon" style="font-size: 1.25rem;"/>
+                                    <span id="btn_detect_gps_text">Usar mi ubicación actual (GPS)</span>
+                                </button>
+                                <div id="wango_gps_status_msg" class="text-center small mt-2 d-none" style="font-size: 0.85rem;"></div>
+                            </div>
+
+                            <div class="d-flex align-items-center my-3 text-muted">
+                                <hr class="flex-grow-1 my-0" style="border-color: #e5e7eb;"/>
+                                <span class="px-3 small font-weight-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.72rem; color: #9ca3af;">O elige manualmente</span>
+                                <hr class="flex-grow-1 my-0" style="border-color: #e5e7eb;"/>
+                            </div>
+
+                            <form id="wango_product_location_form">
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">Departamento</label>
+                                    <select class="form-control select-clean" id="sel_product_department" required="required" style="border-radius: 10px; height: 46px;">
+                                        <option value="">Selecciona Departamento...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">Provincia</label>
+                                    <select class="form-control select-clean" id="sel_product_province" required="required" disabled="disabled" style="border-radius: 10px; height: 46px;">
+                                        <option value="">Selecciona Provincia...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">Distrito</label>
+                                    <select class="form-control select-clean" id="sel_product_district" required="required" disabled="disabled" style="border-radius: 10px; height: 46px;">
+                                        <option value="">Selecciona Distrito...</option>
+                                    </select>
+                                </div>
+
+                                <!-- Exact Address details (Mercado Libre Style) -->
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">Dirección / Calle y Número <span class="text-muted font-weight-normal">(Opcional)</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend input-group-text bg-white border-right-0" style="border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-color: #ced4da;">
+                                            <i class="fa fa-home text-muted"/>
+                                        </div>
+                                        <input type="text" class="form-control border-left-0" id="inp_product_exact_street" placeholder="Ej. Av. Ferrocarril 1240" style="border-top-right-radius: 10px; border-bottom-right-radius: 10px; height: 46px;"/>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="font-weight-bold text-muted small" style="text-transform: uppercase; letter-spacing: 1px;">Piso / Dpto / Referencia <span class="text-muted font-weight-normal">(Opcional)</span></label>
+                                    <input type="text" class="form-control" id="inp_product_exact_street2" placeholder="Ej. Dpto 302, frente al parque" style="border-radius: 10px; height: 46px;"/>
+                                </div>
+
+                                <!-- Save to User Book Switch (If Logged In) -->
+                                <div class="form-group form-check mb-4 d-none" id="wango_save_addr_switch_group">
+                                    <input type="checkbox" class="form-check-input" id="chk_save_to_user_book" style="cursor: pointer;"/>
+                                    <label class="form-check-label small font-weight-bold text-dark" for="chk_save_to_user_book" style="cursor: pointer;">
+                                        Guardar en mis direcciones (para próximas compras)
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-2.5 font-weight-bold" style="background-color: #00a650; border: none; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 166, 80, 0.2);">
+                                    Guardar ubicación
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- FORMULARIO DE COMPRADOR Y FACTURACIÓN ADAPTADO A PERÚ (SUNAT)   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- FORMULARIO DE COMPRADOR Y FACTURACIÓN ADAPTADO A PERÚ (SUNAT)   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <template id="wango_address_form_peru_inherit" inherit_id="website_sale.address" name="Perú Billing &amp; Invoicing Form">
+        <!-- 1. Encabezado Premium del Checkout (Reemplazar 'Su dirección o Iniciar sesión') -->
+        <xpath expr="//div[hasclass('oe_cart')]//h2" position="replace">
+            <div class="wango-checkout-header d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                <div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge me-2 mr-2 px-2.5 py-1 rounded-pill font-weight-bold" style="background: #e6f7ef; color: #00a650; font-size: 0.8rem; border: 1px solid #a3e6cd;">
+                            Paso 2 de 3
+                        </span>
+                        <h3 class="font-weight-bold text-dark mb-0" style="font-size: 1.45rem; letter-spacing: -0.3px;">
+                            Dirección de Entrega
+                        </h3>
+                    </div>
+                    <p class="text-muted small mb-0 mt-1" style="font-size: 0.85rem;">
+                        Indica a quién y dónde entregaremos tu pedido para calcular el envío exacto.
+                    </p>
+                </div>
+                <t t-if="not partner_id or partner_id == request.website.user_id.sudo().partner_id.id">
+                    <a href="/web/login?redirect=/shop/checkout" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 font-weight-bold text-decoration-none shadow-2xs" style="border-color: #00a650; color: #00a650; font-size: 0.82rem;">
+                        <i class="fa fa-user-circle mr-1 me-1"/> ¿Ya tienes cuenta? Iniciar sesión
+                    </a>
+                </t>
+            </div>
+        </xpath>
+
+        <!-- 2. Botones de Navegación con Jerarquía UX Correcta (Atrás vs Continuar) -->
+        <xpath expr="//form[hasclass('checkout_autoformat')]//div[hasclass('d-flex')][hasclass('justify-content-between')]" position="replace">
+            <div class="d-flex align-items-center justify-content-between mt-4 pt-3 border-top w-100" style="order: 25;">
+                <a role="button" t-att-href="mode == ('new', 'billing') and '/shop/cart' or '/shop/checkout'" class="btn btn-outline-secondary rounded-pill px-4 py-2.5 font-weight-bold d-inline-flex align-items-center text-decoration-none" style="border: 1.5px solid #cbd5e1; color: #475569; font-size: 0.95rem;">
+                    <i class="fa fa-arrow-left mr-2 me-2"/> Volver al Carrito
+                </a>
+                <a role="button" href="#" class="btn btn-success rounded-pill px-4 py-2.5 font-weight-bold a-submit a-submit-disable a-submit-loading d-inline-flex align-items-center shadow-sm" style="background-color: #00a650; border-color: #00a650; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 166, 80, 0.3);">
+                    <span>Continuar al Pago</span>
+                    <i class="fa fa-arrow-right ml-2 ms-2"/>
+                </a>
+            </div>
+        </xpath>
+
+        <!-- 3. Título interno del formulario (Datos de Contacto y Ubicación) -->
+        <xpath expr="//form[hasclass('checkout_autoformat')]" position="inside">
+            <div class="wango-form-section-title w-100 mb-3 pb-2 border-bottom d-flex align-items-center justify-content-between" style="order: 0 !important; width: 100% !important;">
+                <span class="font-weight-bold text-dark" style="font-size: 1.05rem;">
+                    <i class="fa fa-map-marker text-success mr-2 me-2"/> Datos del Destinatario y Ubicación
+                </span>
+                <span class="text-muted small">Campos obligatorios <span class="text-danger">*</span></span>
+            </div>
+        </xpath>
+
+        <!-- 4. Estilos y Selector Dinámico de Comprobante -->
+        <xpath expr="//form[hasclass('checkout_autoformat')]" position="before">
+            <style>
+                /* ═══ STEPPER CHECKOUT PREMIUM ═══ */
+                .wizard {
+                    background: transparent !important;
+                    padding: 8px 0 20px 0 !important;
+                }
+                .wizard .progress-wizard {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    max-width: 680px !important;
+                    margin: 0 auto !important;
+                    padding: 0 !important;
+                    list-style: none !important;
+                }
+                .wizard .progress-wizard-step {
+                    position: relative !important;
+                    flex: 1 !important;
+                    text-align: center !important;
+                    padding: 0 10px !important;
+                }
+                .wizard .progress-wizard-step .progress-wizard-bar {
+                    position: absolute !important;
+                    top: 15px !important;
+                    left: -50% !important;
+                    width: 100% !important;
+                    height: 3px !important;
+                    background: #e2e8f0 !important;
+                    z-index: 1 !important;
+                    border-radius: 4px !important;
+                }
+                .wizard .progress-wizard-step:first-child .progress-wizard-bar {
+                    display: none !important;
+                }
+                .wizard .progress-wizard-step.complete .progress-wizard-bar {
+                    background: #00a650 !important;
+                }
+                .wizard .progress-wizard-step .progress-wizard-dot {
+                    position: relative !important;
+                    z-index: 2 !important;
+                    width: 32px !important;
+                    height: 32px !important;
+                    margin: 0 auto 6px auto !important;
+                    border-radius: 50% !important;
+                    background: #ffffff !important;
+                    border: 2px solid #cbd5e1 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    font-size: 0.85rem !important;
+                    font-weight: 700 !important;
+                    color: #64748b !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+                    transition: all 0.25s ease !important;
+                }
+                .wizard .progress-wizard-step.active .progress-wizard-dot {
+                    background: #00a650 !important;
+                    border-color: #00a650 !important;
+                    color: #ffffff !important;
+                    box-shadow: 0 0 0 5px rgba(0, 166, 80, 0.18) !important;
+                }
+                .wizard .progress-wizard-step.complete .progress-wizard-dot {
+                    background: #00a650 !important;
+                    border-color: #00a650 !important;
+                    color: #ffffff !important;
+                }
+                .wizard .progress-wizard-step .progress-wizard-steplabel {
+                    font-size: 0.88rem !important;
+                    font-weight: 600 !important;
+                    color: #64748b !important;
+                    letter-spacing: -0.2px !important;
+                    margin-top: 0 !important;
+                }
+                .wizard .progress-wizard-step.active .progress-wizard-steplabel {
+                    color: #0f172a !important;
+                    font-weight: 700 !important;
+                }
+                .wizard .progress-wizard-step.complete .progress-wizard-steplabel {
+                    color: #00a650 !important;
+                }
+
+                /* ═══ TARJETA DEL FORMULARIO ═══ */
+                .oe_cart {
+                    padding-right: 20px;
+                }
+                .checkout_autoformat {
+                    background: #ffffff !important;
+                    border: 1px solid #e2e8f0 !important;
+                    border-radius: 20px !important;
+                    padding: 28px 32px !important;
+                    box-shadow: 0 4px 25px -3px rgba(0, 0, 0, 0.04) !important;
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                }
+                .checkout_autoformat .form-group {
+                    margin-bottom: 1.15rem !important;
+                }
+                .checkout_autoformat label.col-form-label,
+                .checkout_autoformat label.font-weight-bold {
+                    font-weight: 700 !important;
+                    color: #334155 !important;
+                    font-size: 0.85rem !important;
+                    letter-spacing: 0.3px !important;
+                    margin-bottom: 6px !important;
+                    display: block !important;
+                }
+                .checkout_autoformat .form-control,
+                .checkout_autoformat select.form-control {
+                    border-radius: 10px !important;
+                    border: 1.5px solid #e2e8f0 !important;
+                    height: 48px !important;
+                    padding: 10px 14px !important;
+                    font-size: 0.95rem !important;
+                    background-color: #fafbfc !important;
+                    color: #1e293b !important;
+                    transition: all 0.2s ease-in-out !important;
+                }
+                .checkout_autoformat .form-control:focus,
+                .checkout_autoformat select.form-control:focus {
+                    background-color: #ffffff !important;
+                    border-color: #00a650 !important;
+                    box-shadow: 0 0 0 3.5px rgba(0, 166, 80, 0.15) !important;
+                    outline: none !important;
+                }
+                .checkout_autoformat .form-control::placeholder {
+                    color: #94a3b8 !important;
+                    font-size: 0.9rem !important;
+                }
+
+                /* Document Card Selector */
+                .wango-doc-card {
+                    cursor: pointer;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 14px;
+                    padding: 14px 20px;
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    background: #ffffff;
+                }
+                .wango-doc-card:hover {
+                    border-color: #cbd5e1;
+                    transform: translateY(-1px);
+                }
+                .wango-doc-card.active {
+                    border-color: #00a650 !important;
+                    background-color: #f0fdf4 !important;
+                    box-shadow: 0 4px 12px rgba(0, 166, 80, 0.12) !important;
+                }
+
+                /* Ocultar campo de Código Postal innecesario en Perú */
+                div[id*="div_zip"], .div_zip, input[name="zip"], label[for="zip"] {
+                    display: none !important;
+                }
+
+                /* ORDEN Y ANCHOS RESPONSIVOS PARA PERÚ */
+                .checkout_autoformat > div, 
+                .checkout_autoformat > .form-group, 
+                .checkout_autoformat > .col-12, 
+                .checkout_autoformat > [class*="col-"] {
+                    width: 100%;
+                }
+                div[id*="company_name"] { order: 1 !important; width: 50% !important; padding-right: 10px !important; }
+                div[id*="div_vat"], .div_vat { order: 2 !important; width: 50% !important; padding-left: 10px !important; }
+                .div_name, div[id*="div_name"] { order: 3 !important; width: 100% !important; }
+                .div_email, div[id*="div_email"] { order: 4 !important; width: 50% !important; padding-right: 10px !important; }
+                .div_phone, div[id*="div_phone"] { order: 5 !important; width: 50% !important; padding-left: 10px !important; }
+                .div_country, div[id*="div_country"] { order: 6 !important; width: 50% !important; padding-right: 10px !important; }
+                .div_state, div[id*="div_state"] { order: 7 !important; width: 50% !important; padding-left: 10px !important; }
+                .div_city, div[id*="div_city"] { order: 8 !important; width: 100% !important; }
+                .div_street, div[id*="div_street"] { order: 9 !important; width: 100% !important; }
+                div[id*="div_street2"], .div_street2 { order: 10 !important; width: 100% !important; }
+                div.form-group.col-12 { order: 15 !important; width: 100% !important; }
+
+                @media (max-width: 767.98px) {
+                    .oe_cart { padding-right: 0 !important; }
+                    div[id*="company_name"],
+                    div[id*="div_vat"], .div_vat,
+                    .div_email, div[id*="div_email"],
+                    .div_phone, div[id*="div_phone"],
+                    .div_country, div[id*="div_country"],
+                    .div_state, div[id*="div_state"] {
+                        width: 100% !important;
+                        padding-left: 0 !important;
+                        padding-right: 0 !important;
+                    }
+                    .checkout_autoformat {
+                        padding: 20px 16px !important;
+                    }
+                }
+            </style>
+
+            <div class="card mb-4 border shadow-2xs" style="border-radius: 18px; border-color: #e2e8f0 !important; background: #ffffff;">
+                <div class="card-body p-3 p-md-4">
+                    <label class="font-weight-bold text-dark d-block mb-3" style="font-size: 1.05rem;">
+                        <i class="fa fa-file-text-o text-success mr-2 me-2"></i>¿Qué tipo de comprobante necesitas?
+                    </label>
+                    <div class="row" style="gap: 10px 0;">
+                        <div class="col-sm-6 pr-sm-2">
+                            <div class="wango-doc-card active d-flex align-items-center" id="card_doc_boleta" onclick="setDocType('boleta')">
+                                <input type="radio" name="wango_doc_type" id="radio_boleta" value="boleta" checked="checked" class="mr-3 me-3" style="accent-color: #00a650; transform: scale(1.15);"/>
+                                <div>
+                                    <strong class="d-block text-dark" style="font-size: 0.95rem;">Boleta de Venta</strong>
+                                    <small class="text-muted">Para personas naturales (DNI)</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 pl-sm-2">
+                            <div class="wango-doc-card d-flex align-items-center" id="card_doc_factura" onclick="setDocType('factura')">
+                                <input type="radio" name="wango_doc_type" id="radio_factura" value="factura" class="mr-3 me-3" style="accent-color: #00a650; transform: scale(1.15);"/>
+                                <div>
+                                    <strong class="d-block text-dark" style="font-size: 0.95rem;">Factura Electrónica</strong>
+                                    <small class="text-muted">Para empresas / negocios (RUC)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script type="text/javascript">
+            // <![CDATA[
+                function setDocType(type) {
+                    var cardB = document.getElementById('card_doc_boleta');
+                    var cardF = document.getElementById('card_doc_factura');
+                    var radioB = document.getElementById('radio_boleta');
+                    var radioF = document.getElementById('radio_factura');
+
+                    var compNameDiv = document.querySelector('div[id*="company_name"]') || document.querySelector('input[name="company_name"]')?.closest('.form-group') || document.querySelector('input[name="company_name"]')?.closest('div');
+                    var vatInput = document.querySelector('input[name="vat"]');
+                    var vatLabel = vatInput ? vatInput.closest('.form-group')?.querySelector('label') : null;
+                    var nameLabel = document.querySelector('input[name="name"]')?.closest('.form-group')?.querySelector('label');
+                    var nameInput = document.querySelector('input[name="name"]');
+
+                    if (type === 'factura') {
+                        if (cardF) cardF.classList.add('active');
+                        if (cardB) cardB.classList.remove('active');
+                        if (radioF) radioF.checked = true;
+                        if (compNameDiv) {
+                            compNameDiv.style.display = 'block';
+                            var compLabel = compNameDiv.querySelector('label');
+                            if (compLabel) compLabel.innerHTML = 'Razón Social <span class="text-danger">*</span>';
+                            var compInput = compNameDiv.querySelector('input');
+                            if (compInput) compInput.placeholder = 'Ej: Inversiones Wanka S.A.C.';
+                        }
+                        if (vatLabel) vatLabel.innerHTML = 'RUC <span class="text-danger">*</span>';
+                        if (vatInput) {
+                            vatInput.placeholder = 'Ej: 20506146039 (11 dígitos)';
+                            vatInput.required = true;
+                            vatInput.maxLength = 11;
+                        }
+                        if (nameLabel) nameLabel.innerHTML = 'Nombre de Contacto / Representante <span class="text-danger">*</span>';
+                        if (nameInput) nameInput.placeholder = 'Ej: Carlos Mendoza';
+                    } else {
+                        if (cardB) cardB.classList.add('active');
+                        if (cardF) cardF.classList.remove('active');
+                        if (radioB) radioB.checked = true;
+                        if (compNameDiv) compNameDiv.style.display = 'none';
+                        if (vatLabel) vatLabel.innerHTML = 'DNI (Documento de Identidad) <span class="text-danger">*</span>';
+                        if (vatInput) {
+                            vatInput.placeholder = 'Ej: 72345678 (8 dígitos)';
+                            vatInput.required = false;
+                            vatInput.maxLength = 8;
+                        }
+                        if (nameLabel) nameLabel.innerHTML = 'Nombre Completo <span class="text-danger">*</span>';
+                        if (nameInput) nameInput.placeholder = 'Ej: Juan Carlos Pérez Gómez';
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Inicializar en Boleta (persona natural por defecto)
+                    setDocType('boleta');
+                    
+                    // Ocultar campo de Código Postal innecesario en Perú y dar valor default
+                    var zipInput = document.querySelector('input[name="zip"]');
+                    if (zipInput) {
+                        var zipContainer = zipInput.closest('.form-group') || zipInput.closest('div[class*="col-"]');
+                        if (zipContainer) zipContainer.style.display = 'none';
+                        if (!zipInput.value) zipInput.value = '15001';
+                    }
+
+                    // Transformar Calle 2 en Referencia de Entrega (Vital en Perú)
+                    var street2Input = document.querySelector('input[name="street2"]');
+                    if (street2Input) {
+                        var street2Container = street2Input.closest('.form-group') || street2Input.closest('div[class*="col-"]');
+                        if (street2Container) {
+                            street2Container.style.display = 'block';
+                            street2Container.style.order = '10';
+                            street2Container.style.width = '100%';
+                            var street2Label = street2Container.querySelector('label');
+                            if (street2Label) street2Label.textContent = 'Referencia de Entrega (Opcional)';
+                            street2Input.placeholder = 'Ej: Dpto 302, frente al parque o portón blanco';
+                        }
+                    }
+
+                    // Auto-seleccionar Perú si está vacío para desplegar Departamento de inmediato
+                    var countrySelect = document.querySelector('select[name="country_id"]');
+                    if (countrySelect && (!countrySelect.value || countrySelect.value === '')) {
+                        for (var i = 0; i < countrySelect.options.length; i++) {
+                            var optTxt = countrySelect.options[i].text.toLowerCase();
+                            if (optTxt.includes('peru') || optTxt.includes('perú')) {
+                                countrySelect.selectedIndex = i;
+                                if (window.$) {
+                                    $(countrySelect).trigger('change');
+                                } else {
+                                    countrySelect.dispatchEvent(new Event('change', { bubbles: true }));
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    // Formatear cantidades en el Resumen (quitar el decimal 3.0)
+                    var qtyCells = document.querySelectorAll('.td-qty div, td.td-qty');
+                    qtyCells.forEach(function(c) {
+                        var txt = c.textContent.trim();
+                        if (txt.endsWith('.0')) {
+                            c.textContent = parseInt(txt, 10);
+                        }
+                    });
+
+                    // ══════════════════════════════════════════════════════════
+                    // CASCADA DINÁMICA: DEPARTAMENTO -> PROVINCIA -> DISTRITO
+                    // ══════════════════════════════════════════════════════════
+                    var stateSelect = document.querySelector('select[name="state_id"]');
+                    var cityContainer = document.querySelector('div[id*="div_city"]') || document.querySelector('.div_city');
+                    var cityInput = document.querySelector('input[name="city"]');
+
+                    if (stateSelect && cityContainer && cityInput) {
+                        var stateLabel = stateSelect.closest('.form-group')?.querySelector('label');
+                        if (stateLabel) stateLabel.innerHTML = 'Departamento <span class="text-danger">*</span>';
+
+                        var origCityLabel = cityContainer.querySelector('label');
+                        if (origCityLabel) origCityLabel.style.display = 'none';
+
+                        cityInput.type = 'hidden';
+
+                        var cascadeWrapper = document.getElementById('wango_cascade_geo_wrapper');
+                        if (!cascadeWrapper) {
+                            cascadeWrapper = document.createElement('div');
+                            cascadeWrapper.id = 'wango_cascade_geo_wrapper';
+                            cascadeWrapper.className = 'row w-100 m-0 p-0';
+                            cascadeWrapper.innerHTML = `
+                                <div class="col-12 col-md-6 pl-0 pr-md-2 mb-3">
+                                    <label class="col-form-label font-weight-bold text-dark">Provincia <span class="text-danger">*</span></label>
+                                    <select id="wango_checkout_sel_prov" class="form-control" style="border-radius: 10px; height: 48px; border: 1.5px solid #e2e8f0;">
+                                        <option value="">-- Selecciona Provincia --</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6 pr-0 pl-md-2 mb-3">
+                                    <label class="col-form-label font-weight-bold text-dark">Distrito <span class="text-danger">*</span></label>
+                                    <select id="wango_checkout_sel_dist" class="form-control" style="border-radius: 10px; height: 48px; border: 1.5px solid #e2e8f0;">
+                                        <option value="">-- Selecciona Distrito --</option>
+                                    </select>
+                                </div>
+                            `;
+                            cityContainer.appendChild(cascadeWrapper);
+                        }
+
+                        var selProv = document.getElementById('wango_checkout_sel_prov');
+                        var selDist = document.getElementById('wango_checkout_sel_dist');
+
+                        function updateBackendCity() {
+                            var pText = selProv.options[selProv.selectedIndex]?.text || '';
+                            var dText = selDist.options[selDist.selectedIndex]?.text || '';
+                            if (pText && dText && selProv.value && selDist.value) {
+                                cityInput.value = dText + ', ' + pText;
+                                localStorage.setItem('wango_del_prov_name', pText);
+                                localStorage.setItem('wango_del_dist_name', dText);
+                                localStorage.setItem('wango_del_dist_id', selDist.value);
+                            }
+                        }
+
+                        function loadProvinces(deptId, preselectedProvName) {
+                            selProv.innerHTML = '<option value="">Cargando provincias...</option>';
+                            selDist.innerHTML = '<option value="">-- Selecciona Distrito --</option>';
+                            if (!deptId) {
+                                selProv.innerHTML = '<option value="">-- Selecciona Provincia --</option>';
+                                return;
+                            }
+                            fetch('/shop/delivery/locations', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({params: {department_id: deptId}})
+                            })
+                            .then(function(r){ return r.json(); })
+                            .then(function(data){
+                                var provs = data.result || [];
+                                selProv.innerHTML = '<option value="">-- Selecciona Provincia --</option>';
+                                provs.forEach(function(p){
+                                    var opt = document.createElement('option');
+                                    opt.value = p.id;
+                                    opt.textContent = p.name;
+                                    if (preselectedProvName && p.name.toLowerCase() === preselectedProvName.toLowerCase()) {
+                                        opt.selected = true;
+                                    }
+                                    selProv.appendChild(opt);
+                                });
+                                if (selProv.value) {
+                                    loadDistricts(selProv.value, localStorage.getItem('wango_del_dist_name'));
+                                }
+                            })
+                            .catch(function(e){
+                                console.error('Error cargando provincias:', e);
+                                selProv.innerHTML = '<option value="">-- Error al cargar --</option>';
+                            });
+                        }
+
+                        function loadDistricts(provId, preselectedDistName) {
+                            selDist.innerHTML = '<option value="">Cargando distritos...</option>';
+                            if (!provId) {
+                                selDist.innerHTML = '<option value="">-- Selecciona Distrito --</option>';
+                                return;
+                            }
+                            fetch('/shop/delivery/locations', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({params: {province_id: provId}})
+                            })
+                            .then(function(r){ return r.json(); })
+                            .then(function(data){
+                                var dists = data.result || [];
+                                selDist.innerHTML = '<option value="">-- Selecciona Distrito --</option>';
+                                dists.forEach(function(d){
+                                    var opt = document.createElement('option');
+                                    opt.value = d.id;
+                                    opt.textContent = d.name;
+                                    if (preselectedDistName && d.name.toLowerCase() === preselectedDistName.toLowerCase()) {
+                                        opt.selected = true;
+                                    }
+                                    selDist.appendChild(opt);
+                                });
+                                updateBackendCity();
+                            })
+                            .catch(function(e){
+                                console.error('Error cargando distritos:', e);
+                                selDist.innerHTML = '<option value="">-- Error al cargar --</option>';
+                            });
+                        }
+
+                        stateSelect.addEventListener('change', function(){
+                            loadProvinces(this.value);
+                        });
+                        if (window.$) {
+                            $(stateSelect).on('change', function(){
+                                loadProvinces($(this).val());
+                            });
+                        }
+                        selProv.addEventListener('change', function(){
+                            loadDistricts(this.value);
+                        });
+                        selDist.addEventListener('change', function(){
+                            updateBackendCity();
+                        });
+
+                        function triggerInitialLoad() {
+                            var initialDept = stateSelect.value;
+                            var savedDeptId = localStorage.getItem('wango_del_dept_id');
+                            var savedDeptName = localStorage.getItem('wango_del_dept_name');
+                            var savedProv = localStorage.getItem('wango_del_prov_name');
+                            var savedStreet = localStorage.getItem('wango_del_exact_street');
+
+                            var streetInput = document.querySelector('input[name="street"]');
+                            if (streetInput && !streetInput.value && savedStreet) {
+                                streetInput.value = savedStreet;
+                            }
+
+                            if (!initialDept && (savedDeptId || savedDeptName)) {
+                                for (var i = 0; i < stateSelect.options.length; i++) {
+                                    var opt = stateSelect.options[i];
+                                    if (opt.value == savedDeptId || (savedDeptName && opt.text.toLowerCase().includes(savedDeptName.toLowerCase()))) {
+                                        stateSelect.selectedIndex = i;
+                                        initialDept = opt.value;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (initialDept) {
+                                loadProvinces(initialDept, savedProv);
+                            }
+                        }
+                        setTimeout(triggerInitialLoad, 300);
+                        setTimeout(triggerInitialLoad, 1000);
+                    }
+                });
+            // ]]>
+            </script>
+        </xpath>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RESUMEN DEL PEDIDO SHOPIFY-STYLE PARA EL CHECKOUT               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <template id="wango_cart_summary_inherit" inherit_id="website_sale.cart_summary" name="WanGO Resumen de Carrito Premium" priority="20">
+        <!-- Tarjeta flotante moderna -->
+        <xpath expr="//div[hasclass('card')]" position="attributes">
+            <attribute name="class">card border-0 shadow-sm wango-checkout-summary-card</attribute>
+            <attribute name="style">border-radius: 18px; border: 1px solid #e2e8f0 !important; background: #ffffff; position: sticky; top: 90px;</attribute>
+        </xpath>
+        
+        <!-- Header del resumen -->
+        <xpath expr="//div[hasclass('card')]//div[hasclass('card-body')]" position="before">
+            <div class="card-header bg-white border-bottom px-4 py-3 d-flex align-items-center justify-content-between" style="border-top-left-radius: 18px; border-top-right-radius: 18px;">
+                <span class="font-weight-bold text-dark d-flex align-items-center" style="font-size: 1.05rem;">
+                    <i class="fa fa-shopping-bag text-success mr-2 me-2"/> Resumen del Pedido
+                </span>
+                <t t-set="total_items_count" t-value="int(sum(website_sale_order.website_order_line.mapped('product_uom_qty'))) if (website_sale_order and website_sale_order.website_order_line) else 0"/>
+                <span class="badge bg-light text-muted border px-2 py-1 rounded-pill small font-weight-bold">
+                    <t t-esc="total_items_count"/> items
+                </span>
+            </div>
+        </xpath>
+
+        <!-- Bloque de Garantías y Sellos al pie del Resumen -->
+        <xpath expr="//t[@t-call='website_sale.total']" position="after">
+            <div class="wango-checkout-trust-box mt-3 pt-3 border-top px-3 pb-2">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mr-2 me-2 flex-shrink-0" style="width: 26px; height: 26px; background: #ecfdf5; color: #059669; font-size: 0.8rem;">
+                        <i class="fa fa-lock"/>
+                    </div>
+                    <span class="text-dark font-weight-semibold small" style="font-size: 0.8rem;">Pago 100% Seguro y Encriptado SSL</span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mr-2 me-2 flex-shrink-0" style="width: 26px; height: 26px; background: #eff6ff; color: #2563eb; font-size: 0.8rem;">
+                        <i class="fa fa-shield"/>
+                    </div>
+                    <span class="text-dark font-weight-semibold small" style="font-size: 0.8rem;">Compra Protegida WanGO</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center mr-2 me-2 flex-shrink-0" style="width: 26px; height: 26px; background: #fefce8; color: #ca8a04; font-size: 0.8rem;">
+                        <i class="fa fa-truck"/>
+                    </div>
+                    <span class="text-dark font-weight-semibold small" style="font-size: 0.8rem;">Despacho rápido y garantizado</span>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

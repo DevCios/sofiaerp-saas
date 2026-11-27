@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- FORMULARIO DEL LIBRO DE RECLAMACIONES VIRTUAL -->
+    <template id="claim_form_template" name="Libro de Reclamaciones Virtual - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container py-5" style="max-width: 850px;">
+                    
+                    <!-- Encabezado Oficial -->
+                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; border-left: 6px solid #00a650 !important; background-color: #ffffff;">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-2" style="gap: 12px;">
+                                <div style="background-color: #e8f5e9; color: #00a650; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                                    <i class="fa fa-book"></i>
+                                </div>
+                                <div>
+                                    <h2 class="font-weight-bold text-dark mb-0" style="font-size: 1.6rem; letter-spacing: -0.5px;">Libro de Reclamaciones Virtual</h2>
+                                    <span class="text-muted small">Conforme a lo establecido en el Código de Protección y Defensa del Consumidor (Ley Nº 29571) y D.S. Nº 011-2011-PCM</span>
+                                </div>
+                            </div>
+                            <div class="alert alert-light border mt-3 mb-0 small text-muted" style="border-radius: 10px;">
+                                <strong>Razón Social:</strong> MERCADO WANKA S.A.C. | <strong>RUC:</strong> 20612345678 | <strong>Domicilio:</strong> Huancayo, Junín, Perú.<br/>
+                                De acuerdo a la normativa de INDECOPI, daremos respuesta formal a tu requerimiento en un plazo no mayor a quince (15) días hábiles.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje de Error si aplica -->
+                    <t t-if="error_msg">
+                        <div class="alert alert-danger shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+                            <i class="fa fa-exclamation-triangle mr-2"></i> <t t-esc="error_msg"/>
+                        </div>
+                    </t>
+
+                    <!-- Formulario de Reclamación -->
+                    <form action="/libro-de-reclamaciones" method="post" class="card border-0 shadow-sm" style="border-radius: 16px; background-color: #ffffff;">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                        <div class="card-body p-4 p-md-5">
+
+                            <!-- Bloque 1: Identificación del Consumidor -->
+                            <h5 class="font-weight-bold text-dark mb-3 pb-2 border-bottom">
+                                <span class="badge badge-success mr-2" style="background-color: #00a650;">1</span> Identificación del Consumidor Reclamante
+                            </h5>
+                            
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold small text-muted">Nombres y Apellidos Completos *</label>
+                                <input type="text" name="consumer_name" required="required" class="form-control form-control-lg rounded-pill" placeholder="Ej: Juan Carlos Pérez Gómez"/>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-5 form-group">
+                                    <label class="font-weight-bold small text-muted">Tipo de Documento *</label>
+                                    <select name="doc_type" class="form-control form-control-lg rounded-pill">
+                                        <option value="dni">DNI</option>
+                                        <option value="ce">Carné de Extranjería</option>
+                                        <option value="passport">Pasaporte</option>
+                                        <option value="ruc">RUC</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-7 form-group">
+                                    <label class="font-weight-bold small text-muted">Número de Documento *</label>
+                                    <input type="text" name="doc_number" required="required" class="form-control form-control-lg rounded-pill" placeholder="Ingresa tu número de documento"/>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 form-group">
+                                    <label class="font-weight-bold small text-muted">Correo Electrónico (Para recibir constancia y respuesta) *</label>
+                                    <input type="email" name="consumer_email" required="required" class="form-control form-control-lg rounded-pill" placeholder="ejemplo@correo.com"/>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label class="font-weight-bold small text-muted">Teléfono / Celular *</label>
+                                    <input type="tel" name="consumer_phone" required="required" class="form-control form-control-lg rounded-pill" placeholder="Ej: 964123456"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold small text-muted">Domicilio Completo (Dirección, Distrito, Ciudad) *</label>
+                                <input type="text" name="consumer_address" required="required" class="form-control form-control-lg rounded-pill" placeholder="Ej: Av. Ferrocarril 1234, El Tambo, Huancayo"/>
+                            </div>
+
+
+                            <!-- Bloque 2: Identificación del Bien Contratado -->
+                            <h5 class="font-weight-bold text-dark mb-3 pb-2 border-bottom mt-4">
+                                <span class="badge badge-success mr-2" style="background-color: #00a650;">2</span> Identificación del Bien Contratado
+                            </h5>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4 form-group">
+                                    <label class="font-weight-bold small text-muted">Tipo de Bien *</label>
+                                    <select name="contracted_good" class="form-control form-control-lg rounded-pill">
+                                        <option value="product">Producto</option>
+                                        <option value="service">Servicio</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label class="font-weight-bold small text-muted">Monto Reclamado (S/)</label>
+                                    <input type="number" step="0.01" name="claimed_amount" class="form-control form-control-lg rounded-pill" placeholder="0.00"/>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label class="font-weight-bold small text-muted">Nº de Pedido / Orden (Opcional)</label>
+                                    <input type="text" name="order_ref" class="form-control form-control-lg rounded-pill" placeholder="Ej: S00007"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold small text-muted">Descripción del Producto o Servicio *</label>
+                                <input type="text" name="good_description" required="required" class="form-control form-control-lg rounded-pill" placeholder="Ej: Zapatillas deportivas compradas en la tienda de la plataforma"/>
+                            </div>
+
+
+                            <!-- Bloque 3: Detalle de la Reclamación -->
+                            <h5 class="font-weight-bold text-dark mb-3 pb-2 border-bottom mt-4">
+                                <span class="badge badge-success mr-2" style="background-color: #00a650;">3</span> Detalle de la Reclamación
+                            </h5>
+
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold small text-muted d-block mb-2">Selecciona el tipo *</label>
+                                <div class="custom-control custom-radio custom-control-inline mb-2">
+                                    <input type="radio" id="type_claim" name="claim_type" value="claim" class="custom-control-input" checked="checked"/>
+                                    <label class="custom-control-label font-weight-bold text-dark" for="type_claim">
+                                        RECLAMO
+                                        <span class="d-block font-weight-normal text-muted small" style="line-height: 1.2;">Disconformidad relacionada a los productos o servicios adquiridos.</span>
+                                    </label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="type_complaint" name="claim_type" value="complaint" class="custom-control-input"/>
+                                    <label class="custom-control-label font-weight-bold text-dark" for="type_complaint">
+                                        QUEJA
+                                        <span class="d-block font-weight-normal text-muted small" style="line-height: 1.2;">Malestar o descontento respecto a la atención al público (no relacionado directamente con el producto).</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="font-weight-bold small text-muted">Detalle del Reclamo o Queja *</label>
+                                <textarea name="detail" rows="4" required="required" class="form-control" style="border-radius: 12px;" placeholder="Explica detalladamente los hechos ocurridos..."></textarea>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="font-weight-bold small text-muted">Pedido Concreto del Consumidor (¿Qué solución solicitas?) *</label>
+                                <textarea name="consumer_request" rows="3" required="required" class="form-control" style="border-radius: 12px;" placeholder="Ej: Solicito la devolución del dinero / cambio del producto defectuoso / aclaración..."></textarea>
+                            </div>
+
+                            <!-- Consentimiento de Datos -->
+                            <div class="custom-control custom-checkbox mb-4">
+                                <input type="checkbox" class="custom-control-input" id="check_legal" required="required"/>
+                                <label class="custom-control-label small text-muted" for="check_legal">
+                                    Declaro que los datos proporcionados son verdaderos y acepto el tratamiento de mis datos personales para fines exclusivos de la atención de esta reclamación, conforme a la Ley Nº 29733.
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-lg btn-block rounded-pill font-weight-bold py-3 shadow-sm" style="background-color: #00a650; border: none; font-size: 1.1rem;">
+                                <i class="fa fa-paper-plane mr-2"></i> Enviar Hoja de Reclamación
+                            </button>
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- PANTALLA DE ÉXITO DE REGISTRO DE RECLAMO -->
+    <template id="claim_success_template" name="Reclamación Registrada - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container py-5 text-center" style="max-width: 650px;">
+                    <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 20px; background-color: #ffffff;">
+                        <div class="mb-3">
+                            <span class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: #e8f5e9; color: #00a650; font-size: 38px;">
+                                <i class="fa fa-check"></i>
+                            </span>
+                        </div>
+                        <h2 class="font-weight-bold text-dark mb-1">¡Hoja de Reclamación Registrada!</h2>
+                        <p class="text-muted small">Tu requerimiento ha sido registrado en nuestro Libro de Reclamaciones Virtual conforme a las disposiciones de INDECOPI.</p>
+
+                        <div class="bg-light border rounded p-3 my-4">
+                            <div class="small text-muted font-weight-bold">NÚMERO DE HOJA DE RECLAMACIÓN</div>
+                            <div class="h3 font-weight-bold text-danger my-1"><t t-esc="claim.name"/></div>
+                            <div class="small text-muted">Fecha: <t t-esc="claim.date.strftime('%d/%m/%Y %H:%M')"/></div>
+                        </div>
+
+                        <div class="alert alert-info text-left small mb-4" style="border-radius: 10px;">
+                            <i class="fa fa-info-circle mr-1"></i> Se ha enviado una copia íntegra de la constancia al correo <b><t t-esc="claim.consumer_email"/></b>. Mercado Wanka responderá dentro del plazo legal máximo de <b>15 días hábiles</b>.
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row justify-content-center" style="gap: 10px;">
+                            <a t-attf-href="/libro-de-reclamaciones/hoja/#{claim.name}" target="_blank" class="btn btn-outline-dark rounded-pill px-4 font-weight-bold py-2">
+                                <i class="fa fa-print mr-1"></i> Ver e Imprimir Hoja
+                            </a>
+                            <a href="/" class="btn btn-success rounded-pill px-4 font-weight-bold py-2" style="background-color: #00a650; border: none;">
+                                Volver al Inicio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- HOJA DE RECLAMACIÓN OFICIAL IMPRIMIBLE -->
+    <template id="claim_sheet_print_template" name="Hoja de Reclamación Oficial">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <title>Hoja de Reclamación - <t t-esc="claim.name"/></title>
+                <style>
+                    body { font-family: 'Montserrat', Arial, sans-serif; padding: 20px; color: #222; font-size: 12px; }
+                    .sheet { max-width: 750px; margin: auto; border: 2px solid #222; padding: 20px; border-radius: 6px; }
+                    .header { text-align: center; border-bottom: 2px solid #222; padding-bottom: 10px; margin-bottom: 12px; }
+                    .code-box { background: #eee; border: 1px solid #aaa; padding: 6px; text-align: center; font-weight: bold; margin-bottom: 15px; }
+                    .section-title { background: #00a650; color: #fff; font-weight: bold; padding: 4px 8px; font-size: 12px; margin-top: 10px; margin-bottom: 6px; border-radius: 3px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+                    td, th { padding: 5px; border: 1px solid #ccc; font-size: 11px; }
+                    .print-btn { background: #00a650; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+                    @media print { .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <div style="max-width: 750px; margin: auto;" class="no-print">
+                    <button class="print-btn" onclick="window.print();">🖨️ Imprimir Hoja de Reclamación</button>
+                </div>
+                <div class="sheet">
+                    <div class="header">
+                        <h2 style="margin: 0; text-transform: uppercase;">MERCADO WANKA S.A.C.</h2>
+                        <div style="font-size: 11px; color: #555;">RUC: 20612345678 | Huancayo, Junín, Perú</div>
+                        <h3 style="margin: 6px 0 0 0; color: #00a650;">LIBRO DE RECLAMACIONES VIRTUAL</h3>
+                        <div style="font-size: 10px; color: #666;">Conforme al D.S. Nº 011-2011-PCM</div>
+                    </div>
+
+                    <div class="code-box">
+                        HOJA DE RECLAMACIÓN Nº: <span style="font-size: 16px; color: #d63031;"><t t-esc="claim.name"/></span> | 
+                        FECHA: <t t-esc="claim.date.strftime('%d/%m/%Y %H:%M')"/>
+                    </div>
+
+                    <div class="section-title">1. IDENTIFICACIÓN DEL CONSUMIDOR RECLAMANTE</div>
+                    <table>
+                        <tr>
+                            <td style="width: 25%;"><strong>Nombre:</strong></td>
+                            <td><t t-esc="claim.consumer_name"/></td>
+                            <td style="width: 20%;"><strong>Documento:</strong></td>
+                            <td><t t-esc="claim.doc_type.upper()"/> <t t-esc="claim.doc_number"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Domicilio:</strong></td>
+                            <td colspan="3"><t t-esc="claim.consumer_address"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Teléfono:</strong></td>
+                            <td><t t-esc="claim.consumer_phone"/></td>
+                            <td><strong>Correo Electrónico:</strong></td>
+                            <td><t t-esc="claim.consumer_email"/></td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">2. IDENTIFICACIÓN DEL BIEN CONTRATADO</div>
+                    <table>
+                        <tr>
+                            <td style="width: 25%;"><strong>Tipo de Bien:</strong></td>
+                            <td><t t-esc="'PRODUCTO' if claim.contracted_good == 'product' else 'SERVICIO'"/></td>
+                            <td style="width: 20%;"><strong>Monto Reclamado:</strong></td>
+                            <td>S/ <t t-esc="'%.2f' % claim.claimed_amount"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nº Pedido / Orden:</strong></td>
+                            <td colspan="3"><t t-esc="claim.order_ref or 'No indicado'"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Descripción:</strong></td>
+                            <td colspan="3"><t t-esc="claim.good_description"/></td>
+                        </tr>
+                    </table>
+
+                    <div class="section-title">3. DETALLE DE LA RECLAMACIÓN</div>
+                    <table>
+                        <tr>
+                            <td style="width: 25%;"><strong>Tipo:</strong></td>
+                            <td colspan="3"><strong><t t-esc="'RECLAMO (Disconformidad con producto o servicio)' if claim.claim_type == 'claim' else 'QUEJA (Malestar en atención)'"/></strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Detalle:</strong></td>
+                            <td colspan="3"><t t-esc="claim.detail"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pedido del Consumidor:</strong></td>
+                            <td colspan="3"><t t-esc="claim.consumer_request"/></td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 15px; font-size: 10px; color: #555; text-align: justify; border-top: 1px solid #ccc; padding-top: 8px;">
+                        * La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI.<br/>
+                        * El proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles improrrogables.
+                    </div>
+                </div>
+            </body>
+        </html>
+    </template>
+
+
+    <!-- PÁGINA DE TÉRMINOS Y CONDICIONES -->
+    <template id="terms_conditions_template" name="Términos y Condiciones - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container py-5" style="max-width: 900px;">
+                    <h1 class="font-weight-bold text-dark mb-4">Términos y Condiciones de Uso</h1>
+                    <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background-color: #ffffff; line-height: 1.7;">
+                        <p class="text-muted small">Última actualización: Octubre 2026</p>
+                        
+                        <h4 class="font-weight-bold text-dark mt-3">1. Aspectos Generales</h4>
+                        <p>El presente documento regula el uso de la plataforma <strong>Mercado Wanka</strong> (operada en Perú). Al navegar, registrarse o comprar, el usuario acepta de manera vinculante los presentes Términos y Condiciones.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">2. Naturaleza del Marketplace</h4>
+                        <p>Mercado Wanka es una plataforma de intermediación digital que conecta a vendedores independientes locales con compradores finales. Cada vendedor es responsable por la originalidad, stock, calidad y entrega conforme de los productos que publica.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">3. Precios y Medios de Pago</h4>
+                        <p>Todos los precios se encuentran expresados en Soles peruanos (PEN) e incluyen los tributos aplicables de ley. Los pagos se procesan de forma segura a través de pasarelas autorizadas (Mercado Pago, Yape, transferencias oficiales).</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">4. Políticas de Despacho y Envíos</h4>
+                        <p>Los envíos se realizan bajo las modalidades de Despacho a Domicilio urbano o Envío Interprovincial por Agencia. Los plazos y costos de flete son calculados al momento del checkout según la cobertura territorial configurada.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">5. Libro de Reclamaciones</h4>
+                        <p>En cumplimiento del Código de Protección y Defensa del Consumidor, ponemos a disposición de los usuarios nuestro <a href="/libro-de-reclamaciones" class="text-success font-weight-bold">Libro de Reclamaciones Virtual</a> para registrar cualquier queja o reclamo con plazo legal de respuesta de 15 días hábiles.</p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- PÁGINA DE POLÍTICA DE PRIVACIDAD -->
+    <template id="privacy_policy_template" name="Política de Privacidad - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container py-5" style="max-width: 900px;">
+                    <h1 class="font-weight-bold text-dark mb-4">Política de Privacidad y Tratamiento de Datos</h1>
+                    <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background-color: #ffffff; line-height: 1.7;">
+                        <p class="text-muted small">Conforme a la Ley Nº 29733 (Ley de Protección de Datos Personales del Perú)</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">1. Titular del Banco de Datos</h4>
+                        <p>Los datos personales proporcionados a través de Mercado Wanka son almacenados en nuestros bancos de datos debidamente protegidos con altos estándares de seguridad y cifrado.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">2. Finalidad del Tratamiento</h4>
+                        <p>Recopilamos datos estrictamente necesarios para: procesar pedidos, coordinar entregas logísticas, emitir comprobantes de pago, responder solicitudes en el Libro de Reclamaciones y brindar soporte al cliente.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">3. Derechos ARCO</h4>
+                        <p>El titular de los datos personales puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) comunicándose a nuestro canal de soporte oficial.</p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- PÁGINA DE POLÍTICA DE DEVOLUCIONES -->
+    <template id="return_policy_template" name="Política de Devoluciones - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <div class="container py-5" style="max-width: 900px;">
+                    <h1 class="font-weight-bold text-dark mb-4">Políticas de Cambios y Devoluciones</h1>
+                    <div class="card border-0 shadow-sm p-4" style="border-radius: 16px; background-color: #ffffff; line-height: 1.7;">
+                        <h4 class="font-weight-bold text-dark mt-3">1. Plazo para Devoluciones</h4>
+                        <p>El comprador podrá solicitar el cambio o devolución de un producto dentro de los <strong>7 días calendario</strong> posteriores a la recepción del pedido en su domicilio o agencia.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">2. Condiciones del Producto</h4>
+                        <p>El artículo debe encontrarse sin uso, con sus empaques y etiquetas originales en perfecto estado, adjuntando la orden de compra o comprobante correspondiente.</p>
+
+                        <h4 class="font-weight-bold text-dark mt-3">3. Productos con Falla de Fábrica</h4>
+                        <p>Si el producto presenta defectos o averías no atribuibles al mal uso, se procederá al cambio inmediato o reembolso íntegro del dinero incluyendo los costos de flete.</p>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+
+    <!-- INYECCIÓN OFICIAL DEL LIBRO DE RECLAMACIONES Y ENLACES LEGALES EN EL FOOTER -->
+    <template id="footer_legal_indecopi_inherit" inherit_id="website.footer_custom" name="Footer Legal INDECOPI">
+        <xpath expr="//div[hasclass('container')]" position="after">
+            <div class="container pt-4 pb-3 border-top mt-4" style="border-color: rgba(255,255,255,0.1) !important;">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-md-7 mb-3 mb-md-0">
+                        <div class="d-flex flex-wrap align-items-center" style="gap: 15px; font-size: 0.85rem;">
+                            <a href="/terminos-y-condiciones" class="text-muted text-decoration-none hover-white">Términos y Condiciones</a>
+                            <span class="text-muted">|</span>
+                            <a href="/politica-de-privacidad" class="text-muted text-decoration-none hover-white">Política de Privacidad</a>
+                            <span class="text-muted">|</span>
+                            <a href="/politica-de-devoluciones" class="text-muted text-decoration-none hover-white">Cambios y Devoluciones</a>
+                        </div>
+                        <div class="text-muted small mt-2">
+                            © 2026 Mercado Wanka S.A.C. Todos los derechos reservados. Comercio Electrónico y Logística Regional.
+                        </div>
+                    </div>
+                    <div class="col-md-5 text-md-right">
+                        <!-- Botón Oficial Libro de Reclamaciones Exigido por INDECOPI -->
+                        <a href="/libro-de-reclamaciones" class="d-inline-flex align-items-center p-2 rounded border bg-white text-dark text-decoration-none shadow-sm" style="border-radius: 12px; gap: 10px; max-width: 250px; text-align: left;">
+                            <div style="background-color: #00a650; color: #fff; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                <i class="fa fa-book"></i>
+                            </div>
+                            <div>
+                                <span class="d-block font-weight-bold" style="font-size: 0.78rem; line-height: 1.1;">LIBRO DE RECLAMACIONES</span>
+                                <span class="text-muted" style="font-size: 0.68rem; display: block;">Conforme a ley INDECOPI</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Sale Order Form View to show delivery info -->
+    <record id="view_order_form_inherit_wango_delivery" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.wango.delivery</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='other_information']" position="before">
+                <page string="Logística de Entrega" name="wango_delivery_logistics">
+                    <group>
+                        <group string="Detalles de Entrega">
+                            <field name="delivery_type" widget="radio" readonly="1"/>
+                            <field name="store_branch_id" options="{'no_create': True, 'no_open': True}" invisible="delivery_type != 'store_pickup'" readonly="state in ('done', 'cancel')"/>
+                            <field name="agency_id" options="{'no_create': True, 'no_open': True}" invisible="delivery_type != 'agency_shipping'" readonly="state in ('done', 'cancel')"/>
+                            <field name="wango_shipment_id" readonly="1" invisible="not wango_shipment_id"/>
+                            <field name="estimated_delivery_date" readonly="1"/>
+                        </group>
+                        <group string="Dirección Cobertura">
+                            <field name="delivery_department_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                            <field name="delivery_province_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                            <field name="delivery_district_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+                            <field name="shipping_cost" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

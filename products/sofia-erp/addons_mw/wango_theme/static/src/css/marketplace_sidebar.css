@@ -1,0 +1,98 @@
+/* Sidebar Logic */
+.wbl-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100vh;
+    background-color: white;
+    z-index: 9999;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.wbl-sidebar.wbl-sidebar-open {
+    transform: translateX(0);
+}
+
+.wbl-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.wbl-sidebar-overlay.wbl-sidebar-open {
+    display: block;
+    opacity: 1;
+}
+
+.wbl-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+.wbl-sidebar-body {
+    padding: 0;
+    /* Let list items handle padding */
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.wbl-sidebar-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.wbl-menu-btn {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 15px;
+    font-weight: 600;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 25px;
+    transition: all 0.2s;
+}
+
+.wbl-menu-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #ccc;
+}
+
+/* List Item Styles */
+.wbl-sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    font-size: 15px;
+}
+
+.wbl-sidebar-item:hover {
+    background-color: #f8f9fa;
+    color: #027cd5;
+    text-decoration: none;
+}

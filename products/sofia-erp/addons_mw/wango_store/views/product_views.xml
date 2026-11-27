@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit Product Template Form -->
+    <record id="product_template_form_view_inherit_wango_store" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.wango.store</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Portada &amp; Ofertas WanGO" name="wango_store_deals">
+                    <group>
+                        <group string="Configuración de Oferta (Estilo Mercado Libre)">
+                            <field name="is_daily_deal" widget="boolean_toggle"/>
+                            <field name="is_deal_highlight" invisible="not is_daily_deal"/>
+                            <field name="deal_priority" invisible="not is_daily_deal"/>
+                        </group>
+                        <group string="Precios y Descuentos Visuales">
+                            <field name="compare_list_price" placeholder="Ej: 240.00"/>
+                            <field name="deal_discount_percent" placeholder="Ej: 33 (Calculado auto si es 0)"/>
+                            <field name="deal_installments_text" placeholder="Ej: 6 cuotas de S/ 26.67 sin interés"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Insignias de Confianza">
+                            <field name="is_published" widget="boolean_toggle" string="Publicado en la Tienda Web"/>
+                            <field name="deal_free_shipping" widget="boolean_toggle"/>
+                            <field name="deal_coupon_badge" placeholder="Ej: Cupón S/ 25 OFF (opcional)"/>
+                            <field name="wango_product_condition"/>
+                        </group>
+                        <group string="Social Proof &amp; Calificaciones (Ficha de Producto)">
+                            <field name="sales_count_base"/>
+                            <field name="sales_count_real" readonly="1"/>
+                            <field name="wango_sales_display" readonly="1"/>
+                            <field name="wango_rating_avg"/>
+                            <field name="wango_rating_count"/>
+                        </group>
+                    </group>
+                    <group string="Reputación de la Tienda Asignada" invisible="not marketplace_seller_id">
+                        <group>
+                            <field name="marketplace_seller_id" readonly="1"/>
+                            <field name="seller_is_official_store" widget="boolean_toggle"/>
+                            <field name="seller_sales_completed"/>
+                        </group>
+                        <group>
+                            <field name="seller_rating_avg"/>
+                            <field name="seller_rating_count"/>
+                            <field name="seller_on_time_delivery_pct"/>
+                            <field name="seller_good_service_pct"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Opiniones &amp; Reseñas" name="wango_product_reviews">
+                    <div class="mb-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="text-muted m-0">
+                                Gestiona los testimonios y opiniones reales o de marketing visibles en la tienda web para este producto.
+                            </p>
+                        </div>
+                        <div>
+                            <button name="action_generate_sample_reviews" type="object" string="Generar Opiniones de Ejemplo" class="btn btn-outline-primary btn-sm" icon="fa-magic" help="Crea 3 opiniones iniciales para este producto si aún no tiene ninguna."/>
+                        </div>
+                    </div>
+                    <field name="review_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="author_name"/>
+                            <field name="author_location"/>
+                            <field name="rating" widget="selection"/>
+                            <field name="title"/>
+                            <field name="content"/>
+                            <field name="date_display"/>
+                            <field name="is_verified_purchase" widget="boolean_toggle"/>
+                            <field name="helpful_count"/>
+                            <field name="is_published" widget="boolean_toggle"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Tree View Editable: Social Proof y Calificaciones de Productos (Panel Rápido) -->
+    <record id="view_product_template_tree_social_proof" model="ir.ui.view">
+        <field name="name">product.template.tree.social.proof</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="Social Proof &amp; Calificaciones de Productos" editable="bottom" multi_edit="1">
+                <field name="name" readonly="1"/>
+                <field name="default_code" readonly="1" optional="show"/>
+                <field name="list_price" readonly="1" optional="show"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <field name="marketplace_seller_id" readonly="1" optional="show"/>
+                <field name="wango_product_condition"/>
+                <field name="sales_count_base"/>
+                <field name="sales_count_real" readonly="1"/>
+                <field name="wango_sales_display" readonly="1"/>
+                <field name="wango_rating_avg"/>
+                <field name="wango_rating_count"/>
+                <field name="review_count" string="Reseñas Reg." readonly="1" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window Action: Social Proof de Productos -->
+    <record id="action_wango_product_social_proof" model="ir.actions.act_window">
+        <field name="name">Social Proof de Productos</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_product_template_tree_social_proof"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Administra el Social Proof y Calificaciones de tus Productos
+            </p>
+            <p>
+                Edita en línea (estilo Excel) la condición (Nuevo/Usado), ventas base para marketing, calificación en estrellas (1.0 - 5.0) y cantidad de opiniones de tus productos.
+            </p>
+        </field>
+    </record>
+
+    <!-- Window Action: Ofertas del Día -->
+    <record id="action_wango_daily_deals" model="ir.actions.act_window">
+        <field name="name">Ofertas del Día</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_daily_deal', '=', True)]</field>
+        <field name="context">{'default_is_daily_deal': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay ofertas configuradas para hoy
+            </p>
+            <p>
+                Marca productos con la casilla "Oferta del Día" para que aparezcan en el bloque especial de la portada.
+            </p>
+        </field>
+    </record>
+</odoo>

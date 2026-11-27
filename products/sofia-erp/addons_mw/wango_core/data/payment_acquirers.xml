@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Pagar al Conductor (Colectivo) -->
+        <record id="wango_acquirer_pay_driver" model="payment.acquirer">
+            <field name="name">Pagar al Conductor</field>
+            <field name="provider">transfer</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="state">enabled</field>
+            <field name="pending_msg">Realiza el pago directamente al conductor al momento de abordar el vehículo.</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Pagar en Efectivo (Taxi / General) -->
+        <record id="wango_acquirer_cash" model="payment.acquirer">
+            <field name="name">Pagar en Efectivo</field>
+            <field name="provider">transfer</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="state">enabled</field>
+            <field name="pending_msg">El pago se realizará en efectivo al finalizar el servicio.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Contraentrega (Encomienda) -->
+        <record id="wango_acquirer_cod" model="payment.acquirer">
+            <field name="name">Contraentrega</field>
+            <field name="provider">transfer</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="state">enabled</field>
+            <field name="pending_msg">El pago se realizará al momento de la entrega o recojo del paquete.</field>
+            <field name="sequence">30</field>
+        </record>
+
+    </data>
+</odoo>

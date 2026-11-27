@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Interstate Cost Form View -->
+    <record id="view_delivery_interstate_cost_form" model="ir.ui.view">
+        <field name="name">delivery.interstate.cost.form</field>
+        <field name="model">delivery.interstate.cost</field>
+        <field name="arch" type="xml">
+            <form string="Costo Inter-Departamental">
+                <sheet>
+                    <group>
+                        <group string="Ruta">
+                            <field name="state_from_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="state_to_id" options="{'no_create': True, 'no_open': True}"/>
+                        </group>
+                        <group string="Costo">
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="cost" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Interstate Cost List View -->
+    <record id="view_delivery_interstate_cost_tree" model="ir.ui.view">
+        <field name="name">delivery.interstate.cost.tree</field>
+        <field name="model">delivery.interstate.cost</field>
+        <field name="arch" type="xml">
+            <list string="Costos Inter-Departamentales" editable="bottom">
+                <field name="state_from_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="state_to_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="cost"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Interstate Cost Action -->
+    <record id="action_delivery_interstate_cost" model="ir.actions.act_window">
+        <field name="name">Recargo Inter-Departamental</field>
+        <field name="res_model">delivery.interstate.cost</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Configura los recargos interprovinciales entre departamentos.
+            </p>
+            <p>
+                Define la tarifa base de traslado de mercancía entre un departamento de origen y uno de destino. Esto se sumará al costo del delivery local en destino.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú de Costo Inter-Departamental retirado: Las tarifas de envío se centralizan en Cobertura de Delivery -->
+</odoo>

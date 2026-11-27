@@ -1,0 +1,13 @@
+id,name,model_id,group_id/id,operation,domain
+access_res_partner_seller,Seller Partner Access,res.partner,wango_marketplace.group_marketplace_seller,rw,
+access_product_template_seller,Seller Product Access,product.template,wango_marketplace.group_marketplace_seller,rwc,
+access_sale_order_seller,Seller Sale Order Access,sale.order,wango_marketplace.group_marketplace_seller,r,
+access_sale_order_line_seller,Seller Sale Line Access,sale.order.line,wango_marketplace.group_marketplace_seller,r,
+access_store_branch_seller,Seller Store Branch Access,delivery.store.branch,wango_marketplace.group_marketplace_seller,crud,
+access_store_branch_manager,Manager Store Branch Access,delivery.store.branch,wango_marketplace.group_marketplace_manager,crud,
+access_marketplace_settlement_manager,Manager Settlement Access,marketplace.settlement,wango_marketplace.group_marketplace_manager,crud,
+access_marketplace_settlement_seller,Seller Settlement Access,marketplace.settlement,wango_marketplace.group_marketplace_seller,r,
+access_wango_claim_public,Public Claim Access,wango.claim,base.group_public,rc,
+access_wango_claim_portal,Portal Claim Access,wango.claim,base.group_portal,rc,
+access_wango_claim_user,User Claim Access,wango.claim,base.group_user,rwc,
+access_wango_claim_manager,Manager Claim Access,wango.claim,wango_marketplace.group_marketplace_manager,crud,

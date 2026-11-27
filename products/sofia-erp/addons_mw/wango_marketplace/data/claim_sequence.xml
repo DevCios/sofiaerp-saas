@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Secuencia Correlativa para el Libro de Reclamaciones -->
+        <record id="seq_wango_claim" model="ir.sequence">
+            <field name="name">Secuencia Hoja de Reclamación</field>
+            <field name="code">wango.claim</field>
+            <field name="prefix">LR-%(year)s-</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cities linked to Real Localization -->
+        <!-- Using standard Odoo XML IDs for Peru States -->
+        
+        <record id="city_lima" model="wango.city">
+            <field name="name">Lima</field>
+            <field name="code">LIMA</field>
+            <field name="state_id" ref="base.state_pe_15"/> <!-- Lima -->
+        </record>
+        <record id="city_ica" model="wango.city">
+            <field name="name">Ica</field>
+            <field name="code">ICA</field>
+            <field name="state_id" ref="base.state_pe_11"/> <!-- Ica -->
+        </record>
+        <record id="city_arequipa" model="wango.city">
+            <field name="name">Arequipa</field>
+            <field name="code">AQP</field>
+            <field name="state_id" ref="base.state_pe_04"/> <!-- Arequipa -->
+        </record>
+
+        <!-- Agencies -->
+        <record id="agency_lima_norte" model="wango.agency">
+            <field name="name">Terminal Plaza Norte</field>
+            <field name="city_id" ref="city_lima"/>
+            <field name="address">Av. Túpac Amaru, Independencia</field>
+        </record>
+        <record id="agency_ica_center" model="wango.agency">
+            <field name="name">Terminal Ica Centro</field>
+            <field name="city_id" ref="city_ica"/>
+            <field name="address">Av. Matías Manzanilla</field>
+        </record>
+
+        <!-- Partners for Drivers -->
+        <record id="partner_driver_1" model="res.partner">
+            <field name="name">Juan Pérez (Conductor)</field>
+            <field name="email">juan.driver@wango.demo</field>
+        </record>
+        <record id="partner_driver_2" model="res.partner">
+            <field name="name">María López (Conductora)</field>
+            <field name="email">maria.driver@wango.demo</field>
+        </record>
+
+        <!-- Drivers -->
+        <record id="driver_1" model="wango.driver">
+            <field name="partner_id" ref="partner_driver_1"/>
+            <field name="license_number">A12345678</field>
+            <field name="status">active</field>
+        </record>
+        <record id="driver_2" model="wango.driver">
+            <field name="partner_id" ref="partner_driver_2"/>
+            <field name="license_number">B87654321</field>
+            <field name="status">active</field>
+        </record>
+
+        <!-- Vehicles -->
+        <!-- Fleet Brands & Models (Demo) -->
+        <record id="brand_hyundai" model="fleet.vehicle.model.brand">
+            <field name="name">Hyundai</field>
+        </record>
+        <record id="brand_toyota" model="fleet.vehicle.model.brand">
+            <field name="name">Toyota</field>
+        </record>
+        
+        <record id="model_h1" model="fleet.vehicle.model">
+            <field name="brand_id" ref="brand_hyundai"/>
+            <field name="name">H1</field>
+            <field name="vehicle_type">car</field>
+        </record>
+        <record id="model_yaris" model="fleet.vehicle.model">
+            <field name="brand_id" ref="brand_toyota"/>
+            <field name="name">Yaris</field>
+            <field name="vehicle_type">car</field>
+        </record>
+
+        <!-- Vehicles -->
+        <record id="fleet_vehicle_bus_1" model="fleet.vehicle">
+            <field name="license_plate">ABC-123</field>
+            <field name="type_id">minivan</field>
+            <field name="model_id" ref="model_h1"/>
+            <field name="capacity_passengers">12</field>
+            <field name="wango_driver_id" ref="driver_1"/>
+            <field name="driver_id" ref="partner_driver_1"/> 
+            <field name="wango_status">available</field>
+        </record>
+        <record id="fleet_vehicle_taxi_1" model="fleet.vehicle">
+            <field name="license_plate">XYZ-987</field>
+            <field name="type_id">auto</field>
+            <field name="model_id" ref="model_yaris"/>
+            <field name="capacity_passengers">4</field>
+            <field name="wango_driver_id" ref="driver_2"/>
+            <field name="driver_id" ref="partner_driver_2"/>
+            <field name="wango_status">available</field>
+        </record>
+    </data>
+</odoo>

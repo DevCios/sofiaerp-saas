@@ -1,0 +1,134 @@
+/* Mega Menu Layout */
+.wbl-sidebar-body {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    /* Prevent body scroll, handle inner scroll */
+}
+
+/* LEFT COLUMN: Parent Categories */
+.wbl-mega-menu-left {
+    width: 300px;
+    /* Fixed width for parents */
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+    background-color: #fff;
+    flex-shrink: 0;
+}
+
+.wbl-mega-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: 4px solid transparent;
+    cursor: pointer;
+    color: #334155;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.925rem;
+    font-weight: 500;
+    font-family: var(--mw-font-family, 'Montserrat', sans-serif);
+    text-decoration: none;
+}
+
+.wbl-mega-menu-item:hover,
+.wbl-mega-menu-item.active {
+    background-color: #f8fafc;
+    color: #3483fa;
+    font-weight: 700;
+    border-left-color: #3483fa;
+}
+
+.wbl-mega-menu-item .fa-chevron-right {
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.wbl-mega-menu-item:hover .fa-chevron-right,
+.wbl-mega-menu-item.active .fa-chevron-right {
+    color: #3483fa;
+    transform: translateX(4px);
+}
+
+/* RIGHT COLUMN: Content Panels */
+.wbl-mega-menu-right {
+    flex-grow: 1;
+    background-color: #fff;
+    overflow-y: auto;
+    position: relative;
+    padding: 24px;
+    display: none;
+    /* Hidden by default until active */
+}
+
+/* When the sidebar is wide enough (e.g. desktop), show the right column */
+@media (min-width: 768px) {
+    .wbl-sidebar {
+        width: 900px !important;
+        /* Make sidebar WIDE on desktop */
+        max-width: 90vw;
+    }
+
+    .wbl-mega-menu-right {
+        display: block;
+        /* Show right column container */
+    }
+}
+
+/* Individual Category Panels */
+.wbl-category-panel {
+    display: none;
+    /* Hidden by default */
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.wbl-category-panel.active {
+    display: block;
+    /* Show when active */
+}
+
+/* Subcategory Styling inside Panel */
+.wbl-subcategory-group {
+    margin-bottom: 24px;
+}
+
+.wbl-subcategory-title {
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: var(--mw-font-family, 'Montserrat', sans-serif);
+    color: #0f172a;
+    margin-bottom: 12px;
+    display: block;
+    border-bottom: 2px solid #3483fa;
+    padding-bottom: 6px;
+    letter-spacing: -0.01em;
+}
+
+.wbl-subcategory-link {
+    display: block;
+    color: #475569;
+    padding: 6px 0;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    font-family: var(--mw-font-family, 'Montserrat', sans-serif);
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.wbl-subcategory-link:hover {
+    color: #3483fa;
+    transform: translateX(3px);
+    text-decoration: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

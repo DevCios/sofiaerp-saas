@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Default Trust Badges -->
+    <record id="badge_yape" model="wango.home.trust.badge">
+        <field name="title">Paga con Yape</field>
+        <field name="description">Paga rápido y seguro con Yape, transferencias bancarias o tarjetas sin comisiones ocultas.</field>
+        <field name="icon_class">fa fa-qrcode</field>
+        <field name="link_text">Cómo pagar con Yape</field>
+        <field name="link_url">/shop</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="badge_free_shipping" model="wango.home.trust.badge">
+        <field name="title">Envío gratis desde S/ 50</field>
+        <field name="description">Compra con envíos rápidos en el Valle del Mantaro y disfruta de envío gratis en compras mayores a 50 soles.</field>
+        <field name="icon_class">fa fa-truck</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="badge_security" model="wango.home.trust.badge">
+        <field name="title">Seguridad, de principio a fin</field>
+        <field name="description">¿No te gusta? ¡Devuélvelo! En WanGO tus compras, pagos y envíos están 100% protegidos.</field>
+        <field name="icon_class">fa fa-shield</field>
+        <field name="link_text">Cómo te protegemos</field>
+        <field name="link_url">/legal/terminos</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <!-- Default Quick Cards -->
+    <record id="card_account" model="wango.home.card">
+        <field name="name">Ingresa a tu cuenta</field>
+        <field name="subtitle">Disfruta de tus compras, cupones y seguimiento de pedidos.</field>
+        <field name="card_type">login</field>
+        <field name="icon_class">fa fa-user-circle-o</field>
+        <field name="button_text">Inicia sesión</field>
+        <field name="url_redirect">/web/login</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="card_location" model="wango.home.card">
+        <field name="name">Ingresa tu ubicación</field>
+        <field name="subtitle">Consulta costos de envío y tiempos exactos de entrega.</field>
+        <field name="card_type">location</field>
+        <field name="icon_class">fa fa-map-marker</field>
+        <field name="button_text">Elegir ubicación</field>
+        <field name="url_redirect">#</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="card_favorites" model="wango.home.card">
+        <field name="name">Producto favorito</field>
+        <field name="subtitle">Guarda lo que más te gusta para comprarlo cuando quieras.</field>
+        <field name="card_type">favorites</field>
+        <field name="icon_class">fa fa-heart-o</field>
+        <field name="button_text">Ver favoritos</field>
+        <field name="url_redirect">/shop</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="card_free_shipping" model="wango.home.card">
+        <field name="name">Envío gratis &gt; S/ 50</field>
+        <field name="subtitle">Miles de productos seleccionados con envío gratis a tu casa.</field>
+        <field name="card_type">free_shipping</field>
+        <field name="icon_class">fa fa-truck</field>
+        <field name="button_text">Ver productos</field>
+        <field name="url_redirect">/shop</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="card_best_sellers" model="wango.home.card">
+        <field name="name">Producto más vendido</field>
+        <field name="subtitle">Explora los productos que son tendencia en este momento.</field>
+        <field name="card_type">best_sellers</field>
+        <field name="icon_class">fa fa-fire</field>
+        <field name="button_text">Ir a Más vendidos</field>
+        <field name="url_redirect">/shop</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="card_stores" model="wango.home.card">
+        <field name="name">Tiendas oficiales</field>
+        <field name="subtitle">Encuentra tus marcas preferidas y comercios verificados.</field>
+        <field name="card_type">stores</field>
+        <field name="icon_class">fa fa-shopping-bag</field>
+        <field name="button_text">Mostrar tiendas</field>
+        <field name="url_redirect">/shop</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="card_categories" model="wango.home.card">
+        <field name="name">Todas las categorías</field>
+        <field name="subtitle">Explora todo el catálogo organizado por departamentos.</field>
+        <field name="card_type">categories</field>
+        <field name="icon_class">fa fa-th-large</field>
+        <field name="button_text">Ir a Categorías</field>
+        <field name="url_redirect">/shop</field>
+        <field name="sequence">70</field>
+    </record>
+
+    <record id="card_recently_viewed" model="wango.home.card">
+        <field name="name">Visto recientemente</field>
+        <field name="subtitle">Continúa viendo los productos que revisaste antes.</field>
+        <field name="card_type">recently_viewed</field>
+        <field name="icon_class">fa fa-history</field>
+        <field name="button_text">Ver historial</field>
+        <field name="url_redirect">#wangoRecentlyViewedSection</field>
+        <field name="sequence">80</field>
+    </record>
+</odoo>

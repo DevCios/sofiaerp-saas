@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Store Branch / Agente Wanka Form View -->
+    <record id="view_delivery_store_branch_form" model="ir.ui.view">
+        <field name="name">delivery.store.branch.form</field>
+        <field name="model">delivery.store.branch</field>
+        <field name="arch" type="xml">
+            <form string="Punto de Retiro / Agente Wanka">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name" string="Nombre del Punto"/>
+                        <h1>
+                            <field name="name" placeholder="Ej: Agente Wanka Pilcomayo (Bodega Don Pepe)"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Tipo y Responsable">
+                            <field name="point_type" widget="radio"/>
+                            <field name="seller_id" invisible="point_type != 'seller_store'" required="point_type == 'seller_store'" options="{'no_create': True}"/>
+                            <field name="reference" placeholder="Ej: Frente al parque central, junto a la botica"/>
+                            <field name="partner_id" string="Encargado / Contacto"/>
+                            <field name="phone"/>
+                            <field name="schedule"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Ubicación Geográfica">
+                            <field name="department_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="province_id" options="{'no_create': True, 'no_open': True}" readonly="not department_id"/>
+                            <field name="district_id" options="{'no_create': True, 'no_open': True}" readonly="not province_id"/>
+                            <field name="address" placeholder="Av. / Jr. / Calle y número"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                            <field name="warehouse_id" options="{'no_create': True}" string="Almacén de Inventario (Opcional)"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Store Branch / Agente Wanka Tree View -->
+    <record id="view_delivery_store_branch_tree" model="ir.ui.view">
+        <field name="name">delivery.store.branch.tree</field>
+        <field name="model">delivery.store.branch</field>
+        <field name="arch" type="xml">
+            <list string="Puntos de Retiro y Agentes Wanka">
+                <field name="name"/>
+                <field name="point_type" widget="badge" decoration-success="point_type == 'agent'" decoration-info="point_type == 'seller_store'"/>
+                <field name="district_id"/>
+                <field name="province_id"/>
+                <field name="department_id"/>
+                <field name="seller_id" optional="show"/>
+                <field name="reference" optional="show"/>
+                <field name="address"/>
+                <field name="phone"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Store Branch Search View -->
+    <record id="view_delivery_store_branch_search" model="ir.ui.view">
+        <field name="name">delivery.store.branch.search</field>
+        <field name="model">delivery.store.branch</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Punto de Retiro">
+                <field name="name"/>
+                <field name="address"/>
+                <field name="district_id"/>
+                <field name="province_id"/>
+                <field name="seller_id"/>
+                <filter string="Agentes Wanka" name="filter_agents" domain="[('point_type', '=', 'agent')]"/>
+                <filter string="Locales de Vendedores" name="filter_seller_stores" domain="[('point_type', '=', 'seller_store')]"/>
+                <separator/>
+                <filter string="Archivados" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Tipo de Punto" name="group_by_type" context="{'group_by': 'point_type'}"/>
+                    <filter string="Distrito" name="group_by_district" context="{'group_by': 'district_id'}"/>
+                    <filter string="Provincia" name="group_by_province" context="{'group_by': 'province_id'}"/>
+                    <filter string="Departamento" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Store Branch Action -->
+    <record id="action_delivery_store_branch" model="ir.actions.act_window">
+        <field name="name">Puntos de Retiro (Agentes Wanka y Locales)</field>
+        <field name="res_model">delivery.store.branch</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_delivery_store_branch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registra tu primer Punto de Retiro o Agente Wanka.
+            </p>
+            <p>
+                Los <b>Agentes Wanka</b> permiten que los clientes recojan sus compras de cualquier vendedor de forma 100% gratuita en su distrito o localidad.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menus Structure (Prioridad 2 en Configuración) -->
+    <menuitem id="menu_delivery_store_branch" name="Puntos de Retiro / Agentes Wanka" parent="wango_core.menu_wango_config" action="action_delivery_store_branch" sequence="20"/>
+</odoo>

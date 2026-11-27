@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_wango_marketplace" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.wango_marketplace</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+            <xpath expr="//notebook" position="inside">
+                <page string="Marketplace" name="marketplace_info">
+                    <group>
+                        <group string="Estado de Vendedor">
+                            <field name="is_marketplace_seller"/>
+                            <field name="marketplace_seller_status" 
+                                   invisible="not is_marketplace_seller"
+                                   readonly="1"/>
+                            <field name="marketplace_delivery_carrier_id"
+                                   invisible="not is_marketplace_seller"/>
+                            <field name="seller_is_official_store" 
+                                   invisible="not is_marketplace_seller"/>
+                        </group>
+                        <group string="Reputación y Calificaciones">
+                            <field name="seller_rating_avg"/>
+                            <field name="seller_rating_count"/>
+                            <field name="seller_sales_completed"/>
+                            <field name="seller_on_time_delivery_pct"/>
+                            <field name="seller_good_service_pct"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Botones de aprobación exclusivos para managers -->
+                    <div groups="wango_marketplace.group_marketplace_manager" 
+                         invisible="not is_marketplace_seller or marketplace_seller_status != 'pending'">
+                        <button string="Aprobar Vendedor" 
+                                type="object" 
+                                name="action_approve_seller" 
+                                class="oe_highlight btn-success"/>
+                        <button string="Rechazar Vendedor" 
+                                type="object" 
+                                name="action_reject_seller" 
+                                class="btn-danger"/>
+                    </div>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+
+    <!-- Tree View Editable: Reputación de Tiendas / Vendedores (Panel Rápido) -->
+    <record id="view_partner_tree_seller_reputation" model="ir.ui.view">
+        <field name="name">res.partner.tree.seller.reputation</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="Reputación de Tiendas y Vendedores" editable="bottom" multi_edit="1">
+                <field name="name" readonly="1"/>
+                <field name="email" readonly="1" optional="show"/>
+                <field name="phone" readonly="1" optional="hide"/>
+                <field name="marketplace_seller_status" readonly="1"/>
+                <field name="seller_is_official_store" widget="boolean_toggle"/>
+                <field name="seller_sales_completed"/>
+                <field name="seller_rating_avg"/>
+                <field name="seller_rating_count"/>
+                <field name="seller_on_time_delivery_pct"/>
+                <field name="seller_good_service_pct"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Window Action: Reputación de Tiendas -->
+    <record id="action_admin_seller_reputation" model="ir.actions.act_window">
+        <field name="name">Reputación de Tiendas</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_partner_tree_seller_reputation"/>
+        <field name="domain">[('is_marketplace_seller', '=', True)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Gestiona la reputación de las tiendas y vendedores
+            </p>
+            <p>
+                Modifica directamente en la lista las ventas concretadas, calificación promedio, opiniones, porcentaje de despacho a tiempo y buena atención.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú en Administración de Marketplace -->
+    <menuitem id="menu_admin_seller_reputation"
+              name="Reputación de Tiendas"
+              parent="wango_marketplace.menu_admin_marketplace"
+              action="action_admin_seller_reputation"
+              sequence="18"/>
+</odoo>

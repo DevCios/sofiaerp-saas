@@ -1,0 +1,157 @@
+/* Custom Header Styles */
+.wbl-custom-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.wbl-logo img {
+    max-height: 48px;
+    /* Slightly larger like reference */
+}
+
+/* Menu Button - Ghost Style */
+.wbl-header-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #495057;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    padding: 5px 15px;
+    border-radius: 20px;
+    /* Subtle hover effect area */
+    transition: background-color 0.2s;
+}
+
+.wbl-header-menu-btn:hover {
+    background-color: #f1f3f5;
+    color: #000;
+}
+
+.wbl-header-menu-btn i {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Search Bar - Pill Shape */
+.wbl-header-search {
+    flex-grow: 1;
+    max-width: 800px;
+    margin: 0 30px;
+}
+
+.wbl-header-search .input-group {
+    border-radius: 50px;
+    /* Full Pill */
+    overflow: hidden;
+    border: 1px solid #ced4da;
+}
+
+.wbl-header-search input {
+    border: none;
+    box-shadow: none;
+    padding-left: 25px;
+    height: 45px;
+    /* Taller input */
+    font-size: 0.95rem;
+}
+
+.wbl-header-search input::placeholder {
+    color: #6c757d;
+}
+
+.wbl-header-search .btn {
+    background-color: #333;
+    /* Dark Grey/Black */
+    color: white;
+    border-radius: 0 50px 50px 0;
+    /* Right rounded only */
+    padding-left: 25px;
+    padding-right: 25px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wbl-header-search .btn:hover {
+    background-color: #000;
+}
+
+/* User Actions */
+.wbl-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.wbl-header-action-item {
+    text-align: center;
+    color: #333;
+    text-decoration: none;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.wbl-header-action-item:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+/* "Hola, Inicia Sesión" Specifics */
+.wbl-header-action-item .text-start {
+    text-align: left;
+}
+
+.wbl-header-action-item .small-text {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 300;
+    /* Light weight */
+    display: block;
+    margin-bottom: -2px;
+}
+
+.wbl-header-action-item .bold-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    /* Bold */
+    color: #333;
+}
+
+/* Info Bar (Sub Header) */
+.wbl-sub-header {
+    background-color: #fff;
+    /* White background to match ref? Or keep light grey */
+    border-bottom: 1px solid #f0f0f0;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.wbl-sub-header a {
+    color: #666;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 400;
+}
+
+.wbl-sub-header a:hover {
+    color: #333;
+}
+
+/* Hide default Odoo Search Bar in key areas */
+#wrap .o_wsale_products_searchbar_form {
+    display: none !important;
+}

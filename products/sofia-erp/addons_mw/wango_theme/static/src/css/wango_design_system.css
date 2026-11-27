@@ -1,0 +1,416 @@
+/* ==========================================================================
+   MERCADO WANKA - MASTER DESIGN SYSTEM & UX/UI ARCHITECTURE
+   Inspirado en Mercado Libre / Falabella (Senior E-commerce Standard)
+   Tipografía Central Unificada: Montserrat (Google Fonts)
+   Paleta: Amarillo Wanka (#FFE600), Verde Éxito (#00A650), Azul Mercado (#3483FA)
+   ========================================================================== */
+
+/* 1. IMPORTACIÓN ROBUSTA DE FUENTE (TODOS LOS PESOS) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+/* 2. DESIGN TOKENS GLOBALES */
+:root {
+    /* Tipografía */
+    --mw-font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Colores Principales */
+    --mw-yellow: #FFE600;
+    --mw-yellow-hover: #F2D800;
+    --mw-yellow-light: #FFF9DB;
+    --mw-green: #00A650;
+    --mw-green-hover: #008F45;
+    --mw-green-light: #E6F7EE;
+    --mw-blue: #3483FA;
+    --mw-blue-hover: #1A6BE6;
+    --mw-blue-light: #EAF1FC;
+    
+    /* Escala Neutra / Slate Moderno */
+    --mw-text-main: #0F172A;      /* slate-900: Títulos de alto impacto */
+    --mw-text-title: #1E293B;     /* slate-800: Títulos de sección y tarjetas */
+    --mw-text-body: #334155;      /* slate-700: Párrafos y descripciones */
+    --mw-text-muted: #64748B;     /* slate-500: Subtítulos e información secundaria */
+    --mw-text-light: #94A3B8;     /* slate-400: Precios tachados y placeholders */
+    
+    /* Superficies y Bordes */
+    --mw-surface: #FFFFFF;
+    --mw-bg-canvas: #F8F9FA;
+    --mw-border: #E2E8F0;
+    --mw-border-subtle: #F1F5F9;
+    --mw-border-focus: #3483FA;
+    
+    /* Bordes Redondeados (Radii) */
+    --mw-radius-xs: 4px;
+    --mw-radius-sm: 8px;
+    --mw-radius-md: 12px;
+    --mw-radius-lg: 16px;
+    --mw-radius-xl: 20px;
+    --mw-radius-pill: 9999px;
+    
+    /* Sombras y Elevaciones */
+    --mw-shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --mw-shadow-card: 0 1px 4px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.03);
+    --mw-shadow-card-hover: 0 10px 25px rgba(15, 23, 42, 0.09);
+    --mw-shadow-modal: 0 20px 45px -10px rgba(15, 23, 42, 0.22);
+    
+    /* Transiciones */
+    --mw-transition-fast: all 0.15s ease;
+    --mw-transition-normal: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* ==========================================================================
+   3. RESET Y UNIFICACIÓN TOTAL DE TIPOGRAFÍA (GLOBAL)
+   ========================================================================== */
+html, body, #wrapwrap,
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
+p, span:not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fad):not(.oi),
+a:not(.fa):not(.fas):not(.far):not(.fal):not(.fab),
+input, button, select, textarea, label,
+.btn, .badge, .card, .table, .dropdown-menu, .dropdown-item,
+.modal, .modal-title, .nav, .nav-link, .form-control, .form-select, .breadcrumb,
+.falabella-header-wrapper, .wango-home-page, .oe_website_sale, #product_detail {
+    font-family: var(--mw-font-family) !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+}
+
+/* BLINDAJE DE ICONOS FONTAWESOME Y ODOO ICONS (Para que nunca se rompan) */
+.fa, .fas, .far, .fal, .fab, .fad, .oi,
+[class^="fa-"], [class*=" fa-"],
+[class^="oi-"], [class*=" oi-"] {
+    font-family: 'FontAwesome' !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    line-height: 1 !important;
+}
+
+/* Base de Cuerpo y Lienzo */
+body {
+    background-color: var(--mw-surface) !important;
+    color: var(--mw-text-body) !important;
+    letter-spacing: -0.01em;
+    font-size: 0.925rem;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   4. JERARQUÍA Y ESCALA TIPOGRÁFICA SENIOR
+   ========================================================================== */
+h1, .h1 {
+    font-size: 1.85rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    line-height: 1.2 !important;
+    color: var(--mw-text-main) !important;
+}
+
+h2, .h2, .wango-box-title {
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.25 !important;
+    color: var(--mw-text-title) !important;
+}
+
+h3, .h3 {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.015em !important;
+    line-height: 1.3 !important;
+    color: var(--mw-text-title) !important;
+}
+
+h4, .h4 {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.35 !important;
+    color: var(--mw-text-title) !important;
+}
+
+h5, .h5 {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: var(--mw-text-body) !important;
+}
+
+h6, .h6 {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--mw-text-muted) !important;
+}
+
+p {
+    font-size: 0.925rem;
+    color: var(--mw-text-body);
+    margin-bottom: 0.75rem;
+}
+
+.text-muted, small.text-muted {
+    color: var(--mw-text-muted) !important;
+}
+
+/* ==========================================================================
+   5. BOTONES MODERNOS ESTILO FINTECH / MERCADO LIBRE
+   ========================================================================== */
+.btn {
+    font-family: var(--mw-font-family) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    border-radius: var(--mw-radius-pill) !important;
+    padding: 0.55rem 1.35rem !important;
+    font-size: 0.925rem !important;
+    transition: var(--mw-transition-normal) !important;
+    box-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+}
+
+/* Botón Primario Amarillo Wanka */
+.btn-primary, 
+.btn-warning,
+.btn-wanka-primary {
+    background-color: var(--mw-yellow) !important;
+    border-color: var(--mw-yellow) !important;
+    color: var(--mw-text-main) !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 6px rgba(255, 230, 0, 0.25) !important;
+}
+
+.btn-primary:hover, 
+.btn-warning:hover,
+.btn-wanka-primary:hover {
+    background-color: var(--mw-yellow-hover) !important;
+    border-color: var(--mw-yellow-hover) !important;
+    color: var(--mw-text-main) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(255, 230, 0, 0.4) !important;
+}
+
+/* Botón Acción Verde (Checkout / WhatsApp / Compra Rápida) */
+.btn-success {
+    background-color: var(--mw-green) !important;
+    border-color: var(--mw-green) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(0, 166, 80, 0.25) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--mw-green-hover) !important;
+    border-color: var(--mw-green-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 166, 80, 0.35) !important;
+}
+
+/* Botón Secundario / Outline */
+.btn-secondary, 
+.btn-outline-secondary,
+.btn-outline-primary {
+    border-radius: var(--mw-radius-pill) !important;
+    font-weight: 600 !important;
+    border: 1.5px solid var(--mw-border) !important;
+    color: var(--mw-text-body) !important;
+    background-color: #FFFFFF !important;
+}
+
+.btn-secondary:hover, 
+.btn-outline-secondary:hover,
+.btn-outline-primary:hover {
+    background-color: var(--mw-bg-canvas) !important;
+    border-color: var(--mw-blue) !important;
+    color: var(--mw-blue) !important;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   6. TIPOGRAFÍA Y FORMATO DE PRECIOS E-COMMERCE
+   ========================================================================== */
+.wango-meli-prices, .product_price {
+    font-feature-settings: "tnum" 1, "cv01" 1;
+}
+
+.wango-meli-price-amount, .product_price .oe_currency_value {
+    font-size: 1.45rem !important;
+    font-weight: 700 !important;
+    color: var(--mw-text-main) !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.1 !important;
+}
+
+.wango-meli-old-price, .text-decoration-line-through {
+    font-size: 0.78rem !important;
+    color: var(--mw-text-light) !important;
+    font-weight: 400 !important;
+}
+
+.wango-meli-discount-badge {
+    color: var(--mw-green) !important;
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.wango-meli-installments-text {
+    font-size: 0.78rem !important;
+    color: var(--mw-green) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.wango-meli-free-shipping {
+    color: var(--mw-green) !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.wango-meli-full-tag {
+    background: var(--mw-green) !important;
+    color: #FFFFFF !important;
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    font-style: italic !important;
+    padding: 2px 6px !important;
+    border-radius: var(--mw-radius-xs) !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Título de Producto en Tarjetas */
+.wango-meli-title {
+    font-size: 0.90rem !important;
+    font-weight: 500 !important;
+    color: var(--mw-text-body) !important;
+    line-height: 1.38 !important;
+    transition: color 0.15s ease !important;
+}
+
+.wango-meli-title:hover {
+    color: var(--mw-blue) !important;
+}
+
+/* ==========================================================================
+   7. INPUTS, FORMULARIOS Y SELECTS
+   ========================================================================== */
+.form-control, .form-select, select.form-control {
+    border-radius: 10px !important;
+    border: 1.5px solid var(--mw-border) !important;
+    padding: 0.65rem 1rem !important;
+    font-size: 0.925rem !important;
+    color: var(--mw-text-title) !important;
+    background-color: #FFFFFF !important;
+    transition: var(--mw-transition-fast) !important;
+}
+
+.form-control:focus, .form-select:focus, select.form-control:focus {
+    border-color: var(--mw-blue) !important;
+    box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.15) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--mw-text-light) !important;
+    font-weight: 400 !important;
+}
+
+/* ==========================================================================
+   8. ENCABEZADO FALABELLA / MERCADO LIBRE: REFINAMIENTO UX
+   ========================================================================== */
+.falabella-header-wrapper {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid var(--mw-border) !important;
+}
+
+.falabella-search-form {
+    border: 1.5px solid var(--mw-border) !important;
+    transition: var(--mw-transition-fast) !important;
+}
+
+.falabella-search-form:focus-within {
+    border-color: var(--mw-blue) !important;
+    box-shadow: 0 0 0 3px rgba(52, 131, 250, 0.12) !important;
+}
+
+.falabella-search-form input {
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    color: var(--mw-text-title) !important;
+}
+
+.custom-menu-btn {
+    font-weight: 600 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--mw-text-title) !important;
+}
+
+.sub-header-link {
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: var(--mw-text-body) !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease !important;
+}
+
+.sub-header-link:hover {
+    color: var(--mw-blue) !important;
+}
+
+/* ==========================================================================
+   9. BREADCRUMBS Y NAVEGACIÓN
+   ========================================================================== */
+.breadcrumb {
+    background: transparent !important;
+    padding: 0.5rem 0 !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.825rem !important;
+    font-weight: 500 !important;
+}
+
+.breadcrumb-item a {
+    color: var(--mw-text-muted) !important;
+    text-decoration: none !important;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--mw-blue) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--mw-text-title) !important;
+    font-weight: 600 !important;
+}
+
+/* ==========================================================================
+   10. TARJETAS ELEVADAS Y CONTENEDORES
+   ========================================================================== */
+.card, .wango-home-box {
+    border: 1px solid var(--mw-border) !important;
+    border-radius: var(--mw-radius-md) !important;
+    background-color: var(--mw-surface) !important;
+    box-shadow: var(--mw-shadow-card) !important;
+    transition: var(--mw-transition-normal) !important;
+}
+
+.card:hover, .wango-home-box:hover {
+    border-color: rgba(52, 131, 250, 0.25) !important;
+}
+
+/* Modales Premium */
+.modal-content {
+    border: none !important;
+    border-radius: var(--mw-radius-lg) !important;
+    box-shadow: var(--mw-shadow-modal) !important;
+    font-family: var(--mw-font-family) !important;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--mw-border-subtle) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--mw-border-subtle) !important;
+}

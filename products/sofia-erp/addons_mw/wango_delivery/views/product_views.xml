@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_inherit_wango_delivery" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.wango.delivery</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='inventory']" position="inside">
+                <group string="Restricciones de Entrega (WanGO)" name="wango_delivery_restrictions_group" col="4">
+                    <field name="wango_only_pickup"/>
+                    <field name="wango_no_home_delivery" invisible="wango_only_pickup"/>
+                    <field name="wango_no_agency" invisible="wango_only_pickup"/>
+                </group>
+                <group string="Ubicación de Origen (WanGO)" name="wango_origin_location_group" col="4">
+                    <field name="wango_origin_department_id" options="{'no_create': True, 'no_open': True}"/>
+                    <field name="wango_origin_province_id" options="{'no_create': True, 'no_open': True}" readonly="not wango_origin_department_id"/>
+                    <field name="wango_origin_district_id" options="{'no_create': True, 'no_open': True}" readonly="not wango_origin_province_id"/>
+                </group>
+                <group string="Tiempos Personalizados (WanGO)" name="wango_custom_times_group">
+                    <field name="wango_custom_home_time" invisible="wango_no_home_delivery" placeholder="Ej: Llega en 2 a 5 días laborables"/>
+                    <field name="wango_custom_pickup_time" placeholder="Ej: Disponible en 2 horas"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

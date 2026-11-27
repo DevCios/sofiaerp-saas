@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Carga segura de la fuente en el HTML Head -->
+    <template id="layout_font_inherit_wango_marketplace" inherit_id="website.layout" name="Custom Font Layout">
+        <xpath expr="//head" position="inside">
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+            <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;display=swap" rel="stylesheet"/>
+            <style>
+                /* Forzar alineación perfecta en TODAS las tarjetas de la tienda Odoo */
+                .oe_product_cart {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    height: 100% !important;
+                }
+                .oe_product_cart .o_wsale_product_information {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    flex-grow: 1 !important;
+                }
+                .oe_product_cart .o_wsale_product_information_text {
+                    flex-grow: 1 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                }
+                .oe_product_cart .o_wsale_products_item_title {
+                    height: 2.8em !important;
+                    overflow: hidden !important;
+                    display: -webkit-box !important;
+                    -webkit-line-clamp: 2 !important;
+                    -webkit-box-orient: vertical !important;
+                    text-overflow: ellipsis !important;
+                }
+                
+                /* Fix Modal de Agregar al Carrito (Profesional) */
+                .modal-dialog .modal-content {
+                    border-radius: 16px !important;
+                    border: none !important;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+                }
+                .modal-dialog .modal-header {
+                    border-bottom: 1px solid #f0f0f0 !important;
+                    padding: 1.2rem 1rem !important;
+                }
+                .modal-dialog .modal-header .modal-title {
+                    font-weight: 700 !important;
+                    color: #2c3e50 !important;
+                }
+                .modal-dialog .modal-footer {
+                    border-top: 1px solid #f0f0f0 !important;
+                    padding: 1rem !important;
+                }
+                .modal-dialog .modal-footer .btn {
+                    border-radius: 10px !important;
+                    font-weight: 600 !important;
+                    padding: 0.6rem 1rem !important;
+                }
+                .modal-dialog .modal-footer .btn-primary {
+                    background-color: #2c3e50 !important;
+                    border-color: #2c3e50 !important;
+                }
+                .modal-dialog .modal-footer .btn-secondary {
+                    background-color: #f8f9fa !important;
+                    color: #2c3e50 !important;
+                    border: 1px solid #e0e0e0 !important;
+                }
+                
+                @media (max-width: 767.98px) {
+                    .modal-dialog {
+                        margin: 1rem !important;
+                    }
+                    .modal-dialog .modal-header .modal-title {
+                        font-size: 1.15rem !important; /* Texto en 1 sola línea */
+                        text-align: center;
+                    }
+                    /* Arreglar botones del footer (Seguir comprando e Ir al carro) */
+                    .modal-dialog .modal-footer {
+                        display: flex !important;
+                        flex-direction: row !important;
+                        flex-wrap: nowrap !important;
+                        justify-content: space-between !important;
+                        padding: 0.8rem !important;
+                    }
+                    .modal-dialog .modal-footer .btn {
+                        flex: 1 !important;
+                        margin: 0 4px !important;
+                        font-size: 0.9rem !important;
+                        white-space: nowrap !important; /* Evita que el texto se rompa en 2 líneas */
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                                        /* Estructura Premium del cuerpo (CSS Grid para Modal) */
+                    .modal-dialog .modal-body {
+                        padding: 1.5rem 1rem !important;
+                    }
+                    /* Layout de Rejilla (Grid) Mvil */
+                    .modal-dialog .modal-body > .row,
+                    .modal-dialog .modal-body table,
+                    .modal-dialog .modal-body tbody,
+                    .modal-dialog .modal-body tr {
+                        display: grid !important;
+                        grid-template-columns: 90px 1fr !important;
+                        grid-template-rows: auto auto !important;
+                        gap: 10px 15px !important;
+                        align-items: center !important;
+                        width: 100% !important;
+                        border: none !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    /* Contenedor 1: Imagen (Arriba Izquierda) */
+                    .modal-dialog .modal-body > .row > div:nth-child(1),
+                    .modal-dialog .modal-body td:nth-child(1) {
+                        grid-column: 1 / 2 !important;
+                        grid-row: 1 / 2 !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        border: none !important;
+                    }
+                    /* Contenedor 2: Textos (Arriba Derecha) */
+                    .modal-dialog .modal-body > .row > div:nth-child(2),
+                    .modal-dialog .modal-body td:nth-child(2) {
+                        grid-column: 2 / 3 !important;
+                        grid-row: 1 / 2 !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: center !important;
+                        align-items: flex-start !important;
+                        border: none !important;
+                    }
+                    /* Contenedor 3: Cantidad (Abajo, Ancho Completo) */
+                    .modal-dialog .modal-body > .row > div:nth-child(3),
+                    .modal-dialog .modal-body td:nth-child(3) {
+                        grid-column: 1 / 3 !important;
+                        grid-row: 2 / 3 !important;
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        padding: 15px 0 0 0 !important;
+                        margin: 5px 0 0 0 !important;
+                        border-top: 1px dashed #e0e0e0 !important;
+                        border-bottom: none !important;
+                        border-left: none !important;
+                        border-right: none !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: center !important;
+                    }
+                    
+                    /* Formato de la Imagen Limpio */
+                    .modal-dialog .modal-body img {
+                        width: 100% !important;
+                        max-width: 90px !important;
+                        height: auto !important;
+                        object-fit: contain !important;
+                        border-radius: 8px !important;
+                        border: 1px solid #f0f0f0 !important;
+                        padding: 5px !important;
+                        margin: 0 !important; /* Quita mrgenes que empujaban el texto */
+                    }
+                    
+                    /* Formato de Textos */
+                    .modal-dialog .modal-body h6, 
+                    .modal-dialog .modal-body .h6,
+                    .modal-dialog .modal-body strong {
+                        font-size: 1.05rem !important;
+                        color: #2c3e50 !important;
+                        line-height: 1.25 !important;
+                        margin-bottom: 6px !important;
+                        text-align: left !important;
+                        white-space: normal !important;
+                        width: 100% !important;
+                        display: block !important;
+                    }
+                    
+                    /* Asegurar que el input de cantidad se centre */
+                    .modal-dialog .modal-body .css_quantity {
+                        width: 140px !important;
+                        margin: 0 auto !important;
+                        display: flex !important;
+                    }
+                }
+
+            </style>
+        </xpath>
+    </template>
+
+    <!-- Forzar el mismo estilo de fuente en el cuerpo principal -->
+    <template id="layout_font_body_inherit_wango_marketplace" inherit_id="website.layout" name="Custom Font Body">
+        <xpath expr="//body" position="attributes">
+            <attribute name="style">font-family: 'Montserrat', sans-serif !important;</attribute>
+        </xpath>
+    </template>
+
+    <template id="products_item_inherit_wango_marketplace" inherit_id="website_sale.products_item">
+        <xpath expr="//div[hasclass('o_wsale_product_information_text')]" position="inside">
+            <div class="mt-2" t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
+                <span class="text-muted" style="font-size: 0.9rem;">
+                    <i class="fa fa-store"/> Vendido por: <strong><t t-esc="product.sudo().marketplace_seller_id.name"/></strong>
+                </span>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="product_inherit_wango_marketplace" inherit_id="website_sale.product">
+        <xpath expr="//h1[@itemprop='name']" position="after">
+            <div class="mt-2 mb-3">
+                <span class="text-muted d-inline-flex align-items-center flex-wrap" style="font-size: 0.92rem;">
+                    <i class="fa fa-store text-primary me-1.5"/> Vendido y entregado por:&amp;nbsp;
+                    <t t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
+                        <strong>
+                            <a t-attf-href="/shop?seller_id={{ product.sudo().marketplace_seller_id.id }}" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
+                                <t t-esc="product.sudo().marketplace_seller_id.name"/>
+                            </a>
+                        </strong>
+                        <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700;">
+                            <i class="fa fa-check-circle text-primary me-1"/> <t t-esc="'%.1f' % (product.sudo().marketplace_seller_id.seller_rating_avg or 4.9)"/> ★
+                        </span>
+                    </t>
+                    <t t-else="">
+                        <strong>
+                            <a href="/shop" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
+                                <t t-esc="website.sudo().company_id.name or 'Mercado Wanka'"/>
+                            </a>
+                        </strong>
+                        <span class="badge bg-success-subtle text-success border border-success px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700; background-color: #ecfdf5; color: #059669;">
+                            <i class="fa fa-shield me-1"/> Tienda Oficial
+                        </span>
+                        <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-1" style="font-size: 0.72rem; font-weight: 700;">
+                            <i class="fa fa-check-circle text-primary me-1"/> <t t-esc="'%.1f' % (website.sudo().company_id.partner_id.seller_rating_avg or 4.9)"/> ★
+                        </span>
+                    </t>
+                </span>
+            </div>
+            
+            <!-- Advertencia temporal si el vendedor ya no está aprobado pero el producto sigue publicado -->
+            <div class="alert alert-warning mt-2" t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status != 'approved'">
+                <i class="fa fa-warning"/> Esta tienda se encuentra temporalmente inactiva. No es posible realizar compras en este momento.
+            </div>
+        </xpath>
+        
+        <!-- Ocultar botón de "Añadir al carrito" si la tienda no está aprobada -->
+        <xpath expr="//a[@id='add_to_cart']" position="attributes">
+            <attribute name="t-if">not product.marketplace_seller_id or product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'</attribute>
+        </xpath>
+        
+        <!-- Mostrar Descripción del Vendedor debajo del precio / opciones -->
+        <xpath expr="//div[@id='product_details']" position="inside">
+            <div class="mt-4 pt-3 border-top" t-if="product.description_sale">
+                <h5 class="text-muted mb-3"><i class="fa fa-info-circle"/> Acerca de este producto</h5>
+                <div class="text-justify text-muted" style="white-space: pre-line;">
+                    <t t-esc="product.description_sale"/>
+                </div>
+            </div>
+        </xpath>
+        
+        <!-- Sticky Add to Cart (Mobile) con Cantidad y Ocultamiento del Original -->
+        <xpath expr="//div[@id='product_details']" position="after">
+            <div class="d-flex d-md-none fixed-bottom bg-white border-top shadow-lg align-items-center justify-content-between px-3 py-2" style="z-index: 1050; padding-bottom: env(safe-area-inset-bottom) !important;" id="sticky_mobile_cart_bar">
+                
+                <div class="input-group mr-3" style="width: 120px;">
+                    <div class="input-group-prepend">
+                        <a role="button" class="btn btn-light border" onclick="var input = document.getElementById('sticky_qty'); var val = parseInt(input.value, 10); if (val > 1) { input.value = val - 1; var orig = document.querySelector('.css_quantity input'); orig.value = input.value; orig.dispatchEvent(new Event('change')); }">
+                            <i class="fa fa-minus"></i>
+                        </a>
+                    </div>
+                    <input type="text" class="form-control text-center font-weight-bold" id="sticky_qty" value="1" onchange="var orig = document.querySelector('.css_quantity input'); orig.value = this.value; orig.dispatchEvent(new Event('change'));"/>
+                    <div class="input-group-append">
+                        <a role="button" class="btn btn-light border" onclick="var input = document.getElementById('sticky_qty'); input.value = parseInt(input.value, 10) + 1; var orig = document.querySelector('.css_quantity input'); orig.value = input.value; orig.dispatchEvent(new Event('change'));">
+                            <i class="fa fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <a role="button" class="btn btn-lg flex-grow-1 font-weight-bold d-flex align-items-center justify-content-center text-white" onclick="document.getElementById('add_to_cart').click();" style="border-radius: 8px; background-color: var(--meli-blue, #3483fa); font-size: 1.05rem;">
+                    Comprar ahora <i class="fa fa-shopping-cart ml-2"></i>
+                </a>
+            </div>
+            <style>
+                @media (max-width: 767.98px) {
+                    #wrap { padding-bottom: 90px !important; }
+                    /* Ocultar el botón original y el selector de cantidad original en móvil */
+                    #product_details .css_quantity, 
+                    #product_details #add_to_cart { 
+                        display: none !important; 
+                    }
+                }
+            </style>
+        </xpath>
+    </template>
+
+    <template id="products_inherit_wango_marketplace_seller_title" inherit_id="website_sale.products" name="Seller Store Title">
+        <xpath expr="//div[@id='products_grid']//div[hasclass('o_wsale_products_grid_table_wrapper')]" position="before">
+            <t t-if="request.params.get('seller_id')">
+                <t t-set="seller" t-value="request.env['res.partner'].sudo().browse(int(request.params.get('seller_id')))"/>
+                <div t-if="seller.exists()" class="wango-seller-header card border-0 shadow-sm mb-4 rounded-lg overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f8fbfd 100%); border: 1px solid #e2e8f0 !important; border-radius: 14px;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <div class="d-flex align-items-center mb-3 mb-md-0">
+                                <!-- Logo / Avatar del Vendedor -->
+                                <div class="position-relative mr-3 flex-shrink-0">
+                                    <img t-if="seller.image_128" 
+                                         t-attf-src="/web/image/res.partner/#{seller.id}/image_128" 
+                                         alt="Logo de Tienda" 
+                                         class="rounded-circle border shadow-sm" 
+                                         style="width: 72px; height: 72px; object-fit: cover; background: #fff;"/>
+                                    <div t-if="not seller.image_128" 
+                                         class="rounded-circle d-flex align-items-center justify-content-center text-primary shadow-sm border" 
+                                         style="width: 72px; height: 72px; background: #ebf5fb; font-size: 1.8rem; font-weight: 700;">
+                                        <i class="fa fa-store text-primary"></i>
+                                    </div>
+                                    <span class="position-absolute" style="bottom: -2px; right: -2px;" title="Vendedor Verificado">
+                                        <i class="fa fa-check-circle text-success bg-white rounded-circle" style="font-size: 1.25rem;"></i>
+                                    </span>
+                                </div>
+                                
+                                <!-- Información de la Tienda -->
+                                <div>
+                                    <div class="d-flex flex-wrap align-items-center mb-1">
+                                        <h2 class="h4 font-weight-bold mb-0 text-dark mr-2" style="font-family: 'Montserrat', sans-serif;">
+                                            <t t-esc="seller.name"/>
+                                        </h2>
+                                        <span class="badge badge-success px-2 py-1 font-weight-normal text-white" style="font-size: 0.75rem; border-radius: 6px; background-color: #28a745;">
+                                            <i class="fa fa-shield-alt mr-1"></i> Tienda Oficial
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center flex-wrap gap-2 my-1">
+                                        <div class="text-warning small" style="letter-spacing: 1px;">
+                                            <t t-foreach="seller.get_seller_stars_list()" t-as="st">
+                                                <i t-if="st == 'full'" class="fa fa-star text-warning"/>
+                                                <i t-elif="st == 'half'" class="fa fa-star-half-o text-warning"/>
+                                                <i t-else="" class="fa fa-star-o text-muted" style="opacity: 0.35;"/>
+                                            </t>
+                                        </div>
+                                        <span class="font-weight-bold text-dark small">
+                                            <t t-esc="'%.1f' % (seller.seller_rating_avg or 4.9)"/>
+                                        </span>
+                                        <span class="text-muted small">
+                                            (<t t-esc="seller.seller_rating_count or 128"/> opiniones)
+                                        </span>
+                                        <span class="badge bg-light text-success border border-success-subtle px-2 py-0.5 rounded-pill small font-weight-bold">
+                                            +<t t-esc="seller.seller_sales_completed or 250"/> ventas concretadas
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="text-muted small d-flex flex-wrap align-items-center" style="gap: 12px;">
+                                        <span t-if="seller.city or (seller.state_id and seller.state_id.name)">
+                                            <i class="fa fa-map-marker-alt text-danger mr-1"></i>
+                                            <t t-if="seller.city"><t t-esc="seller.city"/>, </t>
+                                            <t t-if="seller.state_id"><t t-esc="seller.state_id.name"/></t>
+                                        </span>
+                                        <span t-else="">
+                                            <i class="fa fa-map-marker-alt text-danger mr-1"></i> Huancayo, Junín
+                                        </span>
+                                        <span>
+                                            <i class="fa fa-box text-secondary mr-1"></i>
+                                            <t t-esc="bins and sum(len(b) for b in bins) or 0"/> productos en vitrina
+                                        </span>
+                                        <span class="text-success font-weight-500">
+                                            <i class="fa fa-truck mr-1"></i> Envíos locales y recojo en tienda
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón de acción para volver al catálogo general -->
+                            <div class="flex-shrink-0 text-md-right">
+                                <a href="/shop" class="btn btn-outline-secondary btn-sm px-3 py-2 font-weight-bold shadow-none" style="border-radius: 8px; border-color: #cbd5e1; color: #475569;">
+                                    <i class="fa fa-arrow-left mr-1"></i> Ver todo el catálogo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

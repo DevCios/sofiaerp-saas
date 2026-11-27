@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_wango_home_banner_tree" model="ir.ui.view">
+        <field name="name">wango.home.banner.tree</field>
+        <field name="model">wango.home.banner</field>
+        <field name="arch" type="xml">
+            <list string="Banners de Portada" default_order="sequence asc">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="url_redirect"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="is_active" widget="boolean_toggle"/>
+                <field name="website_id" groups="website.group_multi_website"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_wango_home_banner_form" model="ir.ui.view">
+        <field name="name">wango.home.banner.form</field>
+        <field name="model">wango.home.banner</field>
+        <field name="arch" type="xml">
+            <form string="Banner de Portada">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <field name="is_active" widget="boolean_toggle" class="oe_right"/>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Título del Banner"/>
+                        <h1>
+                            <field name="name" placeholder="Ej: Especial Perfumes y Belleza - 30% OFF"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Enlace y Visualización">
+                            <field name="url_redirect" placeholder="Ej: /shop/category/belleza o /shop"/>
+                            <field name="subtitle" placeholder="Ej: Tus marcas favoritas con envíos rápidos FULL"/>
+                            <field name="sequence"/>
+                            <field name="website_id" groups="website.group_multi_website"/>
+                        </group>
+                        <group string="Programación / Vigencia">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Imágenes del Banner">
+                            <group>
+                                <group string="Versión Desktop">
+                                    <field name="image" widget="image" options="{'size': [600, 200]}" class="oe_avatar" style="width: 100%; height: auto; max-width: 500px;"/>
+                                    <div class="text-muted small">Recomendado: 1600 x 420 px (JPG / WebP / PNG ligero)</div>
+                                </group>
+                                <group string="Versión Mobile (Opcional)">
+                                    <field name="image_mobile" widget="image" options="{'size': [300, 200]}" class="oe_avatar" style="width: 100%; height: auto; max-width: 300px;"/>
+                                    <div class="text-muted small">Opcional: 800 x 600 px para pantallas pequeñas</div>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_wango_home_banner" model="ir.actions.act_window">
+        <field name="name">Banners de Portada</field>
+        <field name="res_model">wango.home.banner</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer banner deslizante para la portada
+            </p>
+            <p>
+                Los banners se deslizarán automáticamente en el carrusel principal estilo Mercado Libre.
+            </p>
+        </field>
+    </record>
+</odoo>

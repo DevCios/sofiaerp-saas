@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Formulario de Hoja de Reclamación -->
+    <record id="view_wango_claim_form" model="ir.ui.view">
+        <field name="name">wango.claim.form</field>
+        <field name="model">wango.claim</field>
+        <field name="arch" type="xml">
+            <form string="Hoja de Reclamación">
+                <header>
+                    <button name="action_start_process" string="Iniciar Investigación" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_send_response" string="Enviar Respuesta Oficial" type="object" class="oe_highlight" invisible="state != 'in_process'"/>
+                    <button name="action_close" string="Cerrar Reclamación" type="object" invisible="state != 'responded'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_process,responded,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <span class="o_form_label">Libro de Reclamaciones Virtual</span>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Datos del Reclamante">
+                            <field name="consumer_name"/>
+                            <field name="doc_type"/>
+                            <field name="doc_number"/>
+                            <field name="consumer_email"/>
+                            <field name="consumer_phone"/>
+                            <field name="consumer_address"/>
+                            <field name="is_minor"/>
+                            <field name="parent_name" invisible="not is_minor" required="is_minor"/>
+                        </group>
+                        <group string="Plazos y Datos de Registro">
+                            <field name="date"/>
+                            <field name="deadline_date"/>
+                            <field name="contracted_good"/>
+                            <field name="claimed_amount"/>
+                            <field name="order_ref"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Detalle de la Reclamación">
+                            <group>
+                                <field name="claim_type" widget="radio"/>
+                                <field name="good_description"/>
+                                <field name="detail"/>
+                                <field name="consumer_request"/>
+                            </group>
+                        </page>
+                        <page string="Respuesta Oficial del Proveedor">
+                            <group>
+                                <field name="response_date"/>
+                                <field name="response" placeholder="Redacta aquí la respuesta formal que se enviará al correo del consumidor conforme a la normativa de INDECOPI..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Árbol / Lista -->
+    <record id="view_wango_claim_tree" model="ir.ui.view">
+        <field name="name">wango.claim.tree</field>
+        <field name="model">wango.claim</field>
+        <field name="arch" type="xml">
+            <list string="Libro de Reclamaciones" decoration-danger="state == 'draft'" decoration-warning="state == 'in_process'" decoration-success="state in ['responded', 'closed']">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="consumer_name"/>
+                <field name="consumer_phone"/>
+                <field name="consumer_email"/>
+                <field name="claim_type"/>
+                <field name="deadline_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Acción de Ventana -->
+    <record id="action_wango_claim" model="ir.actions.act_window">
+        <field name="name">Libro de Reclamaciones</field>
+        <field name="res_model">wango.claim</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay hojas de reclamación registradas.
+            </p>
+            <p>
+                Los clientes pueden registrar reclamos y quejas desde el enlace oficial del Libro de Reclamaciones en la tienda web.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menú en Administración de WanGO -->
+    <menuitem id="menu_wango_claims" 
+              name="Libro de Reclamaciones" 
+              parent="wango_core.menu_wango_operations" 
+              action="action_wango_claim" 
+              sequence="50"/>
+</odoo>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Declaración del Reporte PDF QWeb -->
+    <record id="action_report_shipment_label" model="ir.actions.report">
+        <field name="name">Rótulo de Envío (10x15 Térmico con PIN y QR)</field>
+        <field name="model">wango.shipment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">wango_delivery.report_shipment_label_template</field>
+        <field name="report_file">wango_delivery.report_shipment_label_template</field>
+        <field name="print_report_name">'Rotulo_Envio_' + (object.name or 'New')</field>
+        <field name="binding_model_id" ref="model_wango_shipment"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Plantilla de Rótulo Térmico con Código QR y PIN de Retiro -->
+    <template id="report_shipment_label_template">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="doc">
+                <div class="page" style="font-family: 'Montserrat', -apple-system, Arial, sans-serif; padding: 10px; max-width: 400px; margin: 0 auto; border: 2px solid #2d3436; border-radius: 8px;">
+                    <!-- Cabecera de Marca -->
+                    <div style="border-bottom: 2px solid #2d3436; padding-bottom: 8px; margin-bottom: 10px;" class="text-center">
+                        <h2 style="margin: 0; font-weight: 800; font-size: 22px; color: #2d3436; text-transform: uppercase; letter-spacing: 1px;">
+                            WANGO LOGÍSTICA
+                        </h2>
+                        <span style="font-size: 11px; font-weight: 600; color: #636e72;">RED DE DISTRIBUCIÓN Y DESPACHOS</span>
+                    </div>
+
+                    <!-- Código y PIN -->
+                    <div style="background-color: #f8f9fa; border: 1px dashed #2d3436; padding: 6px; text-align: center; margin-bottom: 10px; border-radius: 6px;">
+                        <span style="font-size: 12px; font-weight: bold; display: block; color: #636e72;">GUÍA DE DESPACHO E-COMMERCE</span>
+                        <h1 style="margin: 2px 0; font-size: 26px; font-weight: 900; color: #00a650;"><t t-esc="doc.name"/></h1>
+                        <div style="font-size: 13px; font-weight: bold; color: #d63031;">
+                            PIN DE RETIRO: <span style="font-size: 16px; background-color: #ffe600; padding: 2px 8px; border-radius: 4px; color: #2d3436;"><t t-esc="doc.pickup_pin"/></span>
+                        </div>
+                    </div>
+
+                    <!-- Datos Destinatario y Punto de Entrega -->
+                    <div style="border: 2px solid #00a650; padding: 8px; border-radius: 6px; margin-bottom: 10px; background-color: #f0fff4;">
+                        <span style="font-size: 10px; font-weight: bold; color: #00a650; text-transform: uppercase;">DESTINO Y RECEPTOR:</span>
+                        <div style="font-size: 16px; font-weight: 800; color: #2d3436; margin-top: 2px;">
+                            <t t-esc="doc.recipient_id.name"/>
+                        </div>
+                        <div style="font-size: 12px; color: #2d3436; margin-top: 2px;">
+                            <strong>DNI/RUC:</strong> <t t-esc="doc.recipient_id.vat or 'No registrado'"/>
+                        </div>
+                        <div style="font-size: 12px; color: #2d3436; margin-top: 2px;">
+                            <strong>Teléfono:</strong> <t t-esc="doc.recipient_id.phone or doc.recipient_id.mobile or 'No registrado'"/>
+                        </div>
+                        <div t-if="doc.store_branch_id" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #bbf7d0; font-size: 13px; font-weight: 700; color: #00a650;">
+                            🏪 PUNTO DE RETIRO: <t t-esc="doc.store_branch_id.name"/>
+                        </div>
+                        <div t-if="doc.agency_id" style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #bbf7d0; font-size: 13px; font-weight: 700; color: #00a650;">
+                            🏢 AGENCIA: <t t-esc="doc.agency_id.name"/>
+                        </div>
+                        <div t-if="doc.delivery_district_id" style="font-size: 12px; color: #2d3436; margin-top: 2px;">
+                            <strong>Distrito:</strong> <t t-esc="doc.delivery_district_id.name"/>, <t t-esc="doc.delivery_province_id.name if doc.delivery_province_id else ''"/>
+                        </div>
+                    </div>
+
+                    <!-- Remitente -->
+                    <div style="border: 1px solid #dfe6e9; padding: 6px; border-radius: 6px; margin-bottom: 10px; font-size: 11px;">
+                        <span style="font-weight: bold; color: #636e72;">REMITENTE / TIENDA:</span> <t t-esc="doc.sender_id.name"/>
+                    </div>
+
+                    <!-- Carga y Pago -->
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; text-align: center;">
+                        <tr style="background-color: #f1f2f6;">
+                            <th style="padding: 4px; border: 1px solid #ccc;">PESO</th>
+                            <th style="padding: 4px; border: 1px solid #ccc;">BULTOS</th>
+                            <th style="padding: 4px; border: 1px solid #ccc;">PAGO</th>
+                            <th style="padding: 4px; border: 1px solid #ccc;">FLETE</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-esc="doc.total_weight"/> kg</td>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;"><t t-esc="len(doc.package_ids)"/></td>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold;">
+                                <t t-if="doc.payment_mode == 'cod'">CONTRAENTREGA</t>
+                                <t t-else="">PAGADO</t>
+                            </td>
+                            <td style="padding: 4px; border: 1px solid #ccc; font-weight: bold; color: #00a650;">
+                                S/ <t t-esc="'%.2f' % doc.price"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <!-- Pie: QR de Rastreo -->
+                    <div class="text-center" style="border-top: 1px dashed #b2bec3; padding-top: 6px;">
+                        <img t-att-src="'/report/barcode/?type=QR&amp;value=' + (doc.tracking_qr_url or ('http://45.79.217.28:8069/track/' + doc.name)) + '&amp;width=110&amp;height=110'" style="width: 90px; height: 90px;"/>
+                        <div style="font-size: 9px; color: #636e72; margin-top: 2px;">
+                            Escanea para rastrear el despacho en tiempo real
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

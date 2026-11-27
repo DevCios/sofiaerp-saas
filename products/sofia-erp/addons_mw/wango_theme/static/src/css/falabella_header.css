@@ -1,0 +1,132 @@
+/* Falabella Style Overrides */
+
+.falabella-search-form {
+    border: 1.5px solid #dedede !important;
+}
+
+.falabella-search-form input:focus {
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+.falabella-search-form button {
+    border-radius: 0 50px 50px 0 !important; 
+    min-width: 60px;
+    background-color: #343a40 !important;
+    transition: background-color 0.2s ease;
+}
+
+.falabella-search-form button:hover {
+    background-color: #23272b !important;
+}
+
+.hover-text-dark:hover {
+    color: #111 !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.custom-menu-btn:hover {
+    opacity: 0.8;
+}
+
+/* Mobile search button rounding */
+@media (max-width: 767px) {
+    .falabella-search-form button {
+        min-width: 50px;
+    }
+}
+
+/* Premium Cart Quantity Badge Styling - Based on Falabella.com */
+.my-cart-qty {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    border-radius: 50rem !important;
+    background-color: #333F48 !important; /* Falabella's signature dark charcoal gray */
+    color: #ffffff !important; /* Pure white text for high contrast and readability */
+    border: 1.5px solid #ffffff !important; /* White border outline to separate from cart icon */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    pointer-events: none; /* Let clicks pass through to cart link */
+}
+
+/* Premium Cart Success Modal Styling (Falabella style) */
+#cartSuccessModal .modal-content {
+    border-radius: 14px !important;
+    border: none !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+#cartSuccessModal .btn-close {
+    background: none !important;
+    border: none !important;
+    font-size: 1.6rem !important;
+    color: #888 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    outline: none !important;
+}
+
+#cartSuccessModal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Double line text clamping for product name in modal */
+.text-truncate-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;  
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* Quantity input and control buttons inside modal */
+#cartSuccessModal #modal-qty-input {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    width: 35px !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    color: #333 !important;
+    padding: 0 !important;
+}
+
+#cartSuccessModal #modal-qty-minus, 
+#cartSuccessModal #modal-qty-plus {
+    color: #555 !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    transition: color 0.2s;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#cartSuccessModal #modal-qty-minus:hover, 
+#cartSuccessModal #modal-qty-plus:hover {
+    color: #000 !important;
+}
+
+/* Gap helper in case bootstrap gap utility is not loaded */
+#cartSuccessModal .gap-2 {
+    gap: 0.5rem !important;
+}
+#cartSuccessModal .gap-3 {
+    gap: 1rem !important;
+}
+

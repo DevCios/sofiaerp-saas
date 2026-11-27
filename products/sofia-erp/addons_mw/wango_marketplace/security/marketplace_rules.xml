@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Regla para Productos: Vendedores solo ven sus productos -->
+        <record id="rule_product_template_seller" model="ir.rule">
+            <field name="name">Vendedores ven solo sus propios productos</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="domain_force">['|', ('website_published', '=', True), ('marketplace_seller_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_seller'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Administradores ven todos los productos -->
+        <record id="rule_product_template_manager" model="ir.rule">
+            <field name="name">Administradores ven todos los productos marketplace</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_manager'))]"/>
+        </record>
+
+        <!-- Regla para Ã“rdenes de Venta: Vendedores ven ventas de sus productos -->
+        <!-- Como hemos acordado dividir Ã³rdenes, la orden entera tendrÃ¡ el marketplace_seller_id -->
+        <record id="rule_sale_order_seller" model="ir.rule">
+            <field name="name">Vendedores ven solo sus propias ordenes</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="domain_force">[('marketplace_seller_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_seller'))]"/>
+        </record>
+        
+        <!-- Regla para Lineas de Venta -->
+        <record id="rule_sale_order_line_seller" model="ir.rule">
+            <field name="name">Vendedores ven solo sus propias lÃ­neas de venta</field>
+            <field name="model_id" ref="sale.model_sale_order_line"/>
+            <field name="domain_force">[('order_id.marketplace_seller_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_seller'))]"/>
+        </record>
+
+        <!-- Regla para Liquidaciones -->
+        <record id="rule_marketplace_settlement_seller" model="ir.rule">
+            <field name="name">Vendedores ven solo sus propias liquidaciones</field>
+            <field name="model_id" ref="model_marketplace_settlement"/>
+            <field name="domain_force">[('seller_id', '=', user.partner_id.id)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_seller'))]"/>
+        </record>
+
+        <record id="rule_marketplace_settlement_manager" model="ir.rule">
+            <field name="name">Administradores ven todas las liquidaciones</field>
+            <field name="model_id" ref="model_marketplace_settlement"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('wango_marketplace.group_marketplace_manager'))]"/>
+        </record>
+    </data>
+</odoo>

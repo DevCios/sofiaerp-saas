@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View: Opiniones y Reseñas de Productos con Moderación Rápida -->
+    <record id="view_wango_product_review_tree" model="ir.ui.view">
+        <field name="name">wango.product.review.tree</field>
+        <field name="model">wango.product.review</field>
+        <field name="arch" type="xml">
+            <list string="Opiniones y Reseñas de Productos" decoration-warning="state == 'pending'" decoration-success="state == 'approved'" decoration-muted="state == 'rejected'">
+                <field name="sequence" widget="handle"/>
+                <field name="product_tmpl_id" options="{'no_create': True}"/>
+                <field name="author_name"/>
+                <field name="author_location" optional="show"/>
+                <field name="rating" widget="selection"/>
+                <field name="title"/>
+                <field name="content" optional="show"/>
+                <field name="date_display" optional="show"/>
+                <field name="is_verified_purchase" widget="boolean_toggle"/>
+                <field name="state" widget="badge" decoration-warning="state == 'pending'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"/>
+                <field name="is_published" widget="boolean_toggle"/>
+                <button name="action_approve" type="object" string="Aprobar" icon="fa-check text-success" title="Aprobar y Publicar en Web" invisible="state == 'approved'"/>
+                <button name="action_reject" type="object" string="Rechazar" icon="fa-ban text-danger" title="Rechazar Reseña" invisible="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View: Detalle y Moderación de Opinión -->
+    <record id="view_wango_product_review_form" model="ir.ui.view">
+        <field name="name">wango.product.review.form</field>
+        <field name="model">wango.product.review</field>
+        <field name="arch" type="xml">
+            <form string="Opinión de Producto">
+                <header>
+                    <button name="action_approve" type="object" string="Aprobar y Publicar en Web" class="btn-success" invisible="state == 'approved'"/>
+                    <button name="action_reject" type="object" string="Rechazar Opinión" class="btn-danger" invisible="state == 'rejected'"/>
+                    <button name="action_set_pending" type="object" string="Pasar a Pendiente de Moderación" class="btn-secondary" invisible="state == 'pending'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="title" class="oe_edit_only" string="Título de la Opinión"/>
+                        <h1>
+                            <field name="title" placeholder="Ej: Excelente producto y entrega puntual"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Detalles del Producto y Autor">
+                            <field name="product_tmpl_id" options="{'no_create': True}"/>
+                            <field name="partner_id" options="{'no_create': True}" optional="show"/>
+                            <field name="author_name" placeholder="Ej: Carlos M."/>
+                            <field name="author_location" placeholder="Ej: Huancayo"/>
+                            <field name="date_display" placeholder="Ej: Hace 3 días"/>
+                            <field name="date_review"/>
+                        </group>
+                        <group string="Calificación y Estado Web">
+                            <field name="rating" widget="radio"/>
+                            <field name="is_verified_purchase" widget="boolean_toggle"/>
+                            <field name="helpful_count"/>
+                            <field name="is_published" widget="boolean_toggle"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group string="Contenido del Comentario">
+                        <field name="content" nolabel="1" placeholder="Escribe el testimonio o comentario que se mostrará en la tienda web..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View con Filtros de Moderación -->
+    <record id="view_wango_product_review_search" model="ir.ui.view">
+        <field name="name">wango.product.review.search</field>
+        <field name="model">wango.product.review</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Opiniones">
+                <field name="product_tmpl_id"/>
+                <field name="author_name"/>
+                <field name="title"/>
+                <field name="content"/>
+                <filter string="⏳ Pendientes de Aprobación" name="filter_pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="✅ Aprobadas y Publicadas" name="filter_approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="❌ Rechazadas" name="filter_rejected" domain="[('state', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="Compra Verificada" name="filter_verified" domain="[('is_verified_purchase', '=', True)]"/>
+                <filter string="5 Estrellas" name="filter_rating_5" domain="[('rating', '=', '5')]"/>
+                <filter string="4 Estrellas" name="filter_rating_4" domain="[('rating', '=', '4')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado de Moderación" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Producto" name="group_product" context="{'group_by': 'product_tmpl_id'}"/>
+                    <filter string="Calificación" name="group_rating" context="{'group_by': 'rating'}"/>
+                    <filter string="Compra Verificada" name="group_verified" context="{'group_by': 'is_verified_purchase'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Window -->
+    <record id="action_wango_product_review" model="ir.actions.act_window">
+        <field name="name">Opiniones y Reseñas</field>
+        <field name="res_model">wango.product.review</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_wango_product_review_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                ¡Gestiona y modera las opiniones de tus productos!
+            </p>
+            <p>
+                Los clientes que compren tus productos pueden opinar desde la web. Todas las opiniones quedan pendientes de aprobación hasta que tú las apruebes aquí.
+            </p>
+        </field>
+    </record>
+</odoo>

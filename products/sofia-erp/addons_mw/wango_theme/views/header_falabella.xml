@@ -1,0 +1,1450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="header_falabella" inherit_id="website.layout" name="Falabella Header" priority="60">
+        <xpath expr="//head" position="inside">
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&amp;display=swap"/>
+        </xpath>
+        <xpath expr="//header" position="replace">
+            <header class="falabella-header-wrapper bg-white border-bottom">
+                
+                <style type="text/css">
+                    <![CDATA[
+                    /* Tipografía Montserrat Unificada para Cabecera */
+                    .falabella-header-wrapper,
+                    .falabella-header-wrapper *,
+                    .falabella-header-wrapper input,
+                    .falabella-header-wrapper button,
+                    .falabella-header-wrapper a,
+                    .falabella-header-wrapper span:not(.fa) {
+                        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+                    }
+                    .falabella-header-wrapper .fa,
+                    .falabella-header-wrapper i.fa,
+                    .falabella-header-wrapper span.fa {
+                        font-family: 'FontAwesome' !important;
+                    }
+
+                    /* Sidebar Layout & Logic */
+                    .wbl-sidebar {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 300px;
+                        height: 100vh;
+                        background-color: white;
+                        z-index: 9999;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s ease-in-out;
+                        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .wbl-sidebar.wbl-sidebar-open {
+                        transform: translateX(0) !important;
+                    }
+
+                    .wbl-sidebar-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        z-index: 9998;
+                        display: none;
+                        opacity: 0;
+                        transition: opacity 0.3s ease-in-out;
+                    }
+
+                    .wbl-sidebar-overlay.wbl-sidebar-open {
+                        display: block !important;
+                        opacity: 1 !important;
+                    }
+
+                    .wbl-sidebar-header {
+                        padding: 20px;
+                        border-bottom: 1px solid #eee;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        background-color: #f8f9fa;
+                    }
+
+                    .wbl-sidebar-body {
+                        padding: 0;
+                        overflow-y: auto;
+                        flex-grow: 1;
+                        display: flex;
+                        flex-direction: row;
+                        height: 100%;
+                        overflow: hidden;
+                    }
+
+                    .wbl-sidebar-close {
+                        background: none;
+                        border: none;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        color: #333;
+                    }
+
+                    .wbl-menu-btn {
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-right: 15px;
+                        font-weight: 600;
+                        border: none !important;
+                        padding: 0 !important;
+                        background: transparent !important;
+                        transition: all 0.2s;
+                    }
+
+                    .wbl-menu-btn:hover {
+                        opacity: 0.8;
+                    }
+
+                    /* List Item Styles */
+                    .wbl-sidebar-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 15px 20px;
+                        border-bottom: 1px solid #f0f0f0;
+                        color: #333;
+                        text-decoration: none;
+                        transition: background-color 0.2s;
+                        font-size: 15px;
+                    }
+
+                    .wbl-sidebar-item:hover {
+                        background-color: #f8f9fa;
+                        color: #accf33;
+                        text-decoration: none;
+                    }
+
+                    /* Megamenu Layout & Grid */
+                    .wbl-mega-menu-left {
+                        width: 300px;
+                        border-right: 1px solid #e0e0e0;
+                        overflow-y: auto;
+                        background-color: #fff;
+                        flex-shrink: 0;
+                    }
+
+                    .wbl-mega-menu-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 15px 20px;
+                        border-bottom: 1px solid #f8f9fa;
+                        border-left: 4px solid transparent;
+                        cursor: pointer;
+                        color: #333;
+                        transition: all 0.25s ease-in-out;
+                        font-size: 1.1rem;
+                        font-weight: 500;
+                        text-decoration: none;
+                    }
+
+                    .wbl-mega-menu-item:hover,
+                    .wbl-mega-menu-item.active {
+                        background-color: #f8f9fa;
+                        color: #accf33;
+                        font-weight: 700;
+                        border-left-color: #accf33;
+                    }
+
+                    .wbl-mega-menu-item .fa-chevron-right {
+                        transition: transform 0.25s ease-in-out, color 0.25s ease-in-out;
+                    }
+
+                    .wbl-mega-menu-item:hover .fa-chevron-right,
+                    .wbl-mega-menu-item.active .fa-chevron-right {
+                        color: #accf33;
+                        transform: translateX(4px);
+                    }
+
+                    .wbl-mega-menu-right {
+                        flex-grow: 1;
+                        background-color: #fff;
+                        overflow-y: auto;
+                        position: relative;
+                        padding: 20px;
+                        display: none;
+                    }
+
+                    /* Desktop Grid Override */
+                    @media (min-width: 768px) {
+                        .wbl-sidebar {
+                            width: 900px !important;
+                            max-width: 90vw;
+                        }
+
+                        .wbl-mega-menu-right {
+                            display: block;
+                        }
+                    }
+
+                    /* Individual Category Panels */
+                    .wbl-category-panel {
+                        display: none;
+                        animation: fadeIn 0.2s ease-in-out;
+                    }
+
+                    .wbl-category-panel.active {
+                        display: block;
+                    }
+
+                    /* Subcategory Styling inside Panel */
+                    .wbl-subcategory-group {
+                        margin-bottom: 20px;
+                    }
+
+                    .wbl-subcategory-title {
+                        font-weight: 700;
+                        font-size: 1rem;
+                        color: #333;
+                        margin-bottom: 10px;
+                        display: block;
+                        border-bottom: 2px solid #accf33;
+                        padding-bottom: 5px;
+                    }
+
+                    .wbl-subcategory-link {
+                        display: block;
+                        color: #555;
+                        padding: 5px 0;
+                        text-decoration: none;
+                        font-size: 1.05rem;
+                        transition: color 0.2s;
+                    }
+
+                    .wbl-subcategory-link:hover {
+                        color: #accf33;
+                        text-decoration: none;
+                    }
+
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+
+                    @media (max-width: 991.98px) {
+                        .falabella-header-wrapper .dropdown-toggle::after {
+                            display: none !important;
+                        }
+                    }
+
+                    /* Hide Odoo's secondary search bar in shop */
+                    #wrap .o_wsale_products_searchbar_form {
+                        display: none !important;
+                    }
+
+                    /* Custom Autocomplete Dropdown styling */
+                    .falabella-search-form {
+                        position: relative !important;
+                    }
+                    .falabella-search-form .dropdown-menu {
+                        border-radius: 12px !important;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+                        border: 1px solid #eee !important;
+                        padding: 10px 0 !important;
+                        margin-top: 5px !important;
+                        width: 100% !important;
+                        max-height: 400px;
+                        overflow-y: auto;
+                        z-index: 1050 !important;
+                    }
+                    .falabella-search-form .dropdown-item {
+                        padding: 8px 16px !important;
+                        transition: background-color 0.2s ease;
+                    }
+                    .falabella-search-form .dropdown-item:hover {
+                        background-color: #f8f9fa !important;
+                    }
+                    .falabella-search-form .dropdown-item a {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 12px;
+                        color: #333 !important;
+                        text-decoration: none !important;
+                    }
+                    .falabella-search-form .dropdown-item img {
+                        width: 48px !important;
+                        height: 48px !important;
+                        object-fit: cover !important;
+                        border-radius: 6px !important;
+                        border: 1px solid #f0f0f0 !important;
+                    }
+                    .falabella-search-form .dropdown-item .media-body {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .falabella-search-form .dropdown-item .o_wsale_search_title {
+                        font-weight: 600 !important;
+                        font-size: 1.1rem !important;
+                        color: #333 !important;
+                    }
+                    .falabella-search-form .dropdown-item .o_wsale_search_price {
+                        color: #ff3b30 !important;
+                        font-weight: 700 !important;
+                        font-size: 1rem !important;
+                        margin-top: 2px;
+                    }
+
+                    /* Style the eCommerce sidebar filter section */
+                    #products_grid_before {
+                        border-right: 1px solid #eee;
+                        padding-right: 20px;
+                    }
+                    #products_grid_before h4, #products_grid_before .o_categories_collapse_title {
+                        font-weight: 700;
+                        font-size: 1.1rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        color: #333;
+                        border-bottom: 2px solid #accf33;
+                        padding-bottom: 5px;
+                        margin-bottom: 15px;
+                    }
+                    #products_grid_before .nav-pills .nav-link {
+                        color: #555;
+                        font-size: 1.05rem;
+                        padding: 6px 10px;
+                        transition: all 0.2s;
+                    }
+                    #products_grid_before .nav-pills .nav-link:hover, 
+                    #products_grid_before .nav-pills .nav-link.active {
+                        background-color: #f8f9fa;
+                        color: #accf33;
+                        font-weight: bold;
+                    }
+
+                    /* Style product card grid */
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart {
+                        border: 1px solid #f0f0f0 !important;
+                        border-radius: 8px !important;
+                        overflow: hidden !important;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+                        box-shadow: 0 2px 5px rgba(0,0,0,0.02) !important;
+                        background: #fff !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart:hover {
+                        transform: translateY(-5px) !important;
+                        box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
+                        border-color: #e0e0e0 !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_image {
+                        padding: 10px !important;
+                        background: #fff !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_information {
+                        background: #fff !important;
+                        padding: 20px !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_information_text {
+                        padding: 0 !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_products_item_title a {
+                        color: #333 !important;
+                        font-weight: 600 !important;
+                        font-size: 1.1rem !important;
+                        text-decoration: none !important;
+                        line-height: 1.3 !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_products_item_title a:hover {
+                        color: #accf33 !important;
+                    }
+                    
+                    /* Price styling matching premium eCommerce */
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .product_price {
+                        margin-top: 10px !important;
+                        font-weight: 700 !important;
+                        color: #ff3b30 !important;
+                        font-size: 1.1rem !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .product_price del {
+                        color: #999 !important;
+                        font-size: 1rem !important;
+                        font-weight: 400 !important;
+                        margin-left: 5px !important;
+                    }
+
+                    /* Premium Breadcrumb Styling - Force Single Row */
+                    .breadcrumb {
+                        background-color: transparent !important;
+                        padding: 12px 0 !important;
+                        margin-bottom: 24px !important;
+                        font-size: 0.92rem !important;
+                        display: flex !important;
+                        flex-wrap: nowrap !important;
+                        overflow: hidden !important;
+                        text-overflow: ellipsis !important;
+                        white-space: nowrap !important;
+                        align-items: center !important;
+                    }
+                    .breadcrumb-item {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        color: #666 !important;
+                        white-space: nowrap !important;
+                    }
+                    .breadcrumb-item + .breadcrumb-item::before {
+                        content: "/" !important;
+                        color: #bbb !important;
+                        padding: 0 10px !important;
+                        font-size: 1rem !important;
+                    }
+                    .breadcrumb-item a {
+                        color: #666 !important;
+                        text-decoration: none !important;
+                        transition: color 0.2s ease;
+                        font-weight: 500 !important;
+                    }
+                    .breadcrumb-item a:hover {
+                        color: #accf33 !important;
+                    }
+                    .breadcrumb-item.active {
+                        color: #333 !important;
+                        font-weight: 600 !important;
+                        overflow: hidden !important;
+                        text-overflow: ellipsis !important;
+                        white-space: nowrap !important;
+                    }
+
+                    /* Hide default hover add to cart overlay/buttons in Odoo */
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_btn {
+                        display: none !important;
+                    }
+
+                    /* Perfect Alignment for eCommerce Cards Grid */
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart,
+                    #products_grid:not(.o_wsale_layout_list) .o_wsale_product_grid_wrapper {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        height: 100% !important;
+                        min-height: 480px !important;
+                    }
+                    /* Make product card image larger */
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_image {
+                        height: 280px !important;
+                        flex-shrink: 0 !important;
+                        padding: 2px !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        background: #fff !important;
+                        overflow: hidden !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_image a,
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_image span {
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        height: 100% !important;
+                        width: 100% !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_image img {
+                        max-height: 96% !important;
+                        width: auto !important;
+                        max-width: 96% !important;
+                        object-fit: contain !important;
+                        transition: transform 0.3s ease !important;
+                        transform: scale(1) !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart:hover .oe_product_image img {
+                        transform: scale(1.06) !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_information {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        flex-grow: 1 !important;
+                        justify-content: space-between !important;
+                        padding: 20px !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_information_text {
+                        flex-grow: 1 !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                    }
+                    #products_grid:not(.o_wsale_layout_list) .oe_product_cart .o_wsale_product_information_text .o_wsale_products_item_title {
+                        min-height: 46px !important;
+                        max-height: 46px !important;
+                        overflow: hidden !important;
+                        text-overflow: ellipsis !important;
+                        display: -webkit-box !important;
+                        -webkit-line-clamp: 2 !important;
+                        -webkit-box-orient: vertical !important;
+                        margin-bottom: 12px !important;
+                    }
+                    
+                    /* Custom Premium "Comprar" button in product grid cards */
+                    .custom-comprar-form {
+                        margin-top: 18px !important;
+                        width: 100% !important;
+                        position: relative !important;
+                        z-index: 5 !important;
+                    }
+                    .custom-comprar-btn {
+                        position: relative !important;
+                        z-index: 6 !important;
+                        background-color: #00a650 !important;
+                        border: none !important;
+                        color: white !important;
+                        font-weight: 700 !important;
+                        font-size: 1.1rem !important;
+                        padding: 10px 16px !important;
+                        border-radius: 50px !important;
+                        width: 100% !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        gap: 8px;
+                        transition: all 0.2s ease-in-out !important;
+                        text-decoration: none !important;
+                        cursor: pointer !important;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+                    }
+                    .custom-comprar-btn:hover {
+                        background-color: #008f45 !important;
+                        transform: translateY(-1px) !important;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+                        color: white !important;
+                        text-decoration: none !important;
+                    }
+                    .custom-comprar-btn:active {
+                        transform: translateY(0) !important;
+                    }
+                    
+                    /* List layout overrides for the Comprar button to prevent stretching */
+                    .o_wsale_layout_list .custom-comprar-form,
+                    #products_grid.o_wsale_layout_list .custom-comprar-form {
+                        width: auto !important;
+                        margin-top: 0 !important;
+                        margin-left: auto !important;
+                        align-self: center !important;
+                        height: auto !important;
+                    }
+                    .o_wsale_layout_list .custom-comprar-btn,
+                    #products_grid.o_wsale_layout_list .custom-comprar-btn {
+                        width: 180px !important;
+                        height: 42px !important;
+                        padding: 10px 16px !important;
+                        font-size: 1.1rem !important;
+                        align-self: center !important;
+                        margin-left: auto !important;
+                    }
+
+                    /* ── Mercado Libre Style Product Image Gallery (4 photos) ── */
+                    #o-carousel-product {
+                        border-radius: 12px !important;
+                        background: #ffffff !important;
+                    }
+                    #o-carousel-product .carousel-outer {
+                        min-height: 420px !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                    #o-carousel-product .product_detail_img {
+                        max-height: 460px !important;
+                        width: auto !important;
+                        max-width: 100% !important;
+                        object-fit: contain !important;
+                        transition: transform 0.25s ease !important;
+                    }
+                    /* Left Thumbnails styling (Mercado Libre Style) */
+                    #o-carousel-product .o_carousel_product_indicators {
+                        gap: 8px !important;
+                        padding: 4px !important;
+                    }
+                    #o-carousel-product .o_carousel_product_indicators li {
+                        width: 60px !important;
+                        height: 60px !important;
+                        border-radius: 8px !important;
+                        border: 2px solid #e0e0e0 !important;
+                        overflow: hidden !important;
+                        opacity: 0.85 !important;
+                        transition: all 0.2s ease !important;
+                        background-color: #fff !important;
+                    }
+                    #o-carousel-product .o_carousel_product_indicators li:hover,
+                    #o-carousel-product .o_carousel_product_indicators li.active {
+                        border-color: #00a650 !important;
+                        opacity: 1 !important;
+                        box-shadow: 0 0 0 1px #00a650 !important;
+                        transform: scale(1.05) !important;
+                    }
+                    #o-carousel-product .o_carousel_product_indicators li img {
+                        width: 100% !important;
+                        height: 100% !important;
+                        object-fit: contain !important;
+                    }
+                    
+                    /* Falabella Mobile Login Bottom Sheet */
+                    @media (max-width: 767.98px) {
+                        #mobileLoginModal .modal-dialog {
+                            position: fixed !important;
+                            bottom: 0 !important;
+                            left: 0 !important;
+                            right: 0 !important;
+                            margin: 0 !important;
+                            max-width: 100% !important;
+                            width: 100% !important;
+                        }
+                        #mobileLoginModal.fade .modal-dialog {
+                            transform: translateY(100%) !important;
+                            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                        }
+                        #mobileLoginModal.show .modal-dialog {
+                            transform: translateY(0) !important;
+                        }
+                        #mobileLoginModal .modal-content {
+                            border-top-left-radius: 24px !important;
+                            border-top-right-radius: 24px !important;
+                            border-bottom-left-radius: 0 !important;
+                            border-bottom-right-radius: 0 !important;
+                            border: none !important;
+                            box-shadow: 0 -10px 25px rgba(0,0,0,0.15) !important;
+                        }
+                        #mobileLoginModal input:focus {
+                            border-bottom: 2px solid #2c3e50 !important;
+                            outline: none !important;
+                        }
+                    }
+]]>
+                </style>
+                
+                <!-- Main Header Row -->
+                <div class="container-fluid py-2 px-3 px-md-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        
+                        <!-- Left: Menu + Logo (Falabella Mobile Reorder) -->
+                        <div class="d-flex align-items-center" style="gap: 0.75rem;">
+                            <!-- Menu Button (Bars only on mobile, with text on desktop) -->
+                            <button class="btn btn-link text-dark text-decoration-none fw-bold d-flex align-items-center p-0 custom-menu-btn wbl-menu-btn order-1 order-md-2 me-md-2" type="button" style="font-size: 1.1rem; gap: 0.5rem; border: none !important; box-shadow: none !important;">
+                                <i class="fa fa-bars fs-4"/>
+                                <span class="d-none d-md-inline ms-1">Categorías</span>
+                            </button>
+
+                            <!-- Brand Logo (Sincronizado con Backend de Odoo) -->
+                            <a href="/" class="text-decoration-none order-2 order-md-1 d-flex align-items-center">
+                                <img t-att-src="'/logo.png?%s' % (res_company.write_date or '')" 
+                                     alt="Mercado Wanka" 
+                                     class="img-fluid" 
+                                     style="max-height: 42px; width: auto; object-fit: contain;"
+                                     onerror="this.onerror=null; this.src='/wango_theme/static/src/img/mercadowanka_logo.png';"/>
+                            </a>
+                        </div>
+
+                        <!-- Center: Search Bar -->
+                        <div class="flex-grow-1 mx-4 d-none d-md-block" style="max-width: 800px;">
+                            <form method="get" action="/shop" class="falabella-search-form o_wsale_products_searchbar_form o_wait_lazy_js d-flex align-items-center border rounded-pill overflow-hidden" style="border-color: #ddd !important; height: 46px;" data-limit="5" data-display-image="true" data-display-description="true" data-display-price="true" data-display-extra-link="true" data-display-categories="true">
+                                <input type="search" name="search" class="search-query form-control border-0 shadow-none px-4 h-100" placeholder="Buscar en Mercado Wanka..." style="font-size: 1.1rem;" t-att-value="search"/>
+                                <button type="submit" class="btn border-0 shadow-none h-100 d-flex align-items-center justify-content-center px-4" style="background-color: #343a40; color: white;">
+                                    <i class="fa fa-search fs-5"/>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Right: Actions -->
+                        <div class="d-flex align-items-center flex-shrink-0" style="gap: 1rem;">
+                            
+                            <!-- 1. Si el usuario NO está logueado -->
+                            <t t-if="user_id._is_public()">
+                                <!-- Desktop: Menú desplegable original -->
+                                <div class="dropdown d-none d-md-flex align-items-center">
+                                    <a href="#" class="dropdown-toggle text-dark text-decoration-none d-flex flex-column lh-1" data-bs-toggle="dropdown" data-toggle="dropdown" style="gap: 0.15rem; cursor: pointer;">
+                                        <span class="text-dark d-none d-lg-inline" style="font-size: 1.05rem;">Hola,</span>
+                                        <div class="d-flex align-items-center fw-bold" style="font-size: 1.1rem; gap: 0.25rem;">
+                                            <span>Inicia sesión</span>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-end shadow border-0 mt-3" style="border-radius: 12px; min-width: 220px; overflow: hidden;">
+                                        <div class="p-3 text-center bg-light border-bottom">
+                                            <a href="/web/login" class="btn w-100 fw-bold mb-2 text-white" style="background-color: #00a650; border-radius: 8px;">Iniciar Sesión</a>
+                                            <div class="small text-muted">¿Eres nuevo? <a href="/web/signup" class="text-primary fw-bold text-decoration-none">Regístrate aquí</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile: Gatillador Bottom Sheet Estilo Falabella -->
+                                <div class="d-flex d-md-none align-items-center">
+                                    <a href="#" class="text-dark text-decoration-none fw-bold" style="font-size: 0.95rem; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#mobileLoginModal" data-toggle="modal" data-target="#mobileLoginModal" onclick="var m = document.getElementById('mobileLoginModal'); if (window.bootstrap &amp;&amp; window.bootstrap.Modal) { try { new window.bootstrap.Modal(m).show(); } catch(e){ $(m).modal('show'); } } else if (window.$) { $(m).modal('show'); }">
+                                        Inicia sesión
+                                    </a>
+                                </div>
+                            </t>
+
+                            <!-- 2. Si el usuario SÍ está logueado (Tanto Desktop como Mobile ven su menú) -->
+                            <t t-if="not user_id._is_public()">
+                                <div class="dropdown d-flex align-items-center">
+                                    <a href="#" class="dropdown-toggle text-dark text-decoration-none d-flex flex-column lh-1" data-bs-toggle="dropdown" data-toggle="dropdown" style="gap: 0.15rem; cursor: pointer;">
+                                        <span class="text-dark d-none d-lg-inline" style="font-size: 1.05rem;">Hola,</span>
+                                        <div class="d-flex align-items-center fw-bold" style="font-size: 1.1rem; gap: 0.25rem;">
+                                            <span class="d-none d-lg-inline"><t t-esc="user_id.name[:12] + '..' if len(user_id.name) > 12 else user_id.name"/></span>
+                                            <span class="d-inline d-lg-none text-dark fw-bold text-truncate" style="font-size: 0.95rem; max-width: 85px;"><t t-esc="user_id.name.split(' ')[0]"/></span>
+                                        </div>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-end shadow border-0 mt-3" style="border-radius: 12px; min-width: 220px; overflow: hidden;">
+                                        <div class="p-2">
+                                            <t t-if="user_id.has_group('wango_marketplace.group_marketplace_seller') or user_id.partner_id.marketplace_seller_status == 'approved' or user_id.partner_id.is_marketplace_seller">
+                                                <a class="dropdown-item py-2 fw-bold text-success" style="border-radius: 6px; background-color: #e8f5e9;" href="/my/seller/dashboard">
+                                                    <i class="fa fa-store me-2" style="width: 16px;"/> Panel de Vendedor
+                                                </a>
+                                                <a class="dropdown-item py-2 fw-bold text-dark" style="border-radius: 6px;" href="/my/seller/settings">
+                                                    <i class="fa fa-cogs me-2" style="width: 16px;"/> Configuración de Mi Tienda
+                                                </a>
+                                                <div class="dropdown-divider my-2"></div>
+                                            </t>
+                                            <a class="dropdown-item py-2" style="border-radius: 6px;" href="/my/home?purchases=1"><i class="fa fa-shopping-bag me-2 text-muted" style="width: 16px;"/> Mis Compras Personales</a>
+                                            <a class="dropdown-item py-2" style="border-radius: 6px;" href="/my/account"><i class="fa fa-id-card-o me-2 text-muted" style="width: 16px;"/> Mis Datos</a>
+                                            <a class="dropdown-item py-2" style="border-radius: 6px;" href="/my/wango"><i class="fa fa-truck me-2 text-muted" style="width: 16px;"/> Mis Encomiendas</a>
+                                            <a class="dropdown-item py-2" style="border-radius: 6px;" href="/my/security"><i class="fa fa-lock me-2 text-muted" style="width: 16px;"/> Seguridad</a>
+                                            <div class="dropdown-divider my-2"></div>
+                                            <a class="dropdown-item text-danger py-2 fw-bold" style="border-radius: 6px;" href="/web/session/logout?redirect=/"><i class="fa fa-sign-out me-2" style="width: 16px;"/> Cerrar sesión</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <div class="d-none d-lg-block border-start h-100 mx-1 hide-mobile" style="border-color: #ddd !important; min-height: 25px;"></div>
+                            
+                            <!-- Wishlist (Oculto en movil para diseno limpio tipo Falabella) -->
+                            <a href="/shop/wishlist" class="text-dark text-decoration-none d-none d-md-inline-block">
+                                <i class="fa fa-heart-o fs-4"/>
+                            </a>
+                            
+                            <!-- Cart con Badge visible y responsive -->
+                            <a href="/shop/cart" id="wango_header_cart" data-wango-header="v3" class="text-dark text-decoration-none position-relative d-inline-flex align-items-center justify-content-center p-2" style="min-width: 44px; min-height: 44px;" title="Mi Carrito">
+                                <i class="fa fa-shopping-cart" style="font-size: 1.55rem; color: #333F48;"/>
+                                <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                                <span class="position-absolute badge rounded-pill bg-success text-white my_cart_quantity my-cart-qty font-weight-bold" style="top: 2px; right: 0; font-size: 11px; padding: 2px 6px; border: 2px solid #ffffff; background-color: #00a650 !important; line-height: 1;">
+                                    <t t-esc="website_sale_order and website_sale_order.cart_quantity or '0'"/>
+                                </span>
+                            </a>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Mobile Search Bar (Visible only on small screens) -->
+                    <div class="d-block d-md-none mt-3">
+                        <form method="get" action="/shop" class="falabella-search-form o_wsale_products_searchbar_form o_wait_lazy_js d-flex align-items-center border rounded-pill overflow-hidden" style="border-color: #ddd !important; height: 40px;" data-limit="5" data-display-image="true" data-display-description="true" data-display-price="true" data-display-extra-link="true" data-display-categories="true">
+                            <input type="search" name="search" class="search-query form-control border-0 shadow-none px-3 h-100" placeholder="Buscar en Mercado Wanka..." style="font-size: 1.05rem;" t-att-value="search"/>
+                            <button type="submit" class="btn border-0 shadow-none h-100 px-3" style="background-color: #343a40; color: white;">
+                                <i class="fa fa-search"/>
+                            </button>
+                        </form>
+                        <!-- Mobile Location Row (Mercado Libre Style) -->
+                        <div class="d-flex align-items-center mt-2 px-1 text-muted falabella-mobile-loc-row" id="falabella_header_location_mobile" role="button" style="font-size: 0.85rem; gap: 0.4rem; cursor: pointer;">
+                            <i class="fa fa-map-marker text-success" style="font-size: 1rem;"/>
+                            <span id="falabella_header_location_mobile_text" class="text-truncate font-weight-bold" style="color: #333;">Ingresa tu ubicación</span>
+                            <i class="fa fa-chevron-right text-muted ms-auto" style="font-size: 0.75rem;"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Sub-Header Row -->
+                <div class="container-fluid border-top py-2 px-3 px-md-4 bg-light d-none d-md-block" style="font-size: 1rem; color: #555;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <!-- Location -->
+                        <div class="d-flex align-items-center cursor-pointer hover-text-dark" style="gap: 0.5rem; cursor: pointer;" id="falabella_header_location_btn" role="button">
+                            <i class="fa fa-map-marker text-success" style="font-size: 1.1rem;"/>
+                            <span id="falabella_header_location_text">Ingresa tu ubicación</span>
+                        </div>
+                        
+                        <!-- Extra Links -->
+                        <div class="d-flex align-items-center" style="gap: 1.5rem;">
+                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Tarjeta CMR <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
+                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Vende y comisiona</a>
+                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Venta telefónica <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
+                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Ayuda <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Drawer Overlay -->
+                <div id="wbl_sidebar_overlay" class="wbl-sidebar-overlay"></div>
+
+                <!-- Sidebar Drawer Megamenu -->
+                <div id="wbl_sidebar" class="wbl-sidebar">
+                    <div class="wbl-sidebar-header">
+                        <h5 class="m-0 fw-bold"><i class="fa fa-bars me-2"/> Categorías</h5>
+                        <button id="wbl_close_sidebar" class="wbl-sidebar-close" type="button">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+                    <div class="wbl-sidebar-body">
+                        <!-- LEFT COLUMN: Parent Categories -->
+                        <div class="wbl-mega-menu-left">
+                            <t t-set="categories" t-value="request.env['product.public.category'].sudo().search([('parent_id', '=', False)])"/>
+                            <t t-if="not categories">
+                                <div class="p-4 text-muted text-center">No hay categorías disponibles</div>
+                            </t>
+                            <t t-else="">
+                                <t t-foreach="categories" t-as="category">
+                                    <a t-attf-href="/shop/category/#{category.id}" t-attf-class="wbl-mega-menu-item #{'active' if category_first else ''}" t-att-data-category-id="category.id">
+                                        <t t-esc="category.name"/>
+                                        <i class="fa fa-chevron-right text-muted small"/>
+                                    </a>
+                                </t>
+                            </t>
+                        </div>
+
+                        <!-- RIGHT COLUMN: Subcategories Panels -->
+                        <div class="wbl-mega-menu-right">
+                            <t t-if="categories">
+                                <t t-foreach="categories" t-as="category">
+                                    <div t-attf-id="wbl-category-panel-#{category.id}" t-attf-class="wbl-category-panel #{'active' if category_first else ''}" t-attf-style="#{'display: block;' if category_first else 'display: none;'}">
+                                        <h4 class="mb-4 fw-bold" style="color: #333; border-bottom: 2px solid #accf33; padding-bottom: 10px;">
+                                            <a t-attf-href="/shop/category/#{category.id}" class="text-decoration-none text-dark hover-text-primary">
+                                                <t t-esc="category.name"/>
+                                            </a>
+                                        </h4>
+                                        <div class="row">
+                                            <t t-if="not category.child_id">
+                                                <div class="col-12 text-muted">No hay subcategorías en esta sección</div>
+                                            </t>
+                                            <t t-else="">
+                                                <t t-foreach="category.child_id" t-as="sub_category">
+                                                    <div class="col-md-4 mb-4">
+                                                        <div class="wbl-subcategory-group">
+                                                            <a t-attf-href="/shop/category/#{sub_category.id}" class="wbl-subcategory-title text-decoration-none">
+                                                                <t t-esc="sub_category.name"/>
+                                                            </a>
+                                                            <t t-foreach="sub_category.child_id" t-as="grand_child">
+                                                                <a t-attf-href="/shop/category/#{grand_child.id}" class="wbl-subcategory-link">
+                                                                    <t t-esc="grand_child.name"/>
+                                                                </a>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inline JS for Sidebar Megamenu Toggling (Anti-cache/Anti-deployment issues) -->
+                <script type="text/javascript">
+                    <![CDATA[
+                    document.addEventListener('click', function (ev) {
+                        // 1. Open Menu button clicked
+                        var menuBtn = ev.target.closest('.wbl-menu-btn, .wbl-header-menu-btn');
+                        if (menuBtn) {
+                            ev.preventDefault();
+                            console.log('Menu button clicked (Vanilla JS)');
+                            var sidebar = document.getElementById('wbl_sidebar');
+                            var overlay = document.getElementById('wbl_sidebar_overlay');
+                            if (sidebar) sidebar.classList.add('wbl-sidebar-open');
+                            if (overlay) {
+                                overlay.style.display = 'block';
+                                setTimeout(function() {
+                                    overlay.classList.add('wbl-sidebar-open');
+                                }, 10);
+                            }
+                            document.body.style.overflow = 'hidden';
+                            return;
+                        }
+
+                        // 2. Close Menu button or overlay clicked
+                        var closeBtn = ev.target.closest('#wbl_close_sidebar, #wbl_sidebar_overlay');
+                        if (closeBtn) {
+                            ev.preventDefault();
+                            console.log('Close button/overlay clicked (Vanilla JS)');
+                            var sidebar = document.getElementById('wbl_sidebar');
+                            var overlay = document.getElementById('wbl_sidebar_overlay');
+                            if (sidebar) sidebar.classList.remove('wbl-sidebar-open');
+                            if (overlay) {
+                                overlay.classList.remove('wbl-sidebar-open');
+                                setTimeout(function() {
+                                    overlay.style.display = 'none';
+                                 }, 300); // Matches transition duration
+                             }
+                             document.body.style.overflow = '';
+                             return;
+                         }
+
+                        // 3. "Comprar" button clicked on product grid cards
+                          var comprarBtn = ev.target.closest('.custom-comprar-btn');
+                          if (comprarBtn) {
+                              ev.preventDefault();
+                              ev.stopPropagation();
+                              if (comprarBtn.classList.contains('disabled')) return;
+                              
+                              var form = comprarBtn.closest('form');
+                              if (!form) return;
+                              
+                              var productIdInput = form.querySelector('input[name="product_id"]');
+                              if (!productIdInput) return;
+                              
+                              var productId = productIdInput.value;
+                              if (!productId) return;
+                              
+                              // Disable button to prevent double-click
+                              comprarBtn.classList.add('disabled');
+                              comprarBtn.style.opacity = '0.7';
+                              comprarBtn._originalHTML = comprarBtn.innerHTML;
+                              
+                              // Extract product details instantly
+                              var card = comprarBtn.closest('.oe_product_cart') || comprarBtn.closest('.oe_product');
+                              var name = card ? (card.querySelector('.o_wsale_products_item_title a') ? card.querySelector('.o_wsale_products_item_title a').textContent.trim() : 'Producto') : 'Producto';
+                              var imgEl = card ? card.querySelector('.oe_product_image img') : null;
+                              var imgUrl = imgEl ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('src') || '') : '';
+                              var priceEl = card ? card.querySelector('.product_price') : null;
+                              var priceText = 'S/ 0.00';
+                              var oldPriceText = '';
+                              var discountPercent = 0;
+                              if (priceEl) {
+                                  var tempDiv = priceEl.cloneNode(true);
+                                  var removeHiddenTags = function(container) {
+                                      var allChildren = container.querySelectorAll('*');
+                                      allChildren.forEach(function(el) {
+                                          var style = el.getAttribute('style') || '';
+                                          if (style.replace(/\s/g, '').indexOf('display:none') !== -1 || el.hasAttribute('itemprop')) {
+                                              el.remove();
+                                          }
+                                      });
+                                  };
+                                  
+                                  var delEl = tempDiv.querySelector('del');
+                                  if (delEl) {
+                                      removeHiddenTags(delEl);
+                                      oldPriceText = delEl.textContent.trim();
+                                      delEl.remove();
+                                  }
+                                  
+                                  removeHiddenTags(tempDiv);
+                                  priceText = tempDiv.textContent.trim();
+                                  
+                                  if (oldPriceText && oldPriceText !== priceText) {
+                                      var oldP = parseFloat(oldPriceText.replace(/[^\d.]/g, '')) || 0;
+                                      var newP = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+                                      if (oldP > newP) {
+                                          discountPercent = Math.round((1 - newP / oldP) * 100);
+                                      }
+                                  }
+                              }
+                              
+                              var brand = 'WANKA';
+                              var commonBrands = ['GLORIA', 'LAIVE', 'NESTLE', 'DONOFRIO', 'ALICORP', 'BOLIVAR', 'OPAL', 'MIMOSA', 'PRIMOR', 'SAN FERNANDO', 'RED BULL', 'COCA COLA', 'INCA KOLA', 'PEPSI'];
+                              var upperName = name.toUpperCase();
+                              for (var i = 0; i < commonBrands.length; i++) {
+                                  if (upperName.indexOf(commonBrands[i]) !== -1) {
+                                      brand = commonBrands[i];
+                                      break;
+                                  }
+                              }
+                              if (brand === 'WANKA' && name) {
+                                  var words = name.split(' ');
+                                  if (words.length > 0 && words[0].length > 3) {
+                                      brand = words[0].toUpperCase();
+                                  }
+                              }
+                              
+                              var details = {
+                                  name: name,
+                                  imgUrl: imgUrl,
+                                  priceText: priceText,
+                                  oldPriceText: oldPriceText,
+                                  discountPercent: discountPercent,
+                                  brand: brand
+                              };
+                              
+                              // Trigger optimistic add to cart and show modal instantly
+                              addToCartAndShowModalOptimistic(productId, 1, details, comprarBtn, form);
+                              return;
+                          }
+
+                         // 3.5. "Añadir al carrito" button clicked on product detail page
+                         var addToCartBtn = ev.target.closest('#add_to_cart');
+                         if (addToCartBtn) {
+                             ev.preventDefault();
+                             ev.stopPropagation();
+                             if (addToCartBtn.classList.contains('disabled')) return;
+                             
+                             var form = addToCartBtn.closest('form');
+                             if (!form) return;
+                             
+                             var productIdInput = form.querySelector('input[name="product_id"]');
+                             if (!productIdInput) return;
+                             
+                             var productId = productIdInput.value;
+                             if (!productId) return;
+                             
+                             // Read quantity
+                             var qtyInput = form.querySelector('input[name="add_qty"]') || form.querySelector('.quantity');
+                             var addQty = qtyInput ? parseInt(qtyInput.value) : 1;
+                             if (isNaN(addQty) || addQty < 1) addQty = 1;
+                             
+                             // Disable button
+                             addToCartBtn.classList.add('disabled');
+                             addToCartBtn.style.opacity = '0.7';
+                             addToCartBtn._originalHTML = addToCartBtn.innerHTML;
+                             
+                             // Extract product details instantly
+                             var nameEl = document.querySelector('h1[t-field="product.name"]') || document.querySelector('.js_product h1') || document.querySelector('h1');
+                             var name = nameEl ? nameEl.textContent.trim() : 'Producto';
+                             
+                             var imgEl = document.querySelector('#o-carousel-product .carousel-item.active img') || 
+                                         document.querySelector('#o-carousel-product img') || 
+                                         document.querySelector('.product_detail_img') || 
+                                         document.querySelector('span[t-field="product.image_1920"] img');
+                             var imgUrl = imgEl ? (imgEl.getAttribute('data-src') || imgEl.getAttribute('src') || '') : '';
+                             
+                             var priceText = '';
+                             var priceValueEl = document.querySelector('.oe_price_value');
+                             if (priceValueEl) {
+                                 var priceParent = priceValueEl.closest('.oe_price') || priceValueEl.parentElement;
+                                 var currencyEl = priceParent ? (priceParent.querySelector('.oe_currency_value') || priceParent.querySelector('.currency')) : null;
+                                 var currency = currencyEl ? currencyEl.textContent.trim() : 'S/';
+                                 priceText = currency + ' ' + priceValueEl.textContent.trim();
+                             } else {
+                                 var priceEl = document.querySelector('.product_price .oe_price') || document.querySelector('.oe_price');
+                                 priceText = priceEl ? priceEl.textContent.trim() : 'S/ 0.00';
+                             }
+                             
+                             var brand = 'WANKA';
+                             var commonBrands = ['GLORIA', 'LAIVE', 'NESTLE', 'DONOFRIO', 'ALICORP', 'BOLIVAR', 'OPAL', 'MIMOSA', 'PRIMOR', 'SAN FERNANDO', 'RED BULL', 'COCA COLA', 'INCA KOLA', 'PEPSI'];
+                             var upperName = name.toUpperCase();
+                             for (var i = 0; i < commonBrands.length; i++) {
+                                 if (upperName.indexOf(commonBrands[i]) !== -1) {
+                                     brand = commonBrands[i];
+                                     break;
+                                 }
+                             }
+                             if (brand === 'WANKA' && name) {
+                                 var words = name.split(' ');
+                                 if (words.length > 0 && words[0].length > 3) {
+                                     brand = words[0].toUpperCase();
+                                 }
+                             }
+                             
+                             var details = {
+                                 name: name,
+                                 imgUrl: imgUrl,
+                                 priceText: priceText,
+                                 brand: brand
+                             };
+                             
+                             // Trigger optimistic add to cart and show modal instantly
+                             addToCartAndShowModalOptimistic(productId, addQty, details, addToCartBtn, form);
+                             return;
+                         }           
+                    });
+
+                    // 3. Category hover on desktop (min-width: 768px)
+                    document.addEventListener('mouseover', function(ev) {
+                        var menuItem = ev.target.closest('.wbl-mega-menu-item');
+                        if (menuItem && window.innerWidth >= 768) {
+                            var categoryId = menuItem.getAttribute('data-category-id');
+                            if (categoryId) {
+                                // Deactivate all items
+                                var allItems = document.querySelectorAll('.wbl-mega-menu-item');
+                                allItems.forEach(function(item) {
+                                    item.classList.remove('active');
+                                });
+                                menuItem.classList.add('active');
+
+                                // Deactivate all panels
+                                var allPanels = document.querySelectorAll('.wbl-category-panel');
+                                allPanels.forEach(function(panel) {
+                                    panel.classList.remove('active');
+                                    panel.style.display = 'none';
+                                });
+
+                                // Activate target panel
+                                var targetPanel = document.getElementById('wbl-category-panel-' + categoryId);
+                                if (targetPanel) {
+                                    targetPanel.classList.add('active');
+                                    targetPanel.style.display = 'block';
+                                }
+                            }
+                        }
+                    });
+
+                    // 4. Modal plus/minus button event handlers (delegated)
+                    document.addEventListener('click', function(ev) {
+                        var btnPlus = ev.target.closest('#modal-qty-plus');
+                        var btnMinus = ev.target.closest('#modal-qty-minus');
+                        if (btnPlus || btnMinus) {
+                            ev.preventDefault();
+                            var modalEl = document.getElementById('cartSuccessModal');
+                            var productId = modalEl.getAttribute('data-product-id');
+                            if (!productId) return;
+                            
+                            var qtyInput = document.getElementById('modal-qty-input');
+                            var delta = btnPlus ? 1 : -1;
+                            
+                            // Prevent going below 0
+                            var currentQty = parseInt(qtyInput.value) || 0;
+                            if (delta === -1 && currentQty <= 0) return;
+                            
+                            updateModalQtyHelper(productId, delta);
+                        }
+                    });
+
+                    function updateModalQtyHelper(productId, delta) {
+                        var modalEl = document.getElementById('cartSuccessModal');
+                        var qtyInput = document.getElementById('modal-qty-input');
+                        var btnMinus = document.getElementById('modal-qty-minus');
+                        var btnPlus = document.getElementById('modal-qty-plus');
+                        
+                        btnMinus.style.pointerEvents = 'none';
+                        btnPlus.style.pointerEvents = 'none';
+                        qtyInput.style.opacity = '0.5';
+                        
+                        fetch('/shop/cart/update_json', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                params: {
+                                    product_id: parseInt(productId),
+                                    add_qty: delta
+                                }
+                            })
+                        })
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            btnMinus.style.pointerEvents = '';
+                            btnPlus.style.pointerEvents = '';
+                            qtyInput.style.opacity = '';
+                            
+                            if (data && data.result && typeof data.result.quantity !== 'undefined') {
+                                var newQty = data.result.quantity;
+                                qtyInput.value = newQty;
+                                
+                                // Update cart badge quantity in header
+                                var qtyBadges = document.querySelectorAll('.my-cart-qty');
+                                var newTotalQty = typeof data.result.cart_quantity !== 'undefined' ? data.result.cart_quantity : 0;
+                                qtyBadges.forEach(function(badge) {
+                                    badge.textContent = newTotalQty;
+                                    badge.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                                    setTimeout(function() {
+                                        badge.style.transform = 'translate(-50%, -50%) scale(1)';
+                                    }, 300);
+                                });
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('Error updating modal quantity:', err);
+                            btnMinus.style.pointerEvents = '';
+                            btnPlus.style.pointerEvents = '';
+                            qtyInput.style.opacity = '';
+                        });
+                    }
+
+                    function addToCartAndShowModalOptimistic(productId, addQty, details, btn, form) {
+                        var modalEl = document.getElementById('cartSuccessModal');
+                        if (modalEl) {
+                            // Populate modal elements instantly using local data
+                            modalEl.setAttribute('data-product-id', productId);
+                            
+                            var modalImg = document.getElementById('modal-product-img');
+                            if (modalImg) modalImg.src = details.imgUrl || '';
+                            
+                            var modalName = document.getElementById('modal-product-name');
+                            if (modalName) modalName.textContent = details.name || 'Producto';
+                            
+                            var modalBrand = document.getElementById('modal-product-brand');
+                            if (modalBrand) modalBrand.textContent = details.brand || 'WANKA';
+                            
+                            var modalPrice = document.getElementById('modal-product-price');
+                            if (modalPrice) modalPrice.textContent = details.priceText || '';
+                            
+                            var modalOldPrice = document.getElementById('modal-product-old-price');
+                            var modalDiscount = document.getElementById('modal-product-discount');
+                            if (modalOldPrice) {
+                                if (details.oldPriceText && details.oldPriceText !== details.priceText) {
+                                    modalOldPrice.textContent = details.oldPriceText;
+                                    modalOldPrice.style.display = 'block';
+                                    if (modalDiscount && details.discountPercent) {
+                                        modalDiscount.textContent = '-' + details.discountPercent + '%';
+                                        modalDiscount.style.display = 'inline-block';
+                                    }
+                                } else {
+                                    modalOldPrice.style.display = 'none';
+                                    if (modalDiscount) modalDiscount.style.display = 'none';
+                                }
+                            }
+                            
+                            var modalQtyInput = document.getElementById('modal-qty-input');
+                            var btnMinus = document.getElementById('modal-qty-minus');
+                            var btnPlus = document.getElementById('modal-qty-plus');
+                            
+                            if (modalQtyInput) {
+                                modalQtyInput.value = '...'; // Temporary loading indicator
+                                modalQtyInput.style.opacity = '0.5';
+                            }
+                            if (btnMinus) btnMinus.style.pointerEvents = 'none';
+                            if (btnPlus) btnPlus.style.pointerEvents = 'none';
+                            
+                            // Open Modal Instantly (Optimistic UX)
+                            openModalHelper(modalEl);
+                        }
+                        
+                        // Fire network request in the background
+                        fetch('/shop/cart/update_json', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                params: {
+                                    product_id: parseInt(productId),
+                                    add_qty: parseInt(addQty)
+                                }
+                            })
+                        })
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            // Restore original button state
+                            if (btn && btn._originalHTML) {
+                                btn.classList.remove('disabled');
+                                btn.style.opacity = '';
+                                btn.innerHTML = btn._originalHTML;
+                            }
+                            
+                            // Re-enable modal controls
+                            if (modalQtyInput) modalQtyInput.style.opacity = '';
+                            if (btnMinus) btnMinus.style.pointerEvents = '';
+                            if (btnPlus) btnPlus.style.pointerEvents = '';
+                            
+                            if (data && data.result && typeof data.result.cart_quantity !== 'undefined') {
+                                // Update header badges
+                                var qtyBadges = document.querySelectorAll('.my-cart-qty');
+                                var newTotalQty = data.result.cart_quantity;
+                                qtyBadges.forEach(function(badge) {
+                                    badge.textContent = newTotalQty;
+                                    badge.style.transform = 'translate(-50%, -50%) scale(1.3)';
+                                    setTimeout(function() {
+                                        badge.style.transform = 'translate(-50%, -50%) scale(1)';
+                                    }, 300);
+                                });
+                                
+                                // Update quantity input inside modal with actual quantity in cart
+                                if (modalQtyInput) {
+                                    modalQtyInput.value = data.result.quantity || addQty;
+                                }
+                            } else {
+                                if (form) form.submit();
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('Error adding to cart:', err);
+                            if (btn && btn._originalHTML) {
+                                btn.classList.remove('disabled');
+                                btn.style.opacity = '';
+                                btn.innerHTML = btn._originalHTML;
+                            }
+                            if (form) form.submit();
+                        });
+                    }
+
+                    function openModalHelper(modalEl) {
+                        if (window.bootstrap && window.bootstrap.Modal) {
+                            var myModal = new window.bootstrap.Modal(modalEl);
+                            myModal.show();
+                        } else if (window.$ && typeof window.$.prototype.modal === 'function') {
+                            window.$(modalEl).modal('show');
+                        } else {
+                            // Manual fallback
+                            modalEl.classList.add('show');
+                            modalEl.style.display = 'block';
+                            document.body.classList.add('modal-open');
+                            
+                            var backdrop = document.getElementById('modal-custom-backdrop');
+                            if (!backdrop) {
+                                backdrop = document.createElement('div');
+                                backdrop.id = 'modal-custom-backdrop';
+                                backdrop.className = 'modal-backdrop fade show';
+                                document.body.appendChild(backdrop);
+                                backdrop.onclick = function() { closeModal(); };
+                            }
+                            
+                            var closeBtns = modalEl.querySelectorAll('[data-bs-dismiss="modal"], [data-dismiss="modal"]');
+                            closeBtns.forEach(function(btn) {
+                                btn.onclick = function(e) {
+                                    e.preventDefault();
+                                    closeModal();
+                                };
+                            });
+                            
+                            function closeModal() {
+                                modalEl.classList.remove('show');
+                                modalEl.style.display = 'none';
+                                document.body.classList.remove('modal-open');
+                                if (backdrop) backdrop.remove();
+                            }
+                        }
+                    }
+                    ]]>
+                </script>
+
+                <!-- Cart Success Modal (Based on Falabella.com design) -->
+                <div class="modal fade" id="cartSuccessModal" tabindex="-1" aria-labelledby="cartSuccessModalLabel" aria-hidden="true" style="z-index: 1055;">
+                    <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+                        <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+                            <!-- Modal Header -->
+                            <div class="modal-header border-bottom-0 pt-4 px-4 pb-0 d-flex justify-content-between align-items-center">
+                                <h5 class="modal-title d-flex align-items-center fw-bold" id="cartSuccessModalLabel" style="font-size: 1.25rem; color: #333;">
+                                    <span class="d-inline-flex align-items-center justify-content-center border rounded-circle me-2" style="width: 26px; height: 26px; border-color: #00a650 !important; color: #00a650;">
+                                        <i class="fa fa-check" style="font-size: 1rem;"/>
+                                    </span>
+                                    Producto agregado a tu Carro
+                                </h5>
+                                <button type="button" class="btn-close shadow-none border-0 bg-transparent text-muted fs-4" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" style="cursor: pointer; line-height: 1;">&amp;times;</button>
+                            </div>
+                            
+                            <!-- Modal Body -->
+                            <div class="modal-body p-4">
+                                <div class="row align-items-center">
+                                    <!-- Product Image -->
+                                    <div class="col-3">
+                                        <div class="border rounded p-2 d-flex align-items-center justify-content-center bg-white" style="width: 90px; height: 90px; margin: 0 auto;">
+                                            <img id="modal-product-img" src="" alt="Product" style="max-width: 100%; max-height: 100%; object-fit: contain;"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Product Details -->
+                                    <div class="col-6 min-width-0">
+                                        <div class="text-muted small fw-bold text-uppercase" id="modal-product-brand" style="font-size: 1.05rem;">GLORIA</div>
+                                        <h6 class="fw-bold mb-2 text-truncate-2" id="modal-product-name" style="color: #333; font-size: 1.1rem; line-height: 1.3;">Leche Gloria...</h6>
+                                        <div class="d-flex flex-column align-items-start">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="fw-bold text-danger fs-5" id="modal-product-price" style="color: #ff3b30 !important;">S/ 0.00</span>
+                                                <span class="badge bg-danger text-white py-1 px-1.5 fw-bold ms-2" id="modal-product-discount" style="font-size: 1rem; display: none;">-15%</span>
+                                            </div>
+                                            <span class="text-decoration-line-through text-muted small" id="modal-product-old-price" style="display: none;">S/ 0.00</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quantity Selector -->
+                                    <div class="col-3 d-flex align-items-center justify-content-center">
+                                        <div class="d-flex align-items-center border rounded" style="height: 34px; background-color: #f8f9fa;">
+                                            <button type="button" class="btn btn-link text-dark px-3 py-0 border-0 text-decoration-none fw-bold" id="modal-qty-minus" style="font-size: 1.1rem; line-height: 1;">-</button>
+                                            <input type="text" class="form-control border-0 text-center bg-transparent p-0 fw-bold" id="modal-qty-input" value="1" readonly="readonly" style="width: 35px; height: 100%; font-size: 1.1rem; pointer-events: none;"/>
+                                            <button type="button" class="btn btn-link text-dark px-3 py-0 border-0 text-decoration-none fw-bold" id="modal-qty-plus" style="font-size: 1.1rem; line-height: 1;">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Modal Footer -->
+                            <div class="modal-footer border-top-0 pt-0 px-4 pb-4 d-flex justify-content-end align-items-center" style="gap: 1.5rem; background-color: #fafafa;">
+                                <a href="#" class="text-decoration-underline text-dark fw-bold small" data-bs-dismiss="modal" data-dismiss="modal" style="font-size: 1.05rem;">Seguir comprando</a>
+                                <a href="/shop/cart" class="btn fw-bold px-4 py-2" style="background-color: #333F48; color: white; border-radius: 50rem; font-size: 1.1rem; transition: background-color 0.2s;">Ir al Carro</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            
+                <!-- Mobile Bottom Sheet Login Modal (Falabella Style) -->
+                <div class="modal fade" id="mobileLoginModal" tabindex="-1" aria-labelledby="mobileLoginModalLabel" aria-hidden="true" style="z-index: 10000;">
+                    <div class="modal-dialog modal-dialog-bottom m-0">
+                        <div class="modal-content border-0 shadow-lg" style="padding: 24px 20px 32px; background-color: #ffffff;">
+                            
+                            <!-- Header: Brand / Close -->
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="d-flex align-items-center">
+                                    <img t-att-src="'/logo.png?%s' % (res_company.write_date or '')" 
+                                         alt="Mercado Wanka" 
+                                         class="img-fluid" 
+                                         style="max-height: 28px; width: auto; object-fit: contain;"
+                                         onerror="this.onerror=null; this.src='/wango_theme/static/src/img/mercadowanka_logo.png';"/>
+                                </div>
+                                <button type="button" class="btn border-0 bg-transparent fs-4 text-muted p-0" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close" style="cursor: pointer; box-shadow: none;">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+
+                            <!-- Title & Subtitle -->
+                            <div class="mb-4">
+                                <h3 class="fw-bold mb-2" style="color: #222; font-size: 1.45rem; letter-spacing: -0.5px;">Inicia sesión para comprar</h3>
+                                <p class="text-muted mb-0" style="font-size: 0.95rem; line-height: 1.4;">
+                                    Usa tu cuenta para ingresar a <strong><t t-esc="website.company_id.name if website.company_id.name and website.company_id.name != 'My Company' else 'Mercado Wanka'"/></strong> y disfrutar de las mejores ofertas.
+                                </p>
+                            </div>
+
+                            <!-- Formulario de Login directo a Odoo -->
+                            <form class="oe_login_form" role="form" method="post" action="/web/login" onsubmit="var l = document.getElementById('modal_login_email'); if(l) l.value = l.value.trim();">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="redirect" t-att-value="request.params.get('redirect') or ''"/>
+
+                                <!-- Email -->
+                                <div class="mb-4 text-start">
+                                    <label for="modal_login_email" class="form-label text-dark fw-bold mb-1" style="font-size: 0.95rem;">Correo electrónico</label>
+                                    <input type="text" name="login" id="modal_login_email" onblur="this.value = this.value.trim();" onchange="this.value = this.value.trim();" class="form-control rounded-0 px-0 shadow-none border-0 border-bottom" placeholder="Ingresa tu correo o usuario" required="required" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username" style="border-bottom: 1px solid #bbb !important; font-size: 1.05rem; padding-bottom: 8px;"/>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="mb-3 text-start position-relative">
+                                    <label for="modal_login_password" class="form-label text-dark fw-bold mb-1" style="font-size: 0.95rem;">Contraseña</label>
+                                    <div class="position-relative d-flex align-items-center">
+                                        <input type="password" name="password" id="modal_login_password" class="form-control rounded-0 px-0 shadow-none border-0 border-bottom pe-5" placeholder="Ingresa tu contraseña" required="required" autocapitalize="none" autocorrect="off" autocomplete="current-password" style="border-bottom: 1px solid #bbb !important; font-size: 1.05rem; padding-bottom: 8px;"/>
+                                        <span class="position-absolute end-0 text-muted cursor-pointer" onclick="var p = document.getElementById('modal_login_password'); var i = this.querySelector('i'); if(p.type === 'password'){ p.type = 'text'; i.className = 'fa fa-eye'; } else { p.type = 'password'; i.className = 'fa fa-eye-slash'; }" style="right: 5px; top: 6px; cursor: pointer;">
+                                            <i class="fa fa-eye-slash fs-5"></i>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Olvidaste contraseña -->
+                                <div class="mb-4 text-start">
+                                    <small class="text-muted" style="font-size: 0.85rem; line-height: 1.35;">
+                                        ¿Olvidaste tu contraseña? No te preocupes, recupera tu clave por <a href="/web/reset_password" class="text-dark fw-bold text-decoration-underline">correo aquí</a>.
+                                    </small>
+                                </div>
+
+                                <!-- Botón Ingresar Falabella Style -->
+                                <button type="submit" class="btn w-100 py-3 fw-bold text-white shadow-sm mb-4" style="background-color: #2c3e50; border-radius: 50px; font-size: 1.15rem; letter-spacing: 0.5px;">
+                                    Ingresar
+                                </button>
+
+                                <!-- Enlace de Registro -->
+                                <div class="text-center">
+                                    <span class="text-muted" style="font-size: 0.95rem;">¿Aún no tienes cuenta? </span>
+                                    <a href="/web/signup" class="text-dark fw-bold text-decoration-underline" style="font-size: 0.95rem;">Regístrate</a>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+</header>
+        </xpath>
+    </template>
+
+    <!-- Inherit Product Details Page to make the Breadcrumbs container span full-width (col-12) -->
+    <template id="product_breadcrumb_full_width" inherit_id="website_sale.product" name="Product Breadcrumb Full Width" priority="20">
+        <xpath expr="//ol[hasclass('breadcrumb')]/.." position="attributes">
+            <attribute name="class">col-12</attribute>
+        </xpath>
+    </template>
+
+    <!-- Inherit eCommerce Product Item Grid Card to insert the premium "Agregar" button -->
+    <template id="products_item_add_to_cart_premium" inherit_id="website_sale.products_item" name="Premium Add to Cart Button" priority="20">
+        <xpath expr="//div[hasclass('o_wsale_product_information')]" position="inside">
+            <form action="/shop/cart/update" method="post" class="custom-comprar-form">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <t t-set="product_variant_id" t-value="product._get_first_possible_variant_id()"/>
+                <input name="product_id" t-att-value="product_variant_id" type="hidden"/>
+                <button type="submit" class="btn custom-comprar-btn">
+                    <i class="fa fa-shopping-cart me-2"/> Comprar
+                </button>
+            </form>
+        </xpath>
+    </template>
+</odoo>

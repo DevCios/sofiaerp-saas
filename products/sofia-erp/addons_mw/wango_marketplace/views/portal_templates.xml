@@ -1,0 +1,2249 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <!-- Add Seller entry to portal menu -->
+
+    <template id="portal_my_home_menu_seller" name="Portal layout : seller menu entry" inherit_id="portal.portal_breadcrumbs" priority="20">
+
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+
+            <!-- Root: Mi Panel de Vendedor -->
+            <li t-if="page_name in ['seller_dashboard', 'seller_orders', 'seller_order_detail', 'seller_products', 'seller_product_new', 'seller_settings']" 
+                t-attf-class="breadcrumb-item #{'active' if page_name == 'seller_dashboard' else ''}">
+                <a t-if="page_name != 'seller_dashboard'" href="/my/seller/dashboard">Mi Panel de Vendedor</a>
+                <t t-else="">Mi Panel de Vendedor</t>
+            </li>
+
+            <!-- Sub-level: Mis Órdenes -->
+            <li t-if="page_name == 'seller_settings'" class="breadcrumb-item active">
+                Configuración de Mi Tienda
+            </li>
+            <li t-if="page_name == 'seller_orders'" class="breadcrumb-item active">
+                Mis Ventas
+            </li>
+            <li t-if="page_name == 'seller_order_detail'" class="breadcrumb-item">
+                <a href="/my/seller/orders">Mis Ventas</a>
+            </li>
+            <li t-if="page_name == 'seller_order_detail'" class="breadcrumb-item active">
+                <t t-esc="order.name"/>
+            </li>
+
+            
+
+            <!-- Sub-level: Mis Productos -->
+
+            <li t-if="page_name in ['seller_products', 'seller_product_new']" 
+
+                t-attf-class="breadcrumb-item #{'active' if page_name == 'seller_products' else ''}">
+
+                <a t-if="page_name != 'seller_products'" href="/my/seller/products">Mis Productos</a>
+
+                <t t-else="">Mis Productos</t>
+
+            </li>
+
+            
+
+            <!-- Sub-level: Nuevo Producto -->
+
+            <li t-if="page_name == 'seller_product_new'" class="breadcrumb-item active">
+
+                Nuevo Producto
+
+            </li>
+
+        </xpath>
+
+    </template>
+
+
+
+    <!-- Menúú Desplegable (Navbar) -->
+
+    <template id="portal_user_dropdown_seller" inherit_id="portal.user_dropdown" name="Seller Portal Dropdown">
+
+        <xpath expr="//a[@id='o_logout']" position="before">
+
+            <t t-if="request.env.user.partner_id.marketplace_seller_status == 'approved'">
+
+                <a href="/my/seller/dashboard" role="menuitem" class="dropdown-item">Mi Panel de Vendedor</a>
+
+                <div role="separator" class="dropdown-divider"></div>
+
+            </t>
+
+        </xpath>
+
+    </template>
+
+
+
+    <!-- Tarjetas de Bienvenida en el Dashboard (/my) -->
+
+    <template id="portal_my_home_seller_banner" inherit_id="portal.portal_my_home" priority="10">
+
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="before">
+
+            <!-- Comprador Dashboard Banner (Para todos, ya que aquíí son sus compras personales) -->
+
+            <div class="row mb-4">
+
+                <div class="col-12">
+
+                    <div class="shadow-sm" style="background: linear-gradient(135deg, #1a4f66 0%, #2b7a9e 100%); border-radius: 12px; overflow: hidden; position: relative; padding: 2rem;">
+
+                        <i class="fa fa-shopping-bag" style="position: absolute; right: -20px; top: -30px; font-size: 180px; opacity: 0.1; color: #fff; transform: rotate(-15deg);"></i>
+
+                        <div style="position: relative; z-index: 1;" class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+
+                            <div class="text-center text-md-left mb-3 mb-md-0">
+
+                                <h2 class="font-weight-bold text-white mb-1" style="font-size: 1.8rem; letter-spacing: -0.5px;">Mis Compras Personales</h2>
+
+                                <p class="text-white mb-2" style="opacity: 0.9; font-size: 1.05rem;">Sigue el estado de tus pedidos fácilmente</p>
+
+                                <div class="d-flex align-items-center justify-content-center justify-content-md-start">
+
+                                    <div class="mr-4 text-white">
+
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-esc="quotation_count or '0'"/></span> Cotizaciones
+
+                                    </div>
+
+                                    <div class="text-white">
+
+                                        <span class="font-weight-bold" style="font-size: 1.2rem;"><t t-esc="order_count or '0'"/></span> Pedidos Confirmados
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </xpath>
+
+    </template>
+
+
+
+    <!-- Dashboard Vendedor -->
+
+        <!-- Dashboard Vendedor Estilo Mercado Libre -->
+    <template id="portal_seller_dashboard" name="Central de Vendedores">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Central de Vendedores</t>
+            </t>
+
+            <!-- Cabecera Central de Vendedores con Botón Publicar Producto -->
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between my-3 pb-3 border-bottom">
+                <div>
+                    <h2 class="font-weight-bold text-dark mb-1" style="font-size: 1.8rem; letter-spacing: -0.5px;">
+                        <i class="fa fa-handshake-o text-warning mr-2"></i> Central de Vendedores
+                    </h2>
+                    <p class="text-muted mb-0 small">Administra tus publicaciones, pedidos y reputación en Mercado Wanka.</p>
+                </div>
+                <div class="mt-3 mt-md-0 d-flex" style="gap: 10px;">
+                    <a href="/my/seller/products/new" class="btn font-weight-bold shadow-sm px-4 py-2" style="background-color: #ffe600; color: #2d3436; border-radius: 50px; font-size: 0.95rem; border: none;">
+                        <i class="fa fa-plus-circle mr-1"></i> Publicar Producto
+                    </a>
+                    <a href="/my/seller/settings" class="btn btn-outline-secondary font-weight-bold shadow-sm px-3 py-2" style="border-radius: 50px; font-size: 0.95rem;">
+                        <i class="fa fa-cogs mr-1"></i> Mi Tienda
+                    </a>
+                </div>
+            </div>
+
+            <!-- PASO 1: BARRA DE MISIONES / ONBOARDING GAMIFICADO (ESTILO MERCADO LIBRE) -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #f8f9fa 0%, #edf2f7 100%);">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <!-- Misión Activa -->
+                        <div class="col-lg-6 mb-3 mb-lg-0 border-right-lg pr-lg-4">
+                            <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 mb-2" style="font-size: 0.75rem; border-radius: 4px;">
+                                <t t-esc="current_mission['step_name']"/>
+                            </span>
+                            <h4 class="font-weight-bold text-dark mb-1" style="letter-spacing: -0.3px;">
+                                <t t-esc="current_mission['title']"/>
+                            </h4>
+                            <p class="text-muted small mb-3">
+                                <t t-esc="current_mission['desc']"/>
+                            </p>
+                            <a t-att-href="current_mission['cta_url']" class="btn btn-dark font-weight-bold rounded-pill px-4 shadow-sm" style="background-color: #2c3e50; font-size: 0.9rem;">
+                                <t t-esc="current_mission['cta_text']"/> <i class="fa fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        <!-- Hitos / Iconos de Progreso -->
+                        <div class="col-lg-6 pl-lg-4">
+                            <div class="d-flex align-items-center justify-content-between text-center">
+                                <!-- Hito 1: Cuenta Activa -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-1 bg-success text-white" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                    <span class="small font-weight-bold text-dark" style="font-size: 0.75rem;">Cuenta activa</span>
+                                </div>
+
+                                <div class="flex-grow-1 border-top mx-1" style="border-width: 2px !important; border-color: #28a745 !important;"></div>
+
+                                <!-- Hito 2: Datos de Tienda / RUC -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-1 #{'bg-success text-white' if step_profile else 'bg-warning text-dark'}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                        <i t-attf-class="fa #{'fa-check' if step_profile else 'fa-id-card'}"></i>
+                                    </div>
+                                    <span class="small font-weight-bold text-dark" style="font-size: 0.75rem;">Datos y RUC</span>
+                                </div>
+
+                                <div class="flex-grow-1 border-top mx-1" t-attf-style="border-width: 2px !important; border-color: #{'#28a745' if step_product else '#cbd5e0'} !important;"></div>
+
+                                <!-- Hito 3: Publicaciones -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-1 #{'bg-success text-white' if step_product else ('bg-warning text-dark' if step_profile else 'bg-light text-muted')}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                        <i t-attf-class="fa #{'fa-check' if step_product else 'fa-cubes'}"></i>
+                                    </div>
+                                    <span class="small font-weight-bold text-dark" style="font-size: 0.75rem;">Listo para vender</span>
+                                </div>
+
+                                <div class="flex-grow-1 border-top mx-1" t-attf-style="border-width: 2px !important; border-color: #{'#28a745' if step_sale else '#cbd5e0'} !important;"></div>
+
+                                <!-- Hito 4: Primera Venta -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-1 #{'bg-success text-white' if step_sale else 'bg-light text-muted'}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                        <i t-attf-class="fa #{'fa-check' if step_sale else 'fa-lock'}"></i>
+                                    </div>
+                                    <span class="small font-weight-bold text-dark" style="font-size: 0.75rem;">Primera venta</span>
+                                </div>
+
+                                <div class="flex-grow-1 border-top mx-1" style="border-width: 2px !important; border-color: #cbd5e0 !important;"></div>
+
+                                <!-- Hito 5: Reputación -->
+                                <div class="d-flex flex-column align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-1 bg-light text-muted" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                        <i class="fa fa-star-o"></i>
+                                    </div>
+                                    <span class="small font-weight-bold text-dark" style="font-size: 0.75rem;">Reputación</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: TARJETAS DE PENDIENTES Y MÉTRICAS CLAVE (ESTILO MERCADO LIBRE) -->
+            <div class="row mb-4">
+                <!-- Widget: Pendientes en tus Ventas -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 14px; border-left: 5px solid #ff7675 !important;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">
+                                    <i class="fa fa-clock-o text-danger mr-1"></i> Pendientes en tus Ventas
+                                </span>
+                                <span t-if="pending_orders_count > 0" class="badge badge-danger px-2 py-1" style="border-radius: 12px;">Urgente</span>
+                            </div>
+                            <t t-if="pending_orders_count > 0">
+                                <h3 class="font-weight-bold text-danger mb-1"><t t-esc="pending_orders_count"/> orden(es)</h3>
+                                <p class="text-muted small mb-3">Tienes pedidos listos para empaquetar o llevar al Agente Wanka.</p>
+                                <a href="/my/seller/orders" class="btn btn-sm btn-outline-danger font-weight-bold rounded-pill px-3">
+                                    Atender Pedidos <i class="fa fa-arrow-right ml-1"></i>
+                                </a>
+                            </t>
+                            <t t-else="">
+                                <h4 class="font-weight-bold text-success mb-1"><i class="fa fa-check-circle mr-1"></i> ¡Estás al día!</h4>
+                                <p class="text-muted small mb-3">No tienes pedidos pendientes de entrega en este momento.</p>
+                                <a href="/my/seller/orders" class="btn btn-sm btn-outline-secondary font-weight-bold rounded-pill px-3">
+                                    Historial de Órdenes
+                                </a>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget: Publicaciones y Catálogo -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 14px; border-left: 5px solid #0984e3 !important;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">
+                                    <i class="fa fa-tag text-primary mr-1"></i> Tus Publicaciones
+                                </span>
+                                <span class="badge badge-light text-primary border px-2 py-1" style="border-radius: 12px;">Catálogo</span>
+                            </div>
+                            <h3 class="font-weight-bold text-dark mb-1"><t t-esc="products_count"/> producto(s)</h3>
+                            <p class="text-muted small mb-3">
+                                <t t-if="products_count > 0">Publicados y disponibles para compra en Mercado Wanka.</t>
+                                <t t-else="">Aún no has publicado productos en tu tienda.</t>
+                            </p>
+                            <div class="d-flex" style="gap: 8px;">
+                                <a href="/my/seller/products/new" class="btn btn-sm btn-primary font-weight-bold rounded-pill px-3">
+                                    + Publicar
+                                </a>
+                                <a href="/my/seller/products" class="btn btn-sm btn-outline-secondary font-weight-bold rounded-pill px-3">
+                                    Ver Todos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget: Tu Dinero y Finanzas -->
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm" style="border-radius: 14px; border-left: 5px solid #00b894 !important;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">
+                                    <i class="fa fa-money text-success mr-1"></i> Tu Dinero a Cobrar
+                                </span>
+                                <span class="badge badge-success px-2 py-1" style="border-radius: 12px;">Neto</span>
+                            </div>
+                            <h3 class="font-weight-bold text-success mb-1">
+                                <t t-esc="net_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/>
+                            </h3>
+                            <p class="text-muted small mb-3">
+                                Ventas brutas: <strong><t t-esc="total_sales" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/></strong>
+                            </p>
+                            <a href="#mis-liquidaciones" class="btn btn-sm btn-outline-success font-weight-bold rounded-pill px-3">
+                                Ver Liquidaciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos Rápidos Principales -->
+            <div class="row mb-4">
+                <div class="col-12 d-flex flex-wrap" style="gap: 10px;">
+                    <a href="/my/seller/products" class="btn btn-outline-primary font-weight-bold shadow-sm" style="border-radius: 8px;">
+                        <i class="fa fa-cubes mr-1"></i> Gestionar mi Catálogo (<t t-esc="products_count"/>)
+                    </a>
+                    <a href="/my/seller/orders" class="btn btn-outline-dark font-weight-bold shadow-sm" style="border-radius: 8px;">
+                        <i class="fa fa-shopping-cart mr-1"></i> Ver todas las Órdenes (<t t-esc="len(orders)"/>)
+                    </a>
+                    <a href="/my/seller/settings" class="btn btn-outline-secondary font-weight-bold shadow-sm" style="border-radius: 8px;">
+                        <i class="fa fa-cogs mr-1"></i> Configuración de Mi Tienda
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tabla de Liquidaciones -->
+            <div id="mis-liquidaciones">
+                <h4 class="font-weight-bold text-dark mt-4 mb-3">
+                    <i class="fa fa-file-text-o text-muted mr-1"></i> Mis Liquidaciones
+                </h4>
+                <t t-if="not settlements">
+                    <div class="alert alert-light border py-3 px-4 text-muted mb-4" style="border-radius: 8px;">
+                        No tienes liquidaciones generadas todavía. Las liquidaciones se generan automáticamente conforme se completen tus ventas.
+                    </div>
+                </t>
+                <t t-if="settlements">
+                    <div class="table-responsive mb-4 shadow-sm border bg-white" style="border-radius: 8px;">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Referencia</th>
+                                    <th>Periodo</th>
+                                    <th>Estado</th>
+                                    <th class="text-right">Total a Cobrar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="settlements" t-as="sett">
+                                    <tr>
+                                        <td><span t-field="sett.name"/></td>
+                                        <td><span t-field="sett.date_start"/> al <span t-field="sett.date_end"/></td>
+                                        <td>
+                                            <span t-if="sett.state == 'draft'" class="badge badge-secondary">Borrador</span>
+                                            <span t-if="sett.state == 'confirmed'" class="badge badge-primary">Pendiente de Pago</span>
+                                            <span t-if="sett.state == 'paid'" class="badge badge-success">Pagado</span>
+                                        </td>
+                                        <td class="text-right font-weight-bold text-success">
+                                            <span t-field="sett.amount_to_pay" t-options="{'widget': 'monetary', 'display_currency': sett.currency_id}"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </div>
+
+            <!-- Tabla de Últimas Órdenes -->
+            <h4 class="font-weight-bold text-dark mt-4 mb-3">
+                <i class="fa fa-shopping-bag text-muted mr-1"></i> Últimas Órdenes Recibidas
+            </h4>
+
+            <t t-if="not orders">
+                <div class="alert alert-light border py-3 px-4 text-muted mb-4" style="border-radius: 8px;">
+                    Aún no tienes ventas registradas. ¡Publica más productos o comparte tu tienda para empezar a recibir clientes!
+                </div>
+            </t>
+
+            <t t-if="orders">
+                <div class="table-responsive shadow-sm border bg-white mb-3" style="border-radius: 8px;">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Orden #</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Estado</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="orders" t-as="order">
+                                <tr>
+                                    <td>
+                                        <a t-attf-href="/my/seller/orders/#{order.id}" class="font-weight-bold text-primary">
+                                            <span t-field="order.name"/>
+                                        </a>
+                                    </td>
+                                    <td><span t-field="order.date_order" t-options="{'widget': 'date'}"/></td>
+                                    <td><span t-field="order.partner_id.name"/></td>
+                                    <td>
+                                        <span t-if="order.state == 'sale'" class="badge badge-success">Confirmada</span>
+                                        <span t-if="order.state == 'done'" class="badge badge-secondary">Entregada</span>
+                                    </td>
+                                    <td class="text-right font-weight-bold">
+                                        <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mb-5">
+                    <a href="/my/seller/orders" class="btn btn-outline-primary font-weight-bold rounded-pill px-4">
+                        Ver todas las Órdenes <i class="fa fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </t>
+
+        </t>
+    </template>
+
+
+
+    <!-- Centro de Ventas y Despachos del Vendedor (Estilo Mercado Libre) -->
+    <template id="portal_seller_orders" name="Ventas y Despachos (Vendedor)">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <div class="container py-3">
+                <!-- Título Superior y Barra de Navegación del Vendedor -->
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3 pb-2 border-bottom" style="gap: 12px;">
+                    <div>
+                        <div class="d-flex align-items-center mb-1" style="gap: 8px;">
+                            <a href="/my/seller/dashboard" class="btn btn-sm btn-light border rounded-pill px-2.5 py-1 text-muted" title="Ir al Dashboard General">
+                                <i class="fa fa-arrow-left mr-1"></i> Dashboard
+                            </a>
+                            <h2 class="font-weight-bold text-dark mb-0" style="font-size: 1.7rem; letter-spacing: -0.5px;">Ventas y Despachos</h2>
+                        </div>
+                        <p class="text-muted small mb-0">Gestiona y despacha tus pedidos a tiempo para mantener una excelente reputación.</p>
+                    </div>
+                    <!-- Pestañas de Acceso Rápido del Vendedor -->
+                    <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+                        <a href="/my/seller/dashboard" class="btn btn-sm btn-outline-secondary rounded-pill font-weight-bold px-3">
+                            <i class="fa fa-dashboard mr-1"></i> Central
+                        </a>
+                        <a href="/my/seller/products" class="btn btn-sm btn-outline-secondary rounded-pill font-weight-bold px-3">
+                            <i class="fa fa-cubes mr-1"></i> Publicaciones
+                        </a>
+                        <a href="/my/seller/orders" class="btn btn-sm btn-warning text-dark font-weight-bold rounded-pill px-3 shadow-sm" style="background-color: #ffe600; border-color: #ffe600;">
+                            <i class="fa fa-truck mr-1"></i> Ventas
+                        </a>
+                        <a href="/my/seller/settings" class="btn btn-sm btn-outline-secondary rounded-pill font-weight-bold px-3">
+                            <i class="fa fa-cog mr-1"></i> Mi Tienda
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Barra de Pestañas Logísticas de Mercado Libre -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px; background-color: #f8f9fa;">
+                    <div class="card-body p-2 d-flex flex-wrap align-items-center justify-content-between" style="gap: 8px;">
+                        <div class="d-flex flex-wrap align-items-center" style="gap: 6px;">
+                            <!-- Tab: Envíos de hoy -->
+                            <a t-attf-href="/my/seller/orders?tab=today#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'today' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
+                                <span>Envíos de hoy</span>
+                                <span t-attf-class="badge rounded-pill #{ 'bg-danger text-white' if count_today > 0 and tab != 'today' else ('bg-white text-dark' if tab == 'today' else 'bg-secondary text-white') }" style="font-size: 0.75rem;">
+                                    <t t-esc="count_today"/>
+                                </span>
+                            </a>
+
+                            <!-- Tab: Próximos días -->
+                            <a t-attf-href="/my/seller/orders?tab=upcoming#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'upcoming' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
+                                <span>Próximos días</span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_upcoming"/></span>
+                            </a>
+
+                            <!-- Tab: En tránsito -->
+                            <a t-attf-href="/my/seller/orders?tab=transit#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'transit' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
+                                <span>En tránsito</span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_transit"/></span>
+                            </a>
+
+                            <!-- Tab: Finalizadas -->
+                            <a t-attf-href="/my/seller/orders?tab=done#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'done' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
+                                <span>Finalizadas</span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_done"/></span>
+                            </a>
+
+                            <!-- Tab: Todas -->
+                            <a t-attf-href="/my/seller/orders?tab=all#{'&amp;search=' + search if search else ''}" t-attf-class="btn rounded-pill px-3 py-1.5 font-weight-bold d-flex align-items-center #{ 'btn-dark shadow-sm' if tab == 'all' else 'btn-light text-dark' }" style="font-size: 0.9rem; gap: 6px;">
+                                <span>Todas</span>
+                                <span class="badge rounded-pill bg-light text-muted border" style="font-size: 0.75rem;"><t t-esc="count_all"/></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Búsqueda y Filtro Rápido -->
+                <div class="row mb-3 align-items-center">
+                    <div class="col-md-6 mb-2 mb-md-0">
+                        <form method="get" action="/my/seller/orders" class="d-flex align-items-center">
+                            <input type="hidden" name="tab" t-att-value="tab"/>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0" style="border-top-left-radius: 20px; border-bottom-left-radius: 20px;">
+                                        <i class="fa fa-search text-muted"></i>
+                                    </span>
+                                </div>
+                                <input type="text" name="search" class="form-control border-left-0" placeholder="Buscar por orden (#S001) o cliente..." t-att-value="search" style="border-top-right-radius: 20px; border-bottom-right-radius: 20px;"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-6 text-md-right text-muted small">
+                        <span>Mostrando <strong><t t-esc="len(orders)"/></strong> ventas en esta sección</span>
+                    </div>
+                </div>
+
+                <!-- Estado Vacío (Empty State Mercado Libre con icono de lupa/caja) -->
+                <t t-if="not orders">
+                    <div class="card border-0 shadow-sm text-center py-5 px-3 mb-4" style="border-radius: 16px; background-color: #ffffff;">
+                        <div class="mb-3">
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: #f1f3f5;">
+                                <i class="fa fa-dropbox text-muted" style="font-size: 2.5rem;"></i>
+                            </span>
+                        </div>
+                        <h4 class="font-weight-bold text-dark mb-1" style="font-size: 1.25rem;">
+                            <t t-if="tab == 'today'">No tienes ventas con envíos para hoy</t>
+                            <t t-elif="tab == 'upcoming'">No tienes envíos programados para los próximos días</t>
+                            <t t-elif="tab == 'transit'">No tienes pedidos en tránsito actualmente</t>
+                            <t t-elif="tab == 'done'">Aún no tienes ventas finalizadas</t>
+                            <t t-else="">No se encontraron órdenes con este criterio</t>
+                        </h4>
+                        <p class="text-muted small mb-3">
+                            <t t-if="tab == 'today'">¡Buen trabajo! Estás al día con todos tus despachos.</t>
+                            <t t-else="">Cuando tus clientes compren productos, los verás listados aquí para preparar su entrega.</t>
+                        </p>
+                        <div>
+                            <a href="/my/seller/products/new" class="btn btn-warning font-weight-bold rounded-pill px-4 text-dark" style="background-color: #ffe600; border: none;">
+                                + Publicar Producto
+                            </a>
+                        </div>
+                    </div>
+                </t>
+
+                <!-- Lista de Ventas y Despachos (Tarjetas Operativas Mercado Libre) -->
+                <t t-if="orders">
+                    <div class="d-flex flex-column" style="gap: 14px;">
+                        <t t-foreach="orders" t-as="order">
+                            <div class="card border-0 shadow-sm p-3 position-relative" style="border-radius: 14px; background-color: #ffffff; transition: all 0.2s; border-left: 5px solid #00a650 !important;">
+                                <div class="row align-items-center">
+                                    
+                                    <!-- Columna 1: Información de la Venta y Cliente -->
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="d-flex align-items-center mb-1" style="gap: 8px;">
+                                            <span class="badge badge-light border font-weight-bold text-dark px-2 py-1" style="font-size: 0.85rem;">
+                                                <t t-esc="order.name"/>
+                                            </span>
+                                            <span class="text-muted small">
+                                                <i class="fa fa-clock-o mr-1"></i><span t-field="order.date_order" t-options="{'widget': 'date'}"/>
+                                            </span>
+                                        </div>
+                                        <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">
+                                            <t t-esc="order.partner_id.name"/>
+                                        </div>
+                                        <div class="text-muted small">
+                                            <t t-if="order.partner_id.phone">
+                                                <i class="fa fa-phone mr-1"></i><t t-esc="order.partner_id.phone"/>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <!-- Columna 2: Logística y Método de Entrega WanGO -->
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <!-- Tipo de Entrega -->
+                                        <div class="mb-1">
+                                            <t t-if="order.delivery_type == 'store_pickup'">
+                                                <span class="badge badge-success text-white px-2 py-1 font-weight-bold" style="font-size: 0.8rem; background-color: #00a650;">
+                                                    <i class="fa fa-shopping-bag mr-1"></i> Retiro en Tienda / Agente
+                                                </span>
+                                            </t>
+                                            <t t-elif="order.delivery_type == 'agency_shipping'">
+                                                <span class="badge badge-info text-white px-2 py-1 font-weight-bold" style="font-size: 0.8rem; background-color: #17a2b8;">
+                                                    <i class="fa fa-cubes mr-1"></i> Envío por Agencia
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge badge-primary text-white px-2 py-1 font-weight-bold" style="font-size: 0.8rem; background-color: #0d6efd;">
+                                                    <i class="fa fa-truck mr-1"></i> Despacho a Domicilio
+                                                </span>
+                                            </t>
+                                        </div>
+
+                                        <!-- Destino o Sucursal -->
+                                        <div class="small text-dark font-weight-500 text-truncate" style="max-width: 300px;">
+                                            <t t-if="order.delivery_type == 'store_pickup' and order.store_branch_id">
+                                                <span>Punto: <strong><t t-esc="order.store_branch_id.name"/></strong></span>
+                                            </t>
+                                            <t t-elif="order.delivery_type == 'agency_shipping' and order.agency_id">
+                                                <span>Agencia: <strong><t t-esc="order.agency_id.name"/></strong> (<t t-esc="order.delivery_district_id.name if order.delivery_district_id else ''"/>)</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span>Destino: <t t-esc="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/></span>
+                                            </t>
+                                        </div>
+
+                                        <!-- Fecha Estimada de Entrega -->
+                                        <div class="small text-muted mt-1">
+                                            <t t-if="order.estimated_delivery_date">
+                                                <span>Compromiso: <strong class="text-danger"><span t-field="order.estimated_delivery_date" t-options="{'widget': 'date'}"/></strong></span>
+                                            </t>
+                                            <t t-else="">
+                                                <span>Entrega estimada: <strong>Hoy</strong></span>
+                                            </t>
+                                        </div>
+                                    </div>
+
+                                    <!-- Columna 3: Total y Acciones Operativas -->
+                                    <div class="col-md-4 text-md-right">
+                                        <div class="font-weight-bold text-dark mb-1" style="font-size: 1.25rem;">
+                                            <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                        </div>
+
+                                        <div class="d-flex align-items-center justify-content-md-end" style="gap: 8px;">
+                                            <!-- Botón WhatsApp Directo con el Comprador -->
+                                            <t t-if="order.partner_id.phone or order.partner_id.mobile">
+                                                <t t-set="raw_phone" t-value="(order.partner_id.mobile or order.partner_id.phone).replace(' ', '').replace('-', '')"/>
+                                                <a t-attf-href="https://wa.me/#{ '51' + raw_phone if len(raw_phone) == 9 else raw_phone }?text=Hola%20#{order.partner_id.name},%20te%20escribo%20de%20la%20tienda%20en%20Mercado%20Wanka%20sobre%20tu%20pedido%20#{order.name}" target="_blank" class="btn btn-sm btn-outline-success rounded-pill px-2.5 font-weight-bold" title="Contactar por WhatsApp">
+                                                    <i class="fa fa-whatsapp font-weight-bold" style="font-size: 1.05rem;"></i>
+                                                </a>
+                                            </t>
+
+                                            <!-- Ver Detalle de Despacho -->
+                                            <a t-attf-href="/my/seller/orders/#{order.id}" class="btn btn-sm btn-dark rounded-pill px-3 font-weight-bold" style="font-size: 0.85rem;">
+                                                Ver Detalle / Despachar <i class="fa fa-chevron-right ml-1" style="font-size: 0.75rem;"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Paginador -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <t t-call="portal.pager"/>
+                    </div>
+                </t>
+
+            </div>
+        </t>
+    </template>
+
+
+
+    <!-- Lista de Productos del Vendedor -->
+
+    <template id="portal_seller_products" name="Mis Productos (Vendedor)">
+
+        <t t-call="portal.portal_layout">
+
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+
+                <t t-set="title">Mis Productos</t>
+
+            </t>
+
+            
+
+            <div class="row mb-3 mt-3">
+
+                <div class="col-md-6">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if not show_archived else ''}" href="/my/seller/products">Activos <span class="badge badge-light" t-esc="count_active"/></a></li>
+                        <li class="nav-item"><a t-attf-class="nav-link #{'active' if show_archived else ''}" href="/my/seller/products?archived=1">Archivados <span class="badge badge-light" t-esc="count_archived"/></a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6 text-right">
+
+                    <a href="/my/seller/products/new" class="btn btn-primary"><i class="fa fa-plus"></i> Crear Nuevo Producto</a>
+
+                </div>
+
+            </div>
+
+
+
+            <t t-if="not products">
+
+                <p>No tienes productos registrados en tu catálogo.</p>
+
+            </t>
+
+            <t t-if="products" t-call="portal.portal_table">
+
+                <thead>
+
+                    <tr class="active">
+
+                        <th>Nombre del Producto</th>
+
+                        <th>Precio</th>
+
+                        <th>Estado</th>
+
+                        <th>Publicado</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <t t-foreach="products" t-as="product">
+
+                        <tr>
+
+                            <td><span t-field="product.name"/></td>
+
+                            <td><span t-field="product.list_price" t-options="{'widget': 'monetary', 'display_currency': request.env.company.currency_id}"/></td>
+
+                            <td>
+
+                                <span t-if="product.marketplace_status == 'pending'" class="badge badge-warning">Pendiente</span>
+
+                                <span t-if="product.marketplace_status == 'approved'" class="badge badge-success">Aprobado</span>
+
+                                <span t-if="product.marketplace_status == 'rejected'" class="badge badge-danger">Rechazado</span>
+
+                            </td>
+
+                            <td>
+
+                                <span t-if="product.is_published" class="text-success"><i class="fa fa-check"></i> Sí</span>
+
+                                <span t-else="" class="text-muted"><i class="fa fa-times"></i> No</span>
+
+                            </td>
+
+                            <td t-if="show_archived">
+                                <form t-attf-action="/my/seller/products/unarchive/#{product.id}" method="POST" class="d-inline">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Reactivar (quedará pendiente de aprobación)"><i class="fa fa-undo"></i> Reactivar</button>
+                                </form>
+                            </td>
+                            <td t-else="">
+
+                                <a t-attf-href="/my/seller/products/edit/#{product.id}" class="btn btn-sm btn-outline-primary" title="Editar Producto">
+
+                                    <i class="fa fa-pencil"></i>
+
+                                </a>
+
+                                <form t-attf-action="/my/seller/products/archive/#{product.id}" method="POST" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar (archivar) este producto? Esta acción lo ocultaráá de tu tienda y de esta lista de manera segura.');">
+
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar (Archivar) Producto">
+
+                                        <i class="fa fa-trash"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                    </t>
+
+                </tbody>
+
+            </t>
+
+        </t>
+
+    </template>
+
+
+
+    <!-- Formulario para Crear Producto -->
+
+    <template id="portal_seller_product_form" name="Crear Producto (Vendedor)">
+
+        <t t-call="portal.portal_layout">
+
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+
+                <t t-set="title">Nuevo Producto</t>
+
+            </t>
+
+            
+
+            <div class="row mt-4">
+
+                <div class="col-md-8 offset-md-2">
+
+                    <div class="card">
+
+                        <div class="card-header bg-primary text-white">
+
+                            <h4 t-if="not product">Detalles del Nuevo Producto</h4>
+
+                            <h4 t-if="product">Editar Producto: <t t-esc="product.name"/></h4>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <form t-attf-action="/my/seller/products/#{ 'edit/' + str(product.id) if product else 'new' }" method="post" enctype="multipart/form-data">
+
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                
+
+                                <div class="form-group">
+
+                                    <label for="name">Nombre del Producto <span class="text-danger">*</span></label>
+
+                                    <input type="text" class="form-control" name="name" id="name" required="1" placeholder="Ej. Zapatillas Deportivas" t-att-value="product.name if product else ''"/>
+
+                                </div>
+
+
+
+                                <div class="row">
+
+                                    <div class="col-md-6 form-group">
+
+                                        <label for="list_price">Precio de Venta <span class="text-danger">*</span></label>
+
+                                        <div class="input-group">
+
+                                            <div class="input-group-prepend">
+
+                                                <span class="input-group-text">$</span>
+
+                                            </div>
+
+                                            <input type="number" step="0.01" class="form-control" name="list_price" id="list_price" required="1" placeholder="0.00" t-att-value="product.list_price if product else ''"/>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-6 form-group">
+
+                                        <label for="type">Tipo de Producto <span class="text-danger">*</span></label>
+
+                                        <select class="form-control" name="type" id="type" required="1" onchange="toggleStockField()">
+
+                                            <option value="consu" t-att-selected="product and product.type == 'consu'">Consumible</option>
+
+                                            <option value="product" t-att-selected="product and product.type == 'product'">Almacenable</option>
+
+                                            <option value="service" t-att-selected="product and product.type == 'service'">Servicio</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+
+
+                                <div class="row">
+
+                                    <div class="col-md-12 form-group">
+
+                                        <label for="public_categ_id">Categoría de la Tienda <span class="text-danger">*</span></label>
+
+                                        <select class="form-control" name="public_categ_id" id="public_categ_id" required="1" style="width: 100%;">
+
+                                            <option value="">Selecciona una categoría...</option>
+
+                                            <t t-foreach="public_categories" t-as="cat">
+
+                                                <option t-att-value="cat.id" t-att-selected="product and product.public_categ_ids and product.public_categ_ids[0].id == cat.id"><t t-esc="cat.display_name"/></option>
+
+                                            </t>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+
+                                    <div class="col-md-6 form-group" id="stock_group" style="display: none;">
+
+                                        <label for="stock_qty">Añadir Stock Extra</label>
+
+                                        <input type="number" min="0" class="form-control" name="stock_qty" id="stock_qty" placeholder="0"/>
+
+                                        <small class="form-text text-muted" t-if="not product">Cantidad de unidades disponibles.</small>
+
+                                        <small class="form-text text-warning" t-if="product">Solo ingresa un número si deseas SUMAR stock adicional. Déjalo en 0 si no deseas alterar el stock actual.</small>
+
+                                    </div>
+
+                                    <!-- Sección de Fotos Estilo Mercado Libre (Hasta 4 fotos con auto-compresión) -->
+                                    <div class="col-12 form-group mt-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <label class="font-weight-bold text-dark mb-0" style="font-size: 1.05rem;">
+                                                <i class="fa fa-camera text-primary mr-1"></i> Fotos del Producto (Hasta 4 fotos)
+                                            </label>
+                                            <span class="badge badge-light border text-muted px-2 py-1" style="font-size: 0.8rem;" id="photos_counter">0 de 4 fotos cargadas</span>
+                                        </div>
+
+                                        <!-- Alerta de Recomendaciones y Peso Mercado Wanka -->
+                                        <div class="alert alert-light border py-2.5 px-3 mb-3 d-flex align-items-start" style="border-radius: 10px; background-color: #fdfdfd; font-size: 0.88rem; gap: 10px;">
+                                            <i class="fa fa-info-circle text-info mt-1" style="font-size: 1.1rem;"></i>
+                                            <div class="text-muted" style="line-height: 1.45;">
+                                                <strong class="text-dark">Recomendaciones de Mercado Wanka:</strong>
+                                                <ul class="mb-0 pl-3 mt-1" style="font-size: 0.83rem;">
+                                                    <li><strong>Foto 1 (Portada obligatoria):</strong> Usa fondo blanco puro o neutro, sin marcas de agua ni logos.</li>
+                                                    <li><strong>Fotos 2, 3 y 4 (Detalles):</strong> Muestra otros ángulos, el producto en uso, empaque o dimensiones.</li>
+                                                    <li><strong>Compresión Automática Inteligente:</strong> Las fotos de tu celular se optimizan automáticamente a <strong>1200x1200 px</strong> y menos de <strong>400 KB</strong> antes de subir, protegiendo la velocidad de tu publicación.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <!-- Grid de 4 Casillas de Fotos -->
+                                        <div class="row" id="product_photos_grid">
+                                            <!-- Foto 1 (Principal) -->
+                                            <div class="col-6 col-md-3 mb-3">
+                                                <div class="photo-slot-card position-relative border rounded text-center p-2 d-flex flex-column align-items-center justify-content-center" id="slot_card_1" style="height: 160px; background-color: #fafafa; border: 2px dashed #ced4da !important; cursor: pointer; transition: all 0.2s;">
+                                                    <input type="file" id="file_slot_1" accept="image/*" class="d-none" onchange="handlePhotoSelect(1, this)"/>
+                                                    <input type="hidden" name="image_1920_b64" id="b64_slot_1"/>
+                                                    
+                                                    <div class="slot-empty-state" id="empty_slot_1">
+                                                        <t t-if="product and product.image_1920">
+                                                            <img t-attf-src="/web/image/product.template/#{product.id}/image_1920" class="img-fluid rounded mb-1" style="max-height: 110px; object-fit: contain;"/>
+                                                            <div class="small font-weight-bold text-dark">Portada Actual</div>
+                                                            <span class="badge badge-secondary" style="font-size: 0.65rem;">Clic para cambiar</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-camera fa-2x text-muted mb-2"></i>
+                                                            <div class="small font-weight-bold text-dark">Foto 1 (Portada)</div>
+                                                            <small class="text-danger font-weight-bold">* Obligatoria</small>
+                                                        </t>
+                                                    </div>
+
+                                                    <div class="slot-filled-state d-none w-100 h-100 position-relative" id="filled_slot_1">
+                                                        <img id="preview_slot_1" src="" class="img-fluid rounded h-100 w-100" style="object-fit: contain;"/>
+                                                        <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" onclick="removePhoto(1, event)" style="top: -6px; right: -6px; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                            <i class="fa fa-times" style="font-size: 11px;"></i>
+                                                        </button>
+                                                        <span class="badge badge-success position-absolute" style="bottom: 4px; left: 4px; font-size: 0.65rem;">Portada</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Foto 2 -->
+                                            <div class="col-6 col-md-3 mb-3">
+                                                <div class="photo-slot-card position-relative border rounded text-center p-2 d-flex flex-column align-items-center justify-content-center" id="slot_card_2" style="height: 160px; background-color: #fafafa; border: 2px dashed #ced4da !important; cursor: pointer; transition: all 0.2s;">
+                                                    <input type="file" id="file_slot_2" accept="image/*" class="d-none" onchange="handlePhotoSelect(2, this)"/>
+                                                    <input type="hidden" name="extra_image_1_b64" id="b64_slot_2"/>
+                                                    
+                                                    <div class="slot-empty-state" id="empty_slot_2">
+                                                        <t t-if="product and product.product_template_image_ids and len(product.product_template_image_ids) >= 1">
+                                                            <img t-attf-src="/web/image/product.image/#{product.product_template_image_ids[0].id}/image_1920" class="img-fluid rounded mb-1" style="max-height: 110px; object-fit: contain;"/>
+                                                            <div class="small font-weight-bold text-dark">Foto 2 Actual</div>
+                                                            <span class="badge badge-secondary" style="font-size: 0.65rem;">Clic para cambiar</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-plus-circle fa-2x text-muted mb-2"></i>
+                                                            <div class="small font-weight-bold text-dark">Foto 2</div>
+                                                            <small class="text-muted">Ángulo 2</small>
+                                                        </t>
+                                                    </div>
+
+                                                    <div class="slot-filled-state d-none w-100 h-100 position-relative" id="filled_slot_2">
+                                                        <img id="preview_slot_2" src="" class="img-fluid rounded h-100 w-100" style="object-fit: contain;"/>
+                                                        <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" onclick="removePhoto(2, event)" style="top: -6px; right: -6px; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                            <i class="fa fa-times" style="font-size: 11px;"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Foto 3 -->
+                                            <div class="col-6 col-md-3 mb-3">
+                                                <div class="photo-slot-card position-relative border rounded text-center p-2 d-flex flex-column align-items-center justify-content-center" id="slot_card_3" style="height: 160px; background-color: #fafafa; border: 2px dashed #ced4da !important; cursor: pointer; transition: all 0.2s;">
+                                                    <input type="file" id="file_slot_3" accept="image/*" class="d-none" onchange="handlePhotoSelect(3, this)"/>
+                                                    <input type="hidden" name="extra_image_2_b64" id="b64_slot_3"/>
+                                                    
+                                                    <div class="slot-empty-state" id="empty_slot_3">
+                                                        <t t-if="product and product.product_template_image_ids and len(product.product_template_image_ids) >= 2">
+                                                            <img t-attf-src="/web/image/product.image/#{product.product_template_image_ids[1].id}/image_1920" class="img-fluid rounded mb-1" style="max-height: 110px; object-fit: contain;"/>
+                                                            <div class="small font-weight-bold text-dark">Foto 3 Actual</div>
+                                                            <span class="badge badge-secondary" style="font-size: 0.65rem;">Clic para cambiar</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-plus-circle fa-2x text-muted mb-2"></i>
+                                                            <div class="small font-weight-bold text-dark">Foto 3</div>
+                                                            <small class="text-muted">Ángulo 3</small>
+                                                        </t>
+                                                    </div>
+
+                                                    <div class="slot-filled-state d-none w-100 h-100 position-relative" id="filled_slot_3">
+                                                        <img id="preview_slot_3" src="" class="img-fluid rounded h-100 w-100" style="object-fit: contain;"/>
+                                                        <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" onclick="removePhoto(3, event)" style="top: -6px; right: -6px; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                            <i class="fa fa-times" style="font-size: 11px;"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Foto 4 -->
+                                            <div class="col-6 col-md-3 mb-3">
+                                                <div class="photo-slot-card position-relative border rounded text-center p-2 d-flex flex-column align-items-center justify-content-center" id="slot_card_4" style="height: 160px; background-color: #fafafa; border: 2px dashed #ced4da !important; cursor: pointer; transition: all 0.2s;">
+                                                    <input type="file" id="file_slot_4" accept="image/*" class="d-none" onchange="handlePhotoSelect(4, this)"/>
+                                                    <input type="hidden" name="extra_image_3_b64" id="b64_slot_4"/>
+                                                    
+                                                    <div class="slot-empty-state" id="empty_slot_4">
+                                                        <t t-if="product and product.product_template_image_ids and len(product.product_template_image_ids) >= 3">
+                                                            <img t-attf-src="/web/image/product.image/#{product.product_template_image_ids[2].id}/image_1920" class="img-fluid rounded mb-1" style="max-height: 110px; object-fit: contain;"/>
+                                                            <div class="small font-weight-bold text-dark">Foto 4 Actual</div>
+                                                            <span class="badge badge-secondary" style="font-size: 0.65rem;">Clic para cambiar</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <i class="fa fa-plus-circle fa-2x text-muted mb-2"></i>
+                                                            <div class="small font-weight-bold text-dark">Foto 4</div>
+                                                            <small class="text-muted">Detalles / Uso</small>
+                                                        </t>
+                                                    </div>
+
+                                                    <div class="slot-filled-state d-none w-100 h-100 position-relative" id="filled_slot_4">
+                                                        <img id="preview_slot_4" src="" class="img-fluid rounded h-100 w-100" style="object-fit: contain;"/>
+                                                        <button type="button" class="btn btn-sm btn-danger position-absolute rounded-circle p-0 d-flex align-items-center justify-content-center" onclick="removePhoto(4, event)" style="top: -6px; right: -6px; width: 24px; height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                                            <i class="fa fa-times" style="font-size: 11px;"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Indicador de compresión en progreso -->
+                                        <div id="compression_toast" class="alert alert-info py-2 px-3 small d-none align-items-center" style="border-radius: 8px; gap: 8px;">
+                                            <i class="fa fa-spinner fa-spin"></i>
+                                            <span>Optimizando y comprimiendo imagen para Mercado Wanka...</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description">Descripción</label>
+                                    <textarea class="form-control" name="description" id="description" rows="4" placeholder="Describe los beneficios y características de tu producto..."><t t-esc="product.description_sale if product else ''"/></textarea>
+                                </div>
+
+                                <div class="alert alert-info mt-3">
+                                    <i class="fa fa-info-circle"></i> Al guardar, el producto pasará a estado <strong>Pendiente de Aprobación</strong>. El equipo de WanGO lo revisará antes de publicarlo.
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <a href="/my/seller/products" class="btn btn-secondary mr-2">Cancelar</a>
+                                    <button type="submit" class="btn btn-success" id="btn_submit_product">Guardar y Enviar a Revisión</button>
+                                </div>
+
+                            </form>
+
+                            <script type="text/javascript">
+                                function toggleStockField() {
+                                    var typeSelect = document.getElementById('type');
+                                    var stockGroup = document.getElementById('stock_group');
+                                    var stockInput = document.getElementById('stock_qty');
+                                    if (typeSelect.value === 'product') {
+                                        stockGroup.style.display = 'block';
+                                        stockInput.setAttribute('required', '1');
+                                    } else {
+                                        stockGroup.style.display = 'none';
+                                        stockInput.removeAttribute('required');
+                                        stockInput.value = '';
+                                    }
+                                }
+
+                                // ── Conectar Clics en Slots de Foto ──
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    toggleStockField();
+                                    for (var i = 1; i &lt;= 4; i++) {
+                                        (function(slotNum) {
+                                            var card = document.getElementById('slot_card_' + slotNum);
+                                            var fileInput = document.getElementById('file_slot_' + slotNum);
+                                            if (card &amp;&amp; fileInput) {
+                                                card.addEventListener('click', function(e) {
+                                                    if (e.target.closest('button')) return;
+                                                    fileInput.click();
+                                                });
+                                            }
+                                        })(i);
+                                    }
+                                    updatePhotoCounter();
+                                });
+
+                                // ── Motor de Compresión Inteligente Client-Side (1200x1200px, Web/Mobile friendly) ──
+                                function handlePhotoSelect(slotNum, input) {
+                                    if (!input.files || !input.files[0]) return;
+                                    var file = input.files[0];
+                                    
+                                    // Validar tipo de archivo
+                                    if (!file.type.match(/^image\//)) {
+                                        alert('Por favor selecciona un archivo de imagen válido (JPG, PNG o WEBP).');
+                                        input.value = '';
+                                        return;
+                                    }
+
+                                    var toast = document.getElementById('compression_toast');
+                                    if (toast) toast.classList.remove('d-none');
+
+                                    var reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        var img = new Image();
+                                        img.onload = function() {
+                                            // Dimensionamiento óptimo estilo Mercado Libre: Max 1200x1200px
+                                            var maxDim = 1200;
+                                            var width = img.width;
+                                            var height = img.height;
+
+                                            if (width &gt; maxDim || height &gt; maxDim) {
+                                                if (width &gt; height) {
+                                                    height = Math.round((height * maxDim) / width);
+                                                    width = maxDim;
+                                                } else {
+                                                    width = Math.round((width * maxDim) / height);
+                                                    maxDim = height;
+                                                }
+                                            }
+
+                                            // Render en Canvas y compresión JPEG 85%
+                                            var canvas = document.createElement('canvas');
+                                            canvas.width = width;
+                                            canvas.height = height;
+                                            var ctx = canvas.getContext('2d');
+                                            
+                                            // Fondo blanco para imágenes transparentes PNG
+                                            ctx.fillStyle = '#FFFFFF';
+                                            ctx.fillRect(0, 0, width, height);
+                                            ctx.drawImage(img, 0, 0, width, height);
+
+                                            var compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+                                            // Actualizar Preview y Campo Hidden
+                                            var preview = document.getElementById('preview_slot_' + slotNum);
+                                            var b64Field = document.getElementById('b64_slot_' + slotNum);
+                                            var emptyState = document.getElementById('empty_slot_' + slotNum);
+                                            var filledState = document.getElementById('filled_slot_' + slotNum);
+                                            var card = document.getElementById('slot_card_' + slotNum);
+
+                                            if (preview) preview.src = compressedBase64;
+                                            if (b64Field) b64Field.value = compressedBase64;
+                                            if (emptyState) emptyState.classList.add('d-none');
+                                            if (filledState) filledState.classList.remove('d-none');
+                                            if (card) {
+                                                card.style.border = '2px solid #28a745 !important';
+                                                card.style.backgroundColor = '#ffffff';
+                                            }
+
+                                            if (toast) toast.classList.add('d-none');
+                                            updatePhotoCounter();
+                                        };
+                                        img.src = e.target.result;
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+
+                                function removePhoto(slotNum, ev) {
+                                    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+                                    var fileInput = document.getElementById('file_slot_' + slotNum);
+                                    var b64Field = document.getElementById('b64_slot_' + slotNum);
+                                    var emptyState = document.getElementById('empty_slot_' + slotNum);
+                                    var filledState = document.getElementById('filled_slot_' + slotNum);
+                                    var card = document.getElementById('slot_card_' + slotNum);
+
+                                    if (fileInput) fileInput.value = '';
+                                    if (b64Field) b64Field.value = '__REMOVE__';
+                                    if (emptyState) emptyState.classList.remove('d-none');
+                                    if (filledState) filledState.classList.add('d-none');
+                                    if (card) {
+                                        card.style.border = '2px dashed #ced4da !important';
+                                        card.style.backgroundColor = '#fafafa';
+                                    }
+                                    updatePhotoCounter();
+                                }
+
+                                function updatePhotoCounter() {
+                                    var count = 0;
+                                    for (var i = 1; i &lt;= 4; i++) {
+                                        var filled = document.getElementById('filled_slot_' + i);
+                                        var empty = document.getElementById('empty_slot_' + i);
+                                        if (filled &amp;&amp; !filled.classList.contains('d-none')) {
+                                            count++;
+                                        } else if (empty &amp;&amp; empty.querySelector('img')) {
+                                            count++;
+                                        }
+                                    }
+                                    var counterEl = document.getElementById('photos_counter');
+                                    if (counterEl) {
+                                        counterEl.textContent = count + ' de 4 fotos cargadas';
+                                        if (count &gt; 0) {
+                                            counterEl.className = 'badge badge-success text-white px-2 py-1';
+                                        } else {
+                                            counterEl.className = 'badge badge-light border text-muted px-2 py-1';
+                                        }
+                                    }
+                                }
+                            </script>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </t>
+
+    </template>
+
+
+
+
+
+    <!-- Vista Detalle de Orden (Vendedor) -->
+    <template id="portal_seller_order_detail" name="Detalle de Orden y Despacho (Vendedor)">
+        <t t-call="portal.portal_layout">
+            <div class="container py-3">
+                <!-- Barra Superior de Navegación -->
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <a href="/my/seller/orders" class="text-muted small text-decoration-none">
+                            <i class="fa fa-arrow-left mr-1"></i> Volver a Ventas
+                        </a>
+                        <h2 class="font-weight-bold text-dark mt-1 mb-0" style="font-size: 1.6rem;">
+                            Orden <t t-esc="order.name"/>
+                        </h2>
+                        <span class="text-muted small">
+                            Registrada el <strong class="text-dark"><t t-esc="order_date_str"/></strong>
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center" style="gap: 8px;">
+                        <a t-attf-href="/track/#{order.name}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill px-3 font-weight-bold" title="Ver cómo ve el cliente el estado de su envío">
+                            <i class="fa fa-eye mr-1"></i> Ver Seguimiento del Cliente
+                        </a>
+                        <a t-attf-href="/my/seller/orders/#{order.id}/label" target="_blank" class="btn btn-sm btn-dark rounded-pill px-3 font-weight-bold" title="Abrir e imprimir rótulo oficial de paquete">
+                            <i class="fa fa-print mr-1"></i> Imprimir Rótulo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Banner Logístico de Estado estilo Mercado Envíos -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background-color: #ffffff; border-left: 6px solid #00a650 !important;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center mb-1" style="gap: 10px;">
+                                    <t t-if="order.state == 'done'">
+                                        <span class="badge badge-success px-3 py-1.5 font-weight-bold text-white rounded-pill" style="font-size: 0.85rem; background-color: #00a650;">
+                                            <i class="fa fa-check-circle mr-1"></i> Entregado con Éxito
+                                        </span>
+                                    </t>
+                                    <t t-elif="order.state == 'sale'">
+                                        <span class="badge badge-warning px-3 py-1.5 font-weight-bold text-dark rounded-pill" style="font-size: 0.85rem; background-color: #ffe600;">
+                                            <i class="fa fa-clock-o mr-1"></i> Pendiente de Despacho
+                                        </span>
+                                    </t>
+                                    <span class="text-muted small">
+                                        Compromiso de entrega: <strong class="text-dark"><t t-esc="delivery_date_str"/></strong>
+                                    </span>
+                                </div>
+                                <h4 class="font-weight-bold text-dark mb-1" style="font-size: 1.25rem;">
+                                    <t t-if="delivery_type == 'store_pickup'">
+                                        Retiro en Tienda / Agente Wanka Oficial
+                                    </t>
+                                    <t t-elif="delivery_type == 'agency_shipping'">
+                                        Envío Interprovincial por Agencia
+                                    </t>
+                                    <t t-else="">
+                                        Despacho a Domicilio (Reparto Urbano)
+                                    </t>
+                                </h4>
+                                <p class="text-muted small mb-0">
+                                    <t t-if="delivery_type == 'store_pickup'">
+                                        El comprador pasará a retirar los productos al punto seleccionado. Prepara el paquete y colócale una etiqueta.
+                                    </t>
+                                    <t t-elif="delivery_type == 'agency_shipping'">
+                                        Lleva este paquete a la agencia correspondiente y registra el número de guía para que el cliente rastree su envío.
+                                    </t>
+                                    <t t-else="">
+                                        Embala cuidadosamente los productos para entregarlos al motorizado de reparto o llevarlos a la dirección del cliente.
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-md-right mt-3 mt-md-0">
+                                <t t-if="order.state == 'sale'">
+                                    <form t-attf-action="/my/seller/orders/#{order.id}/update_state" method="post" onsubmit="return confirm('¿Confirmas que este pedido ha sido entregado o despachado satisfactoriamente?');">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <input type="hidden" name="new_state" value="done"/>
+                                        <button type="submit" class="btn btn-success btn-lg rounded-pill px-4 py-2.5 font-weight-bold shadow-sm" style="background-color: #00a650; border: none; font-size: 0.95rem;">
+                                            <i class="fa fa-check mr-1"></i> Marcar como Entregado
+                                        </button>
+                                    </form>
+                                </t>
+                                <t t-else="">
+                                    <span class="text-success font-weight-bold">
+                                        <i class="fa fa-check-circle mr-1"></i> Pedido Finalizado
+                                    </span>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Columna Izquierda: Productos Vendidos y Resumen Financiero -->
+                    <div class="col-md-7 mb-4">
+                        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: #ffffff;">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="font-weight-bold text-dark mb-0" style="font-size: 1.1rem;">
+                                    <i class="fa fa-cubes text-muted mr-2"></i>Productos a Despachar
+                                </h5>
+                            </div>
+                            <div class="card-body p-3">
+                                <div class="table-responsive">
+                                    <table class="table table-borderless mb-0">
+                                        <thead class="text-muted small border-bottom">
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th class="text-center">Cant.</th>
+                                                <th class="text-right">Precio</th>
+                                                <th class="text-right">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="order_lines" t-as="item">
+                                                <tr>
+                                                    <td class="align-middle">
+                                                        <div class="d-flex align-items-center" style="gap: 10px;">
+                                                            <t t-if="item['has_image'] and item['product_id']">
+                                                                <img t-attf-src="/web/image/product.product/#{item['product_id']}/image_128" class="rounded border" style="width: 48px; height: 48px; object-fit: contain;"/>
+                                                            </t>
+                                                            <div>
+                                                                <div class="font-weight-bold text-dark small"><t t-esc="item['name']"/></div>
+                                                                <span class="text-muted" style="font-size: 0.75rem;">SKU: <t t-esc="item['default_code']"/></span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center align-middle font-weight-bold">
+                                                        <t t-esc="item['qty']"/>
+                                                    </td>
+                                                    <td class="text-right align-middle small text-muted">
+                                                        <t t-esc="item['price_unit_str']"/>
+                                                    </td>
+                                                    <td class="text-right align-middle font-weight-bold text-dark">
+                                                        <t t-esc="item['price_subtotal_str']"/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <hr class="my-3"/>
+
+                                <!-- Resumen de Totales y Liquidación del Vendedor -->
+                                <div class="px-2">
+                                    <div class="d-flex justify-content-between text-muted small mb-1">
+                                        <span>Subtotal Productos:</span>
+                                        <span><t t-esc="amount_untaxed_str"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted small mb-1">
+                                        <span>Flete / Envío:</span>
+                                        <span><t t-esc="shipping_cost_str"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between font-weight-bold text-dark border-top pt-2 mt-2" style="font-size: 1.15rem;">
+                                        <span>Total de la Venta:</span>
+                                        <span class="text-success"><t t-esc="amount_total_str"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Datos del Comprador y Destino de Envío -->
+                    <div class="col-md-5">
+                        <!-- Tarjeta de Contacto del Comprador -->
+                        <div class="card border-0 shadow-sm mb-3" style="border-radius: 16px; background-color: #ffffff;">
+                            <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
+                                <h5 class="font-weight-bold text-dark mb-0" style="font-size: 1rem;">
+                                    <i class="fa fa-user-circle text-muted mr-2"></i>Datos del Comprador
+                                </h5>
+                                <a t-if="whatsapp_url" t-att-href="whatsapp_url" target="_blank" class="btn btn-sm btn-success rounded-pill font-weight-bold px-3 py-1" style="background-color: #25d366; border: none; font-size: 0.8rem;">
+                                    <i class="fa fa-whatsapp mr-1"></i> WhatsApp
+                                </a>
+                            </div>
+                            <div class="card-body p-3 small">
+                                <div class="mb-2">
+                                    <strong class="text-muted d-block">Nombre:</strong>
+                                    <span class="font-weight-bold text-dark fs-6"><t t-esc="(order.partner_id and order.partner_id.name) or 'Cliente'"/></span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong class="text-muted d-block">Teléfono / Móvil:</strong>
+                                    <span class="text-dark"><t t-esc="(order.partner_id and (order.partner_id.phone or order.partner_id.mobile)) or 'No especificado'"/></span>
+                                </div>
+                                <div>
+                                    <strong class="text-muted d-block">Correo:</strong>
+                                    <span class="text-dark"><t t-esc="(order.partner_id and order.partner_id.email) or 'No registrado'"/></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Destino / Punto de Entrega WanGO -->
+                        <div class="card border-0 shadow-sm" style="border-radius: 16px; background-color: #ffffff;">
+                            <div class="card-header bg-white border-bottom py-3">
+                                <h5 class="font-weight-bold text-dark mb-0" style="font-size: 1rem;">
+                                    <i class="fa fa-map-marker text-success mr-2"></i>Destino de Entrega
+                                </h5>
+                            </div>
+                            <div class="card-body p-3 small">
+                                <t t-if="delivery_type == 'store_pickup' and store_branch">
+                                    <div class="mb-2">
+                                        <span class="badge badge-success text-white mb-1">Punto de Retiro Oficial</span>
+                                        <div class="font-weight-bold text-dark"><t t-esc="store_branch.name"/></div>
+                                        <div class="text-muted"><t t-esc="store_branch.address"/></div>
+                                        <div class="text-muted mt-1"><i class="fa fa-clock-o mr-1"></i>Horario: <t t-esc="store_branch.schedule or 'Horario comercial'"/></div>
+                                    </div>
+                                </t>
+                                <t t-elif="delivery_type == 'agency_shipping' and agency">
+                                    <div class="mb-2">
+                                        <span class="badge badge-info text-white mb-1">Agencia de Encomiendas</span>
+                                        <div class="font-weight-bold text-dark"><t t-esc="agency.name"/></div>
+                                        <div class="text-muted">Destino: 
+                                            <t t-if="district_name"><t t-esc="district_name"/>, </t>
+                                            <t t-if="province_name"><t t-esc="province_name"/></t>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="mb-2">
+                                        <span class="badge badge-primary text-white mb-1">Dirección del Cliente</span>
+                                        <div class="font-weight-bold text-dark">
+                                            <t t-esc="street"/>
+                                        </div>
+                                        <t t-if="street2">
+                                            <div class="text-muted">Ref: <t t-esc="street2"/></div>
+                                        </t>
+                                        <div class="text-muted">
+                                            <t t-if="district_name">
+                                                <t t-esc="district_name"/>
+                                            </t>
+                                            <t t-elif="city">
+                                                <t t-esc="city"/>
+                                            </t>
+                                            <t t-if="province_name">
+                                                , <t t-esc="province_name"/>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+
+    <!-- Rótulo Oficial de Despacho Térmico / A4 (Estilo Mercado Envíos) -->
+    <template id="portal_seller_order_shipping_label" name="Rótulo de Envío WanGO">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{'style': 'background-color: #f1f2f6;'}"/>
+            <t t-set="head">
+                <title>Rótulo de Envío - <t t-esc="order.name"/></title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+                <style>
+                    * { box-sizing: border-box; }
+                    body {
+                        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+                        margin: 0;
+                        padding: 20px;
+                        background-color: #f1f2f6 !important;
+                        color: #2d3436;
+                    }
+                    .label-container {
+                        max-width: 440px;
+                        margin: 0 auto;
+                        background: #ffffff;
+                        border: 2px dashed #2d3436;
+                        border-radius: 12px;
+                        padding: 16px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+                    }
+                    .header-brand {
+                        border-bottom: 2px solid #2d3436;
+                        padding-bottom: 8px;
+                        margin-bottom: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .order-badge {
+                        background: #f8f9fa;
+                        border: 2px solid #00a650;
+                        border-radius: 8px;
+                        padding: 8px 12px;
+                        margin-bottom: 10px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .box-section {
+                        border: 1px solid #dfe6e9;
+                        border-radius: 8px;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                    }
+                    .box-recipient {
+                        border: 2px solid #00a650;
+                        background-color: #f6fffa;
+                    }
+                    .section-title {
+                        font-size: 11px;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin-bottom: 4px;
+                        display: block;
+                    }
+                    .table-items {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 11px;
+                        margin-top: 6px;
+                    }
+                    .table-items th, .table-items td {
+                        padding: 4px 6px;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .print-btn-bar {
+                        max-width: 440px;
+                        margin: 0 auto 15px auto;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    @media print {
+                        body { background: #fff !important; padding: 0 !important; }
+                        .label-container { box-shadow: none !important; border: 2px solid #000 !important; width: 100% !important; max-width: 100% !important; }
+                        .print-btn-bar { display: none !important; }
+                    }
+                </style>
+            </t>
+
+            <div class="print-btn-bar">
+                <button onclick="window.print();" style="background:#00a650;color:#fff;border:none;padding:9px 18px;border-radius:25px;font-weight:bold;cursor:pointer;font-size:13px;box-shadow:0 3px 6px rgba(0,0,0,0.15);">
+                    <i class="fa fa-print mr-1"></i> Imprimir Rótulo
+                </button>
+                <span style="font-size:12px;color:#636e72;">Cortar y pegar en el paquete</span>
+            </div>
+
+            <div class="label-container">
+                <!-- Cabecera -->
+                <div class="header-brand">
+                    <div>
+                        <h2 style="margin:0;font-size:19px;font-weight:900;letter-spacing:-0.5px;color:#00a650;">
+                            MERCADO WANKA
+                        </h2>
+                        <span style="font-size:10px;font-weight:700;color:#636e72;letter-spacing:1px;">RED LOGÍSTICA DE ENVÍOS</span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:inline-block;background:#ffe600;color:#000;padding:3px 8px;border-radius:15px;font-size:10px;font-weight:800;">
+                            <t t-if="delivery_type == 'store_pickup'">RETIRO EN TIENDA</t>
+                            <t t-elif="delivery_type == 'agency_shipping'">AGENCIA</t>
+                            <t t-else="">DOMICILIO</t>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Código de Orden -->
+                <div class="order-badge">
+                    <div>
+                        <span style="font-size:9px;color:#636e72;font-weight:bold;display:block;">NÚMERO DE ORDEN</span>
+                        <span style="font-size:23px;font-weight:900;color:#2d3436;letter-spacing:-0.5px;"><t t-esc="order.name"/></span>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="font-size:10px;color:#636e72;display:block;">FECHA: <t t-esc="order_date_str"/></span>
+                        <span style="font-size:11px;color:#00a650;font-weight:bold;">ENTREGA: <t t-esc="delivery_date_str"/></span>
+                    </div>
+                </div>
+
+                <!-- DESTINATARIO -->
+                <div class="box-section box-recipient">
+                    <span class="section-title" style="color:#00a650;"><i class="fa fa-user"></i> DESTINATARIO (ENTREGAR A):</span>
+                    <div style="font-size:16px;font-weight:800;color:#2d3436;"><t t-esc="recipient_name"/></div>
+                    <div style="font-size:13px;font-weight:700;color:#2d3436;margin-top:2px;">
+                        📞 Teléfono: <t t-esc="recipient_phone"/>
+                    </div>
+                    <div style="margin-top:6px;padding-top:6px;border-top:1px dashed #bbf7d0;">
+                        <t t-if="delivery_type == 'store_pickup' and store_branch">
+                            <div style="font-size:12px;color:#2d3436;">
+                                <strong>Punto Oficial:</strong> <t t-esc="store_branch.name"/>
+                            </div>
+                            <div style="font-size:11px;color:#636e72;"><t t-esc="store_branch.address"/></div>
+                        </t>
+                        <t t-elif="delivery_type == 'agency_shipping' and agency">
+                            <div style="font-size:12px;color:#2d3436;">
+                                <strong>Agencia:</strong> <t t-esc="agency.name"/>
+                            </div>
+                            <div style="font-size:11px;color:#636e72;">Destino: <t t-esc="district_name"/>, <t t-esc="province_name"/></div>
+                        </t>
+                        <t t-else="">
+                            <div style="font-size:12px;font-weight:600;color:#2d3436;">
+                                📍 <t t-esc="street"/>
+                            </div>
+                            <div t-if="street2" style="font-size:11px;color:#636e72;">Ref: <t t-esc="street2"/></div>
+                            <div style="font-size:12px;font-weight:700;color:#00a650;margin-top:2px;">
+                                <t t-esc="district_name or city"/>, <t t-esc="province_name"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- REMITENTE -->
+                <div class="box-section" style="background:#fafafa;">
+                    <span class="section-title" style="color:#636e72;"><i class="fa fa-home"></i> REMITENTE (TIENDA):</span>
+                    <div style="font-size:13px;font-weight:700;color:#2d3436;">
+                        <t t-esc="seller.name"/>
+                    </div>
+                    <div style="font-size:11px;color:#636e72;">
+                        Tel: <t t-esc="seller.phone or seller.mobile or 'No registrado'"/>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DEL PAQUETE -->
+                <div class="box-section">
+                    <span class="section-title" style="color:#636e72;"><i class="fa fa-cubes"></i> CONTENIDO DEL BULTO:</span>
+                    <table class="table-items">
+                        <thead>
+                            <tr style="background:#f1f2f6;text-align:left;">
+                                <th style="width:40px;text-align:center;">Cant.</th>
+                                <th>Producto</th>
+                                <th style="width:55px;text-align:right;">SKU</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="order_lines" t-as="item">
+                                <tr>
+                                    <td style="text-align:center;font-weight:800;font-size:12px;"><t t-esc="item['qty']"/></td>
+                                    <td><t t-esc="item['name']"/></td>
+                                    <td style="text-align:right;color:#636e72;"><t t-esc="item['default_code']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pie: QR y Firma -->
+                <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #b2bec3;padding-top:8px;margin-top:6px;">
+                    <div style="text-align:center;">
+                        <img t-att-src="'/report/barcode/?type=QR&amp;value=' + tracking_url + '&amp;width=80&amp;height=80'" style="width:70px;height:70px;border:1px solid #dfe6e9;padding:2px;border-radius:4px;"/>
+                        <div style="font-size:8px;color:#636e72;margin-top:2px;">Escanea para rastrear</div>
+                    </div>
+                    <div style="width:160px;text-align:center;border-top:1px solid #2d3436;padding-top:3px;margin-top:20px;">
+                        <span style="font-size:9px;font-weight:bold;color:#636e72;display:block;">Firma / DNI Receptor</span>
+                        <span style="font-size:8px;color:#b2bec3;">Recibido Conforme</span>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 400);
+                });
+            </script>
+        </t>
+    </template>
+
+
+    <!-- Plantilla de Configuración de Tienda para el Vendedor -->
+    <template id="portal_seller_settings" name="Configuración de Mi Tienda">
+
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Configuración de Mi Tienda</t>
+            </t>
+
+            <div class="container py-4">
+                <t t-if="success_msg">
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 8px;">
+                        <i class="fa fa-check-circle mr-2"></i> <t t-esc="success_msg"/>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&amp;times;</span>
+                        </button>
+                    </div>
+                </t>
+
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                    <div>
+                        <h2 class="font-weight-bold text-dark mb-1" style="letter-spacing: -0.5px;">Configuración de Mi Tienda</h2>
+                        <p class="text-muted mb-0">Gestiona los datos comerciales, RUC/DNI y puntos de entrega de tu negocio.</p>
+                    </div>
+                    <a href="/my/seller/dashboard" class="btn btn-outline-secondary font-weight-bold" style="border-radius: 8px;">
+                        <i class="fa fa-arrow-left mr-1"></i> Volver al Panel
+                    </a>
+                </div>
+
+                <form action="/my/seller/settings" method="post" enctype="multipart/form-data" class="shadow-sm border rounded-lg bg-white p-4" style="border-radius: 12px;">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                    <!-- SECCIÓN 1: DATOS GENERALES Y LOGO -->
+                    <h4 class="font-weight-bold text-dark mb-3">
+                        <i class="fa fa-id-card text-primary mr-2"></i> Información del Negocio y Contacto
+                    </h4>
+                    
+                    <!-- Subida de Logo de la Tienda -->
+                    <div class="row align-items-center mb-4 p-3 rounded" style="background-color: #f8fafc; border: 1px dashed #cbd5e1; margin-left: 0; margin-right: 0;">
+                        <div class="col-auto">
+                            <div class="position-relative">
+                                <img id="seller_logo_preview" 
+                                     t-attf-src="/web/image/res.partner/#{partner.id}/image_128" 
+                                     alt="Logo de Tienda" 
+                                     class="rounded-circle border shadow-sm" 
+                                     style="width: 80px; height: 80px; object-fit: cover; background: #fff;"/>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <label for="logo" class="font-weight-bold text-dark mb-1 d-block" style="font-size: 0.95rem;">
+                                <i class="fa fa-camera mr-1 text-primary"></i> Logo o Foto de la Tienda
+                            </label>
+                            <p class="text-muted small mb-2">Este logo aparecerá en la cabecera de tu tienda y en tus productos. Formato PNG o JPG recomendado.</p>
+                            <input type="file" name="logo" id="logo" class="form-control-file" accept="image/*" onchange="var reader = new FileReader(); reader.onload = function(e){ document.getElementById('seller_logo_preview').src = e.target.result; }; reader.readAsDataURL(this.files[0]);" style="font-size: 0.85rem;"/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="font-weight-bold small text-muted">Nombre Comercial de la Tienda *</label>
+                            <input type="text" name="name" id="name" class="form-control" t-att-value="partner.name" required="required"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="vat" class="font-weight-bold small text-muted">RUC o DNI *</label>
+                            <input type="text" name="vat" id="vat" class="form-control" t-att-value="partner.vat" placeholder="Ej: 20601234567 o 45678912"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone" class="font-weight-bold small text-muted">Teléfono / WhatsApp de Atención</label>
+                            <input type="text" name="phone" id="phone" class="form-control" t-att-value="partner.phone" placeholder="Ej: 964123456"/>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="font-weight-bold small text-muted">Correo Electrónico de Contacto</label>
+                            <input type="email" name="email" id="email" class="form-control" t-att-value="partner.email"/>
+                        </div>
+                        <div class="col-12 mb-4">
+                            <label for="street" class="font-weight-bold small text-muted">Dirección Fiscal / Legal</label>
+                            <input type="text" name="street" id="street" class="form-control" t-att-value="partner.street" placeholder="Ej: Av. Principal 123"/>
+                        </div>
+                    </div>
+
+                    <hr class="my-4"/>
+
+                    <!-- SECCIÓN 2: RETIRO EN LOCAL FÍSICO -->
+                    <div class="p-3 mb-4 rounded" style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                <h4 class="font-weight-bold text-dark mb-1">
+                                    <i class="fa fa-shopping-bag text-success mr-2"></i> Retiro en Local Físico Propio
+                                </h4>
+                                <p class="text-muted small mb-0">
+                                    ¿Cuentas con una tienda, taller o punto físico donde tus clientes puedan recoger sus pedidos gratuitamente?
+                                </p>
+                            </div>
+                            <div class="custom-control custom-switch custom-switch-lg" style="transform: scale(1.3); margin-right: 15px;">
+                                <input type="checkbox" class="custom-control-input" id="seller_allow_pickup" name="seller_allow_pickup" value="1" t-att-checked="'checked' if seller_branch and seller_branch.active else None" onchange="document.getElementById('pickup_details_box').style.display = this.checked ? 'block' : 'none';"/>
+                                <label class="custom-control-label cursor-pointer" for="seller_allow_pickup"></label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info py-2 px-3 small mb-0 mt-2" style="background-color: #e8f4fd; border-color: #b8dffd; color: #004085;">
+                            <i class="fa fa-info-circle mr-1"></i>
+                            <strong>Nota para negocios rurales:</strong> Si operas desde una zona sin atención directa al público o tu taller es inaccesible, mantén este interruptor <strong>apagado</strong>. Tus clientes podrán recoger sus compras en los <strong>Agentes Wanka</strong> oficiales de la red.
+                        </div>
+                    </div>
+
+                    <!-- Campos Condicionales de Retiro -->
+                    <div id="pickup_details_box" t-att-style="'display: block;' if seller_branch and seller_branch.active else 'display: none;'">
+                        <h5 class="font-weight-bold text-dark mb-3">Datos del Local para Retiro de Pedidos</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_address" class="font-weight-bold small text-muted">Dirección del Local *</label>
+                                <input type="text" name="seller_pickup_address" id="seller_pickup_address" class="form-control" t-att-value="seller_branch.address if seller_branch else partner.street or ''" placeholder="Ej: Calle Real 450"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_reference" class="font-weight-bold small text-muted">Referencia del Local</label>
+                                <input type="text" name="seller_pickup_reference" id="seller_pickup_reference" class="form-control" t-att-value="seller_branch.reference if seller_branch else ''" placeholder="Ej: Frente al mercado modelo, junto a la botica"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_schedule" class="font-weight-bold small text-muted">Horario de Atención para Retiro</label>
+                                <input type="text" name="seller_pickup_schedule" id="seller_pickup_schedule" class="form-control" t-att-value="seller_branch.schedule if seller_branch else 'Lunes a Sábado 9:00 AM - 7:00 PM'"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_department_id" class="font-weight-bold small text-muted">Departamento</label>
+                                <select name="seller_pickup_department_id" id="seller_pickup_department_id" class="form-control">
+                                    <option value="">Selecciona Departamento...</option>
+                                    <t t-foreach="departments" t-as="dept">
+                                        <option t-att-value="dept.id" t-att-selected="'selected' if seller_branch and seller_branch.department_id and seller_branch.department_id.id == dept.id else None">
+                                            <t t-esc="dept.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_province_id" class="font-weight-bold small text-muted">Provincia</label>
+                                <select name="seller_pickup_province_id" id="seller_pickup_province_id" class="form-control">
+                                    <option value="">Selecciona Provincia...</option>
+                                    <t t-foreach="provinces" t-as="prov">
+                                        <option t-att-value="prov.id" t-att-selected="'selected' if seller_branch and seller_branch.province_id and seller_branch.province_id.id == prov.id else None">
+                                            <t t-esc="prov.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="seller_pickup_district_id" class="font-weight-bold small text-muted">Distrito</label>
+                                <select name="seller_pickup_district_id" id="seller_pickup_district_id" class="form-control">
+                                    <option value="">Selecciona Distrito...</option>
+                                    <t t-foreach="districts" t-as="dist">
+                                        <option t-att-value="dist.id" t-att-selected="'selected' if seller_branch and seller_branch.district_id and seller_branch.district_id.id == dist.id else None">
+                                            <t t-esc="dist.name"/>
+                                        </option>
+                                    </t>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top text-right">
+                        <button type="submit" class="btn btn-success btn-lg px-5 font-weight-bold shadow-sm" style="border-radius: 8px;">
+                            <i class="fa fa-save mr-2"></i> Guardar Configuración
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </t>
+    </template>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- WEB DE SEGUIMIENTO (TRACKING) DE PEDIDOS PARA COMPRADORES        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+
+    <template id="portal_order_tracking" name="Seguimiento de Mi Pedido - Mercado Wanka">
+        <t t-call="portal.portal_layout">
+            <div class="container py-4 my-2" style="max-width: 900px;">
+                
+                <!-- Navegación y Cabecera -->
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <a href="/my/orders" class="text-muted small text-decoration-none">
+                            <i class="fa fa-arrow-left mr-1"></i> Volver a Mis Compras
+                        </a>
+                        <h2 class="font-weight-bold text-dark mt-1 mb-0" style="font-size: 1.8rem; letter-spacing: -0.5px;">
+                            Seguimiento de Pedido #<t t-esc="order.name"/>
+                        </h2>
+                        <span class="text-muted small">
+                            Comprado el <span t-field="order.date_order" t-options="{'widget': 'date'}"/>
+                        </span>
+                    </div>
+                    <div>
+                        <a t-attf-href="/track" class="btn btn-sm btn-outline-secondary rounded-pill font-weight-bold px-3">
+                            <i class="fa fa-search mr-1"></i> Rastrear otro
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 1. BARRA DE ESTADO LOGÍSTICO Y TIMELINE ACTIVO -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden; background-color: #ffffff;">
+                    <!-- Cabecera de Estado con color de Mercado Wanka -->
+                    <div class="p-4" t-attf-style="background: #{'#28a745' if step_current == 4 else ('#0984e3' if step_current in [2, 3] else '#6c757d')}; color: #ffffff;">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <div>
+                                <span class="badge badge-light text-dark font-weight-bold px-2 py-1 mb-2 text-uppercase" style="font-size: 0.75rem; border-radius: 4px;">
+                                    <t t-if="delivery_mode == 'store_pickup'">Retiro en Tienda / Agente Wanka</t>
+                                    <t t-elif="delivery_mode == 'agency_shipping'">Envío a Agencia</t>
+                                    <t t-else="">Despacho a Domicilio</t>
+                                </span>
+                                <h3 class="font-weight-bold mb-1" style="font-size: 1.5rem;">
+                                    <t t-if="step_current == 4">
+                                        <i class="fa fa-check-circle mr-2"></i> ¡Pedido Entregado con Éxito!
+                                    </t>
+                                    <t t-elif="step_current == 3">
+                                        <t t-if="delivery_mode == 'store_pickup'">
+                                            <i class="fa fa-check-circle mr-2"></i> ¡Listo para retirar en el punto seleccionado!
+                                        </t>
+                                        <t t-else="">
+                                            <i class="fa fa-truck mr-2"></i> ¡Tu paquete está en camino!
+                                        </t>
+                                    </t>
+                                    <t t-elif="step_current == 2">
+                                        <i class="fa fa-cube mr-2"></i> El vendedor está preparando tu paquete
+                                    </t>
+                                    <t t-elif="step_current == 1">
+                                        <i class="fa fa-credit-card mr-2"></i> Pago confirmado, preparando despacho
+                                    </t>
+                                    <t t-elif="step_current == -1">
+                                        <i class="fa fa-times-circle mr-2"></i> Pedido Cancelado
+                                    </t>
+                                </h3>
+                                <p class="mb-0" style="opacity: 0.95; font-size: 0.95rem;">
+                                    <t t-if="order.estimated_delivery_date">
+                                        Fecha estimada: <strong><span t-field="order.estimated_delivery_date" t-options="{'widget': 'date'}"/></strong>
+                                    </t>
+                                    <t t-else="">
+                                        Te mantendremos informado en cada actualización de este enlace.
+                                    </t>
+                                </p>
+                            </div>
+                            <div class="mt-3 mt-md-0 text-md-right">
+                                <t t-if="seller_phone">
+                                    <a t-attf-href="https://wa.me/#{seller_phone}?text=Hola%2C%20te%20escribo%20por%20mi%20compra%20#{order.name}%20en%20Mercado%20Wanka.%20Quisiera%20consultar%20sobre%20mi%20entrega." target="_blank" class="btn btn-success font-weight-bold rounded-pill px-4 shadow-sm" style="background-color: #25D366; border-color: #25D366;">
+                                        <i class="fa fa-whatsapp mr-1" style="font-size: 1.1rem;"></i> Contactar al Vendedor
+                                    </a>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Visual de 4 Pasos estilo Mercado Libre -->
+                    <div class="card-body p-4 bg-white">
+                        <div class="d-flex align-items-center justify-content-between position-relative px-2 py-3" style="min-height: 90px;">
+                            <!-- Paso 1: Confirmado -->
+                            <div class="d-flex flex-column align-items-center text-center" style="z-index: 2; width: 22%;">
+                                <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2 #{'bg-success text-white' if step_current >= 1 else 'bg-light text-muted'}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                    <i class="fa fa-check"></i>
+                                </div>
+                                <span class="font-weight-bold small text-dark">Confirmado</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">Pago aprobado</span>
+                            </div>
+
+                            <!-- Línea de conexión 1-2 -->
+                            <div class="flex-grow-1 border-top" t-attf-style="border-width: 3px !important; border-color: #{'#28a745' if step_current >= 2 else '#e9ecef'} !important; margin-top: -30px;"></div>
+
+                            <!-- Paso 2: Preparando -->
+                            <div class="d-flex flex-column align-items-center text-center" style="z-index: 2; width: 22%;">
+                                <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2 #{'bg-success text-white' if step_current >= 2 else ('bg-primary text-white' if step_current == 2 else 'bg-light text-muted')}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                    <i t-attf-class="fa #{'fa-check' if step_current > 2 else 'fa-cube'}"></i>
+                                </div>
+                                <span class="font-weight-bold small text-dark">Preparando</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">En empaque</span>
+                            </div>
+
+                            <!-- Línea de conexión 2-3 -->
+                            <div class="flex-grow-1 border-top" t-attf-style="border-width: 3px !important; border-color: #{'#28a745' if step_current >= 3 else '#e9ecef'} !important; margin-top: -30px;"></div>
+
+                            <!-- Paso 3: En camino / Listo -->
+                            <div class="d-flex flex-column align-items-center text-center" style="z-index: 2; width: 22%;">
+                                <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2 #{'bg-success text-white' if step_current >= 3 else ('bg-primary text-white' if step_current == 3 else 'bg-light text-muted')}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                    <i t-attf-class="fa #{'fa-check' if step_current > 3 else ('fa-map-marker' if delivery_mode == 'store_pickup' else 'fa-truck')}"></i>
+                                </div>
+                                <span class="font-weight-bold small text-dark">
+                                    <t t-if="delivery_mode == 'store_pickup'">Listo para retirar</t>
+                                    <t t-else="">En camino</t>
+                                </span>
+                                <span class="text-muted" style="font-size: 0.72rem;">
+                                    <t t-if="delivery_mode == 'store_pickup'">En sucursal</t>
+                                    <t t-else="">En ruta a destino</t>
+                                </span>
+                            </div>
+
+                            <!-- Línea de conexión 3-4 -->
+                            <div class="flex-grow-1 border-top" t-attf-style="border-width: 3px !important; border-color: #{'#28a745' if step_current >= 4 else '#e9ecef'} !important; margin-top: -30px;"></div>
+
+                            <!-- Paso 4: Entregado -->
+                            <div class="d-flex flex-column align-items-center text-center" style="z-index: 2; width: 22%;">
+                                <div t-attf-class="rounded-circle d-flex align-items-center justify-content-center shadow-sm mb-2 #{'bg-success text-white' if step_current == 4 else 'bg-light text-muted'}" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                                    <i class="fa fa-handshake-o"></i>
+                                </div>
+                                <span class="font-weight-bold small text-dark">Entregado</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">¡Completado!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. INFORMACIÓN CONTEXTUAL DE ENTREGA SEGÚN MÉTODO -->
+                <div class="row">
+                    <!-- Tarjeta de Punto de Destino / Retiro -->
+                    <div class="col-md-7 mb-4">
+                        <div class="card h-100 border-0 shadow-sm" style="border-radius: 14px;">
+                            <div class="card-header bg-white font-weight-bold text-dark border-0 pt-3 pb-0">
+                                <i class="fa fa-map-pin text-danger mr-2"></i> 
+                                <t t-if="delivery_mode == 'store_pickup'">Lugar de Retiro del Producto</t>
+                                <t t-elif="delivery_mode == 'agency_shipping'">Agencia de Encomienda</t>
+                                <t t-else="">Dirección de Entrega a Domicilio</t>
+                            </div>
+                            <div class="card-body">
+                                <!-- Retiro en Tienda / Agente -->
+                                <t t-if="delivery_mode == 'store_pickup'">
+                                    <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #00a650;">
+                                        <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">
+                                            <t t-esc="order.store_branch_id.name if order.store_branch_id else 'Punto de Retiro del Vendedor'"/>
+                                        </div>
+                                        <div class="text-muted small mt-1">
+                                            <i class="fa fa-map-marker mr-1 text-danger"></i>
+                                            <t t-esc="order.store_branch_id.address if order.store_branch_id and order.store_branch_id.address else (seller.street or 'Dirección confirmada con el vendedor')"/>
+                                        </div>
+                                        <div t-if="order.store_branch_id and order.store_branch_id.opening_hours" class="text-muted small mt-1">
+                                            <i class="fa fa-clock-o mr-1 text-info"></i>
+                                            Horario: <t t-esc="order.store_branch_id.opening_hours"/>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info py-2 px-3 small mb-0" style="border-radius: 8px;">
+                                        <i class="fa fa-info-circle mr-1"></i> Presenta tu DNI y el código de orden <strong>#<t t-esc="order.name"/></strong> para retirar.
+                                    </div>
+                                </t>
+
+                                <!-- Envío por Agencia -->
+                                <t t-elif="delivery_mode == 'agency_shipping'">
+                                    <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #0984e3;">
+                                        <div class="font-weight-bold text-dark" style="font-size: 1.1rem;">
+                                            <t t-esc="order.agency_id.name if order.agency_id else (shipment.destination_agency_id.name if shipment else 'Agencia WanGO')"/>
+                                        </div>
+                                        <div class="text-muted small mt-1">
+                                            <i class="fa fa-map-marker mr-1 text-danger"></i>
+                                            <t t-esc="order.agency_id.address if order.agency_id else (shipment.destination_agency_id.address if shipment else 'Dirección de agencia asignada')"/>
+                                        </div>
+                                        <t t-if="shipment">
+                                            <div class="mt-2 pt-2 border-top">
+                                                <span class="badge badge-primary text-white">Guía: <t t-esc="shipment.name"/></span>
+                                                <span class="badge badge-light border ml-1">Estado Encomienda: <t t-esc="shipment.state"/></span>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <p class="text-muted small mb-0">Podrás reclamar tu encomienda en ventanilla presentando tu DNI.</p>
+                                </t>
+
+                                <!-- Despacho a Domicilio -->
+                                <t t-else="">
+                                    <div class="p-3 mb-3 bg-light rounded" style="border-left: 4px solid #f39c12;">
+                                        <div class="font-weight-bold text-dark" style="font-size: 1.05rem;">
+                                            <t t-esc="order.partner_shipping_id.street or order.partner_id.street or 'Dirección del Comprador'"/>
+                                        </div>
+                                        <t t-if="order.partner_shipping_id.street2">
+                                            <div class="text-muted small mt-1">
+                                                <strong>Referencia:</strong> <t t-esc="order.partner_shipping_id.street2"/>
+                                            </div>
+                                        </t>
+                                        <div class="text-muted small mt-1">
+                                            <t t-esc="order.delivery_district_id.name if order.delivery_district_id else order.partner_shipping_id.city"/>, 
+                                            <t t-esc="order.delivery_province_id.name if order.delivery_province_id else ''"/>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-0">Un repartidor entregará el paquete directamente en tu puerta.</p>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta de Información del Vendedor y Soporte -->
+                    <div class="col-md-5 mb-4">
+                        <div class="card h-100 border-0 shadow-sm" style="border-radius: 14px;">
+                            <div class="card-header bg-white font-weight-bold text-dark border-0 pt-3 pb-0">
+                                <i class="fa fa-handshake-o text-warning mr-2"></i> Vendedor Responsable
+                            </div>
+                            <div class="card-body">
+                                <h5 class="font-weight-bold text-dark mb-1"><t t-esc="seller_name"/></h5>
+                                <span class="badge badge-success text-white font-weight-bold mb-3">Vendedor Oficial Mercado Wanka</span>
+                                
+                                <t t-if="seller_phone">
+                                    <div class="mt-3">
+                                        <a t-attf-href="https://wa.me/#{seller_phone}?text=Hola%2C%20te%20escribo%20por%20mi%20compra%20#{order.name}%20en%20Mercado%20Wanka.%20Quisiera%20consultar%20sobre%20mi%20entrega." target="_blank" class="btn btn-outline-success btn-block font-weight-bold rounded-pill shadow-sm">
+                                            <i class="fa fa-whatsapp mr-1"></i> WhatsApp: +<t t-esc="seller_phone"/>
+                                        </a>
+                                    </div>
+                                </t>
+                                <t t-else="">
+                                    <div class="text-muted small mt-2">
+                                        Para dudas sobre este despacho, puedes escribir a soporte@mercadowanka.pe
+                                    </div>
+                                </t>
+
+                                <div class="mt-4 pt-3 border-top text-center">
+                                    <span class="text-muted small">Copia y guarda tu enlace de seguimiento:</span>
+                                    <div class="input-group mt-2">
+                                        <input type="text" class="form-control form-control-sm text-center" id="trackingUrlInput" t-att-value="'/track/' + order.name" readonly="readonly"/>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-sm btn-outline-primary" type="button" onclick="navigator.clipboard.writeText(window.location.origin + document.getElementById('trackingUrlInput').value); alert('¡Enlace de rastreo copiado al portapapeles!');">
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. RESUMEN DE PRODUCTOS COMPRADOS -->
+                <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+                    <div class="card-header bg-white font-weight-bold text-dark border-0 pt-3 pb-2">
+                        <i class="fa fa-shopping-bag text-primary mr-2"></i> Artículos en este paquete
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="border-0 px-4">Producto</th>
+                                    <th class="border-0 text-center">Cant.</th>
+                                    <th class="border-0 text-right">Precio Unit.</th>
+                                    <th class="border-0 text-right pr-4">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="order.order_line" t-as="line">
+                                    <t t-if="not line.is_delivery">
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <t t-if="line.product_id.image_128">
+                                                        <img t-att-src="image_data_uri(line.product_id.image_128)" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;" class="mr-3 border"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <div class="bg-light border rounded mr-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                            <i class="fa fa-image text-muted"></i>
+                                                        </div>
+                                                    </t>
+                                                    <div>
+                                                        <span class="font-weight-bold text-dark d-block"><t t-esc="line.product_id.name"/></span>
+                                                        <small t-if="line.product_id.default_code" class="text-muted">SKU: <t t-esc="line.product_id.default_code"/></small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center font-weight-bold text-dark">
+                                                <t t-esc="int(line.product_uom_qty)"/>
+                                            </td>
+                                            <td class="text-right text-muted">
+                                                <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                            </td>
+                                            <td class="text-right pr-4 font-weight-bold text-dark">
+                                                <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                            <tfooter class="bg-light">
+                                <tr>
+                                    <td colspan="3" class="text-right font-weight-bold py-3">Total Pagado:</td>
+                                    <td class="text-right pr-4 font-weight-bold py-3" style="font-size: 1.15rem; color: #2d3436;">
+                                        <span t-field="order.amount_total" t-options="{'widget': 'monetary', 'display_currency': order.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tfooter>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+    <!-- PÁGINA: BUSCADOR PÚBLICO DE RASTREO (/track) -->
+    <template id="portal_order_tracking_search" name="Rastrear Pedido - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty bg-light py-5" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+                <div class="container" style="max-width: 600px;">
+                    <div class="card border-0 shadow-sm text-center p-4 p-md-5" style="border-radius: 24px; background: #ffffff;">
+                        <div class="mb-3">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; background-color: #fff9db; color: #f59f00; font-size: 2.2rem;">
+                                <i class="fa fa-truck"></i>
+                            </div>
+                        </div>
+                        <h2 class="font-weight-bold text-dark mb-2" style="font-size: 1.8rem; letter-spacing: -0.5px;">Rastreo de Envíos Mercado Wanka</h2>
+                        <p class="text-muted mb-4" style="font-size: 0.95rem;">Ingresa el número de tu pedido para consultar su estado en tiempo real.</p>
+                        
+                        <form action="/track" method="get" class="mb-4">
+                            <div class="input-group input-group-lg shadow-sm" style="border-radius: 50px; overflow: hidden; border: 2px solid #ffe600; padding: 3px; background: #ffffff;">
+                                <input type="text" name="q" class="form-control border-0 px-4" placeholder="Ej. S00012 o 12" style="font-size: 1.05rem; box-shadow: none;" required="required"/>
+                                <div class="input-group-append">
+                                    <button class="btn font-weight-bold px-4" type="submit" style="background-color: #ffe600; color: #2d3436; border-radius: 50px;">
+                                        <i class="fa fa-search mr-1"></i> Rastrear
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="d-flex align-items-center justify-content-center text-muted small" style="gap: 15px;">
+                            <span><i class="fa fa-shield text-success mr-1"></i> Rastreo Seguro</span>
+                            <span>•</span>
+                            <span><i class="fa fa-clock-o text-info mr-1"></i> Actualización en Vivo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- PÁGINA: PEDIDO NO ENCONTRADO -->
+    <template id="portal_order_tracking_not_found" name="Pedido No Encontrado - Mercado Wanka">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty bg-light py-5" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+                <div class="container text-center" style="max-width: 550px;">
+                    <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 24px; background: #ffffff;">
+                        <div class="mb-3 text-muted" style="font-size: 3.5rem;">
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <h3 class="font-weight-bold text-dark mb-2">No encontramos ese pedido</h3>
+                        <p class="text-muted mb-4">
+                            No se encontró ningún despacho con la referencia <strong>"<t t-esc="searched_ref"/>"</strong>. Por favor verifica el número e inténtalo nuevamente.
+                        </p>
+                        <div>
+                            <a href="/track" class="btn btn-warning font-weight-bold rounded-pill px-4 py-2 shadow-sm" style="background-color: #ffe600; border-color: #ffe600; color: #2d3436;">
+                                <i class="fa fa-arrow-left mr-1"></i> Intentar de Nuevo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
+

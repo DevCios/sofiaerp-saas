@@ -1,0 +1,192 @@
+/* Armonizar con la tipografía global Montserrat */
+body, html, #wrapwrap, h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, p, 
+span:not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.oi), 
+a:not(.fa):not(.fas), input, select, button {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Delivery Options Checkout Card - premium aesthetics */
+#delivery_carrier, div#delivery_carrier {
+    display: none !important;
+}
+
+#wango_delivery_checkout_card {
+    border-color: #e2e8f0 !important;
+    transition: box-shadow 0.2s ease-in-out;
+}
+#wango_delivery_checkout_card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+#deliveryTabs .nav-link {
+    color: #4a5568 !important;
+    border: 1px solid transparent !important;
+    transition: all 0.2s ease-in-out;
+}
+#deliveryTabs .nav-link.active {
+    color: #00a650 !important;
+    border-color: #e2e8f0 #e2e8f0 transparent !important;
+    background-color: #ffffff !important;
+    border-bottom: 3px solid #00a650 !important;
+}
+#deliveryTabs .nav-link:hover:not(.active) {
+    color: #1a202c !important;
+    background-color: #f7fafc !important;
+}
+
+/* Scrollbar for branch listing */
+#wango_branch_list::-webkit-scrollbar {
+    width: 6px;
+}
+#wango_branch_list::-webkit-scrollbar-track {
+    background: #f7fafc;
+}
+#wango_branch_list::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+#wango_branch_list::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Branch Card */
+.wango-branch-card {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+}
+.wango-branch-card:hover:not(.disabled) {
+    border-color: #00a650 !important;
+    background-color: #f6fcf9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 166, 80, 0.08);
+}
+.wango-branch-card.active {
+    border-color: #00a650 !important;
+    background-color: #e6f6ee;
+    box-shadow: 0 0 0 1px #00a650;
+}
+.wango-branch-card.disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    background-color: #f8fafc;
+    border-color: #e2e8f0 !important;
+}
+
+/* Leaflet Map overrides */
+#wango_leaflet_map {
+    border: 1px solid #cbd5e0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+}
+
+/* Agency Card */
+.wango-agency-card {
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px;
+    padding: 18px;
+    transition: all 0.2s ease;
+    background-color: #ffffff;
+}
+.wango-agency-card:hover {
+    border-color: #00a650 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Progress and Skeleton Helpers */
+.wango-skeleton-line {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading-skeleton 1.5s infinite;
+    height: 16px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+@keyframes loading-skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.bg-warning-light {
+    background-color: #fffaf0 !important;
+}
+.text-warning-dark {
+    color: #dd6b20 !important;
+}
+
+/* Product Page Delivery Widget - premium Falabella aesthetics */
+.wango-delivery-widget {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.wango-delivery-widget #wango_widget_selected_location {
+    color: #00a650 !important;
+    transition: color 0.15s ease;
+}
+
+.wango-delivery-widget #wango_widget_selected_location:hover {
+    color: #008740 !important;
+}
+
+.wango-widget-option-row {
+    border-left: 3px solid transparent !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+.wango-widget-option-row:hover:not(.disabled) {
+    background-color: #fafbfc;
+}
+
+.wango-widget-option-row.active {
+    border-left: 3px solid #00a650 !important;
+    background-color: #f0fdf4 !important;
+}
+
+.wango-widget-option-row.disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.wango-widget-option-row i {
+    color: #555555;
+}
+
+/* Cleaner selects for location modal */
+.select-clean {
+    border: 1.5px solid #cbd5e0 !important;
+    background-color: #ffffff !important;
+    font-size: 0.95rem !important;
+    color: #2d3748 !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select-clean:focus {
+    border-color: #00a650 !important;
+    box-shadow: 0 0 0 3px rgba(0, 166, 80, 0.1) !important;
+    outline: none !important;
+}
+
+.select-clean:disabled {
+    background-color: #f7fafc !important;
+    cursor: not-allowed;
+}
+
+.modal-header .close {
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+.modal-header .close:hover {
+    opacity: 0.8;
+}

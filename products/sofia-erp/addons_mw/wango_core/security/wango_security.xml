@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Group: User -->
+        <record id="group_wango_user" model="res.groups">
+            <field name="name">Mercado Wanka / Logística: Usuario</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Acceso operativo a Mercado Wanka y logística.</field>
+        </record>
+
+        <!-- Group: Manager -->
+        <record id="group_wango_manager" model="res.groups">
+            <field name="name">Mercado Wanka / Logística: Administrador</field>
+            <field name="implied_ids" eval="[(4, ref('group_wango_user'))]"/>
+            <field name="comment">Acceso administrativo completo a configuración y reportes de Mercado Wanka.</field>
+        </record>
+    </data>
+</odoo>
