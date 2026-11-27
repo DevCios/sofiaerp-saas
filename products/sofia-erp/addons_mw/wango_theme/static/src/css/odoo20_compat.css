@@ -50,3 +50,41 @@ footer .container {
 }
 
 /* No sobrescribir font-family de .fa / .oi / .material-icons: Odoo 20 carga sus propias fuentes nativas */
+
+/* ==========================================================================
+ * Ficha de Producto de Alta Conversión (Mercado Wanka UX Standard)
+ * ========================================================================== */
+#product_detail #product_details h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.25;
+}
+#product_detail .product_price h3,
+#product_detail .oe_price {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+}
+#product_detail #add_to_cart {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 12px 26px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#product_detail #add_to_cart:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.36) !important;
+}
+#product_detail .o_wsale_product_images,
+#product_detail .carousel-inner {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}

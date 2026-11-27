@@ -215,35 +215,63 @@
 
     <template id="product_inherit_wango_marketplace" inherit_id="website_sale.product">
         <xpath expr="//div[@id='product_details']" position="inside">
-            <div class="mt-2 mb-3">
-                <span class="text-muted d-inline-flex align-items-center flex-wrap" style="font-size: 0.92rem;">
-                    <i class="fa fa-shopping-bag text-primary me-1.5"/> Vendido y entregado por:&amp;nbsp;
-                    <t t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
-                        <strong>
-                            <a t-attf-href="/shop?seller_id={{ product.sudo().marketplace_seller_id.id }}" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
-                                <t t-out="product.sudo().marketplace_seller_id.name"/>
-                            </a>
-                        </strong>
-                        <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700;">
-                            <i class="fa fa-check-circle text-primary me-1"/> <t t-out="'%.1f' % (product.sudo().marketplace_seller_id.seller_rating_avg or 4.9)"/> ★
+            <t t-set="mw_seller" t-value="product.sudo().marketplace_seller_id if (product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved') else website.sudo().company_id.partner_id"/>
+            <t t-set="mw_seller_url" t-value="('/shop?seller_id=%s' % mw_seller.id) if (product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved') else '/shop'"/>
+
+            <!-- Tarjeta Premium de Confianza, Medios de Pago y Reputación del Vendedor -->
+            <div class="mw-product-trust-card card border-0 mt-3 mb-3" style="border: 1px solid #e2e8f0 !important; border-radius: 14px; background: #f8fafc;">
+                <div class="card-body p-3">
+                    <!-- Medios de pago aceptados -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between pb-2 mb-2 border-bottom" style="gap: 8px;">
+                        <span class="small fw-bold text-dark">
+                            <i class="fa fa-lock text-success me-1"/> Pago 100% seguro:
                         </span>
-                    </t>
-                    <t t-else="">
-                        <strong>
-                            <a href="/shop" class="text-primary text-decoration-none fw-bold" style="color: #3483fa !important;">
-                                <t t-out="website.sudo().company_id.name or 'Mercado Wanka'"/>
-                            </a>
-                        </strong>
-                        <span class="badge bg-success-subtle text-success border border-success px-2 py-0.5 rounded-pill ms-2" style="font-size: 0.72rem; font-weight: 700; background-color: #ecfdf5; color: #059669;">
-                            <i class="fa fa-shield me-1"/> Tienda Oficial
-                        </span>
-                        <span class="badge bg-light text-primary border px-2 py-0.5 rounded-pill ms-1" style="font-size: 0.72rem; font-weight: 700;">
-                            <i class="fa fa-check-circle text-primary me-1"/> <t t-out="'%.1f' % (website.sudo().company_id.partner_id.seller_rating_avg or 4.9)"/> ★
-                        </span>
-                    </t>
-                </span>
+                        <div class="d-flex flex-wrap align-items-center" style="gap: 6px;">
+                            <span class="badge rounded-pill px-2 py-1" style="background:#742284;color:#fff;font-size:0.72rem;">Yape</span>
+                            <span class="badge rounded-pill px-2 py-1" style="background:#00d1b2;color:#0f172a;font-size:0.72rem;font-weight:700;">Plin</span>
+                            <span class="badge rounded-pill px-2 py-1" style="background:#009ee3;color:#fff;font-size:0.72rem;">Mercado Pago</span>
+                            <span class="badge rounded-pill px-2 py-1 border bg-white text-dark" style="font-size:0.72rem;"><i class="fa fa-credit-card me-1"/>Visa / MC</span>
+                        </div>
+                    </div>
+
+                    <!-- Garantías de Compra Protegida Escrow + Comprobante SUNAT -->
+                    <div class="d-flex flex-column small text-muted mb-3" style="gap: 6px;">
+                        <div>
+                            <i class="fa fa-shield text-success me-2"/>
+                            <strong class="text-dark">Compra Protegida Mercado Wanka:</strong> recibes tu producto o te devolvemos tu dinero.
+                        </div>
+                        <div>
+                            <i class="fa fa-file-text-o text-primary me-2"/>
+                            <strong class="text-dark">Comprobante SUNAT:</strong> Boleta o Factura Electrónica emitida por la tienda.
+                        </div>
+                    </div>
+
+                    <!-- Bloque de Reputación de la Tienda Vendedora -->
+                    <div class="p-2 px-3 bg-white rounded-3 border d-flex flex-wrap align-items-center justify-content-between" style="gap: 10px;">
+                        <div>
+                            <div class="small text-muted">Vendido y entregado por</div>
+                            <div class="d-flex align-items-center flex-wrap" style="gap: 6px;">
+                                <a t-att-href="mw_seller_url" class="fw-bold text-decoration-none" style="color: #0f172a; font-size: 0.98rem;">
+                                    <i class="fa fa-shopping-bag text-primary me-1"/>
+                                    <t t-out="mw_seller.name or 'Mercado Wanka'"/>
+                                </a>
+                                <span class="badge rounded-pill px-2 py-1" style="background:#ecfdf5; color:#059669; font-size:0.7rem; font-weight:700;">
+                                    <i class="fa fa-check-circle me-1"/> Verificada
+                                </span>
+                            </div>
+                            <div class="small text-muted mt-1 d-flex flex-wrap align-items-center" style="gap: 10px;">
+                                <span><i class="fa fa-star text-warning me-1"/><strong class="text-dark" t-out="'%.1f' % (mw_seller.seller_rating_avg or 4.9)"/></span>
+                                <span>+<t t-out="mw_seller.seller_sales_completed or 250"/> ventas</span>
+                                <span class="text-success"><i class="fa fa-clock-o me-1"/><t t-out="mw_seller.seller_on_time_delivery_pct or 99"/>% a tiempo</span>
+                            </div>
+                        </div>
+                        <a t-att-href="mw_seller_url" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3">
+                            Ver tienda
+                        </a>
+                    </div>
+                </div>
             </div>
-            
+
             <!-- Advertencia temporal si el vendedor ya no está aprobado pero el producto sigue publicado -->
             <div class="alert alert-warning mt-2" t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status != 'approved'">
                 <i class="fa fa-warning"/> Esta tienda se encuentra temporalmente inactiva. No es posible realizar compras en este momento.

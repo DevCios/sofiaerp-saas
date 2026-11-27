@@ -755,8 +755,8 @@
                         
                         <!-- Extra Links -->
                         <div class="d-flex align-items-center" style="gap: 1.5rem;">
-                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Tarjeta CMR <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
-                            <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Vende y comisiona</a>
+                            <a href="/terminos-y-condiciones" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;"><i class="fa fa-shield text-success"/> Compra Protegida</a>
+                            <a href="/vender-en-wango" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Vende en Mercado Wanka</a>
                             <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Venta telefónica <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
                             <a href="#" class="text-decoration-none text-muted hover-text-dark d-flex align-items-center" style="gap: 0.25rem;">Ayuda <i class="fa fa-chevron-down pt-1" style="font-size: 1rem;"/></a>
                         </div>
