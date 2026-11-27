@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import hashlib
+import hmac
 import json
 import logging
 import os
@@ -15,9 +17,11 @@ MP_PAYMENT_API = "https://api.mercadopago.com/v1/payments/{payment_id}"
 
 class MercadoWankaMercadoPagoCheckout(http.Controller):
     """
-    Reutiliza el mismo motor Mercado Pago Checkout Pro de SOFIA ERP (MP_ACCESS_TOKEN)
-    para cobrar carritos multi-vendedor en Mercado Wanka (tienda.sofiaerp.com)
-    y confirmar/dividir las órdenes por vendedor al recibir pago aprobado.
+    Motor de Pagos Producción de Mercado Wanka (reutiliza MP_ACCESS_TOKEN de SOFIA ERP):
+    - Checkout Pro (Tarjetas, Yape, Plin, PagoEfectivo).
+    - Validación HMAC-SHA256 del webhook oficial de Mercado Pago (x-signature).
+    - Idempotencia estricta por payment_id (evita doble confirmación/división).
+    - Confirmación multi-vendedor + despacho automático al ERP del vendedor.
     """
 
     def _get_mp_access_token(self):
@@ -27,9 +31,50 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             token = param.value if param else ""
         return token.strip()
 
+    def _get_mp_webhook_secret(self):
+        secret = os.getenv("MP_WEBHOOK_SECRET") or ""
+        if not secret:
+            param = request.env['ir.config_parameter'].sudo().search([('key', '=', 'sofia.mercadopago.webhook_secret')], limit=1)
+            secret = param.value if param else ""
+        return secret.strip()
+
     def _get_base_url(self):
         param = request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1)
         return (param.value if param else 'https://tienda.sofiaerp.com').rstrip('/')
+
+    def _verify_mp_signature(self, data_id):
+        """Verifica cabecera x-signature de Mercado Pago (HMAC-SHA256) si MP_WEBHOOK_SECRET está configurado."""
+        secret = self._get_mp_webhook_secret()
+        if not secret:
+            return True  # Si no hay secret configurado, la validación se hace consultando directamente la API MP
+        x_sig = request.httprequest.headers.get("x-signature", "")
+        x_req_id = request.httprequest.headers.get("x-request-id", "")
+        parts = {}
+        for piece in x_sig.split(","):
+            if "=" in piece:
+                k, v = piece.split("=", 1)
+                parts[k.strip()] = v.strip()
+        ts = parts.get("ts", "")
+        v1 = parts.get("v1", "")
+        if not ts or not v1:
+            return False
+        manifest = f"id:{data_id};request-id:{x_req_id};ts:{ts};"
+        expected = hmac.new(secret.encode("utf-8"), manifest.encode("utf-8"), hashlib.sha256).hexdigest()
+        return hmac.compare_digest(expected, v1)
+
+    @http.route('/shop/mercadopago/set_delivery', type='http', auth='public', website=True, methods=['POST'], csrf=False)
+    def set_delivery_preference(self, delivery_mode='home_delivery', delivery_notes='', **kwargs):
+        """Guarda la modalidad de entrega elegida por el comprador antes de pagar en Mercado Pago."""
+        order = request.website.sale_get_order()
+        if order and order.exists():
+            vals = {}
+            if 'delivery_type' in order._fields and delivery_mode in ('store_pickup', 'home_delivery', 'agency_shipping'):
+                vals['delivery_type'] = delivery_mode
+            if delivery_notes:
+                vals['note'] = f"Entrega: {delivery_mode} | {delivery_notes.strip()[:300]}"
+            if vals:
+                order.sudo().write(vals)
+        return request.redirect('/shop/mercadopago/pay')
 
     @http.route('/shop/mercadopago/pay', type='http', auth='public', website=True, csrf=False)
     def start_mercadopago_payment(self, **kwargs):
@@ -40,7 +85,7 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
         access_token = self._get_mp_access_token()
         if not access_token:
             _logger.error("Mercado Wanka: MP_ACCESS_TOKEN no configurado.")
-            return request.redirect('/shop/payment?error=mp_not_configured')
+            return request.redirect('/shop/cart?error=mp_not_configured')
 
         base_url = self._get_base_url()
         mp_items = [
@@ -65,7 +110,7 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             "back_urls": {
                 "success": f"{base_url}/shop/mercadopago/callback?order_id={order.id}",
                 "pending": f"{base_url}/shop/mercadopago/callback?order_id={order.id}",
-                "failure": f"{base_url}/shop/payment?mp_status=failure",
+                "failure": f"{base_url}/shop/cart?mp_status=failure",
             },
             "auto_return": "approved",
             "notification_url": f"{base_url}/shop/mercadopago/webhook",
@@ -87,12 +132,21 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
         except Exception as exc:
             _logger.error("Mercado Wanka MP exception: %s", exc)
 
-        return request.redirect('/shop/payment?error=mp_unavailable')
+        return request.redirect('/shop/cart?error=mp_unavailable')
 
     def _verify_and_confirm_order(self, order, payment_id):
+        """Verifica el pago directamente en la API oficial de Mercado Pago con idempotencia estricta."""
         access_token = self._get_mp_access_token()
         if not access_token or not payment_id:
             return False
+
+        ref_tag = f"MP-{payment_id}"
+        # Idempotencia: si ya fue procesado este payment_id en cualquier orden, no duplicar
+        already = request.env['sale.order'].sudo().search([('client_order_ref', '=', ref_tag)], limit=1)
+        if already:
+            _logger.info("Mercado Wanka: pago %s ya procesado previamente en orden %s (idempotente).", ref_tag, already.name)
+            return True
+
         try:
             resp = requests.get(
                 MP_PAYMENT_API.format(payment_id=payment_id),
@@ -102,10 +156,13 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             if resp.status_code != 200:
                 return False
             pdata = resp.json()
-            if pdata.get("status") == "approved":
+            paid_amount = float(pdata.get("transaction_amount") or 0.0)
+            expected_amount = float(order.amount_total or 0.0)
+            if pdata.get("status") == "approved" and paid_amount + 0.05 >= expected_amount:
                 if order.state in ('draft', 'sent'):
-                    order.sudo().write({'client_order_ref': f'MP-{payment_id}'})
+                    order.sudo().write({'client_order_ref': ref_tag})
                     order.sudo().action_confirm()
+                    _logger.info("Mercado Wanka: orden %s confirmada con pago verificado %s (S/ %.2f)", order.name, ref_tag, paid_amount)
                 return True
         except Exception as exc:
             _logger.error("Mercado Wanka: error verificando pago MP %s: %s", payment_id, exc)
@@ -129,23 +186,27 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
     def mercadopago_webhook(self, **kwargs):
         try:
             body = json.loads(request.httprequest.data.decode('utf-8') or '{}')
-            payment_id = (body.get('data') or {}).get('id') or kwargs.get('data.id')
-            if payment_id:
-                access_token = self._get_mp_access_token()
-                r = requests.get(
-                    MP_PAYMENT_API.format(payment_id=payment_id),
-                    headers={"Authorization": f"Bearer {access_token}"},
-                    timeout=12,
-                )
-                if r.status_code == 200:
-                    pdata = r.json()
-                    ext_ref = pdata.get('external_reference') or ''
-                    if ext_ref.startswith('MW-') and pdata.get('status') == 'approved':
-                        oid = int(ext_ref.split('-')[1])
-                        order = request.env['sale.order'].sudo().browse(oid)
-                        if order.exists() and order.state in ('draft', 'sent'):
-                            order.sudo().write({'client_order_ref': f'MP-{payment_id}'})
-                            order.sudo().action_confirm()
+            payment_id = str((body.get('data') or {}).get('id') or kwargs.get('data.id') or '').strip()
+            if not payment_id:
+                return http.Response("OK", status=200)
+            if not self._verify_mp_signature(payment_id):
+                _logger.warning("Mercado Wanka MP webhook: firma HMAC inválida para payment_id=%s", payment_id)
+                return http.Response("Invalid signature", status=403)
+
+            access_token = self._get_mp_access_token()
+            r = requests.get(
+                MP_PAYMENT_API.format(payment_id=payment_id),
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=12,
+            )
+            if r.status_code == 200:
+                pdata = r.json()
+                ext_ref = pdata.get('external_reference') or ''
+                if ext_ref.startswith('MW-') and pdata.get('status') == 'approved':
+                    oid = int(ext_ref.split('-')[1])
+                    order = request.env['sale.order'].sudo().browse(oid)
+                    if order.exists():
+                        self._verify_and_confirm_order(order, payment_id)
         except Exception as exc:
             _logger.warning("Mercado Wanka MP webhook warning: %s", exc)
         return http.Response("OK", status=200)

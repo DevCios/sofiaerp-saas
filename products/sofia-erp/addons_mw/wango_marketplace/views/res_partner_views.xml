@@ -27,6 +27,20 @@
                             <field name="seller_good_service_pct"/>
                         </group>
                     </group>
+                    <group invisible="not is_marketplace_seller">
+                        <group string="KYC y Cuenta Bancaria (Liquidaciones)">
+                            <field name="seller_kyc_verified" widget="boolean_toggle"/>
+                            <field name="seller_bank_name"/>
+                            <field name="seller_bank_account"/>
+                            <field name="seller_bank_cci"/>
+                            <field name="marketplace_custom_commission_rate"/>
+                        </group>
+                        <group string="Conexión Ecosistema SOFIA ERP">
+                            <field name="sofia_tenant_slug"/>
+                            <field name="sofia_tenant_url"/>
+                            <field name="sofia_subscription_active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
                     
                     <!-- Botones de aprobación exclusivos para managers -->
                     <div groups="wango_marketplace.group_marketplace_manager" 

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Bloque Producción Odoo 20: Selector de Entrega + Pago Seguro Mercado Pago (Tarjetas / Yape / Plin) -->
+    <template id="wango_cart_mercadopago_express" inherit_id="website_sale.cart" name="Mercado Wanka Checkout Express (Entrega + Mercado Pago)" priority="30">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <t t-set="mw_order" t-value="website.sale_get_order()"/>
+            <div class="container my-4" t-if="mw_order and mw_order.order_line">
+                <div class="card border-0 shadow-sm" style="border-radius: 16px; border: 1px solid #e2e8f0 !important; background: #ffffff;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center g-4">
+                            <div class="col-lg-7">
+                                <h4 class="fw-bold mb-1" style="color: #0f172a;">
+                                    <i class="fa fa-shield text-success me-2"/> Finalizar Compra Segura en Mercado Wanka
+                                </h4>
+                                <p class="text-muted small mb-3">
+                                    Elige cómo deseas recibir tu pedido y paga al instante con <strong>Mercado Pago (Tarjetas, Yape o Plin)</strong>.
+                                    Cada tienda emitirá tu Boleta o Factura Electrónica SUNAT por sus productos.
+                                </p>
+                                <form action="/shop/mercadopago/set_delivery" method="post" id="mw_express_checkout_form">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                                <input type="radio" name="delivery_mode" value="home_delivery" checked="checked"/>
+                                                <span class="small fw-bold"><i class="fa fa-truck text-primary me-1"/> Delivery</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                                <input type="radio" name="delivery_mode" value="store_pickup"/>
+                                                <span class="small fw-bold"><i class="fa fa-store text-success me-1"/> Retiro Tienda</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="w-100 p-2 border rounded-3 d-flex align-items-center gap-2 cursor-pointer" style="background:#f8fafc;">
+                                                <input type="radio" name="delivery_mode" value="agency_shipping"/>
+                                                <span class="small fw-bold"><i class="fa fa-box text-warning me-1"/> Agencia</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" name="delivery_notes" class="form-control form-control-sm"
+                                               placeholder="Dirección de entrega, referencia o agencia preferida (Shalom / Olva / Marvisur)..."/>
+                                    </div>
+                                    <button type="submit" class="btn btn-lg w-100 fw-bold text-white shadow-sm"
+                                            style="background: linear-gradient(135deg, #009ee3 0%, #007eb5 100%); border-radius: 10px; padding: 12px 20px;">
+                                        <i class="fa fa-lock me-2"/> Pagar S/ <t t-esc="'%.2f' % (mw_order.amount_total or 0.0)"/> con Mercado Pago (Tarjetas / Yape / Plin)
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-lg-5 border-start ps-lg-4">
+                                <div class="d-flex flex-column gap-2 small">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa fa-check-circle text-success"/>
+                                        <span><strong>Compra Protegida:</strong> tu dinero se custodia (Escrow) hasta confirmar la entrega.</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa fa-check-circle text-success"/>
+                                        <span><strong>Pago 100% Encriptado SSL</strong> procesado por Mercado Pago.</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="fa fa-check-circle text-success"/>
+                                        <span><strong>Comprobante SUNAT garantizado</strong> por cada tienda verificada.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

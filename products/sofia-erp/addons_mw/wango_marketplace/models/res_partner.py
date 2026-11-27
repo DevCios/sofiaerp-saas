@@ -79,6 +79,23 @@ class ResPartner(models.Model):
         help="Si es mayor a 0, sobrescribe la comisión por categoría para este vendedor.",
     )
 
+    # KYC y Datos Bancarios para Liquidación de Ventas
+    seller_kyc_verified = fields.Boolean(
+        string="KYC / RUC Verificado en SUNAT",
+        default=False,
+        help="Confirma que el RUC está ACTIVO/HABIDO en SUNAT y la cuenta bancaria corresponde al titular.",
+    )
+    seller_bank_name = fields.Selection([
+        ('bcp', 'BCP — Banco de Crédito del Perú'),
+        ('bbva', 'BBVA Perú'),
+        ('interbank', 'Interbank'),
+        ('scotiabank', 'Scotiabank'),
+        ('banbif', 'BanBif'),
+        ('yape_plin', 'Yape / Plin Empresarial'),
+    ], string="Banco para Liquidaciones")
+    seller_bank_account = fields.Char(string="Número de Cuenta (Soles)")
+    seller_bank_cci = fields.Char(string="Código de Cuenta Interbancario (CCI - 20 dígitos)", size=20)
+
     def get_seller_stars_list(self):
         """Retorna lista de 5 estados ('full', 'half', 'empty') para la tienda."""
         self.ensure_one()

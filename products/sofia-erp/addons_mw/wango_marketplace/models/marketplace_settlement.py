@@ -57,17 +57,29 @@ class MarketplaceSettlement(models.Model):
             rec.commission_total = rec.commission_variable_total + rec.platform_fee_total
             rec.amount_to_pay = max(0.0, rec.amount_total - rec.commission_total)
 
+    only_delivered_escrow = fields.Boolean(
+        string='Custodia Escrow (Solo Entregados)',
+        default=True,
+        help='Protección antifraude: solo incluye en la liquidación órdenes ya entregadas o sin envío pendiente.',
+    )
+
     def action_fetch_lines(self):
         for rec in self:
             if rec.state != 'draft':
                 continue
-            lines = self.env['sale.order.line'].search([
+            domain = [
                 ('order_id.marketplace_seller_id', '=', rec.seller_id.id),
                 ('order_id.state', 'in', ['sale', 'done']),
                 ('order_id.date_order', '>=', rec.date_start),
                 ('order_id.date_order', '<=', rec.date_end),
                 ('marketplace_settlement_id', '=', False),
-            ])
+            ]
+            lines = self.env['sale.order.line'].search(domain)
+            if rec.only_delivered_escrow:
+                lines = lines.filtered(
+                    lambda l: not getattr(l.order_id, 'wango_shipment_id', False)
+                    or l.order_id.wango_shipment_id.state == 'delivered'
+                )
             rec.line_ids = [(6, 0, lines.ids)]
 
     def action_confirm(self):

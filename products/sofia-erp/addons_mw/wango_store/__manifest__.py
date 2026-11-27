@@ -39,6 +39,7 @@ Módulo de Tienda y Portada estilo Mercado Libre:
         'views/menus.xml',
         'views/home_templates.xml',
         'views/product_detail_templates.xml',
+        'views/checkout_mercadopago_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [

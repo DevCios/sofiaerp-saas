@@ -23,6 +23,7 @@
                             <field name="seller_id" readonly="state != 'draft'"/>
                             <field name="date_start" readonly="state != 'draft'"/>
                             <field name="date_end" readonly="state != 'draft'"/>
+                            <field name="only_delivered_escrow" widget="boolean_toggle" readonly="state != 'draft'"/>
                             <field name="commission_invoice_id" invisible="not commission_invoice_id"/>
                         </group>
                         <group>
