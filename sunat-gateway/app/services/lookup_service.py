@@ -47,6 +47,10 @@ def today_lima_str() -> str:
     return datetime.now(timezone.utc).astimezone(ZoneInfo(settings.LIMA_TZ)).strftime("%Y-%m-%d")
 
 
+def _decolecta_token() -> str:
+    return (settings.DECOLECTA_TOKEN or os.getenv("DECOLECTA_TOKEN") or "").strip()
+
+
 def _apis_net_pe_token() -> str:
     return (settings.APIS_NET_PE_TOKEN or os.getenv("APIS_NET_PE_TOKEN") or "").strip()
 
@@ -56,11 +60,41 @@ def _apisperu_token() -> str:
 
 
 async def _fetch_ruc_external(ruc: str) -> Optional[tuple[dict[str, Any], str]]:
-    """Consulta proveedores externos de RUC y normaliza el contrato de salida."""
+    """Consulta proveedores externos de RUC (Decolecta -> apis.net.pe -> apisperu) y normaliza el contrato."""
+    token_dec = _decolecta_token()
     token_v2 = _apis_net_pe_token()
     token_ap = _apisperu_token()
 
     async with httpx.AsyncClient(timeout=10.0) as client:
+        # 0. Decolecta (Proveedor #1 oficial actual)
+        if token_dec:
+            try:
+                r = await client.get(
+                    f"https://api.decolecta.com/v1/sunat/ruc?numero={ruc}",
+                    headers={"Authorization": f"Bearer {token_dec}", "Accept": "application/json"},
+                )
+                if r.status_code == 200:
+                    d = r.json()
+                    name = (d.get("razon_social") or d.get("razonSocial") or d.get("nombre") or "").strip()
+                    if name:
+                        return (
+                            {
+                                "ruc": ruc,
+                                "business_name": name,
+                                "trade_name": (d.get("nombre_comercial") or d.get("nombreComercial") or name).strip(),
+                                "status": (d.get("estado") or "").strip(),
+                                "condition": (d.get("condicion") or "").strip(),
+                                "address": (d.get("direccion") or "").strip(),
+                                "ubigeo": (d.get("ubigeo") or "").strip(),
+                                "department": (d.get("departamento") or "").strip(),
+                                "province": (d.get("provincia") or "").strip(),
+                                "district": (d.get("distrito") or "").strip(),
+                            },
+                            "decolecta",
+                        )
+            except Exception as exc:
+                _logger.warning("Lookup RUC decolecta falló para %s: %s", ruc, exc)
+
         # 1. apis.net.pe (v2 con token o v1 pública)
         try:
             if token_v2:
@@ -124,10 +158,38 @@ async def _fetch_ruc_external(ruc: str) -> Optional[tuple[dict[str, Any], str]]:
 
 
 async def _fetch_dni_external(dni: str) -> Optional[tuple[dict[str, Any], str]]:
+    token_dec = _decolecta_token()
     token_v2 = _apis_net_pe_token()
     token_ap = _apisperu_token()
 
     async with httpx.AsyncClient(timeout=10.0) as client:
+        # 0. Decolecta (Proveedor #1 oficial actual)
+        if token_dec:
+            try:
+                r = await client.get(
+                    f"https://api.decolecta.com/v1/reniec/dni?numero={dni}",
+                    headers={"Authorization": f"Bearer {token_dec}", "Accept": "application/json"},
+                )
+                if r.status_code == 200:
+                    d = r.json()
+                    first = (d.get("first_name") or d.get("nombres") or "").strip()
+                    pat = (d.get("first_last_name") or d.get("apellidoPaterno") or "").strip()
+                    mat = (d.get("second_last_name") or d.get("apellidoMaterno") or "").strip()
+                    full = (d.get("full_name") or d.get("nombre") or d.get("nombreCompleto") or f"{first} {pat} {mat}").strip()
+                    if full:
+                        return (
+                            {
+                                "dni": dni,
+                                "full_name": " ".join(full.split()),
+                                "first_names": first,
+                                "paternal_surname": pat,
+                                "maternal_surname": mat,
+                            },
+                            "decolecta",
+                        )
+            except Exception as exc:
+                _logger.warning("Lookup DNI decolecta falló para %s: %s", dni, exc)
+
         try:
             if token_v2:
                 r = await client.get(
@@ -185,9 +247,27 @@ async def _fetch_dni_external(dni: str) -> Optional[tuple[dict[str, Any], str]]:
 
 
 async def _fetch_exchange_rate_external(rate_date: str) -> Optional[tuple[float, float, str, str]]:
-    """Retorna (buy_rate, sell_rate, actual_date, source) desde SUNAT/apis.net.pe."""
+    """Retorna (buy_rate, sell_rate, actual_date, source) desde Decolecta -> apis.net.pe -> fallback."""
+    token_dec = _decolecta_token()
     token_v2 = _apis_net_pe_token()
     async with httpx.AsyncClient(timeout=10.0) as client:
+        # 0. Decolecta (Proveedor #1 oficial actual)
+        if token_dec:
+            try:
+                r = await client.get(
+                    f"https://api.decolecta.com/v1/tipo-cambio/sunat?date={rate_date}",
+                    headers={"Authorization": f"Bearer {token_dec}", "Accept": "application/json"},
+                )
+                if r.status_code == 200:
+                    d = r.json()
+                    buy = float(d.get("buy_price") or d.get("precioCompra") or d.get("compra") or 0)
+                    sell = float(d.get("sell_price") or d.get("precioVenta") or d.get("venta") or 0)
+                    actual_date = str(d.get("date") or d.get("fecha") or rate_date)[:10]
+                    if buy > 0 and sell > 0:
+                        return buy, sell, actual_date, "sunat/decolecta"
+            except Exception as exc:
+                _logger.warning("Lookup TC decolecta falló para %s: %s", rate_date, exc)
+
         try:
             if token_v2:
                 r = await client.get(

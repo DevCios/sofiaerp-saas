@@ -236,6 +236,7 @@ services:
       - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
       - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
       - SOFIA_CONTROL_PLANE_URL=http://control-plane-api:8000
+      - DECOLECTA_TOKEN=${DECOLECTA_TOKEN:-}
       - APIS_NET_PE_TOKEN=${APIS_NET_PE_TOKEN:-}
       - APISPERU_TOKEN=${APISPERU_TOKEN:-}
     volumes:
@@ -269,6 +270,9 @@ services:
       - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/4
       - SUNAT_VAULT_MASTER_KEY=${SUNAT_VAULT_MASTER_KEY:-sofia_change_vault_master_key_in_env}
       - GATEWAY_JWT_SECRET=${GATEWAY_JWT_SECRET:-sofia_change_gateway_jwt_secret_in_env}
+      - DECOLECTA_TOKEN=${DECOLECTA_TOKEN:-}
+      - APIS_NET_PE_TOKEN=${APIS_NET_PE_TOKEN:-}
+      - APISPERU_TOKEN=${APISPERU_TOKEN:-}
     volumes:
       - ../../sunat-gateway/app:/app/app
       - sofia_sunat_storage:/var/lib/sofia-sunat/storage

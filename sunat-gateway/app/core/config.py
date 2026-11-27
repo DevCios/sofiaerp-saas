@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     SOFIA_CONTROL_PLANE_URL: str = "http://control-plane-api:8000"
 
     # Hub Central de Consultas Perú (RUC, DNI, Tipo de Cambio SUNAT)
+    DECOLECTA_TOKEN: str = ""
     APIS_NET_PE_TOKEN: str = ""
     APISPERU_TOKEN: str = ""
     RUC_CACHE_TTL_DAYS: int = 7
