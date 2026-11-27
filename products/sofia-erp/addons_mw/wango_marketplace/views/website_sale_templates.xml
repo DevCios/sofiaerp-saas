@@ -202,7 +202,7 @@
     </template>
 
     <template id="products_item_inherit_wango_marketplace" inherit_id="website_sale.products_item">
-        <xpath expr="//div[hasclass('o_wsale_product_information_text')]" position="inside">
+        <xpath expr="//div[hasclass('o_wsale_product_information')]" position="inside">
             <div class="mt-2" t-if="product.sudo().marketplace_seller_id and product.sudo().marketplace_seller_id.marketplace_seller_status == 'approved'">
                 <span class="text-muted" style="font-size: 0.9rem;">
                     <i class="fa fa-store"/> Vendido por: <strong><t t-esc="product.sudo().marketplace_seller_id.name"/></strong>
@@ -299,7 +299,7 @@
     </template>
 
     <template id="products_inherit_wango_marketplace_seller_title" inherit_id="website_sale.products" name="Seller Store Title">
-        <xpath expr="//div[@id='products_grid']//div[hasclass('o_wsale_products_grid_table_wrapper')]" position="before">
+        <xpath expr="//div[@id='products_grid']" position="before">
             <t t-if="request.params.get('seller_id')">
                 <t t-set="seller" t-value="request.env['res.partner'].sudo().browse(int(request.params.get('seller_id')))"/>
                 <div t-if="seller.exists()" class="wango-seller-header card border-0 shadow-sm mb-4 rounded-lg overflow-hidden" style="background: linear-gradient(135deg, #ffffff 0%, #f8fbfd 100%); border: 1px solid #e2e8f0 !important; border-radius: 14px;">

@@ -85,7 +85,7 @@
     </template>
 
     <!-- Custom Checkout Payment Delivery View -->
-    <template id="wango_payment_delivery_inherit" inherit_id="website_sale.payment">
+    <template id="wango_payment_delivery_inherit" inherit_id="website_sale.payment" active="False">
         <xpath expr="//div[@id='payment_method']" position="before">
             <!-- Custom Falabella-style Shipping Selector Card -->
             <div class="card mb-4" id="wango_delivery_checkout_card">
@@ -348,7 +348,7 @@
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- FORMULARIO DE COMPRADOR Y FACTURACIÓN ADAPTADO A PERÚ (SUNAT)   -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <template id="wango_address_form_peru_inherit" inherit_id="website_sale.address" name="Perú Billing &amp; Invoicing Form">
+    <template id="wango_address_form_peru_inherit" inherit_id="website_sale.address" name="Perú Billing &amp; Invoicing Form" active="False">
         <!-- 1. Encabezado Premium del Checkout (Reemplazar 'Su dirección o Iniciar sesión') -->
         <xpath expr="//div[hasclass('oe_cart')]//h2" position="replace">
             <div class="wango-checkout-header d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
@@ -889,7 +889,7 @@
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- RESUMEN DEL PEDIDO SHOPIFY-STYLE PARA EL CHECKOUT               -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
-    <template id="wango_cart_summary_inherit" inherit_id="website_sale.cart_summary" name="WanGO Resumen de Carrito Premium" priority="20">
+    <template id="wango_cart_summary_inherit" inherit_id="website_sale.cart_summary" name="WanGO Resumen de Carrito Premium" priority="20" active="False">
         <!-- Tarjeta flotante moderna -->
         <xpath expr="//div[hasclass('card')]" position="attributes">
             <attribute name="class">card border-0 shadow-sm wango-checkout-summary-card</attribute>

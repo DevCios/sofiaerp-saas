@@ -1428,7 +1428,7 @@
     </template>
 
     <!-- Inherit Product Details Page to make the Breadcrumbs container span full-width (col-12) -->
-    <template id="product_breadcrumb_full_width" inherit_id="website_sale.product" name="Product Breadcrumb Full Width" priority="20">
+    <template id="product_breadcrumb_full_width" inherit_id="website_sale.product" name="Product Breadcrumb Full Width" priority="20" active="False">
         <xpath expr="//ol[hasclass('breadcrumb')]/.." position="attributes">
             <attribute name="class">col-12</attribute>
         </xpath>
