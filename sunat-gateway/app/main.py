@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.api.admin_ui import router as admin_ui_router
+from app.api.mcp_server import router as mcp_router
 from app.api.public_portal import router as public_portal_router
 from app.api.v1.routes import router as v1_router
 from app.core.config import get_settings
@@ -38,9 +39,10 @@ app.add_middleware(
     allow_origins=[settings.PUBLIC_BASE_URL, "https://sofiaerp.com", "https://admin.sofiaerp.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-Internal-Service-Key"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-API-Key", "X-Internal-Service-Key", "Mcp-Session-Id", "MCP-Protocol-Version"],
 )
 
 app.include_router(v1_router)
+app.include_router(mcp_router)
 app.include_router(public_portal_router)
 app.include_router(admin_ui_router)

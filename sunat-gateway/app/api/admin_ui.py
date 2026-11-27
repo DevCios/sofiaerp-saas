@@ -210,6 +210,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
       <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
       <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
+      <button class="tab" data-tab="connectors" onclick="showTab('connectors', this)">Conectores IA (MCP)</button>
       <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
     </nav>
 
@@ -240,6 +241,10 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div class="desk-card" onclick="openTab('clients')">
           <div class="title">Credenciales y API Keys</div>
           <div class="desc">Llaves <code>sk_live_...</code> aisladas por RUC y Webhooks firmados HMAC-SHA256 para POS/apps externas.</div>
+        </div>
+        <div class="desk-card" onclick="openTab('connectors')">
+          <div class="title">Conectores IA (Claude / ChatGPT / MCP)</div>
+          <div class="desc">Conecta Claude, ChatGPT, Cursor o n8n vía Remote MCP (<code>/mcp</code>) y OpenAPI AI (<code>/openapi-ai.json</code>).</div>
         </div>
         <div class="desk-card" onclick="openTab('tester')">
           <div class="title">Probador Rápido (Beta)</div>
@@ -428,6 +433,75 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <pre id="testerOut" class="hidden" style="margin-top:14px"></pre>
       </div>
     </div>
+
+    <!-- TAB 8: CONECTORES IA (REMOTE MCP + OPENAPI AI) -->
+    <div id="tab-connectors" class="hidden">
+      <div class="card" style="background:linear-gradient(135deg, #66598F 0%, #714B67 55%, #017E84 100%);color:#FFFFFF;border:none;padding:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+          <div>
+            <span class="badge b-nav" style="margin-bottom:8px">ADR-010 · Remote MCP (Streamable HTTP) + OpenAPI 3.1</span>
+            <h2 style="margin:4px 0 6px 0;font-size:20px;color:#FFFFFF">Conecta Claude, ChatGPT, Cursor o n8n a Sofia SUNAT Gateway</h2>
+            <p style="margin:0;font-size:13px;color:rgba(255,255,255,.88);max-width:680px">
+              Emite facturas y boletas, calcula IGV, consulta CDRs y explica errores SUNAT directamente desde tu asistente de IA usando API Keys aisladas por RUC.
+            </p>
+          </div>
+          <div class="row-actions">
+            <button class="btn btn-nav" onclick="copyText(window.location.origin + '/mcp', this)">Copiar URL MCP</button>
+            <button class="btn btn-nav" onclick="copyText(window.location.origin + '/openapi-ai.json', this)">Copiar OpenAPI AI</button>
+            <button class="btn" style="background:#FFFFFF;color:#714B67" onclick="openTab('clients')">Crear API Key para IA</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <h3>Claude Code / Claude Desktop</h3>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Conecta mediante <strong>Remote MCP (Streamable HTTP)</strong> usando una API Key restringida al RUC deseado.</p>
+          <pre id="snippetClaude">claude mcp add --transport http sofia-sunat https://gateway.sofiaerp.com/mcp \
+  --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>
+          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetClaude').textContent, this)">Copiar comando</button>
+        </div>
+
+        <div class="card">
+          <h3>ChatGPT (Connectors / Custom GPT)</h3>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Usa el endpoint MCP en <strong>ChatGPT Connectors</strong> o importa el esquema en <strong>Custom GPT Actions</strong> (Auth: Bearer).</p>
+          <pre id="snippetChatGpt">MCP URL:     https://gateway.sofiaerp.com/mcp
+OpenAPI AI:  https://gateway.sofiaerp.com/openapi-ai.json
+Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
+          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetChatGpt').textContent, this)">Copiar configuración</button>
+        </div>
+
+        <div class="card">
+          <h3>Cursor / VS Code / n8n</h3>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Agrega este bloque a <code>.cursor/mcp.json</code> o usa los endpoints REST <code>/api/v1/ai/*</code> en n8n/Make.</p>
+          <pre id="snippetCursor">{
+  "mcpServers": {
+    "sofia-sunat": {
+      "url": "https://gateway.sofiaerp.com/mcp",
+      "headers": {
+        "Authorization": "Bearer sk_live_TU_API_KEY"
+      }
+    }
+  }
+}</pre>
+          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetCursor').textContent, this)">Copiar mcp.json</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Herramientas MCP Activas &amp; Probador en Vivo</h3>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:0">
+          Verifica en tiempo real la respuesta JSON-RPC 2.0 de <code>POST /mcp</code> (seguro, sin emitir documentos reales).
+        </p>
+        <div class="row-actions" style="margin-bottom:12px">
+          <button class="btn btn-teal btn-sm" onclick="testMcp('tools/list', {})">Probar tools/list</button>
+          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'calculate_totals_igv', arguments:{currency:'PEN', items:[{description:'Suscripción SOFIA ERP', quantity:1, unit_price_without_tax:100}]}})">Probar calculate_totals_igv</button>
+          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'explain_sunat_error', arguments:{sunat_code:'1033'}})">Probar explain_sunat_error (1033)</button>
+          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'list_issuers', arguments:{}})">Probar list_issuers</button>
+        </div>
+        <pre id="mcpTestOut" class="hidden"></pre>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -474,7 +548,7 @@ function logout() {
 }
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -776,6 +850,36 @@ async function emitTestDoc() {
     out.textContent = JSON.stringify(res, null, 2);
     document.getElementById('tCorr').value = String(parseInt(document.getElementById('tCorr').value || '1', 10) + 1);
     setTimeout(refreshScopedData, 1500);
+  } catch (e) {
+    out.textContent = 'ERROR: ' + e.message;
+  }
+}
+
+function copyText(txt, btn) {
+  navigator.clipboard.writeText(txt).then(() => {
+    if (btn) {
+      const prev = btn.textContent;
+      btn.textContent = '¡Copiado!';
+      setTimeout(() => { btn.textContent = prev; }, 1400);
+    }
+  });
+}
+
+async function testMcp(method, params) {
+  const out = document.getElementById('mcpTestOut');
+  out.classList.remove('hidden');
+  out.textContent = 'Ejecutando POST /mcp (' + method + ')...';
+  try {
+    const r = await fetch('/mcp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params })
+    });
+    const data = await r.json();
+    out.textContent = JSON.stringify(data, null, 2);
   } catch (e) {
     out.textContent = 'ERROR: ' + e.message;
   }
