@@ -1,45 +1,23 @@
-/* Escala tipográfica global calibrada (+7% respecto a la escala previa para máxima legibilidad UX con Montserrat) */
+/* ==========================================================================
+ * Mercado Wanka — Tipografía Global Limpia (Odoo 20 Compatible)
+ * Herencia CSS estándar sin pisar fuentes de íconos (.fa, .oi, .material-icons)
+ * ========================================================================== */
 html {
-    font-size: 101.5% !important;
+    font-size: 101.5%;
 }
 
-/* Compatibilidad de clases Bootstrap 5 para el tema de Odoo 15 */
-.fw-bold { font-weight: 700 !important; }
-.fw-semibold { font-weight: 600 !important; }
-.fs-3 { font-size: 1.75rem !important; }
-.fs-4 { font-size: 1.5rem !important; }
-.fs-5 { font-size: 1.25rem !important; }
-
-/* Forzar la fuente Montserrat en ABSOLUTAMENTE TODA la web pública */
-html, body, #wrapwrap, header, nav, .navbar, .falabella-header-wrapper, footer, main,
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6, 
-p, div, small, strong, b, 
-button, input, select, textarea,
-.btn, .form-control, .badge, .card,
-.dropdown, .dropdown-menu, .dropdown-item {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+body, #wrapwrap {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Proteger etiquetas de enlaces y spans que sean íconos (.fa) */
-a:not(.fa):not([class*="fa-"]), 
-span:not(.fa):not([class*="fa-"]) {
-    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-}
-
-/* Forzar la recuperación de FontAwesome en TODOS los íconos para evitar que desaparezcan */
-.fa, i.fa, span.fa, a.fa, [class*="fa-"] {
-    font-family: 'FontAwesome' !important;
-}
-
-/* Restaurar y aumentar el tamaño legible para el widget de envíos */
 .wango-delivery-widget {
     .font-weight-bold {
-        font-size: 1.15rem !important; /* ~16px */
+        font-size: 1.15rem;
     }
     p, .small, small, a {
-        font-size: 1rem !important; /* ~14px */
+        font-size: 1rem;
     }
     .fa {
-        font-size: 1.4rem !important;
+        font-size: 1.4rem;
     }
 }

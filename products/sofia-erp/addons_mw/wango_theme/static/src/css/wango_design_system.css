@@ -58,20 +58,13 @@
 }
 
 /* ==========================================================================
-   3. RESET Y UNIFICACIÓN TOTAL DE TIPOGRAFÍA (GLOBAL)
+   3. TIPOGRAFÍA LIMPIA (Herencia natural sin pisar íconos nativos de Odoo 20)
    ========================================================================== */
-html, body, #wrapwrap,
-h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6,
-p, span:not(.fa):not(.fas):not(.far):not(.fal):not(.fab):not(.fad):not(.oi):not(.material-icons):not(.material-symbols-outlined):not([class*="oi-"]),
-a:not(.fa):not(.fas):not(.far):not(.fal):not(.fab),
-input, button, select, textarea, label,
-.btn, .badge, .card, .table, .dropdown-menu, .dropdown-item,
-.modal, .modal-title, .nav, .nav-link, .form-control, .form-select, .breadcrumb,
-.falabella-header-wrapper, .wango-home-page, .oe_website_sale, #product_detail {
-    font-family: var(--mw-font-family) !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
-    text-rendering: optimizeLegibility !important;
+html, body, #wrapwrap {
+    font-family: var(--mw-font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 /* Los íconos (.fa, .oi, .material-icons) usan las fuentes nativas de Odoo 20 sin sobrescrituras */
