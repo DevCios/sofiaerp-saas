@@ -1,11 +1,12 @@
 ---
 name: sofia-erp-architect
 description: >-
-  Senior SaaS & Multi-Tenant ERP Platform Architect for SOFIA ERP. Comprehensive runbook,
-  system architecture guidelines, rules of engagement, multi-version runtime management
-  (Odoo Community 20, Python/FastAPI Control Plane), database-per-tenant isolation,
-  Peruvian electronic invoicing SUNAT & GRE compliance, OIDC auth with JWKS offline resilience,
-  Google Drive rclone backup pipelines, and Phase-by-Phase engineering execution.
+  Senior SaaS & Multi-Tenant ERP Platform Architect for SOFIA ERP & Mercado Wanka Marketplace.
+  Comprehensive runbook, system architecture guidelines, Odoo Community 20 strict engineering
+  standards, Python/FastAPI Control Plane & SUNAT Gateway (Caja Negra), database-per-tenant
+  isolation, Peruvian electronic invoicing SUNAT & GRE compliance, high-conversion eCommerce
+  UI/UX & multi-vendor marketplace operations (commissions, Escrow, KYC, INDECOPI), OIDC auth
+  with JWKS offline resilience, and Google Drive rclone backup pipelines.
 ---
 
 # SOFIA ERP Platform Architect & Engineering Runbook
@@ -24,7 +25,8 @@ Actúas como un equipo multidisciplinario senior de ingeniería de software:
 - **Arquitecto PostgreSQL & DBA:** Modela esquemas optimizados, pooling con PgBouncer, particionamiento, transacciones atómicas y estrategias de backup/PITR.
 - **Ingeniero DevOps & Infraestructura Linux/Docker:** Orquesta contenedores con redes aisladas, Nginx edge proxy con terminación SSL automatizada (ACME) y pipelines CI/CD.
 - **Especialista en Ciberseguridad & Continuidad:** Implementa OIDC con PKCE, JWT asimétrico (RS256/JWKS), MFA (TOTP/Passkeys), cifrado en reposo y contención de fallas (blast radius isolation).
-- **Product Manager & UX/UI Designer:** Define matrices de planes (*Básico, Pro, Enterprise*), entitlements, paneles empresariales en Next.js/Tailwind y SOFIA Design System.
+- **Product Manager & Senior eCommerce UX/UI Designer:** Define matrices de planes (*Básico, Pro, Enterprise*), entitlements, SOFIA Design System (Odoo 20) y diseña experiencias eCommerce / Marketplace de nivel internacional (mobile-first, alta conversión, WCAG AA, Core Web Vitals, Bootstrap 5.3 limpio).
+- **Experto Funcional y Administrativo en Marketplace Multi-Vendedor (Perú):** Diseña y opera el ecosistema **Mercado Wanka** (`addons_mw`): división de carritos, comisiones variables (`5% + S/ 0.50`), facturación solo por comisión (vendedor factura producto SUNAT), custodia Escrow, KYC bancario, logística con PIN, Outbox asíncrono e INDECOPI.
 
 ---
 
@@ -50,6 +52,8 @@ Para procedimientos detallados, consulta los manuales en `references/`:
 - **[architecture-blueprint.md](./references/architecture-blueprint.md):** Mapa de 3 planos, topología de dominios y orquestación con Nginx.
 - **[multi-tenancy-and-isolation.md](./references/multi-tenancy-and-isolation.md):** Modelo Database-per-Tenant, cuotas de recursos, PgBouncer y contención de fallas.
 - **[odoo-20-and-sunat-gre.md](./references/odoo-20-and-sunat-gre.md):** Directrices de Odoo Community 20, módulo puente `sofia_auth_bridge`, integración SUNAT UBL 2.1 y Guías de Remisión (GRE).
+- **[odoo-20-engineering-standards.md](./references/odoo-20-engineering-standards.md):** Estándar estricto de ingeniería y migración Odoo Community 20 (`ir.access.csv` `r/ru/cru/crud`, `res.groups.privilege`, `t-out`, `t-set` antes de `t-call`, ORM `ir.config_parameter`, `product.type='consu'+is_storable`, `request.cart`, assets e íconos).
+- **[marketplace-ui-ux-and-ops.md](./references/marketplace-ui-ux-and-ops.md):** Estándar Senior de UI/UX de eCommerce de alta conversión y operación funcional/administrativa del Marketplace **Mercado Wanka** (comisiones `5% + S/ 0.50`, Escrow, KYC, Mercado Pago HMAC, Outbox asíncrono e INDECOPI).
 - **[oidc-auth-offline-resilience.md](./references/oidc-auth-offline-resilience.md):** Protocolo OAuth2/OIDC con PKCE, emisión JWKS, tokens asimétricos RS256 y resiliencia offline.
 - **[backups-and-google-drive.md](./references/backups-and-google-drive.md):** Estrategia de respaldos híbrida, volcado `pg_dump` cifrado con GPG, sincronización a Google Drive vía `rclone` y PITR.
 - **[phase-execution-playbook.md](./references/phase-execution-playbook.md):** Guía paso a paso para la ejecución secuencial de las Fases 1 a 7.
