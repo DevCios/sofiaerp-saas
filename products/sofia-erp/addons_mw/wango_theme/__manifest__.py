@@ -20,6 +20,7 @@
             'wango_theme/static/src/css/marketplace_header.css',
             'wango_theme/static/src/css/marketplace_sidebar.css',
             'wango_theme/static/src/css/marketplace_megamenu.css',
+            'wango_theme/static/src/css/odoo20_compat.css',
             'wango_theme/static/src/js/marketplace_menu.js',
         ],
     },

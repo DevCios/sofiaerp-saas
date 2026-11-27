@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
-import os
-import requests
 from odoo import models, fields, api
+from ..services.commission_service import (
+    DEFAULT_COMMISSION_RATE,
+    DEFAULT_PLATFORM_FEE,
+    compute_line_commission,
+    compute_order_commission_breakdown,
+    resolve_commission_rate,
+)
 
 _logger = logging.getLogger(__name__)
-
-DEFAULT_COMMISSION_RATE = 5.0
-DEFAULT_PLATFORM_FEE = 0.50
 
 
 class SaleOrder(models.Model):
@@ -55,11 +58,14 @@ class SaleOrder(models.Model):
     def _compute_marketplace_commission_total(self):
         for order in self:
             if order.marketplace_seller_id:
-                var_comm = sum(order.order_line.mapped('marketplace_commission_amount'))
-                fee = order.marketplace_platform_fee if order.marketplace_platform_fee is not None else DEFAULT_PLATFORM_FEE
-                order.marketplace_commission_variable = var_comm
-                order.marketplace_commission_total = var_comm + fee
-                order.marketplace_seller_net = max(0.0, (order.amount_total or 0.0) - order.marketplace_commission_total)
+                bd = compute_order_commission_breakdown(
+                    order.order_line.mapped('marketplace_commission_amount'),
+                    order.amount_total,
+                    order.marketplace_platform_fee,
+                )
+                order.marketplace_commission_variable = bd['commission_variable']
+                order.marketplace_commission_total = bd['commission_total']
+                order.marketplace_seller_net = bd['seller_net']
             else:
                 order.marketplace_commission_variable = 0.0
                 order.marketplace_commission_total = 0.0
@@ -139,11 +145,17 @@ class SaleOrder(models.Model):
                     _logger.warning("Mercado Wanka: no se pudo enviar correo al vendedor %s: %s", seller.name, exc)
 
     def _push_order_to_seller_tenant(self):
-        """Empuja la sub-orden pagada al tenant SOFIA ERP del vendedor para despacho y facturación SUNAT."""
-        internal_key = os.getenv("INTERNAL_SERVICE_KEY", "sofia_internal_mesh_key_change_in_prod")
+        """
+        Encola la sub-orden pagada en mw.webhook.outbox (patrón Outbox Asíncrono).
+        Evita bloquear el checkout del comprador y garantiza reintentos automáticos con backoff.
+        """
+        Outbox = self.env['mw.webhook.outbox'].sudo()
         for order in self:
             seller = order.marketplace_seller_id
             if order.sofia_pushed_to_tenant or not seller or not seller.sofia_tenant_url:
+                continue
+            existing = Outbox.search([('order_id', '=', order.id), ('state', 'in', ('pending', 'retry', 'sent'))], limit=1)
+            if existing:
                 continue
             endpoint = f"{seller.sofia_tenant_url.rstrip('/')}/api/sofia_marketplace/webhook/order"
             payload = {
@@ -170,26 +182,19 @@ class SaleOrder(models.Model):
                         'price_total': l.price_total,
                     }
                     for l in order.order_line
-                    if not l.is_delivery
+                    if not getattr(l, 'is_delivery', False)
                 ],
             }
-            try:
-                resp = requests.post(
-                    endpoint,
-                    json=payload,
-                    headers={
-                        'X-Internal-Service-Key': internal_key,
-                        'X-Marketplace-Seller-Token': seller.sofia_seller_token or '',
-                    },
-                    timeout=10,
-                )
-                if resp.status_code == 200:
-                    order.sudo().write({'sofia_pushed_to_tenant': True})
-                    _logger.info("Mercado Wanka: orden %s sincronizada al ERP %s", order.name, seller.sofia_tenant_url)
-                else:
-                    _logger.warning("Mercado Wanka: ERP %s devolvió HTTP %s al recibir orden %s", seller.sofia_tenant_url, resp.status_code, order.name)
-            except Exception as exc:
-                _logger.warning("Mercado Wanka: error enviando orden %s al ERP %s: %s", order.name, seller.sofia_tenant_url, exc)
+            Outbox.create({
+                'name': f'MW-ORDER-{order.name}',
+                'order_id': order.id,
+                'seller_id': seller.id,
+                'target_url': endpoint,
+                'payload_json': json.dumps(payload, ensure_ascii=False),
+                'seller_token': seller.sofia_seller_token or '',
+                'state': 'pending',
+            })
+            _logger.info("Mercado Wanka: orden %s encolada en Outbox para ERP %s", order.name, seller.sofia_tenant_url)
 
 
 class SaleOrderLine(models.Model):
@@ -213,15 +218,9 @@ class SaleOrderLine(models.Model):
         for line in self:
             seller = line.order_id.marketplace_seller_id
             if seller and line.product_id and not getattr(line, 'is_delivery', False):
-                if seller.marketplace_custom_commission_rate and seller.marketplace_custom_commission_rate > 0:
-                    rate = seller.marketplace_custom_commission_rate
-                elif line.product_id.categ_id and line.product_id.categ_id.marketplace_commission_rate > 0:
-                    rate = line.product_id.categ_id.marketplace_commission_rate
-                else:
-                    rate = DEFAULT_COMMISSION_RATE
-
+                rate = resolve_commission_rate(seller=seller, category=line.product_id.categ_id)
                 line.marketplace_commission_rate = rate
-                line.marketplace_commission_amount = (line.price_total * rate) / 100.0
+                line.marketplace_commission_amount = compute_line_commission(line.price_total, rate)
             else:
                 line.marketplace_commission_rate = 0.0
                 line.marketplace_commission_amount = 0.0

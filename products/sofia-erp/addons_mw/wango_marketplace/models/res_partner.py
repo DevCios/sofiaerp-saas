@@ -117,3 +117,24 @@ class ResPartner(models.Model):
     def action_reject_seller(self):
         for rec in self:
             rec.marketplace_seller_status = 'rejected'
+
+    def write(self, vals):
+        bank_fields = {'seller_bank_name', 'seller_bank_account', 'seller_bank_cci'}
+        tracked = bank_fields.intersection(vals.keys())
+        snapshots = {}
+        if tracked:
+            for rec in self:
+                snapshots[rec.id] = f"{rec.seller_bank_name or '-'} / {rec.seller_bank_account or '-'} / CCI:{rec.seller_bank_cci or '-'}"
+        res = super().write(vals)
+        if tracked:
+            Audit = self.env['mw.bank.audit'].sudo()
+            for rec in self:
+                new_info = f"{rec.seller_bank_name or '-'} / {rec.seller_bank_account or '-'} / CCI:{rec.seller_bank_cci or '-'}"
+                if new_info != snapshots.get(rec.id):
+                    Audit.create({
+                        'seller_id': rec.id,
+                        'old_bank_info': snapshots.get(rec.id),
+                        'new_bank_info': new_info,
+                        'note': f"Campos modificados: {', '.join(sorted(tracked))}",
+                    })
+        return res
