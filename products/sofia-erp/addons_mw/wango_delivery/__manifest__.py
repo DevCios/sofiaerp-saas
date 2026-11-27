@@ -12,7 +12,7 @@
     """,
     'category': 'Website/Logistics',
     'author': 'Antigravity',
-    'depends': ['website_sale', 'wango_core', 'base_vat', 'delivery'],
+    'depends': ['website_sale', 'wango_core', 'delivery'],
     'data': [
         'security/ir.access.csv',
         'data/geographic_data.xml',
