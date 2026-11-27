@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.api.admin_ui import router as admin_ui_router
+from app.api.billing import router as billing_router
 from app.api.docs_portal import router as docs_portal_router
 from app.api.mcp_server import router as mcp_router
 from app.api.oauth_mcp import router as oauth_mcp_router
@@ -28,6 +29,9 @@ async def lifespan(_app: FastAPI):
         await conn.execute(text("ALTER TABLE issuers ADD COLUMN IF NOT EXISTS is_nrus BOOLEAN NOT NULL DEFAULT FALSE"))
         await conn.execute(text("ALTER TABLE issuers ADD COLUMN IF NOT EXISTS plan_name VARCHAR(40) NOT NULL DEFAULT 'STARTER'"))
         await conn.execute(text("ALTER TABLE issuers ADD COLUMN IF NOT EXISTS monthly_quota INTEGER NOT NULL DEFAULT 500"))
+        await conn.execute(text("ALTER TABLE issuers ADD COLUMN IF NOT EXISTS workspace_id VARCHAR(36)"))
+        await conn.execute(text("ALTER TABLE api_clients ADD COLUMN IF NOT EXISTS workspace_id VARCHAR(36)"))
+        await conn.execute(text("ALTER TABLE api_request_logs ADD COLUMN IF NOT EXISTS workspace_id VARCHAR(36)"))
     yield
     await async_engine.dispose()
 
@@ -78,6 +82,7 @@ async def audit_rest_api_middleware(request: Request, call_next):
 
 
 app.include_router(v1_router)
+app.include_router(billing_router)
 app.include_router(mcp_router)
 app.include_router(oauth_mcp_router)
 app.include_router(docs_portal_router)

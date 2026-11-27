@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     SUNAT_GRE_API_URL: str = "https://api-cpe.sunat.gob.pe/v1/contribuyente/gem/comprobantes"
     SUNAT_TIMEOUT_SECONDS: int = 25
 
+    # Mercado Pago (Suscripciones y recargas de planes comerciales)
+    MP_ACCESS_TOKEN: str = ""
+    MP_WEBHOOK_SECRET: str = ""
+
 
 @lru_cache()
 def get_settings() -> Settings:

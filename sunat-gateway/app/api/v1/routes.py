@@ -13,16 +13,23 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import delete, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import assert_ruc_access, get_api_client_or_admin, get_gateway_admin
+from app.api.deps import (
+    assert_ruc_access,
+    get_actor_workspace_id,
+    get_api_client_or_admin,
+    get_gateway_admin,
+)
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import (
     create_admin_jwt,
+    create_workspace_user_jwt,
     decrypt_bytes,
     decrypt_secret,
     encrypt_bytes,
     encrypt_secret,
     generate_api_key,
+    verify_password,
 )
 from app.models import (
     ApiClient,
@@ -31,8 +38,10 @@ from app.models import (
     DispatchPolicy,
     Document,
     DocumentStatus,
+    GatewayUser,
     Issuer,
     WebhookLog,
+    Workspace,
 )
 from app.schemas import (
     AdminLoginRequest,
@@ -93,31 +102,73 @@ async def sunat_health():
     return results
 
 
+async def _get_workspace_rucs(db: AsyncSession, actor: Optional[dict]) -> Optional[list[str]]:
+    """Retorna None para Superadmin (global) o la lista exacta de RUCs del Workspace."""
+    ws_id = get_actor_workspace_id(actor)
+    if not ws_id:
+        return None
+    rows = await db.execute(select(Issuer.ruc).where(Issuer.workspace_id == ws_id))
+    return [r[0] for r in rows.all()]
+
+
 # ==============================================================================
-# 2. Autenticación del Panel Web (gateway.sofiaerp.com)
+# 2. Autenticación del Panel Web (Superadmin + Usuarios de Workspace)
 # ==============================================================================
 @router.post("/auth/login", tags=["Auth"])
-async def admin_login(body: AdminLoginRequest):
-    email_ok = hmac.compare_digest(body.email.strip().lower(), settings.GATEWAY_ADMIN_EMAIL.strip().lower())
+async def admin_login(body: AdminLoginRequest, db: AsyncSession = Depends(get_db)):
+    email = body.email.strip().lower()
+    email_ok = hmac.compare_digest(email, settings.GATEWAY_ADMIN_EMAIL.strip().lower())
     pass_ok = hmac.compare_digest(body.password, settings.GATEWAY_ADMIN_PASSWORD)
-    if not (email_ok and pass_ok):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas.")
-    token = create_admin_jwt(settings.GATEWAY_ADMIN_EMAIL)
-    return {"access_token": token, "token_type": "bearer", "email": settings.GATEWAY_ADMIN_EMAIL}
+    if email_ok and pass_ok:
+        token = create_admin_jwt(settings.GATEWAY_ADMIN_EMAIL)
+        return {"access_token": token, "token_type": "bearer", "email": settings.GATEWAY_ADMIN_EMAIL, "role": "gateway_admin"}
+
+    user = (
+        await db.execute(select(GatewayUser).where(GatewayUser.email == email, GatewayUser.is_active.is_(True)))
+    ).scalar_one_or_none()
+    if user and verify_password(body.password, user.password_hash):
+        ws = await db.get(Workspace, user.workspace_id)
+        if not ws or not ws.is_active:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Workspace inactivo.")
+        token = create_workspace_user_jwt(
+            email=user.email,
+            user_id=user.id,
+            workspace_id=ws.id,
+            workspace_name=ws.name,
+            full_name=user.full_name,
+        )
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "email": user.email,
+            "full_name": user.full_name,
+            "role": user.role,
+            "workspace": {"id": ws.id, "name": ws.name, "slug": ws.slug, "plan_name": ws.plan_name, "monthly_quota": ws.monthly_quota},
+        }
+
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales incorrectas.")
 
 
 # ==============================================================================
-# 3. KPIs del Dashboard Operativo
+# 3. KPIs del Dashboard Operativo (con aislamiento por Workspace)
 # ==============================================================================
 @router.get("/stats", tags=["Dashboard"])
 async def get_stats(
     ruc: Optional[str] = Query(default=None),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    ws_id = get_actor_workspace_id(actor)
+    ws_rucs = await _get_workspace_rucs(db, actor)
+
     stmt = select(Document.status, func.count(Document.id)).group_by(Document.status)
-    if ruc:
+    if ws_rucs is not None:
+        if ruc and ruc not in ws_rucs:
+            return {"total_documents": 0, "accepted": 0, "accepted_with_obs": 0, "queued_or_retrying": 0, "rejected": 0, "at_risk_deadline": 0, "acceptance_rate_pct": 100.0, "issuers_count": len(ws_rucs), "active_clients": 0, "breakdown": {}}
+        stmt = stmt.where(Document.issuer_ruc == ruc) if ruc else stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
+    elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
+
     rows = await db.execute(stmt)
     counts = {st.value: cnt for st, cnt in rows.all()}
     total = sum(counts.values())
@@ -127,8 +178,13 @@ async def get_stats(
     rejected = counts.get("REJECTED", 0) + counts.get("VALIDATION_ERROR", 0)
     at_risk = counts.get("EXPIRED_ALERT", 0)
 
-    issuers_count = (await db.execute(select(func.count(Issuer.id)))).scalar() or 0
-    clients_count = (await db.execute(select(func.count(ApiClient.id)).where(ApiClient.is_active.is_(True)))).scalar() or 0
+    iss_q = select(func.count(Issuer.id))
+    cli_q = select(func.count(ApiClient.id)).where(ApiClient.is_active.is_(True))
+    if ws_id:
+        iss_q = iss_q.where(Issuer.workspace_id == ws_id)
+        cli_q = cli_q.where(ApiClient.workspace_id == ws_id)
+    issuers_count = (await db.execute(iss_q)).scalar() or 0
+    clients_count = (await db.execute(cli_q)).scalar() or 0
 
     return {
         "total_documents": total,
@@ -147,26 +203,37 @@ async def get_stats(
 @router.get("/quota", tags=["Dashboard"])
 async def get_monthly_quota(
     ruc: Optional[str] = Query(default=None),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """Consumo mensual de comprobantes vs cuota configurada por empresa o global (ADR-011)."""
+    """Consumo mensual de comprobantes vs cuota configurada por Workspace / empresa (ADR-011/012)."""
     now_lima = datetime.now(timezone.utc).astimezone(ZoneInfo(settings.LIMA_TZ))
     month_start = now_lima.replace(day=1, hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
 
-    iss_stmt = select(Issuer).where(Issuer.is_active.is_(True))
-    if ruc:
-        iss_stmt = iss_stmt.where(Issuer.ruc == ruc)
-    issuers = list((await db.execute(iss_stmt)).scalars().all())
+    ws_id = get_actor_workspace_id(actor)
+    ws_rucs = await _get_workspace_rucs(db, actor)
 
     doc_stmt = select(func.count(Document.id)).where(Document.created_at >= month_start)
-    if ruc:
-        doc_stmt = doc_stmt.where(Document.issuer_ruc == ruc)
-    used_this_month = (await db.execute(doc_stmt)).scalar() or 0
+    if ws_id:
+        ws = await db.get(Workspace, ws_id)
+        if ruc and ruc in (ws_rucs or []):
+            doc_stmt = doc_stmt.where(Document.issuer_ruc == ruc)
+        else:
+            doc_stmt = doc_stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
+        used_this_month = (await db.execute(doc_stmt)).scalar() or 0
+        total_quota = int(ws.monthly_quota) if ws else 50
+        plan_label = ws.plan_name if ws else "FREE"
+    else:
+        iss_stmt = select(Issuer).where(Issuer.is_active.is_(True))
+        if ruc:
+            iss_stmt = iss_stmt.where(Issuer.ruc == ruc)
+            doc_stmt = doc_stmt.where(Document.issuer_ruc == ruc)
+        issuers = list((await db.execute(iss_stmt)).scalars().all())
+        used_this_month = (await db.execute(doc_stmt)).scalar() or 0
+        total_quota = sum(max(1, int(i.monthly_quota or 500)) for i in issuers) if issuers else 500
+        plan_label = issuers[0].plan_name if len(issuers) == 1 else ("MULTI-EMPRESA" if issuers else "STARTER")
 
-    total_quota = sum(max(1, int(i.monthly_quota or 500)) for i in issuers) if issuers else 500
     remaining = max(0, total_quota - used_this_month)
-    plan_label = issuers[0].plan_name if len(issuers) == 1 else ("MULTI-EMPRESA" if issuers else "STARTER")
     pct = min(100.0, round((used_this_month / total_quota) * 100, 1)) if total_quota else 0.0
 
     return {
@@ -185,12 +252,21 @@ async def list_api_logs(
     ruc: Optional[str] = Query(default=None),
     source: Optional[str] = Query(default=None),
     limit: int = Query(default=80, ge=1, le=200),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """Visor de Logs de peticiones REST y herramientas MCP (ADR-011)."""
+    """Visor de Logs de peticiones REST y herramientas MCP (ADR-011/012)."""
+    ws_id = get_actor_workspace_id(actor)
+    ws_rucs = await _get_workspace_rucs(db, actor)
     stmt = select(ApiRequestLog).order_by(desc(ApiRequestLog.created_at)).limit(limit)
-    if ruc:
+    if ws_id:
+        if ruc and ruc in (ws_rucs or []):
+            stmt = stmt.where(ApiRequestLog.issuer_ruc == ruc)
+        else:
+            stmt = stmt.where(
+                (ApiRequestLog.workspace_id == ws_id) | (ApiRequestLog.issuer_ruc.in_(ws_rucs or ["__none__"]))
+            )
+    elif ruc:
         stmt = stmt.where(ApiRequestLog.issuer_ruc == ruc)
     if source and source.upper() in ("REST", "MCP"):
         stmt = stmt.where(ApiRequestLog.source == source.upper())
@@ -216,17 +292,22 @@ async def list_api_logs(
 async def list_observations(
     ruc: Optional[str] = Query(default=None),
     limit: int = Query(default=100, ge=1, le=300),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """Resumen de Observaciones (>=4000) y Rechazos (2xxx/3xxx) estilo operador.pe."""
+    ws_rucs = await _get_workspace_rucs(db, actor)
     stmt = (
         select(Document)
         .where(Document.status.in_([DocumentStatus.ACCEPTED_WITH_OBS, DocumentStatus.REJECTED, DocumentStatus.VALIDATION_ERROR]))
         .order_by(desc(Document.updated_at))
         .limit(limit)
     )
-    if ruc:
+    if ws_rucs is not None:
+        if ruc and ruc not in ws_rucs:
+            return []
+        stmt = stmt.where(Document.issuer_ruc == ruc) if ruc else stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
+    elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
     res = await db.execute(stmt)
     return [
@@ -250,10 +331,11 @@ async def list_observations(
 async def list_contingencies(
     ruc: Optional[str] = Query(default=None),
     limit: int = Query(default=100, ge=1, le=300),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """Bandeja de Contingencias: comprobantes en cola, reintento, recuperación 1033 o alerta de plazo legal."""
+    ws_rucs = await _get_workspace_rucs(db, actor)
     stmt = (
         select(Document)
         .where(
@@ -268,7 +350,11 @@ async def list_contingencies(
         .order_by(Document.deadline_at.asc().nullslast(), desc(Document.created_at))
         .limit(limit)
     )
-    if ruc:
+    if ws_rucs is not None:
+        if ruc and ruc not in ws_rucs:
+            return []
+        stmt = stmt.where(Document.issuer_ruc == ruc) if ruc else stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
+    elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
     res = await db.execute(stmt)
     now = datetime.now(timezone.utc)
@@ -296,8 +382,12 @@ async def list_contingencies(
 # 4. Gestión de Empresas Emisoras (RUCs + Certificados .pfx cifrados)
 # ==============================================================================
 @router.get("/issuers", tags=["Issuers"])
-async def list_issuers(_admin: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
-    res = await db.execute(select(Issuer).order_by(desc(Issuer.created_at)))
+async def list_issuers(actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    ws_id = get_actor_workspace_id(actor)
+    stmt = select(Issuer).order_by(desc(Issuer.created_at))
+    if ws_id:
+        stmt = stmt.where(Issuer.workspace_id == ws_id)
+    res = await db.execute(stmt)
     items = []
     now = datetime.now(timezone.utc)
     for iss in res.scalars().all():
@@ -331,13 +421,23 @@ async def list_issuers(_admin: dict = Depends(get_gateway_admin), db: AsyncSessi
 @router.post("/issuers", tags=["Issuers"], status_code=status.HTTP_201_CREATED)
 async def upsert_issuer(
     body: IssuerCreateRequest,
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    ws_id = get_actor_workspace_id(actor)
     res = await db.execute(select(Issuer).where(Issuer.ruc == body.ruc))
     issuer = res.scalar_one_or_none()
+    if issuer and ws_id and issuer.workspace_id != ws_id:
+        raise HTTPException(status_code=403, detail=f"El RUC {body.ruc} pertenece a otro Workspace.")
     if not issuer:
-        issuer = Issuer(ruc=body.ruc, business_name=body.business_name)
+        ws = await db.get(Workspace, ws_id) if ws_id else None
+        issuer = Issuer(
+            ruc=body.ruc,
+            business_name=body.business_name,
+            workspace_id=ws_id,
+            plan_name=ws.plan_name if ws else "STARTER",
+            monthly_quota=ws.monthly_quota if ws else 500,
+        )
         db.add(issuer)
 
     issuer.business_name = body.business_name.strip()
@@ -404,17 +504,22 @@ async def upsert_issuer(
 async def list_summaries(
     ruc: Optional[str] = Query(default=None),
     limit: int = Query(default=100, ge=1, le=300),
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """Bandeja de Resúmenes Diarios (RC) y Comunicaciones de Baja (RA) con seguimiento de Ticket SUNAT."""
+    ws_rucs = await _get_workspace_rucs(db, actor)
     stmt = (
         select(Document)
         .where(Document.doc_type.in_(["RA", "RC"]))
         .order_by(desc(Document.created_at))
         .limit(limit)
     )
-    if ruc:
+    if ws_rucs is not None:
+        if ruc and ruc not in ws_rucs:
+            return []
+        stmt = stmt.where(Document.issuer_ruc == ruc) if ruc else stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
+    elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
     res = await db.execute(stmt)
     return [
@@ -439,14 +544,17 @@ async def list_summaries(
 @router.delete("/issuers/{ruc}/beta-documents", tags=["Issuers"])
 async def purge_issuer_beta_documents(
     ruc: str,
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
     """Limpia comprobantes de prueba de un RUC en modo Beta antes de pasarlo a Producción Real."""
+    ws_id = get_actor_workspace_id(actor)
     res = await db.execute(select(Issuer).where(Issuer.ruc == ruc))
     issuer = res.scalar_one_or_none()
     if not issuer:
         raise HTTPException(status_code=404, detail=f"Empresa RUC {ruc} no encontrada.")
+    if ws_id and issuer.workspace_id != ws_id:
+        raise HTTPException(status_code=403, detail=f"No tienes permiso sobre el RUC {ruc}.")
     if not issuer.is_beta:
         raise HTTPException(
             status_code=400,
@@ -489,8 +597,12 @@ async def toggle_issuer(issuer_id: str, _admin: dict = Depends(get_gateway_admin
 # 5. Gestión de Aplicaciones Cliente y API Keys
 # ==============================================================================
 @router.get("/clients", tags=["API Clients"])
-async def list_clients(_admin: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
-    res = await db.execute(select(ApiClient).order_by(desc(ApiClient.created_at)))
+async def list_clients(actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    ws_id = get_actor_workspace_id(actor)
+    stmt = select(ApiClient).order_by(desc(ApiClient.created_at))
+    if ws_id:
+        stmt = stmt.where(ApiClient.workspace_id == ws_id)
+    res = await db.execute(stmt)
     return [
         {
             "id": c.id,
@@ -511,16 +623,28 @@ async def list_clients(_admin: dict = Depends(get_gateway_admin), db: AsyncSessi
 @router.post("/clients", tags=["API Clients"], status_code=status.HTTP_201_CREATED)
 async def create_client(
     body: ApiClientCreateRequest,
-    _admin: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    ws_id = get_actor_workspace_id(actor)
+    ws_rucs = await _get_workspace_rucs(db, actor)
+    allowed_rucs = body.allowed_rucs
+    if ws_id:
+        if allowed_rucs:
+            invalid = [r for r in allowed_rucs if r not in (ws_rucs or [])]
+            if invalid:
+                raise HTTPException(status_code=403, detail=f"RUCs no pertenecen a tu Workspace: {', '.join(invalid)}")
+        else:
+            allowed_rucs = ws_rucs or ["__workspace_empty__"]
+
     raw_key, key_prefix, key_hash = generate_api_key("sk_live_")
     client = ApiClient(
+        workspace_id=ws_id,
         name=body.name.strip(),
         description=body.description,
         key_prefix=key_prefix,
         key_hash=key_hash,
-        allowed_rucs=body.allowed_rucs,
+        allowed_rucs=allowed_rucs,
         webhook_url=body.webhook_url,
         webhook_secret_enc=encrypt_secret(body.webhook_secret) if body.webhook_secret else None,
     )
@@ -537,10 +661,13 @@ async def create_client(
 
 
 @router.delete("/clients/{client_id}", tags=["API Clients"])
-async def revoke_client(client_id: str, _admin: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+async def revoke_client(client_id: str, actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    ws_id = get_actor_workspace_id(actor)
     client = await db.get(ApiClient, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Aplicación no encontrada.")
+    if ws_id and client.workspace_id != ws_id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para revocar esta API Key.")
     client.is_active = False
     await db.commit()
     return {"id": client.id, "revoked": True}
@@ -565,8 +692,11 @@ async def emit_document(
     auth=Depends(get_api_client_or_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    api_client, _admin = auth
+    api_client, actor = auth
     assert_ruc_access(api_client, body.issuer_ruc)
+    ws_rucs = await _get_workspace_rucs(db, actor)
+    if ws_rucs is not None and body.issuer_ruc not in ws_rucs:
+        raise HTTPException(status_code=403, detail=f"El RUC {body.issuer_ruc} no pertenece a tu Workspace.")
 
     # 1. Idempotencia estricta por (RUC, tipo, serie, correlativo)
     existing_q = await db.execute(
@@ -819,7 +949,8 @@ async def list_documents(
     auth=Depends(get_api_client_or_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    api_client, _admin = auth
+    api_client, actor = auth
+    ws_rucs = await _get_workspace_rucs(db, actor)
     stmt = select(Document).order_by(desc(Document.created_at)).limit(limit)
     if api_client and api_client.allowed_rucs:
         if ruc:
@@ -827,6 +958,13 @@ async def list_documents(
             stmt = stmt.where(Document.issuer_ruc == ruc)
         else:
             stmt = stmt.where(Document.issuer_ruc.in_(api_client.allowed_rucs))
+    elif ws_rucs is not None:
+        if ruc:
+            if ruc not in ws_rucs:
+                return []
+            stmt = stmt.where(Document.issuer_ruc == ruc)
+        else:
+            stmt = stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
     elif ruc:
         stmt = stmt.where(Document.issuer_ruc == ruc)
     if status_filter:

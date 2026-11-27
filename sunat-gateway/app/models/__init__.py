@@ -45,11 +45,56 @@ class DocumentStatus(str, enum.Enum):
     EXPIRED_ALERT = "EXPIRED_ALERT"
 
 
+class Workspace(Base):
+    """Espacio de trabajo aislado para clientes comerciales self-service (ADR-012)."""
+    __tablename__ = "workspaces"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    slug: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
+    plan_name: Mapped[str] = mapped_column(String(40), default="FREE", nullable=False)
+    monthly_quota: Mapped[int] = mapped_column(Integer, default=50, nullable=False)
+    plan_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class GatewayUser(Base):
+    """Usuario registrado self-service perteneciente a un Workspace."""
+    __tablename__ = "gateway_users"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    full_name: Mapped[str] = mapped_column(String(160), nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(String(32), default="workspace_owner", nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class BillingOrder(Base):
+    """Orden de compra / recarga de plan vía Mercado Pago Checkout Pro."""
+    __tablename__ = "billing_orders"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=False)
+    plan_code: Mapped[str] = mapped_column(String(40), nullable=False)
+    quota_granted: Mapped[int] = mapped_column(Integer, nullable=False)
+    amount_pen: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), default="PENDING", index=True, nullable=False)  # PENDING | PAID | FAILED
+    mp_preference_id: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    mp_payment_id: Mapped[str | None] = mapped_column(String(80), unique=True, index=True, nullable=True)
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True, nullable=False)
+
+
 class Issuer(Base):
     """Empresa Emisora (RUC) registrada en la Caja Negra SUNAT."""
     __tablename__ = "issuers"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=True)
     ruc: Mapped[str] = mapped_column(String(11), unique=True, index=True, nullable=False)
     business_name: Mapped[str] = mapped_column(String(255), nullable=False)
     trade_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
@@ -94,6 +139,7 @@ class ApiClient(Base):
     __tablename__ = "api_clients"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     key_prefix: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -206,6 +252,7 @@ class ApiRequestLog(Base):
     __tablename__ = "api_request_logs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=True)
     source: Mapped[str] = mapped_column(String(16), default="REST", index=True, nullable=False)  # REST | MCP
     method: Mapped[str] = mapped_column(String(12), default="POST", nullable=False)
     action: Mapped[str] = mapped_column(String(160), index=True, nullable=False)  # ej. /api/v1/documents/emit o mcp:emit_document

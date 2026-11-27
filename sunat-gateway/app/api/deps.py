@@ -83,6 +83,16 @@ async def get_api_client_or_admin(
     return client, None
 
 
+def is_superadmin(actor: Optional[dict]) -> bool:
+    return bool(actor and (actor.get("internal") or actor.get("role") == "gateway_admin"))
+
+
+def get_actor_workspace_id(actor: Optional[dict]) -> Optional[str]:
+    if not actor or is_superadmin(actor):
+        return None
+    return actor.get("workspace_id")
+
+
 def assert_ruc_access(api_client: Optional[ApiClient], ruc: str) -> None:
     """Garantiza aislamiento multi-tenant: una API Key solo accede a sus allowed_rucs."""
     if api_client and api_client.allowed_rucs and ruc not in api_client.allowed_rucs:

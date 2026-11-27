@@ -124,19 +124,48 @@ PANEL_HTML = r"""<!DOCTYPE html>
   <div class="login-box">
     <div class="login-logo">S</div>
     <h2 style="margin:0 0 4px 0;text-align:center;color:var(--text)">Sofia Gateway</h2>
-    <p style="color:var(--muted);font-size:12.5px;text-align:center;margin:0 0 22px 0">Pasarela Resiliente SUNAT Híbrida · <code>gateway.sofiaerp.com</code></p>
-    <div style="margin-bottom:12px">
-      <label>Correo Administrador</label>
-      <input id="loginEmail" type="email" value="admin@sofiaerp.com" />
+    <p style="color:var(--muted);font-size:12.5px;text-align:center;margin:0 0 18px 0">API &amp; Pasarela Resiliente SUNAT · Remote MCP</p>
+    <div style="display:flex;gap:6px;background:#F3F4F6;padding:4px;border-radius:8px;margin-bottom:16px">
+      <button id="btnModeLogin" class="btn btn-sm" style="flex:1" onclick="setAuthMode('login')">Iniciar Sesión</button>
+      <button id="btnModeRegister" class="btn btn-sm btn-sec" style="flex:1;border:none;background:transparent" onclick="setAuthMode('register')">Crear Cuenta Gratis</button>
     </div>
-    <div style="margin-bottom:18px">
-      <label>Contraseña</label>
-      <input id="loginPass" type="password" placeholder="Contraseña" />
+
+    <div id="formLogin">
+      <div style="margin-bottom:12px">
+        <label>Correo electrónico</label>
+        <input id="loginEmail" type="email" placeholder="tu@empresa.com" />
+      </div>
+      <div style="margin-bottom:18px">
+        <label>Contraseña</label>
+        <input id="loginPass" type="password" placeholder="Contraseña" />
+      </div>
+      <button class="btn" style="width:100%;padding:10px" onclick="doLogin()">Ingresar a la Consola</button>
     </div>
-    <button class="btn" style="width:100%;padding:10px" onclick="doLogin()">Ingresar al Panel</button>
+
+    <div id="formRegister" class="hidden">
+      <div style="margin-bottom:10px">
+        <label>Nombre completo</label>
+        <input id="regName" type="text" placeholder="Ej. Luis Pérez" />
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Nombre de tu Workspace (opcional)</label>
+        <input id="regWs" type="text" placeholder="Ej. Workspace de Luis" />
+      </div>
+      <div style="margin-bottom:10px">
+        <label>Correo electrónico</label>
+        <input id="regEmail" type="email" placeholder="luis@empresa.pe" />
+      </div>
+      <div style="margin-bottom:16px">
+        <label>Contraseña (mín. 8 caracteres)</label>
+        <input id="regPass" type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-teal" style="width:100%;padding:10px" onclick="doRegister()">Crear Workspace Gratis (50 ops/mes)</button>
+    </div>
+
     <p id="loginErr" style="color:var(--err);font-size:12px;margin-top:10px;text-align:center"></p>
-    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center">
-      <a href="/consulta" style="font-size:12.5px;font-weight:600;color:var(--o20-teal);text-decoration:none">¿Buscas tu comprobante? Ir al Portal de Consulta Pública →</a>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);text-align:center;display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
+      <a href="/docs-portal" style="font-size:12.5px;font-weight:600;color:var(--o20-primary);text-decoration:none">Documentación API &amp; MCP</a>
+      <a href="/consulta" style="font-size:12.5px;font-weight:600;color:var(--o20-teal);text-decoration:none">Consulta Pública →</a>
     </div>
   </div>
 </div>
@@ -167,10 +196,11 @@ PANEL_HTML = r"""<!DOCTYPE html>
     <!-- Banner Principal Centrado (idéntico a SOFIA Platform) -->
     <div class="hero-banner">
       <div>
-        <h1>Gestión de Emisión &amp; Cola SUNAT</h1>
-        <p>Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas pueden firmar en Bóveda Gateway.</p>
+        <h1 id="heroGreeting">Gestión de Emisión &amp; Cola SUNAT</h1>
+        <p id="heroSub">Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas y Workspaces firman en Bóveda Gateway.</p>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span id="workspaceBadge" class="badge b-info">Cargando...</span>
         <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:260px;padding:7px 12px">
           <option value="">Todas las Empresas (Vista Global)</option>
         </select>
@@ -213,6 +243,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
       <button class="tab" data-tab="connectors" onclick="showTab('connectors', this)">Conectores IA (MCP)</button>
       <button class="tab" data-tab="logs" onclick="showTab('logs', this)">Logs API / MCP</button>
+      <button class="tab" data-tab="billing" onclick="showTab('billing', this)">Facturación y Planes</button>
       <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
     </nav>
 
@@ -225,9 +256,10 @@ PANEL_HTML = r"""<!DOCTYPE html>
             <span id="quotaHeadline" style="font-weight:700;font-size:15px;color:var(--text)">500 operaciones restantes este mes</span>
             <span id="quotaPlanBadge" class="badge b-info" style="margin-left:8px">STARTER</span>
           </div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <a href="/docs-portal" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Ver Documentación</a>
             <button class="btn btn-sm btn-teal" onclick="openTab('connectors')">Conectar Claude / ChatGPT</button>
+            <button class="btn btn-sm" onclick="openTab('billing')">Mejorar Plan</button>
           </div>
         </div>
         <div id="quotaTicks" style="display:flex;gap:3px;height:18px;align-items:center;overflow:hidden"></div>
@@ -572,6 +604,34 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         </table>
       </div>
     </div>
+
+    <!-- TAB 10: FACTURACIÓN Y PLANES (MERCADO PAGO) -->
+    <div id="tab-billing" class="hidden">
+      <div id="billingBanner" class="card hidden" style="background:#EBF8F6;border-color:#C4E8E2;color:#0F766E;font-weight:600"></div>
+      <div class="card">
+        <h3>Planes Mensuales &amp; Recarga de Cuota SUNAT</h3>
+        <p style="font-size:12.5px;color:var(--muted);margin-top:0">
+          Elige el plan ideal para tu Workspace. El pago con <strong>Mercado Pago (Yape, Plin, Tarjetas, PagoEfectivo)</strong> actualiza tu <code>monthly_quota</code> al instante.
+        </p>
+        <div id="plansGrid" class="grid4" style="margin-bottom:0"></div>
+      </div>
+      <div class="card">
+        <h3>Historial de Pagos y Upgrades</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Plan</th>
+              <th>Cuota Otorgada</th>
+              <th>Monto (PEN)</th>
+              <th>Estado</th>
+              <th>ID Pago MP</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -587,6 +647,45 @@ async function api(path, opts = {}) {
   const data = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail || data));
   return data;
+}
+
+function setAuthMode(mode) {
+  const isReg = mode === 'register';
+  document.getElementById('formLogin').classList.toggle('hidden', isReg);
+  document.getElementById('formRegister').classList.toggle('hidden', !isReg);
+  document.getElementById('loginErr').textContent = '';
+  const bL = document.getElementById('btnModeLogin');
+  const bR = document.getElementById('btnModeRegister');
+  if (isReg) {
+    bR.className = 'btn btn-sm'; bR.style.cssText = 'flex:1';
+    bL.className = 'btn btn-sm btn-sec'; bL.style.cssText = 'flex:1;border:none;background:transparent';
+  } else {
+    bL.className = 'btn btn-sm'; bL.style.cssText = 'flex:1';
+    bR.className = 'btn btn-sm btn-sec'; bR.style.cssText = 'flex:1;border:none;background:transparent';
+  }
+}
+
+async function doRegister() {
+  document.getElementById('loginErr').textContent = '';
+  try {
+    const res = await fetch('/api/v1/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name: document.getElementById('regName').value.trim(),
+        workspace_name: document.getElementById('regWs').value.trim() || null,
+        email: document.getElementById('regEmail').value.trim(),
+        password: document.getElementById('regPass').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'No se pudo crear la cuenta');
+    TOKEN = data.access_token;
+    localStorage.setItem('sofia_gw_token', TOKEN);
+    bootApp();
+  } catch (e) {
+    document.getElementById('loginErr').textContent = e.message;
+  }
 }
 
 async function doLogin() {
@@ -618,7 +717,7 @@ function logout() {
 }
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'logs', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -782,8 +881,62 @@ async function refreshScopedData() {
 
 async function refreshAll() {
   refreshSunatHealth();
-  const [issuers, clients] = await Promise.all([api('/issuers'), api('/clients')]);
+  const [me, issuers, clients, billing, orders] = await Promise.all([
+    api('/auth/me'),
+    api('/issuers'),
+    api('/clients'),
+    api('/billing/plans'),
+    api('/billing/orders'),
+  ]);
   ISSUERS_CACHE = issuers;
+
+  if (me) {
+    const wsBadge = document.getElementById('workspaceBadge');
+    if (me.is_superadmin) {
+      wsBadge.className = 'badge b-info';
+      wsBadge.textContent = 'Superadmin Global';
+      document.getElementById('heroGreeting').textContent = 'Gestión de Emisión & Cola SUNAT';
+    } else if (me.workspace) {
+      wsBadge.className = 'badge b-ok';
+      wsBadge.textContent = `${me.workspace.name} · Plan ${me.workspace.plan_name}`;
+      document.getElementById('heroGreeting').textContent = `Hola, ${me.full_name || me.email}`;
+      document.getElementById('heroSub').textContent = `Workspace aislado: ${me.workspace.name} · Cuota mensual: ${me.workspace.monthly_quota} comprobantes.`;
+    }
+  }
+
+  if (billing && billing.plans) {
+    document.getElementById('plansGrid').innerHTML = billing.plans.map(p => {
+      const isCurrent = billing.current_plan === p.code;
+      const btnHtml = p.price_pen <= 0
+        ? `<button class="btn btn-sm btn-sec" disabled style="width:100%;margin-top:12px">${isCurrent ? 'Plan Actual' : 'Plan Base'}</button>`
+        : `<button class="btn btn-sm ${isCurrent ? 'btn-sec' : 'btn-teal'}" style="width:100%;margin-top:12px" onclick="startPlanCheckout('${p.code}')">${isCurrent ? 'Renovar con Mercado Pago' : 'Pagar S/ ' + p.price_pen.toFixed(2) + ' con Mercado Pago'}</button>`;
+      return `
+        <div class="kpi" style="background:#FFFFFF;border:${isCurrent ? '2px solid var(--o20-primary)' : '1px solid var(--border)'};display:flex;flex-direction:column;justify-content:space-between">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span class="lbl" style="color:var(--o20-primary)">${p.name}</span>
+              ${isCurrent ? '<span class="badge b-ok">Activo</span>' : ''}
+            </div>
+            <div class="val" style="font-size:24px;margin-top:8px">S/ ${p.price_pen.toFixed(2)} <span style="font-size:12px;font-weight:500;color:var(--muted)">/ mes</span></div>
+            <div style="font-size:13px;font-weight:700;color:var(--o20-teal);margin-top:4px">${p.monthly_quota.toLocaleString()} comprobantes/mes</div>
+            <div class="sub" style="margin-top:8px;line-height:1.45">${p.description}</div>
+          </div>
+          ${btnHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.getElementById('ordersTable').innerHTML = (orders || []).map(o => `
+    <tr>
+      <td style="font-size:12px;color:var(--muted)">${(o.created_at || '').slice(0,19).replace('T',' ')}</td>
+      <td><strong>${o.plan_code}</strong></td>
+      <td>${o.quota_granted.toLocaleString()} / mes</td>
+      <td>S/ ${o.amount_pen.toFixed(2)}</td>
+      <td><span class="badge ${o.status === 'PAID' ? 'b-ok' : (o.status === 'PENDING' ? 'b-warn' : 'b-err')}">${o.status}</span></td>
+      <td><code>${o.mp_payment_id || '-'}</code></td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="color:var(--muted);text-align:center">Sin pagos registrados aún.</td></tr>';
 
   const sel = document.getElementById('globalRucFilter');
   const prev = sel.value;
@@ -988,9 +1141,35 @@ async function testMcp(method, params) {
   }
 }
 
+async function startPlanCheckout(planCode) {
+  try {
+    const res = await api('/billing/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ plan_code: planCode })
+    });
+    if (res.checkout_url) {
+      window.location.href = res.checkout_url;
+    } else {
+      alert('No se recibió URL de Mercado Pago.');
+    }
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
 function bootApp() {
   document.getElementById('loginView').classList.add('hidden');
   document.getElementById('appView').classList.remove('hidden');
+  const qs = new URLSearchParams(window.location.search);
+  const bStatus = qs.get('billing');
+  if (bStatus) {
+    const banner = document.getElementById('billingBanner');
+    banner.classList.remove('hidden');
+    banner.textContent = bStatus === 'success'
+      ? '¡Pago confirmado en Mercado Pago! Tu plan y cuota mensual han sido actualizados.'
+      : (bStatus === 'pending' ? 'Tu pago está pendiente de confirmación en Mercado Pago.' : 'El pago fue cancelado o rechazado.');
+    openTab('billing');
+  }
   refreshAll();
 }
 

@@ -66,11 +66,47 @@ def sign_webhook_payload(secret: str, payload_bytes: bytes) -> str:
     return hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
 
 
+def hash_password(password: str) -> str:
+    """Hash seguro PBKDF2-HMAC-SHA256 con salt aleatorio (sin dependencias externas)."""
+    salt = secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200_000)
+    return f"pbkdf2_sha256$200000${base64.b64encode(salt).decode('ascii')}${base64.b64encode(dk).decode('ascii')}"
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    try:
+        algo, iters_s, salt_b64, dk_b64 = stored_hash.split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(dk_b64)
+        actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, int(iters_s))
+        return hmac.compare_digest(actual, expected)
+    except Exception:
+        return False
+
+
 def create_admin_jwt(email: str) -> str:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": email,
         "role": "gateway_admin",
+        "workspace_id": None,
+        "iat": int(now.timestamp()),
+        "exp": int((now + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)).timestamp()),
+    }
+    return jwt.encode(payload, settings.GATEWAY_JWT_SECRET, algorithm="HS256")
+
+
+def create_workspace_user_jwt(email: str, user_id: str, workspace_id: str, workspace_name: str, full_name: str) -> str:
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": email,
+        "uid": user_id,
+        "role": "workspace_owner",
+        "workspace_id": workspace_id,
+        "workspace_name": workspace_name,
+        "full_name": full_name,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(minutes=settings.JWT_EXPIRE_MINUTES)).timestamp()),
     }
@@ -78,9 +114,10 @@ def create_admin_jwt(email: str) -> str:
 
 
 def verify_admin_jwt(token: str) -> Optional[dict]:
+    """Verifica JWT de consola (Superadmin global o dueño de Workspace)."""
     try:
         payload = jwt.decode(token, settings.GATEWAY_JWT_SECRET, algorithms=["HS256"])
-        if payload.get("role") != "gateway_admin":
+        if payload.get("role") not in ("gateway_admin", "workspace_owner"):
             return None
         return payload
     except jwt.PyJWTError:
