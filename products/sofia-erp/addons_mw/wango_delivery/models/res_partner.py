@@ -21,6 +21,7 @@ class ResPartner(models.Model):
                     continue
             non_dni_partners |= partner
         
-        if non_dni_partners:
+        if non_dni_partners and hasattr(super(ResPartner, non_dni_partners), 'check_vat'):
             return super(ResPartner, non_dni_partners).check_vat()
+        return True
 
