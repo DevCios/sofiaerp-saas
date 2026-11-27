@@ -38,24 +38,110 @@ PANEL_HTML = r"""<!DOCTYPE html>
     body { margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
     .hidden { display: none !important; }
 
-    /* Top Navbar Centrado Estilo SOFIA Platform / Odoo 20 */
-    header { background: var(--o20-navbar); color: #FFFFFF; box-shadow: 0 1px 3px rgba(17,24,39,.12); position: sticky; top: 0; z-index: 30; }
-    .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; min-height: 56px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 10px; letter-spacing: -0.01em; color: #FFFFFF; }
-    .brand-mark { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,.20); display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; }
-    .brand-sub { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.78); margin-top: -1px; }
+    /* === LAYOUT DEVELOPER CONSOLE (ESTRUCTURA SIDEBAR + PALETA OFICIAL ODOO 20) === */
+    .console-shell { display: flex; min-height: 100vh; background: var(--bg); }
+    .sidebar {
+      width: 256px; min-width: 256px; background: #FAFAFC; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 35; transition: margin-left .2s ease;
+    }
+    .sidebar.collapsed { margin-left: -256px; }
+    .sb-top { padding: 14px 12px 10px 12px; }
+    .sb-brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px 12px 6px; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.01em; }
+    .sb-brand-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--o20-primary); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+    .sb-ws-box {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: #FFFFFF; border: 1px solid var(--border); border-radius: 9px;
+      padding: 7px 10px; margin-bottom: 10px; font-size: 12.5px; font-weight: 600; color: var(--text);
+    }
+    .sb-ws-avatar { width: 22px; height: 22px; border-radius: 6px; background: var(--o20-primary-soft); color: var(--o20-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
+    .sb-env-toggle {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #EFEFF4;
+      padding: 3px; border-radius: 9px; margin-bottom: 14px;
+    }
+    .sb-env-btn {
+      border: none; background: transparent; padding: 5px 8px; border-radius: 7px;
+      font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .sb-env-btn.active { background: #FFFFFF; color: var(--text); box-shadow: 0 1px 2px rgba(16,24,40,.08); }
+    .sb-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+    .sb-dot-prod { background: var(--o20-teal); }
+    .sb-dot-beta { background: var(--warn); }
 
-    /* Contenedor Principal Centrado (igual que SOFIA Platform max-w-7xl) */
-    .container { max-width: 1280px; margin: 28px auto; padding: 0 24px; }
-    .hero-banner { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: 0 1px 2px rgba(16,24,40,.03); }
-    .hero-banner h1 { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
-    .hero-banner p { margin: 4px 0 0 0; font-size: 13px; color: var(--muted); }
+    .sb-group-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 12px 10px 5px 10px; }
+    .sb-item {
+      width: 100%; background: transparent; border: none; border-radius: 8px;
+      padding: 8px 10px; margin-bottom: 2px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      color: #4B5563; font-size: 13px; font-weight: 500; text-align: left; text-decoration: none;
+      transition: background .14s, color .14s;
+    }
+    .sb-item:hover { background: #EFEFF5; color: var(--text); }
+    .sb-item.active { background: var(--o20-primary-soft); color: var(--o20-primary); font-weight: 600; }
+    .sb-item-left { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
+    .sb-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .82; }
+    .sb-item.active svg { opacity: 1; color: var(--o20-primary); }
 
-    /* Tabs de Navegación (Pill Bar Estilo SOFIA Platform) */
-    .tabs { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab { background: transparent; border: none; color: #4B5563; padding: 8px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 12.5px; transition: background .15s, color .15s; }
-    .tab:hover { background: #EAECEF; color: var(--text); }
-    .tab.active { background: var(--o20-primary); color: #FFFFFF; box-shadow: 0 1px 2px rgba(113,75,103,.25); }
+    .sb-bottom { padding: 12px; border-top: 1px solid var(--border); background: #FAFAFC; }
+    .sb-upgrade-btn {
+      width: 100%; border: none; border-radius: 9px; padding: 10px 12px; cursor: pointer;
+      background: linear-gradient(135deg, #241930 0%, #66598F 58%, #714B67 100%);
+      color: #FFFFFF; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px;
+      margin-bottom: 8px; box-shadow: 0 3px 10px rgba(102,89,143,.22); transition: filter .15s;
+    }
+    .sb-upgrade-btn:hover { filter: brightness(1.08); }
+
+    .console-right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .topbar {
+      height: 54px; background: #FFFFFF; border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      position: sticky; top: 0; z-index: 25;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); min-width: 0; }
+    .topbar-left strong { color: var(--text); font-weight: 600; }
+    .tb-icon-btn { background: transparent; border: 1px solid transparent; color: #4B5563; width: 30px; height: 30px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .tb-icon-btn:hover { background: #F3F4F6; border-color: var(--border); }
+    .tb-search {
+      display: inline-flex; align-items: center; gap: 8px; background: #F9FAFB; border: 1px solid var(--border);
+      border-radius: 8px; padding: 5px 10px; color: var(--muted); font-size: 12.5px; cursor: pointer;
+    }
+    .tb-search:hover { border-color: #CBD5E1; color: var(--text); }
+    .tb-kbd { background: #FFFFFF; border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 10.5px; font-weight: 600; color: #6B7280; }
+    .tb-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--o20-navbar); color: #FFFFFF; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; }
+
+    .console-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 28px 32px 44px 32px; }
+    @media (max-width: 900px) {
+      .sidebar { position: fixed; left: 0; top: 0; bottom: 0; box-shadow: 0 12px 32px rgba(0,0,0,.18); }
+      .console-main { padding: 18px 16px 32px 16px; }
+    }
+
+    /* Banner Hero Oscuro Acanalado en Paleta Odoo 20 (Morado #66598F / #714B67 + Teal #017E84) */
+    .ai-hero-ribbed {
+      position: relative; overflow: hidden; border-radius: 16px; padding: 28px 30px; margin-bottom: 24px;
+      background-color: #16111F;
+      background-image:
+        linear-gradient(90deg, #16111F 0%, #1C1528 38%, rgba(102,89,143,0.42) 72%, rgba(113,75,103,0.68) 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 2px, rgba(1,126,132,0.08) 2px, rgba(0,0,0,0.28) 18px);
+      color: #FFFFFF; box-shadow: 0 10px 28px rgba(36,25,48,.16);
+    }
+    .ai-hero-badges { display: flex; gap: 8px; margin-bottom: 18px; }
+    .ai-hero-badge { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; }
+    .ai-hero-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+    .ai-hero-ribbed h2 { margin: 0 0 8px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #FFFFFF; line-height: 1.2; }
+    .ai-hero-ribbed p { margin: 0; font-size: 13.5px; color: rgba(255,255,255,.78); max-width: 520px; line-height: 1.5; }
+    .ai-hero-cta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .ai-hero-link { color: rgba(255,255,255,.92); font-size: 13px; font-weight: 600; text-decoration: none; }
+    .ai-hero-link:hover { text-decoration: underline; }
+    .ai-hero-btn { background: #FFFFFF; color: #1F2937; border: none; border-radius: 9px; padding: 9px 18px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .ai-hero-btn:hover { background: #F3F4F6; }
+
+    /* Command Palette Modal (Ctrl K) */
+    .cmd-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,.45); z-index: 60; display: flex; align-items: flex-start; justify-content: center; padding-top: 12vh; }
+    .cmd-box { width: 100%; max-width: 480px; background: #FFFFFF; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(15,23,42,.22); overflow: hidden; }
+    .cmd-input { border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; padding: 14px 16px !important; font-size: 14px !important; box-shadow: none !important; }
+    .cmd-list { max-height: 300px; overflow-y: auto; padding: 6px; }
+    .cmd-row { width: 100%; border: none; background: transparent; padding: 9px 12px; border-radius: 7px; text-align: left; cursor: pointer; font-size: 13px; color: var(--text); display: flex; justify-content: space-between; }
+    .cmd-row:hover { background: var(--o20-primary-soft); color: var(--o20-primary); }
 
     .badge { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
     .b-ok { background: var(--o20-teal-soft); color: var(--ok); }
@@ -190,141 +276,175 @@ PANEL_HTML = r"""<!DOCTYPE html>
   </div>
 </div>
 
-<div id="appView" class="hidden">
-  <header>
-    <div class="nav-inner">
-      <div class="brand">
-        <span class="brand-mark">S</span>
-        <div>
-          <span>Sofia Gateway</span>
-          <span class="brand-sub">Pasarela Resiliente SUNAT • Modo Híbrido</span>
-        </div>
+<div id="appView" class="hidden console-shell">
+  <!-- SIDEBAR IZQUIERDO ESTILO DEVELOPER CONSOLE EN PALETA ODOO 20 -->
+  <aside id="consoleSidebar" class="sidebar">
+    <div class="sb-top">
+      <div class="sb-brand">
+        <span class="sb-brand-mark">S</span>
+        <span>Sofia Gateway</span>
       </div>
-      <div class="sunat-pill">
-        <span id="sunatBetaStatus" class="badge b-nav">SUNAT Beta: ...</span>
-        <span id="sunatProdStatus" class="badge b-nav">SUNAT Prod: ...</span>
-        <a href="/docs-portal" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">Documentación</a>
-        <a href="/consulta" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">Consulta Pública</a>
-        <a href="https://api.sofiaerp.com/admin" target="_blank" class="btn btn-sm btn-nav" style="text-decoration:none">SOFIA Platform</a>
-        <button class="btn btn-sm btn-nav" onclick="refreshAll()">Actualizar</button>
-        <button class="btn btn-sm btn-nav" onclick="logout()">Salir</button>
-      </div>
-    </div>
-  </header>
 
-  <div class="container">
-    <!-- Banner Principal Centrado (idéntico a SOFIA Platform) -->
-    <div class="hero-banner">
-      <div>
-        <h1 id="heroGreeting">Gestión de Emisión &amp; Cola SUNAT</h1>
-        <p id="heroSub">Tenants SOFIA ERP firman localmente con su <code>.pfx</code> · Apps externas y Workspaces firman en Bóveda Gateway.</p>
+      <div class="sb-ws-box">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <span id="sbWsAvatar" class="sb-ws-avatar">S</span>
+          <span id="workspaceBadge" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cargando...</span>
+        </div>
+        <span style="color:#9CA3AF;font-size:11px">⇅</span>
+      </div>
+
+      <div class="sb-env-toggle">
+        <button id="envBtnBeta" class="sb-env-btn" onclick="setEnvHint('beta')"><span class="sb-dot sb-dot-beta"></span>Prueba</button>
+        <button id="envBtnProd" class="sb-env-btn active" onclick="setEnvHint('prod')"><span class="sb-dot sb-dot-prod"></span>Producción</button>
+      </div>
+
+      <nav>
+        <button class="sb-item tab active" data-tab="desk" onclick="showTab('desk', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</span>
+        </button>
+        <button class="sb-item tab" data-tab="connectors" onclick="showTab('connectors', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Conectores</span>
+          <span class="badge b-info" style="font-size:10px;padding:1px 6px">IA</span>
+        </button>
+        <button class="sb-item tab" data-tab="issuers" onclick="showTab('issuers', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/></svg>Empresas</span>
+        </button>
+        <button class="sb-item tab" data-tab="documents" onclick="showTab('documents', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documentos</span>
+        </button>
+        <button class="sb-item tab" data-tab="summaries" onclick="showTab('summaries', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Resúmenes (RC/RA)</span>
+        </button>
+        <button class="sb-item tab" data-tab="contingencies" onclick="showTab('contingencies', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Contingencias</span>
+        </button>
+        <button class="sb-item tab" data-tab="observations" onclick="showTab('observations', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Observaciones</span>
+        </button>
+
+        <div class="sb-group-lbl">Desarrollador</div>
+        <button class="sb-item tab" data-tab="clients" onclick="showTab('clients', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>API Keys</span>
+        </button>
+        <button class="sb-item tab" data-tab="logs" onclick="showTab('logs', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Logs API / MCP</span>
+        </button>
+        <button class="sb-item tab" data-tab="tester" onclick="showTab('tester', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Probador Rápido</span>
+        </button>
+
+        <div class="sb-group-lbl">Workspace</div>
+        <button class="sb-item tab" data-tab="billing" onclick="showTab('billing', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Facturación</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sb-bottom">
+      <button class="sb-upgrade-btn" onclick="openTab('billing')">
+        <span>↑</span><span>Mejorar plan</span>
+      </button>
+      <a href="/docs-portal" target="_blank" class="sb-item" style="margin-bottom:2px">
+        <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Documentación</span>
+      </a>
+      <a href="/consulta" target="_blank" class="sb-item">
+        <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consulta Pública</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO DERECHO: TOPBAR + AREA PRINCIPAL -->
+  <div class="console-right">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="tb-icon-btn" onclick="toggleSidebar()" title="Mostrar / ocultar menú">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </button>
+        <span>Consola API</span>
+        <span>›</span>
+        <strong id="topbarCrumb">Inicio</strong>
+        <span id="sunatBetaStatus" class="badge b-info" style="margin-left:8px">Beta: ...</span>
+        <span id="sunatProdStatus" class="badge b-ok">Prod: ...</span>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span id="workspaceBadge" class="badge b-info">Cargando...</span>
-        <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;min-width:260px;padding:7px 12px">
-          <option value="">Todas las Empresas (Vista Global)</option>
+        <select id="globalRucFilter" onchange="onRucFilterChange()" style="width:auto;max-width:240px;padding:5px 10px;font-size:12px">
+          <option value="">Todas las Empresas</option>
         </select>
-        <span id="activeEnvBadge" class="badge b-info">Global</span>
+        <span id="activeEnvBadge" class="badge b-info hidden">Global</span>
+        <button class="tb-search" onclick="openCmdModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Buscar</span>
+          <span class="tb-kbd">Ctrl K</span>
+        </button>
+        <button class="tb-icon-btn" onclick="refreshAll()" title="Actualizar">↻</button>
+        <span id="userAvatar" class="tb-avatar" title="Usuario">A</span>
+        <button class="btn btn-sm btn-sec" onclick="logout()">Salir</button>
       </div>
     </div>
 
-    <!-- KPIs Pastel Siempre Visibles (idéntico a SOFIA Platform) -->
-    <div class="grid4">
-      <div class="kpi kpi-purple">
-        <div class="lbl">Comprobantes Totales</div>
-        <div class="val" id="kTotal">0</div>
-        <div class="sub">Procesados en pasarela</div>
-      </div>
-      <div class="kpi kpi-teal">
-        <div class="lbl">Aceptados SUNAT</div>
-        <div class="val" style="color:var(--ok)" id="kAccepted">0</div>
-        <div class="sub" style="color:var(--ok)">Con CDR oficial</div>
-      </div>
-      <div class="kpi kpi-peach">
-        <div class="lbl">En Cola / Contingencia</div>
-        <div class="val" style="color:var(--warn)" id="kQueued">0</div>
-        <div class="sub" style="color:var(--warn)">Reintento automático activo</div>
-      </div>
-      <div class="kpi kpi-rose">
-        <div class="lbl">Observados / Rechazados</div>
-        <div class="val" style="color:var(--err)" id="kRejected">0</div>
-        <div class="sub" style="color:var(--err)">Requieren revisión</div>
-      </div>
-    </div>
+    <main class="console-main">
+      <!-- TAB 1: INICIO (ESTILO DEVELOPER CONSOLE + PALETA ODOO 20) -->
+      <div id="tab-desk">
+        <div style="margin-bottom:20px">
+          <h1 id="heroGreeting" style="margin:0;font-size:24px;font-weight:700;letter-spacing:-0.02em;color:var(--text)">Buenas tardes</h1>
+          <p id="heroSub" style="margin:4px 0 0 0;font-size:13.5px;color:var(--muted)">Facturación electrónica de SUNAT, dentro de tu asistente de IA y SOFIA ERP.</p>
+        </div>
 
-    <!-- Barra de Pestañas Pill (idéntica a SOFIA Platform) -->
-    <nav class="tabs">
-      <button class="tab active" data-tab="desk" onclick="showTab('desk', this)">Escritorio</button>
-      <button class="tab" data-tab="documents" onclick="showTab('documents', this)">Documentos</button>
-      <button class="tab" data-tab="summaries" onclick="showTab('summaries', this)">Resúmenes (RC/RA)</button>
-      <button class="tab" data-tab="contingencies" onclick="showTab('contingencies', this)">Contingencias</button>
-      <button class="tab" data-tab="observations" onclick="showTab('observations', this)">Observaciones</button>
-      <button class="tab" data-tab="issuers" onclick="showTab('issuers', this)">Empresas y Certificados</button>
-      <button class="tab" data-tab="clients" onclick="showTab('clients', this)">Credenciales / API Keys</button>
-      <button class="tab" data-tab="connectors" onclick="showTab('connectors', this)">Conectores IA (MCP)</button>
-      <button class="tab" data-tab="logs" onclick="showTab('logs', this)">Logs API / MCP</button>
-      <button class="tab" data-tab="billing" onclick="showTab('billing', this)">Facturación y Planes</button>
-      <button class="tab" data-tab="tester" onclick="showTab('tester', this)">Probador Rápido</button>
-    </nav>
-
-    <!-- TAB 1: ESCRITORIO -->
-    <div id="tab-desk">
-      <!-- Medidor Visual de Cuota Mensual (Estilo Developer Console en Design System Odoo 20) -->
-      <div class="card" style="padding:18px 22px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-          <div>
-            <span id="quotaHeadline" style="font-weight:700;font-size:15px;color:var(--text)">500 operaciones restantes este mes</span>
-            <span id="quotaPlanBadge" class="badge b-info" style="margin-left:8px">STARTER</span>
+        <!-- Banner Hero Acanalado en Colores Odoo 20 -->
+        <div class="ai-hero-ribbed">
+          <div class="ai-hero-badges">
+            <span class="ai-hero-badge" style="background:#714B67;color:#FFFFFF" title="Claude MCP">✦</span>
+            <span class="ai-hero-badge" style="background:#FFFFFF;color:#017E84" title="ChatGPT / OpenAPI">◎</span>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <a href="/docs-portal" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Ver Documentación</a>
-            <button class="btn btn-sm btn-teal" onclick="openTab('connectors')">Conectar Claude / ChatGPT</button>
-            <button class="btn btn-sm" onclick="openTab('billing')">Mejorar Plan</button>
+          <div class="ai-hero-row">
+            <div>
+              <h2>Conecta Claude o ChatGPT<br/>a Sofia Gateway</h2>
+              <p>Emite facturas, boletas y guías, calcula IGV y consulta su estado en SUNAT directamente desde tu asistente de IA favorito.</p>
+            </div>
+            <div class="ai-hero-cta">
+              <a href="/docs-portal" target="_blank" class="ai-hero-link">Ver documentación ↗</a>
+              <button class="ai-hero-btn" onclick="openTab('connectors')">Conectar</button>
+            </div>
           </div>
         </div>
-        <div id="quotaTicks" style="display:flex;gap:3px;height:18px;align-items:center;overflow:hidden"></div>
-        <div id="quotaSub" style="font-size:12px;color:var(--muted);margin-top:8px">0 de 500 comprobantes usados este mes</div>
-      </div>
 
-      <div class="grid3">
-        <div class="desk-card" onclick="openTab('documents')">
-          <div class="title">Documentos</div>
-          <div class="desc">Bandeja de Facturas, Boletas y Notas. Descarga de XML/CDR, reintentos y recuperación anti-1033.</div>
+        <!-- Medidor Visual de Cuota Mensual -->
+        <div style="margin-bottom:26px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+            <div>
+              <span id="quotaHeadline" style="font-weight:700;font-size:15.5px;color:var(--text)">500 operaciones restantes</span>
+              <span id="quotaPlanBadge" class="badge b-info" style="margin-left:8px">STARTER</span>
+            </div>
+            <button class="btn btn-sm btn-sec" onclick="openTab('billing')">↑ Mejorar plan</button>
+          </div>
+          <div id="quotaTicks" style="display:flex;gap:3px;height:18px;align-items:center;overflow:hidden"></div>
+          <div id="quotaSub" style="font-size:12.5px;color:var(--muted);margin-top:8px">0 de 500 operaciones usadas este mes</div>
         </div>
-        <div class="desk-card" onclick="openTab('summaries')">
-          <div class="title">Resúmenes y Bajas (RC / RA)</div>
-          <div class="desc">Resúmenes Diarios de Boletas y Comunicaciones de Baja con seguimiento automático de Ticket SUNAT.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('contingencies')">
-          <div class="title">Contingencias y Colas</div>
-          <div class="desc">Monitor de envíos en reintento, ventana nocturna y alertas antes de vencer el plazo legal de 3 días.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('observations')">
-          <div class="title">Resumen de Observaciones</div>
-          <div class="desc">Comprobantes aceptados con observaciones (&gt;= 4000) y rechazos SUNAT (2xxx/3xxx) para corrección rápida.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('issuers')">
-          <div class="title">Empresas y Certificados</div>
-          <div class="desc">Empresas auto-sincronizadas desde SOFIA ERP (firma local) o con certificado <code>.pfx</code> en bóveda.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('clients')">
-          <div class="title">Credenciales y API Keys</div>
-          <div class="desc">Llaves <code>sk_live_...</code> aisladas por RUC y Webhooks firmados HMAC-SHA256 para POS/apps externas.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('connectors')">
-          <div class="title">Conectores IA (Claude / ChatGPT / MCP)</div>
-          <div class="desc">Conecta Claude, ChatGPT, Cursor o n8n vía Remote MCP (<code>/mcp</code>), OAuth 2.1 PKCE y OpenAPI AI.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('logs')">
-          <div class="title">Logs API / MCP</div>
-          <div class="desc">Auditoría en vivo de llamadas REST y herramientas MCP con latencia, RUC y códigos de respuesta.</div>
-        </div>
-        <div class="desk-card" onclick="openTab('tester')">
-          <div class="title">Probador Rápido (Beta)</div>
-          <div class="desc">Emite una factura de prueba contra SUNAT Beta y verifica la firma XMLDSig y el CDR oficial.</div>
+
+        <!-- KPIs Pastel Oficiales Odoo 20 -->
+        <div class="grid4">
+          <div class="kpi kpi-purple" style="cursor:pointer" onclick="openTab('documents')">
+            <div class="lbl">Comprobantes Totales</div>
+            <div class="val" id="kTotal">0</div>
+            <div class="sub">Procesados en pasarela</div>
+          </div>
+          <div class="kpi kpi-teal" style="cursor:pointer" onclick="openTab('documents')">
+            <div class="lbl">Aceptados SUNAT</div>
+            <div class="val" style="color:var(--ok)" id="kAccepted">0</div>
+            <div class="sub" style="color:var(--ok)">Con CDR oficial</div>
+          </div>
+          <div class="kpi kpi-peach" style="cursor:pointer" onclick="openTab('contingencies')">
+            <div class="lbl">En Cola / Contingencia</div>
+            <div class="val" style="color:var(--warn)" id="kQueued">0</div>
+            <div class="sub" style="color:var(--warn)">Reintento automático</div>
+          </div>
+          <div class="kpi kpi-rose" style="cursor:pointer" onclick="openTab('observations')">
+            <div class="lbl">Observados / Rechazados</div>
+            <div class="val" style="color:var(--err)" id="kRejected">0</div>
+            <div class="sub" style="color:var(--err)">Requieren revisión</div>
+          </div>
         </div>
       </div>
-    </div>
 
     <!-- TAB 2: DOCUMENTOS -->
     <div id="tab-documents" class="hidden">
@@ -652,6 +772,15 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         </table>
       </div>
     </div>
+    </main>
+  </div>
+</div>
+
+<!-- Command Palette Modal (Ctrl K) -->
+<div id="cmdModal" class="cmd-backdrop hidden" onclick="if(event.target===this) closeCmdModal()">
+  <div class="cmd-box">
+    <input id="cmdInput" class="cmd-input" placeholder="Ir a sección (Inicio, Conectores, Empresas, Documentos, Logs, Facturación)..." oninput="renderCmdList(this.value)" />
+    <div id="cmdList" class="cmd-list"></div>
   </div>
 </div>
 
@@ -765,12 +894,63 @@ function logout() {
   document.getElementById('loginView').classList.remove('hidden');
 }
 
+const TAB_LABELS = {
+  desk: 'Inicio',
+  connectors: 'Conectores IA',
+  issuers: 'Empresas',
+  documents: 'Documentos',
+  summaries: 'Resúmenes (RC/RA)',
+  contingencies: 'Contingencias',
+  observations: 'Observaciones',
+  clients: 'API Keys',
+  logs: 'Logs API / MCP',
+  billing: 'Facturación y Planes',
+  tester: 'Probador Rápido'
+};
+
+function toggleSidebar() {
+  document.getElementById('consoleSidebar').classList.toggle('collapsed');
+}
+
+function setEnvHint(mode) {
+  document.getElementById('envBtnBeta').classList.toggle('active', mode === 'beta');
+  document.getElementById('envBtnProd').classList.toggle('active', mode === 'prod');
+  const iss = ISSUERS_CACHE.find(i => (mode === 'beta' ? i.is_beta : !i.is_beta));
+  if (iss) {
+    document.getElementById('globalRucFilter').value = iss.ruc;
+    onRucFilterChange();
+  }
+}
+
+function openCmdModal() {
+  document.getElementById('cmdModal').classList.remove('hidden');
+  const inp = document.getElementById('cmdInput');
+  inp.value = '';
+  renderCmdList('');
+  setTimeout(() => inp.focus(), 20);
+}
+function closeCmdModal() { document.getElementById('cmdModal').classList.add('hidden'); }
+function renderCmdList(q) {
+  const ql = (q || '').toLowerCase();
+  const rows = Object.entries(TAB_LABELS)
+    .filter(([, label]) => label.toLowerCase().includes(ql))
+    .map(([k, label]) => `<button class="cmd-row" onclick="openTab('${k}');closeCmdModal()"><span>${label}</span><span style="color:#9CA3AF;font-size:11px">Ir →</span></button>`)
+    .join('');
+  document.getElementById('cmdList').innerHTML = rows || '<div style="padding:12px;font-size:12.5px;color:#9CA3AF">Sin coincidencias</div>';
+}
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmdModal(); }
+  if (e.key === 'Escape') closeCmdModal();
+});
+
 function showTab(name, btn) {
   ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  const crumb = document.getElementById('topbarCrumb');
+  if (crumb) crumb.textContent = TAB_LABELS[name] || name;
 }
 
 function openTab(name) {
@@ -940,16 +1120,23 @@ async function refreshAll() {
   ISSUERS_CACHE = issuers;
 
   if (me) {
+    const h = new Date().getHours();
+    const salute = h < 12 ? 'Buenos días' : (h < 19 ? 'Buenas tardes' : 'Buenas noches');
     const wsBadge = document.getElementById('workspaceBadge');
+    const sbAvatar = document.getElementById('sbWsAvatar');
+    const userAvatar = document.getElementById('userAvatar');
     if (me.is_superadmin) {
-      wsBadge.className = 'badge b-info';
       wsBadge.textContent = 'Superadmin Global';
-      document.getElementById('heroGreeting').textContent = 'Gestión de Emisión & Cola SUNAT';
+      if (sbAvatar) sbAvatar.textContent = 'S';
+      if (userAvatar) userAvatar.textContent = 'A';
+      document.getElementById('heroGreeting').innerHTML = `${salute}, <span style="color:var(--muted);font-weight:500">Admin</span>`;
     } else if (me.workspace) {
-      wsBadge.className = 'badge b-ok';
-      wsBadge.textContent = `${me.workspace.name} · Plan ${me.workspace.plan_name}`;
-      document.getElementById('heroGreeting').textContent = `Hola, ${me.full_name || me.email}`;
-      document.getElementById('heroSub').textContent = `Workspace aislado: ${me.workspace.name} · Cuota mensual: ${me.workspace.monthly_quota} comprobantes.`;
+      const firstName = (me.full_name || me.email || 'Usuario').split(' ')[0];
+      wsBadge.textContent = me.workspace.name;
+      if (sbAvatar) sbAvatar.textContent = (me.workspace.name[0] || 'W').toUpperCase();
+      if (userAvatar) userAvatar.textContent = (firstName[0] || 'U').toUpperCase();
+      document.getElementById('heroGreeting').innerHTML = `${salute}, <span style="color:var(--muted);font-weight:500">${firstName}</span>`;
+      document.getElementById('heroSub').textContent = `Facturación electrónica SUNAT & Remote MCP · Plan ${me.workspace.plan_name} (${me.workspace.monthly_quota} ops/mes).`;
     }
   }
 
