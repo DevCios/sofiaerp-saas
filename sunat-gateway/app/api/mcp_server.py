@@ -688,7 +688,20 @@ async def openapi_ai_schema():
                                     "type": "object",
                                     "properties": {
                                         "currency": {"type": "string", "enum": ["PEN", "USD"], "default": "PEN"},
-                                        "items": {"type": "array", "items": {"type": "object"}},
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "description": {"type": "string"},
+                                                    "quantity": {"type": "number", "default": 1},
+                                                    "unit_price_without_tax": {"type": "number"},
+                                                    "igv_affectation_code": {"type": "string", "default": "10"},
+                                                    "igv_rate": {"type": "number", "default": 0.18},
+                                                },
+                                                "required": ["description", "quantity", "unit_price_without_tax"],
+                                            },
+                                        },
                                     },
                                     "required": ["items"],
                                 }
@@ -735,10 +748,59 @@ async def openapi_ai_schema():
             "/api/v1/documents/emit": {
                 "post": {
                     "operationId": "emitSunatDocument",
-                    "summary": "Emitir Factura o Boleta electrónica SUNAT (idempotente)",
+                    "summary": "Emitir Factura (01) o Boleta (03) electrónica SUNAT (idempotente)",
                     "requestBody": {
                         "required": True,
-                        "content": {"application/json": {"schema": {"type": "object"}}},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "issuer_ruc": {"type": "string", "description": "RUC emisor de 11 dígitos"},
+                                        "doc_type": {"type": "string", "enum": ["01", "03"], "default": "01"},
+                                        "serie": {"type": "string", "description": "Serie de 4 caracteres (ej. FE01, BE01)"},
+                                        "correlativo": {"type": "string", "description": "Correlativo numérico (ej. '10')"},
+                                        "issue_date": {"type": "string", "description": "Fecha YYYY-MM-DD (hora Lima)"},
+                                        "currency": {"type": "string", "enum": ["PEN", "USD"], "default": "PEN"},
+                                        "try_sync": {"type": "boolean", "default": True},
+                                        "customer": {
+                                            "type": "object",
+                                            "properties": {
+                                                "doc_type": {"type": "string", "description": "6=RUC, 1=DNI, 0=Sin doc"},
+                                                "doc_number": {"type": "string", "description": "RUC (11) o DNI (8) del cliente"},
+                                                "name": {"type": "string", "description": "Razón social o nombre del cliente"},
+                                            },
+                                            "required": ["doc_type", "doc_number", "name"],
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "code": {"type": "string", "default": "GEN"},
+                                                    "description": {"type": "string"},
+                                                    "unit_code": {"type": "string", "default": "NIU"},
+                                                    "quantity": {"type": "number", "default": 1},
+                                                    "unit_price_without_tax": {"type": "number"},
+                                                    "igv_affectation_code": {"type": "string", "default": "10"},
+                                                    "igv_rate": {"type": "number", "default": 0.18},
+                                                },
+                                                "required": ["description", "quantity", "unit_price_without_tax"],
+                                            },
+                                        },
+                                    },
+                                    "required": [
+                                        "issuer_ruc",
+                                        "doc_type",
+                                        "serie",
+                                        "correlativo",
+                                        "issue_date",
+                                        "customer",
+                                        "items",
+                                    ],
+                                }
+                            }
+                        },
                     },
                     "responses": {"200": {"description": "Comprobante firmado y enviado/encolado en SUNAT"}},
                 }
