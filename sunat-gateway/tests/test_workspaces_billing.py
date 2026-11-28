@@ -83,3 +83,15 @@ def test_sofia_sso_rs256_jwks_verification():
     # Token con firma manipulada debe ser rechazado
     tampered = token[:-4] + "XXXX"
     assert verify_sofia_rs256_token(tampered, [pub_jwk]) is None
+
+
+def test_workspace_member_model_and_create_request():
+    from app.api.billing import WorkspaceCreateRequest
+    from app.models import WorkspaceMember
+
+    req = WorkspaceCreateRequest(name="Agencia Dev Lima S.A.C.")
+    assert req.name == "Agencia Dev Lima S.A.C."
+    mem = WorkspaceMember(user_id="usr-1", workspace_id="ws-2", role="owner")
+    assert mem.user_id == "usr-1"
+    assert mem.workspace_id == "ws-2"
+    assert mem.role == "owner"

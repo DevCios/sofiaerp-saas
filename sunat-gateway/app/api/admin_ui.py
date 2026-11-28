@@ -51,11 +51,25 @@ PANEL_HTML = r"""<!DOCTYPE html>
     .sb-top { padding: 12px 12px 8px 12px; }
     .sb-brand { display: flex; align-items: center; gap: 9px; padding: 2px 6px 10px 6px; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.01em; }
     .sb-brand-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--o20-primary); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+    .sb-ws-wrap { position: relative; margin-bottom: 8px; }
     .sb-ws-box {
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
       background: #FFFFFF; border: 1px solid var(--border); border-radius: 9px;
-      padding: 6px 10px; margin-bottom: 8px; font-size: 12.5px; font-weight: 600; color: var(--text);
+      padding: 6px 10px; font-size: 12.5px; font-weight: 600; color: var(--text); cursor: pointer;
     }
+    .sb-ws-box:hover { border-color: var(--o20-primary); }
+    .sb-ws-menu {
+      position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #FFFFFF;
+      border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 12px 28px rgba(15,23,42,.14);
+      padding: 6px; z-index: 50;
+    }
+    .sb-ws-opt {
+      width: 100%; border: none; background: transparent; border-radius: 7px; padding: 7px 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      font-size: 12.5px; color: var(--text); cursor: pointer; text-align: left;
+    }
+    .sb-ws-opt:hover { background: #F4F1FB; color: var(--o20-primary); }
+    .sb-ws-divider { height: 1px; background: var(--border); margin: 5px 0; }
     .sb-ws-avatar { width: 22px; height: 22px; border-radius: 6px; background: var(--o20-primary-soft); color: var(--o20-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
     .sb-env-toggle {
       display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #EFEFF4;
@@ -293,12 +307,20 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <span>API SUNAT</span>
       </div>
 
-      <div class="sb-ws-box">
-        <div style="display:flex;align-items:center;gap:8px;min-width:0">
-          <span id="sbWsAvatar" class="sb-ws-avatar">S</span>
-          <span id="workspaceBadge" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cargando...</span>
+      <div class="sb-ws-wrap">
+        <button type="button" class="sb-ws-box" onclick="toggleWsMenu()">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <span id="sbWsAvatar" class="sb-ws-avatar">A</span>
+            <span id="workspaceBadge" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Cargando...</span>
+          </div>
+          <span style="color:#9CA3AF;font-size:11px">⇅</span>
+        </button>
+        <div id="wsMenu" class="sb-ws-menu hidden">
+          <div id="wsMenuList"></div>
+          <div class="sb-ws-divider"></div>
+          <button type="button" class="sb-ws-opt" style="font-weight:600;color:var(--o20-primary)" onclick="openNewWsModal()"><span>+ Nuevo workspace</span></button>
+          <button type="button" class="sb-ws-opt" style="color:var(--muted)" onclick="closeWsMenu();openTab('workspaces')"><span>Administrar workspaces</span></button>
         </div>
-        <span style="color:#9CA3AF;font-size:11px">⇅</span>
       </div>
 
       <div class="sb-env-toggle">
@@ -813,7 +835,46 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         </div>
       </div>
     </div>
+
+    <!-- TAB 12: WORKSPACES (MULTI-WORKSPACE) -->
+    <div id="tab-workspaces" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0;font-size:21px;font-weight:700">Workspaces</h2>
+          <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted)">Cada workspace agrupa sus propios RUCs, API Keys, logs y plan de facturación.</p>
+        </div>
+        <button class="btn" onclick="openNewWsModal()">+ Nuevo workspace</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre / Slug</th>
+              <th>Origen</th>
+              <th>Plan</th>
+              <th>Cuota Mensual</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="workspacesTable"></tbody>
+        </table>
+      </div>
+    </div>
     </main>
+  </div>
+</div>
+
+<!-- Modal Crear Nuevo Workspace -->
+<div id="newWsModal" class="cmd-backdrop hidden" onclick="if(event.target===this) closeNewWsModal()">
+  <div class="cmd-box" style="padding:22px;max-width:420px">
+    <h3 style="margin:0 0 6px 0;font-size:17px">Nuevo workspace</h3>
+    <p style="margin:0 0 14px 0;font-size:12.5px;color:var(--muted)">Agrupa tus RUCs, claves API, webhooks y plan de forma aislada. Incluye 50 operaciones/mes gratis.</p>
+    <label>Nombre del workspace</label>
+    <input id="newWsName" placeholder="Ej. Cliente Comercial Lima S.A.C." style="margin-bottom:14px" />
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-sec btn-sm" onclick="closeNewWsModal()">Cancelar</button>
+      <button class="btn btn-sm" onclick="submitNewWorkspace()">Crear workspace</button>
+    </div>
   </div>
 </div>
 
@@ -947,8 +1008,51 @@ const TAB_LABELS = {
   lookup: 'Consultas RUC / DNI / TC',
   logs: 'Logs API / MCP',
   billing: 'Facturación y Planes',
+  workspaces: 'Workspaces',
   tester: 'Probador Rápido'
 };
+
+function toggleWsMenu() { document.getElementById('wsMenu').classList.toggle('hidden'); }
+function closeWsMenu() { document.getElementById('wsMenu').classList.add('hidden'); }
+function openNewWsModal() {
+  closeWsMenu();
+  document.getElementById('newWsName').value = '';
+  document.getElementById('newWsModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('newWsName').focus(), 20);
+}
+function closeNewWsModal() { document.getElementById('newWsModal').classList.add('hidden'); }
+
+async function submitNewWorkspace() {
+  const name = document.getElementById('newWsName').value.trim();
+  if (name.length < 2) { alert('Ingresa un nombre válido para el workspace.'); return; }
+  try {
+    const res = await api('/workspaces', { method: 'POST', body: JSON.stringify({ name }) });
+    if (res.access_token) {
+      TOKEN = res.access_token;
+      localStorage.setItem('sofia_gw_token', TOKEN);
+    }
+    closeNewWsModal();
+    await refreshAll();
+    openTab('desk');
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function switchWorkspace(wsId) {
+  closeWsMenu();
+  try {
+    const res = await api('/workspaces/' + wsId + '/switch', { method: 'POST' });
+    if (res.access_token) {
+      TOKEN = res.access_token;
+      localStorage.setItem('sofia_gw_token', TOKEN);
+      await refreshAll();
+      openTab('desk');
+    }
+  } catch (e) {
+    alert(e.message);
+  }
+}
 
 function toggleSidebar() {
   document.getElementById('consoleSidebar').classList.toggle('collapsed');
@@ -988,7 +1092,7 @@ document.addEventListener('keydown', e => {
 const DOCS_GROUP = new Set(['documents', 'summaries', 'contingencies', 'observations', 'tester']);
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'workspaces', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -1169,14 +1273,37 @@ async function refreshScopedData() {
 
 async function refreshAll() {
   refreshSunatHealth();
-  const [me, issuers, clients, billing, orders] = await Promise.all([
+  const [me, issuers, clients, billing, orders, workspaces] = await Promise.all([
     api('/auth/me'),
     api('/issuers'),
     api('/clients'),
     api('/billing/plans'),
     api('/billing/orders'),
+    api('/workspaces'),
   ]);
   ISSUERS_CACHE = issuers;
+
+  if (Array.isArray(workspaces)) {
+    document.getElementById('wsMenuList').innerHTML = workspaces.map(w => `
+      <button type="button" class="sb-ws-opt" onclick="switchWorkspace('${w.id}')">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.name}</span>
+        ${w.is_current ? '<span style="color:var(--o20-teal);font-weight:700">✓</span>' : `<span style="font-size:10.5px;color:#9CA3AF">${w.plan_name}</span>`}
+      </button>
+    `).join('') || '<div style="padding:6px 8px;font-size:12px;color:#9CA3AF">Sin workspaces creados</div>';
+
+    document.getElementById('workspacesTable').innerHTML = workspaces.map(w => `
+      <tr>
+        <td>
+          <strong>${w.name}</strong> ${w.is_current ? '<span class="badge b-info" style="margin-left:6px">Actual</span>' : ''}
+          <div style="font-size:11.5px;color:var(--muted)"><code>${w.slug}</code></div>
+        </td>
+        <td><span class="badge ${w.source === 'sofia_erp' ? 'b-info' : 'b-ok'}">${w.source === 'sofia_erp' ? 'SOFIA ERP' : 'Externo'}</span></td>
+        <td><strong>${w.plan_name}</strong></td>
+        <td>${(w.monthly_quota || 0).toLocaleString()} / mes</td>
+        <td>${w.is_current ? '<span style="font-size:12px;color:var(--muted)">En uso</span>' : `<button class="btn btn-sm btn-sec" onclick="switchWorkspace('${w.id}')">Cambiar →</button>`}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="color:var(--muted);text-align:center">Aún no hay workspaces. Crea uno con "+ Nuevo workspace".</td></tr>';
+  }
 
   if (me) {
     const h = new Date().getHours();

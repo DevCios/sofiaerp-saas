@@ -24,7 +24,7 @@ from app.api.deps import get_actor_workspace_id, get_gateway_admin, is_superadmi
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import create_workspace_user_jwt, hash_password
-from app.models import BillingOrder, GatewayUser, Issuer, Workspace
+from app.models import BillingOrder, GatewayUser, Issuer, Workspace, WorkspaceMember
 
 router = APIRouter(prefix="/api/v1", tags=["Workspaces & Billing"])
 settings = get_settings()
@@ -157,6 +157,8 @@ async def register_workspace(body: RegisterWorkspaceRequest, db: AsyncSession = 
         role="workspace_owner",
     )
     db.add(user)
+    await db.flush()
+    db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role="owner"))
     await db.commit()
 
     token = create_workspace_user_jwt(
@@ -338,6 +340,8 @@ async def sofia_sso_login(body: SofiaSSORequest, db: AsyncSession = Depends(get_
             role="workspace_owner",
         )
         db.add(user)
+        await db.flush()
+        db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role="owner"))
         await db.commit()
 
     token = create_workspace_user_jwt(
@@ -363,6 +367,147 @@ async def sofia_sso_login(body: SofiaSSORequest, db: AsyncSession = Depends(get_
             "monthly_quota": ws.monthly_quota,
         },
     }
+
+
+# ==============================================================================
+# 1C. Gestión Multi-Workspace (Listar, Crear y Cambiar de Workspace)
+# ==============================================================================
+class WorkspaceCreateRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=160)
+
+
+async def _ensure_user_memberships(db: AsyncSession, user_id: str) -> list[Workspace]:
+    """Retorna todos los workspaces activos del usuario (haciendo backfill de su workspace principal si faltara)."""
+    user = await db.get(GatewayUser, user_id)
+    if not user:
+        return []
+    mem_rows = (
+        await db.execute(select(WorkspaceMember.workspace_id).where(WorkspaceMember.user_id == user_id))
+    ).scalars().all()
+    ws_ids = list(mem_rows)
+    if user.workspace_id and user.workspace_id not in ws_ids:
+        db.add(WorkspaceMember(user_id=user.id, workspace_id=user.workspace_id, role="owner"))
+        await db.commit()
+        ws_ids.append(user.workspace_id)
+    if not ws_ids:
+        return []
+    res = await db.execute(
+        select(Workspace)
+        .where(Workspace.id.in_(ws_ids), Workspace.is_active.is_(True))
+        .order_by(Workspace.created_at.asc())
+    )
+    return list(res.scalars().all())
+
+
+@router.get("/workspaces")
+async def list_my_workspaces(actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    current_ws_id = get_actor_workspace_id(actor)
+    if is_superadmin(actor):
+        res = await db.execute(select(Workspace).where(Workspace.is_active.is_(True)).order_by(desc(Workspace.created_at)).limit(100))
+        workspaces = list(res.scalars().all())
+    else:
+        uid = actor.get("uid")
+        workspaces = await _ensure_user_memberships(db, uid) if uid else []
+    return [
+        {
+            "id": w.id,
+            "name": w.name,
+            "slug": w.slug,
+            "source": w.source,
+            "plan_name": w.plan_name,
+            "monthly_quota": w.monthly_quota,
+            "is_current": (w.id == current_ws_id),
+            "created_at": w.created_at.isoformat(),
+        }
+        for w in workspaces
+    ]
+
+
+@router.post("/workspaces", status_code=status.HTTP_201_CREATED)
+async def create_workspace(
+    body: WorkspaceCreateRequest,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    ws_name = body.name.strip()
+    ws = Workspace(
+        name=ws_name,
+        slug=_slugify(ws_name),
+        source="external",
+        plan_name="FREE",
+        monthly_quota=PLANS_CATALOG["FREE"]["monthly_quota"],
+    )
+    db.add(ws)
+    await db.flush()
+
+    new_token = None
+    if not is_superadmin(actor):
+        uid = actor.get("uid")
+        user = await db.get(GatewayUser, uid) if uid else None
+        if not user:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado.")
+        db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role="owner"))
+        user.workspace_id = ws.id
+        new_token = create_workspace_user_jwt(
+            email=user.email,
+            user_id=user.id,
+            workspace_id=ws.id,
+            workspace_name=ws.name,
+            full_name=user.full_name,
+        )
+    await db.commit()
+    return {
+        "workspace": {
+            "id": ws.id,
+            "name": ws.name,
+            "slug": ws.slug,
+            "plan_name": ws.plan_name,
+            "monthly_quota": ws.monthly_quota,
+        },
+        "access_token": new_token,
+    }
+
+
+@router.post("/workspaces/{workspace_id}/switch")
+async def switch_workspace(
+    workspace_id: str,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    ws = await db.get(Workspace, workspace_id)
+    if not ws or not ws.is_active:
+        raise HTTPException(status_code=404, detail="Workspace no encontrado.")
+
+    if is_superadmin(actor):
+        # Superadmin puede inspeccionar cualquier Workspace generando un JWT acotado a ese Workspace
+        token = create_workspace_user_jwt(
+            email=actor.get("sub") or settings.GATEWAY_ADMIN_EMAIL,
+            user_id="superadmin",
+            workspace_id=ws.id,
+            workspace_name=ws.name,
+            full_name="Admin",
+        )
+        return {"access_token": token, "workspace": {"id": ws.id, "name": ws.name, "slug": ws.slug, "plan_name": ws.plan_name}}
+
+    uid = actor.get("uid")
+    user = await db.get(GatewayUser, uid) if uid else None
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuario no encontrado.")
+
+    workspaces = await _ensure_user_memberships(db, user.id)
+    if not any(w.id == ws.id for w in workspaces):
+        raise HTTPException(status_code=403, detail="No perteneces a este Workspace.")
+
+    user.workspace_id = ws.id
+    await db.commit()
+    token = create_workspace_user_jwt(
+        email=user.email,
+        user_id=user.id,
+        workspace_id=ws.id,
+        workspace_name=ws.name,
+        full_name=user.full_name,
+    )
+    return {"access_token": token, "workspace": {"id": ws.id, "name": ws.name, "slug": ws.slug, "plan_name": ws.plan_name}}
 
 
 # ==============================================================================

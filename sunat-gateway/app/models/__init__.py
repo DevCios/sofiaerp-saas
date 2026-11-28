@@ -75,6 +75,20 @@ class GatewayUser(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 
+class WorkspaceMember(Base):
+    """Membresía N:M entre GatewayUser y Workspace para soporte Multi-Workspace."""
+    __tablename__ = "workspace_members"
+    __table_args__ = (
+        UniqueConstraint("user_id", "workspace_id", name="uq_workspace_member_user_ws"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("gateway_users.id"), index=True, nullable=False)
+    workspace_id: Mapped[str] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=False)
+    role: Mapped[str] = mapped_column(String(32), default="owner", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
 class BillingOrder(Base):
     """Orden de compra / recarga de plan vía Mercado Pago Checkout Pro."""
     __tablename__ = "billing_orders"
