@@ -118,6 +118,9 @@ def _get_mp_webhook_secret() -> str:
 def _verify_mp_signature(request: Request, data_id: str) -> bool:
     secret = _get_mp_webhook_secret()
     if not secret:
+        if settings.ENVIRONMENT == "production":
+            _logger.error("MP_WEBHOOK_SECRET no configurado en producción; webhook rechazado (fail-closed).")
+            return False
         return True
     x_sig = request.headers.get("x-signature", "")
     x_req_id = request.headers.get("x-request-id", "")
@@ -137,22 +140,26 @@ def _verify_mp_signature(request: Request, data_id: str) -> bool:
 
 async def apply_paid_order_upgrade(db: AsyncSession, order: BillingOrder, mp_payment_id: str) -> None:
     """Aplica de forma idempotente el upgrade de plan al Workspace y a sus Issuers."""
-    if order.status == "PAID":
+    locked = (
+        await db.execute(select(BillingOrder).where(BillingOrder.id == order.id).with_for_update())
+    ).scalar_one_or_none()
+    if not locked or locked.status == "PAID":
         return
     now = datetime.now(timezone.utc)
-    order.status = "PAID"
-    order.mp_payment_id = mp_payment_id
-    order.paid_at = now
+    locked.status = "PAID"
+    locked.mp_payment_id = mp_payment_id
+    locked.paid_at = now
 
-    ws = await db.get(Workspace, order.workspace_id)
+    duration_days = 365 if getattr(locked, "billing_cycle", "monthly") == "yearly" else 30
+    ws = await db.get(Workspace, locked.workspace_id)
     if ws:
-        ws.plan_name = order.plan_code
-        ws.monthly_quota = order.quota_granted
-        ws.plan_expires_at = now + timedelta(days=30)
+        ws.plan_name = locked.plan_code
+        ws.monthly_quota = locked.quota_granted
+        ws.plan_expires_at = now + timedelta(days=duration_days)
         await db.execute(
             update(Issuer)
             .where(Issuer.workspace_id == ws.id)
-            .values(plan_name=order.plan_code, monthly_quota=order.quota_granted)
+            .values(plan_name=locked.plan_code, monthly_quota=locked.quota_granted)
         )
     await db.commit()
 
@@ -403,12 +410,22 @@ async def sofia_sso_login(body: SofiaSSORequest, db: AsyncSession = Depends(get_
         db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role="owner"))
         await db.commit()
 
+    mem = (
+        await db.execute(
+            select(WorkspaceMember).where(
+                WorkspaceMember.user_id == user.id,
+                WorkspaceMember.workspace_id == ws.id,
+            )
+        )
+    ).scalar_one_or_none()
+    ws_role = mem.role if mem else ("owner" if user.role == "workspace_owner" else "member")
     token = create_workspace_user_jwt(
         email=user.email,
         user_id=user.id,
         workspace_id=ws.id,
         workspace_name=ws.name,
         full_name=user.full_name,
+        ws_role=ws_role,
     )
     return {
         "access_token": token,
@@ -926,6 +943,7 @@ async def create_billing_checkout(
     order = BillingOrder(
         workspace_id=ws.id,
         plan_code=plan["code"],
+        billing_cycle=body.billing_cycle,
         quota_granted=plan["monthly_quota"],
         amount_pen=amount,
         status="PENDING",
@@ -975,14 +993,15 @@ async def create_billing_checkout(
     return {
         "order_id": order.id,
         "plan_code": plan["code"],
-        "amount_pen": plan["price_pen"],
+        "billing_cycle": body.billing_cycle,
+        "amount_pen": amount,
         "checkout_url": pdata.get("init_point") or pdata.get("sandbox_init_point"),
     }
 
 
 async def _verify_mp_payment_and_apply(db: AsyncSession, order: BillingOrder, payment_id: str) -> bool:
     access_token = _get_mp_access_token()
-    if not access_token or not payment_id:
+    if not access_token or not payment_id or not payment_id.isdigit():
         return False
     # Idempotencia por payment_id
     dup = (await db.execute(select(BillingOrder).where(BillingOrder.mp_payment_id == payment_id))).scalar_one_or_none()
@@ -996,8 +1015,11 @@ async def _verify_mp_payment_and_apply(db: AsyncSession, order: BillingOrder, pa
     if r.status_code != 200:
         return False
     pdata = r.json()
+    expected_ref = f"GW-PLAN-{order.id}"
     paid = float(pdata.get("transaction_amount") or 0.0)
-    if pdata.get("status") == "approved" and paid + 0.05 >= float(order.amount_pen):
+    currency_ok = (pdata.get("currency_id") or "PEN").upper() == "PEN"
+    ref_ok = (pdata.get("external_reference") or "") == expected_ref
+    if pdata.get("status") == "approved" and ref_ok and currency_ok and paid + 0.05 >= float(order.amount_pen):
         await apply_paid_order_upgrade(db, order, payment_id)
         return True
     return False

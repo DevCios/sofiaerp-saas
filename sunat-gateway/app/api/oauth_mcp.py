@@ -185,8 +185,6 @@ async def oauth_authorize_form(
     if not client or redirect_uri not in (client.redirect_uris or []):
         raise HTTPException(status_code=400, detail="client_id o redirect_uri no registrado.")
 
-    res = await db.execute(select(Issuer).where(Issuer.is_active.is_(True)))
-    issuers = list(res.scalars().all())
     return HTMLResponse(
         _render_consent_html(
             client_name=client.client_name,
@@ -195,7 +193,7 @@ async def oauth_authorize_form(
             state=state,
             code_challenge=code_challenge,
             code_challenge_method=code_challenge_method,
-            issuers=issuers,
+            issuers=[],
         )
     )
 
@@ -343,19 +341,20 @@ async def list_ai_connections(
     ws_id = get_actor_workspace_id(actor)
     items = []
 
-    # Clientes OAuth 2.1 registrados
-    oc_res = await db.execute(select(OAuthClient).order_by(OAuthClient.created_at.desc()).limit(30))
-    for oc in oc_res.scalars().all():
-        items.append(
-            {
-                "id": oc.id,
-                "kind": "oauth",
-                "app_name": oc.client_name,
-                "auth_type": "OAuth 2.1 PKCE",
-                "detail": oc.id[:18] + "...",
-                "connected_at": oc.created_at.isoformat(),
-            }
-        )
+    # Clientes OAuth 2.1 globales (solo visibles para Superadmin; workspaces ven sus API Keys)
+    if not ws_id:
+        oc_res = await db.execute(select(OAuthClient).order_by(OAuthClient.created_at.desc()).limit(30))
+        for oc in oc_res.scalars().all():
+            items.append(
+                {
+                    "id": oc.id,
+                    "kind": "oauth",
+                    "app_name": oc.client_name,
+                    "auth_type": "OAuth 2.1 PKCE",
+                    "detail": oc.id[:18] + "...",
+                    "connected_at": oc.created_at.isoformat(),
+                }
+            )
 
     # API Keys activas del workspace
     cli_stmt = select(ApiClient).where(ApiClient.is_active.is_(True)).order_by(ApiClient.created_at.desc()).limit(30)
@@ -379,9 +378,11 @@ async def list_ai_connections(
 @router.delete("/api/v1/connectors/oauth/{client_id}")
 async def delete_oauth_connection(
     client_id: str,
-    _actor: dict = Depends(get_gateway_admin),
+    actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    if get_actor_workspace_id(actor):
+        raise HTTPException(status_code=403, detail="Solo el administrador de plataforma puede eliminar clientes OAuth globales.")
     oc = await db.get(OAuthClient, client_id)
     if not oc:
         raise HTTPException(status_code=404, detail="Conexión OAuth no encontrada.")

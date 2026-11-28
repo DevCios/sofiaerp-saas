@@ -44,6 +44,7 @@ async def lifespan(_app: FastAPI):
         await conn.execute(text("ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS source VARCHAR(24) NOT NULL DEFAULT 'external'"))
         await conn.execute(text("ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS billing_profile JSONB"))
         await conn.execute(text("ALTER TABLE gateway_users ADD COLUMN IF NOT EXISTS auth_provider VARCHAR(24) NOT NULL DEFAULT 'local'"))
+        await conn.execute(text("ALTER TABLE billing_orders ADD COLUMN IF NOT EXISTS billing_cycle VARCHAR(16) NOT NULL DEFAULT 'monthly'"))
     yield
     await async_engine.dispose()
 

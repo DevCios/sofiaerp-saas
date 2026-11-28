@@ -121,9 +121,9 @@ def test_workspace_member_model_and_create_request():
 
 
 def test_insecure_secret_warnings_detection():
-    from app.core.config import GatewaySettings
+    from app.core.config import Settings
 
-    weak = GatewaySettings(
+    weak = Settings(
         SUNAT_VAULT_MASTER_KEY="sofia_change_vault_master_key_in_env",
         GATEWAY_JWT_SECRET="short",
         INTERNAL_SERVICE_KEY="sofia_internal_mesh_key_change_in_prod",
@@ -132,7 +132,7 @@ def test_insecure_secret_warnings_detection():
     warnings = weak.get_insecure_secret_warnings()
     assert len(warnings) == 4
 
-    strong = GatewaySettings(
+    strong = Settings(
         SUNAT_VAULT_MASTER_KEY="A9x!kP2#mQ7$vL4@nR8&wZ5*cB3^yT6%",
         GATEWAY_JWT_SECRET="J8d@pK4#sW9$xM2!qF7&bN5*hV3^cL6%",
         INTERNAL_SERVICE_KEY="M3z!tR6#yP8$kN2@wQ5&vD9*jH4^bF7%",

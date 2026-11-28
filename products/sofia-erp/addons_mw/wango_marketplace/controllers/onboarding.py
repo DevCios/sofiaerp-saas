@@ -21,7 +21,7 @@ class MarketplaceOnboarding(http.Controller):
                 'vat': post.get('vat'),
                 'company_type': 'company',
                 'is_marketplace_seller': True,
-                'marketplace_status': 'pending',
+                'marketplace_seller_status': 'pending',
                 'comment': f"Solicitud web.\nNombre Contacto: {post.get('name')}\nCategoría de interés: {post.get('category', 'No especificada')}"
             }
             # Se usa sudo() porque el usuario público no tiene permisos para crear partners vendedores

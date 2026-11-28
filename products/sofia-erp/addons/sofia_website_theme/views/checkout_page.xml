@@ -1005,20 +1005,20 @@
                                 Tu base de datos aislada y entorno cloud han sido aprovisionados en:
                             </p>
                             <div class="p-3 bg-white rounded-3 border fw-bold text-dark text-center fs-5 mb-3" style="color: #7D1A6A !important;">
-                                https://<span t-esc="subdomain"/>.sofiaerp.com
+                                https://<span t-out="subdomain"/>.sofiaerp.com
                             </div>
                             
                             <div class="p-3 bg-white rounded-3 border mb-3">
                                 <div class="row g-2 small">
                                     <div class="col-sm-4 text-muted">Subdominio:</div>
-                                    <div class="col-sm-8 fw-bold text-dark">https://<span t-esc="subdomain"/>.sofiaerp.com</div>
+                                    <div class="col-sm-8 fw-bold text-dark">https://<span t-out="subdomain"/>.sofiaerp.com</div>
                                     <t t-if="admin_email">
                                         <div class="col-sm-4 text-muted">Usuario Administrador:</div>
-                                        <div class="col-sm-8 fw-bold text-dark"><span t-esc="admin_email"/></div>
+                                        <div class="col-sm-8 fw-bold text-dark"><span t-out="admin_email"/></div>
                                     </t>
                                     <t t-if="temp_password">
                                         <div class="col-sm-4 text-muted">Contraseña Temporal:</div>
-                                        <div class="col-sm-8 fw-bold font-monospace" style="color: #7D1A6A;"><span t-esc="temp_password"/></div>
+                                        <div class="col-sm-8 fw-bold font-monospace" style="color: #7D1A6A;"><span t-out="temp_password"/></div>
                                     </t>
                                 </div>
                             </div>

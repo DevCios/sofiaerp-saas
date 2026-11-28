@@ -56,6 +56,19 @@ class SofiaAuthController(http.Controller):
             if not user_email:
                 return request.redirect('/web/login?error=invalid_token_payload')
 
+            # 1B. Validación estricta de Tenant (bloquea replay cross-tenant entre bases de datos)
+            current_db = request.env.cr.dbname
+            token_db = (payload.get('target_db') or payload.get('database_name') or '').strip()
+            token_slug = (payload.get('tenant_slug') or '').strip().lower()
+            expected_db = token_db or (f"sofia_tenant_{token_slug.replace('-', '_')}" if token_slug else '')
+            is_platform_superadmin = "PLATFORM_SUPERADMIN" in roles
+            if not is_platform_superadmin and (not expected_db or expected_db != current_db):
+                _logger.warning(
+                    "SSO cross-tenant bloqueado: email=%s token_db=%s current_db=%s",
+                    user_email, expected_db or '(empty)', current_db,
+                )
+                return request.redirect('/web/login?error=tenant_mismatch')
+
             # 2. Búsqueda o autoprovisionamiento de usuario local
             env = request.env(user=http.ROOT_USER)
             user = env['res.users'].sudo().search([('login', '=', user_email)], limit=1)
@@ -78,7 +91,7 @@ class SofiaAuthController(http.Controller):
                     'sofia_last_sync': datetime.now(),
                 }
                 if groups_to_assign:
-                    user_vals['groups_id'] = [(6, 0, groups_to_assign)]
+                    user_vals['group_ids'] = [(6, 0, groups_to_assign)]
 
                 user = env['res.users'].sudo().create(user_vals)
                 _logger.info("Usuario Odoo autoprovisionado vía SOFIA Central: %s", user_email)
@@ -89,7 +102,7 @@ class SofiaAuthController(http.Controller):
                     'sofia_last_sync': datetime.now(),
                 }
                 if groups_to_assign:
-                    update_vals['groups_id'] = [(4, gid) for gid in groups_to_assign]
+                    update_vals['group_ids'] = [(4, gid) for gid in groups_to_assign]
                 user.sudo().write(update_vals)
 
             # 3. Autenticación y creación de sesión Odoo

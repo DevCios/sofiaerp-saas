@@ -42,6 +42,7 @@ from app.models import (
     Issuer,
     WebhookLog,
     Workspace,
+    WorkspaceMember,
 )
 from app.schemas import (
     AdminLoginRequest,
@@ -76,7 +77,6 @@ async def health():
         "status": "ok",
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "security_warnings_count": len(settings.get_insecure_secret_warnings()),
     }
 
 
@@ -116,6 +116,26 @@ async def _get_workspace_rucs(db: AsyncSession, actor: Optional[dict]) -> Option
     return [r[0] for r in rows.all()]
 
 
+async def _assert_actor_ruc_access(
+    db: AsyncSession,
+    api_client: Optional[ApiClient],
+    actor: Optional[dict],
+    issuer_ruc: str,
+) -> None:
+    """Valida aislamiento estricto por ApiClient (allowed_rucs + workspace_id) y por Workspace JWT."""
+    assert_ruc_access(api_client, issuer_ruc)
+    ws_id = (api_client.workspace_id if api_client else None) or get_actor_workspace_id(actor)
+    if ws_id:
+        row = await db.execute(
+            select(Issuer.id).where(Issuer.ruc == issuer_ruc, Issuer.workspace_id == ws_id)
+        )
+        if not row.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"No tienes permisos para acceder al RUC {issuer_ruc}.",
+            )
+
+
 # ==============================================================================
 # 2. Autenticación del Panel Web (Superadmin + Usuarios de Workspace)
 # ==============================================================================
@@ -135,12 +155,22 @@ async def admin_login(body: AdminLoginRequest, db: AsyncSession = Depends(get_db
         ws = await db.get(Workspace, user.workspace_id)
         if not ws or not ws.is_active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Workspace inactivo.")
+        mem = (
+            await db.execute(
+                select(WorkspaceMember).where(
+                    WorkspaceMember.user_id == user.id,
+                    WorkspaceMember.workspace_id == ws.id,
+                )
+            )
+        ).scalar_one_or_none()
+        ws_role = mem.role if mem else ("owner" if user.role == "workspace_owner" else "member")
         token = create_workspace_user_jwt(
             email=user.email,
             user_id=user.id,
             workspace_id=ws.id,
             workspace_name=ws.name,
             full_name=user.full_name,
+            ws_role=ws_role,
         )
         return {
             "access_token": token,
@@ -589,10 +619,13 @@ async def purge_issuer_beta_documents(
 
 
 @router.delete("/issuers/{issuer_id}", tags=["Issuers"])
-async def toggle_issuer(issuer_id: str, _admin: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+async def toggle_issuer(issuer_id: str, actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
     issuer = await db.get(Issuer, issuer_id)
     if not issuer:
         raise HTTPException(status_code=404, detail="Empresa emisora no encontrada.")
+    ws_id = get_actor_workspace_id(actor)
+    if ws_id and issuer.workspace_id != ws_id:
+        raise HTTPException(status_code=403, detail="No tienes permisos sobre esta empresa emisora.")
     issuer.is_active = not issuer.is_active
     await db.commit()
     return {"id": issuer.id, "is_active": issuer.is_active}
@@ -957,8 +990,8 @@ async def lookup_document_by_number(
     db: AsyncSession = Depends(get_db),
 ):
     """Consulta estado y CDR XML por (RUC, tipo, serie, correlativo) para sincronización desde SOFIA ERP."""
-    api_client, _admin = auth
-    assert_ruc_access(api_client, issuer_ruc)
+    api_client, actor = auth
+    await _assert_actor_ruc_access(db, api_client, actor, issuer_ruc)
     clean_corr = (correlativo.strip().lstrip("0") or "1").zfill(8)
     res = await db.execute(
         select(Document).where(
@@ -1038,11 +1071,11 @@ async def list_documents(
 
 @router.get("/documents/{doc_id}", tags=["Documents"])
 async def get_document(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
-    api_client, _admin = auth
+    api_client, actor = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
-    assert_ruc_access(api_client, doc.issuer_ruc)
+    await _assert_actor_ruc_access(db, api_client, actor, doc.issuer_ruc)
     att_res = await db.execute(
         select(DeliveryAttempt).where(DeliveryAttempt.document_id == doc.id).order_by(desc(DeliveryAttempt.attempt_number))
     )
@@ -1084,33 +1117,33 @@ async def get_document(doc_id: str, auth=Depends(get_api_client_or_admin), db: A
 
 @router.post("/documents/{doc_id}/retry", tags=["Documents"])
 async def retry_document(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
-    api_client, _admin = auth
+    api_client, actor = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
-    assert_ruc_access(api_client, doc.issuer_ruc)
+    await _assert_actor_ruc_access(db, api_client, actor, doc.issuer_ruc)
     dispatch_document_task.delay(doc.id, force=True)
     return {"document_id": doc.id, "queued": True, "action": "sendBill"}
 
 
 @router.post("/documents/{doc_id}/recover-cdr", tags=["Documents"])
 async def recover_document_cdr(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
-    api_client, _admin = auth
+    api_client, actor = auth
     doc = await db.get(Document, doc_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Comprobante no encontrado.")
-    assert_ruc_access(api_client, doc.issuer_ruc)
+    await _assert_actor_ruc_access(db, api_client, actor, doc.issuer_ruc)
     recover_cdr_task.delay(doc.id)
     return {"document_id": doc.id, "queued": True, "action": "getStatusCdr"}
 
 
 @router.get("/documents/{doc_id}/xml", tags=["Documents"])
 async def download_xml(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
-    api_client, _admin = auth
+    api_client, actor = auth
     doc = await db.get(Document, doc_id)
     if not doc or not doc.xml_path or not Path(doc.xml_path).exists():
         raise HTTPException(status_code=404, detail="XML no disponible.")
-    assert_ruc_access(api_client, doc.issuer_ruc)
+    await _assert_actor_ruc_access(db, api_client, actor, doc.issuer_ruc)
     return Response(
         content=Path(doc.xml_path).read_bytes(),
         media_type="application/xml",
@@ -1120,11 +1153,11 @@ async def download_xml(doc_id: str, auth=Depends(get_api_client_or_admin), db: A
 
 @router.get("/documents/{doc_id}/cdr", tags=["Documents"])
 async def download_cdr(doc_id: str, auth=Depends(get_api_client_or_admin), db: AsyncSession = Depends(get_db)):
-    api_client, _admin = auth
+    api_client, actor = auth
     doc = await db.get(Document, doc_id)
     if not doc or not doc.cdr_path or not Path(doc.cdr_path).exists():
         raise HTTPException(status_code=404, detail="CDR aún no emitido por SUNAT.")
-    assert_ruc_access(api_client, doc.issuer_ruc)
+    await _assert_actor_ruc_access(db, api_client, actor, doc.issuer_ruc)
     cdr_name = Path(doc.cdr_path).name
     return Response(
         content=Path(doc.cdr_path).read_bytes(),

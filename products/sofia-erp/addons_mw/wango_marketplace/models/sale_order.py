@@ -106,6 +106,7 @@ class SaleOrder(models.Model):
                 continue
 
             new_order_vals = self.copy_data({
+                'order_line': False,
                 'marketplace_seller_id': seller.id,
                 'marketplace_platform_fee': DEFAULT_PLATFORM_FEE,
                 'origin': self.name,

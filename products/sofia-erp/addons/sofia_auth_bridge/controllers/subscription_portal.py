@@ -33,19 +33,22 @@ class SofiaTenantSubscriptionPortal(http.Controller):
             ('id', '!=', 1),
         ])
 
-        icp = request.env['ir.config_parameter'].sudo()
+        def _get_icp(key, default=''):
+            rec = request.env['ir.config_parameter'].sudo().search([('key', '=', key)], limit=1)
+            return rec.value if (rec and rec.value) else default
+
         base_url = (
-            icp.get_param('sofia.control_plane_url')
+            _get_icp('sofia.control_plane_url')
             or os.getenv('SOFIA_CONTROL_PLANE_URL', 'http://control-plane-api:8000')
         ).rstrip('/')
 
         # Valores por defecto seguros (resiliencia offline)
-        plan_code = icp.get_param('sofia.entitlements.plan_code', 'PYME-PRO')
+        plan_code = _get_icp('sofia.entitlements.plan_code', 'PYME-PRO')
         tier = 'PROFESSIONAL'
         sub_status = 'ACTIVE'
         is_grace_period = False
         try:
-            max_users = int(icp.get_param('sofia.entitlements.max_users', '5'))
+            max_users = int(_get_icp('sofia.entitlements.max_users', '5'))
         except ValueError:
             max_users = 5
         storage_gb = 20
@@ -88,7 +91,7 @@ class SofiaTenantSubscriptionPortal(http.Controller):
 
         usage_pct = min(100, int((active_users / max_users) * 100)) if max_users > 0 else 0
         central_url = (
-            icp.get_param('sofia.central_web_url')
+            _get_icp('sofia.central_web_url')
             or os.getenv('SOFIA_CENTRAL_WEB_URL', SOFIA_CENTRAL_PORTAL_URL)
         ).rstrip('/')
 

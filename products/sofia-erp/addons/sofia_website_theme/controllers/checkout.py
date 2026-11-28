@@ -232,7 +232,11 @@ class SofiaCheckoutController(http.Controller):
                     _logger.warning("No se pudo registrar lead en CRM: %s", ex)
 
             # 4. Consultar credenciales de Mercado Pago (desde Odoo payment.provider, ir.config_parameter o ENV)
-            base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url', 'https://sofiaerp.com').rstrip('/')
+            def _icp(key, default=''):
+                rec = request.env['ir.config_parameter'].sudo().search([('key', '=', key)], limit=1)
+                return rec.value if (rec and rec.value) else default
+
+            base_url = _icp('web.base.url', 'https://sofiaerp.com').rstrip('/')
             access_token = None
             is_sandbox = False
 
@@ -250,8 +254,8 @@ class SofiaCheckoutController(http.Controller):
 
             # Si no está en el provider, buscar en Parámetros del Sistema o Variable de Entorno
             if not access_token:
-                access_token = request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
-                if access_token and (access_token.startswith('TEST-') or request.env['ir.config_parameter'].sudo().get_param('mercadopago.sandbox', '').lower() in ['true', '1']):
+                access_token = _icp('mercadopago.access_token') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
+                if access_token and (access_token.startswith('TEST-') or _icp('mercadopago.sandbox', '').lower() in ['true', '1']):
                     is_sandbox = True
 
             # Generar preferencia real en Mercado Pago si tiene credenciales configuradas
@@ -353,23 +357,19 @@ class SofiaCheckoutController(http.Controller):
                     or getattr(mp_provider, 'mp_access_token', None)
                 )
         if not access_token:
-            access_token = (
-                request.env['ir.config_parameter'].sudo().get_param('mercadopago.access_token')
-                or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
-            )
+            rec = request.env['ir.config_parameter'].sudo().search([('key', '=', 'mercadopago.access_token')], limit=1)
+            access_token = (rec.value if rec else '') or os.getenv('MERCADOPAGO_ACCESS_TOKEN')
         return access_token
 
     def _verify_mp_webhook_signature(self, data_id):
         """
-        Valida la firma HMAC-SHA256 (x-signature) de Mercado Pago si hay webhook_secret configurado.
-        Retorna True si es válida o si no hay secreto configurado (en cuyo caso se valida vía API MP).
+        Valida la firma HMAC-SHA256 (x-signature) de Mercado Pago en modo fail-closed.
         """
-        webhook_secret = (
-            request.env['ir.config_parameter'].sudo().get_param('mercadopago.webhook_secret')
-            or os.getenv('MERCADOPAGO_WEBHOOK_SECRET')
-        )
+        rec = request.env['ir.config_parameter'].sudo().search([('key', '=', 'mercadopago.webhook_secret')], limit=1)
+        webhook_secret = (rec.value if rec else '') or os.getenv('MERCADOPAGO_WEBHOOK_SECRET')
         if not webhook_secret:
-            return True
+            _logger.error("SOFIA ERP MP webhook: MERCADOPAGO_WEBHOOK_SECRET no configurado (rechazado fail-closed).")
+            return False
 
         x_signature = request.httprequest.headers.get('x-signature', '')
         x_request_id = request.httprequest.headers.get('x-request-id', '')
@@ -518,10 +518,8 @@ class SofiaCheckoutController(http.Controller):
                 )
         else:
             # Solo permitir modo demo si está explícitamente habilitado en parámetros del sistema
-            allow_demo = (
-                request.env['ir.config_parameter'].sudo().get_param('sofia.allow_demo_checkout', 'False').lower()
-                in ['true', '1']
-            )
+            demo_rec = request.env['ir.config_parameter'].sudo().search([('key', '=', 'sofia.allow_demo_checkout')], limit=1)
+            allow_demo = ((demo_rec.value if demo_rec else 'False') or 'False').lower() in ['true', '1']
             if mode == 'demo' and allow_demo and subdomain:
                 plan_code_map = {
                     'emprendedor': 'SOFIA-PLAN-EMP',

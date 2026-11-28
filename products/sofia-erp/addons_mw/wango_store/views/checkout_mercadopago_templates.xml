@@ -231,7 +231,7 @@
                 <t t-if="request.params.get('error') == 'mp_not_configured'">
                     <div class="alert alert-warning d-flex align-items-center gap-2 mb-3" style="border-radius: 12px; font-size: 0.9rem;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        <span>Mercado Pago aún no tiene credenciales configuradas en este entorno. Configura <code>MP_ACCESS_TOKEN</code> o usa el checkout clásico.</span>
+                        <span>Mercado Pago aún no está disponible en este entorno. Usa el checkout clásico o contáctanos por soporte.</span>
                     </div>
                 </t>
 
@@ -262,6 +262,7 @@
                             <!-- Columna Izquierda: Entrega + CTA Pago -->
                             <div class="col-lg-7 d-flex flex-column justify-content-between">
                                 <form action="/shop/mercadopago/set_delivery" method="post" id="mw_express_checkout_form">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                                     <div class="fw-bold mb-2" style="font-size: 0.85rem; color: #475569; text-transform: uppercase; letter-spacing: 0.04em;">
                                         1. ¿Cómo deseas recibir tu pedido?
                                     </div>

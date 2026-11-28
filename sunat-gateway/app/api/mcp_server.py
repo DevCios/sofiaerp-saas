@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import assert_ruc_access, get_api_client_or_admin
+from app.api.deps import assert_ruc_access, get_actor_workspace_id, get_api_client_or_admin
 from app.api.v1.routes import emit_document as v1_emit_document
 from app.core.config import get_settings
 from app.core.database import get_db
@@ -333,7 +333,8 @@ async def _execute_mcp_tool(
     auth: tuple[Optional[ApiClient], Optional[dict]],
     db: AsyncSession,
 ) -> dict[str, Any]:
-    api_client, _admin = auth
+    api_client, actor = auth
+    ws_id = (api_client.workspace_id if api_client else None) or get_actor_workspace_id(actor)
 
     if tool_name == "calculate_totals_igv":
         items = arguments.get("items") or []
@@ -346,6 +347,8 @@ async def _execute_mcp_tool(
 
     if tool_name == "list_issuers":
         stmt = select(Issuer).where(Issuer.is_active.is_(True)).order_by(desc(Issuer.created_at))
+        if ws_id:
+            stmt = stmt.where(Issuer.workspace_id == ws_id)
         if api_client and api_client.allowed_rucs:
             stmt = stmt.where(Issuer.ruc.in_(api_client.allowed_rucs))
         res = await db.execute(stmt)
@@ -370,12 +373,26 @@ async def _execute_mcp_tool(
         status_filter = arguments.get("status")
         limit = min(max(int(arguments.get("limit", 20)), 1), 100)
         stmt = select(Document).order_by(desc(Document.created_at)).limit(limit)
+        ws_rucs: Optional[list[str]] = None
+        if ws_id:
+            ws_rows = await db.execute(select(Issuer.ruc).where(Issuer.workspace_id == ws_id))
+            ws_rucs = [r[0] for r in ws_rows.all()]
         if api_client and api_client.allowed_rucs:
             if ruc:
                 assert_ruc_access(api_client, ruc)
+                if ws_rucs is not None and ruc not in ws_rucs:
+                    raise PermissionError(f"Sin permisos para el RUC {ruc}.")
                 stmt = stmt.where(Document.issuer_ruc == ruc)
             else:
-                stmt = stmt.where(Document.issuer_ruc.in_(api_client.allowed_rucs))
+                allowed = [r for r in api_client.allowed_rucs if ws_rucs is None or r in ws_rucs]
+                stmt = stmt.where(Document.issuer_ruc.in_(allowed or ["__none__"]))
+        elif ws_rucs is not None:
+            if ruc:
+                if ruc not in ws_rucs:
+                    raise PermissionError(f"Sin permisos para el RUC {ruc}.")
+                stmt = stmt.where(Document.issuer_ruc == ruc)
+            else:
+                stmt = stmt.where(Document.issuer_ruc.in_(ws_rucs or ["__none__"]))
         elif ruc:
             stmt = stmt.where(Document.issuer_ruc == ruc)
         if status_filter:
@@ -405,6 +422,10 @@ async def _execute_mcp_tool(
     if tool_name == "lookup_document":
         issuer_ruc = str(arguments["issuer_ruc"]).strip()
         assert_ruc_access(api_client, issuer_ruc)
+        if ws_id:
+            ws_check = await db.execute(select(Issuer.id).where(Issuer.ruc == issuer_ruc, Issuer.workspace_id == ws_id))
+            if not ws_check.scalar_one_or_none():
+                raise PermissionError(f"Sin permisos para consultar el RUC {issuer_ruc}.")
         doc_type = str(arguments["doc_type"]).strip()
         serie = str(arguments["serie"]).strip().upper()
         clean_corr = (str(arguments["correlativo"]).strip().lstrip("0") or "1").zfill(8)

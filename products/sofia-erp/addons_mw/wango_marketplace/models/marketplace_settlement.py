@@ -64,14 +64,17 @@ class MarketplaceSettlement(models.Model):
     )
 
     def action_fetch_lines(self):
+        from datetime import datetime, time
         for rec in self:
             if rec.state != 'draft':
                 continue
+            dt_start = datetime.combine(rec.date_start, time.min)
+            dt_end = datetime.combine(rec.date_end, time.max)
             domain = [
                 ('order_id.marketplace_seller_id', '=', rec.seller_id.id),
                 ('order_id.state', 'in', ['sale', 'done']),
-                ('order_id.date_order', '>=', rec.date_start),
-                ('order_id.date_order', '<=', rec.date_end),
+                ('order_id.date_order', '>=', dt_start),
+                ('order_id.date_order', '<=', dt_end),
                 ('marketplace_settlement_id', '=', False),
             ]
             lines = self.env['sale.order.line'].search(domain)

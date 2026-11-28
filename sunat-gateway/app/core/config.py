@@ -62,19 +62,19 @@ class Settings(BaseSettings):
     DNI_CACHE_TTL_DAYS: int = 30
 
     def get_insecure_secret_warnings(self) -> list[str]:
-        """Detecta secretos por defecto inseguros en entorno de producción."""
+        """Detecta secretos por defecto o débiles en entorno de producción."""
         warnings: list[str] = []
         checks = {
-            "SUNAT_VAULT_MASTER_KEY": self.SUNAT_VAULT_MASTER_KEY,
-            "GATEWAY_JWT_SECRET": self.GATEWAY_JWT_SECRET,
-            "INTERNAL_SERVICE_KEY": self.INTERNAL_SERVICE_KEY,
-            "GATEWAY_ADMIN_PASSWORD": self.GATEWAY_ADMIN_PASSWORD,
+            "SUNAT_VAULT_MASTER_KEY": (self.SUNAT_VAULT_MASTER_KEY, 24),
+            "GATEWAY_JWT_SECRET": (self.GATEWAY_JWT_SECRET, 24),
+            "INTERNAL_SERVICE_KEY": (self.INTERNAL_SERVICE_KEY, 24),
+            "GATEWAY_ADMIN_PASSWORD": (self.GATEWAY_ADMIN_PASSWORD, 12),
         }
-        markers = ("change_me", "change_in_prod", "sofiaadmin2026", "sofiagateway2026", "changeme")
-        for key, val in checks.items():
+        markers = ("change_me", "change_in_prod", "sofia_change_", "sofiaadmin2026", "sofiagateway2026", "changeme")
+        for key, (val, min_len) in checks.items():
             low = (val or "").lower()
-            if not val or any(m in low for m in markers):
-                warnings.append(f"{key} usa un valor por defecto inseguro; sobrescríbelo en .env")
+            if not val or len(val) < min_len or any(m in low for m in markers):
+                warnings.append(f"{key} usa un valor por defecto o demasiado corto (<{min_len}); sobrescríbelo en .env")
         return warnings
 
 
