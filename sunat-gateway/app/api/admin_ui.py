@@ -41,23 +41,25 @@ PANEL_HTML = r"""<!DOCTYPE html>
     /* === LAYOUT DEVELOPER CONSOLE (ESTRUCTURA SIDEBAR + PALETA OFICIAL ODOO 20) === */
     .console-shell { display: flex; min-height: 100vh; background: var(--bg); }
     .sidebar {
-      width: 256px; min-width: 256px; background: #FAFAFC; border-right: 1px solid var(--border);
+      width: 244px; min-width: 244px; background: #FAFAFC; border-right: 1px solid var(--border);
       display: flex; flex-direction: column; justify-content: space-between;
-      position: sticky; top: 0; height: 100vh; overflow-y: auto; z-index: 35; transition: margin-left .2s ease;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;
+      z-index: 35; transition: margin-left .2s ease;
     }
-    .sidebar.collapsed { margin-left: -256px; }
-    .sb-top { padding: 14px 12px 10px 12px; }
-    .sb-brand { display: flex; align-items: center; gap: 10px; padding: 4px 6px 12px 6px; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.01em; }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .sidebar.collapsed { margin-left: -244px; }
+    .sb-top { padding: 12px 12px 8px 12px; }
+    .sb-brand { display: flex; align-items: center; gap: 9px; padding: 2px 6px 10px 6px; font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.01em; }
     .sb-brand-mark { width: 28px; height: 28px; border-radius: 7px; background: var(--o20-primary); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
     .sb-ws-box {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       background: #FFFFFF; border: 1px solid var(--border); border-radius: 9px;
-      padding: 7px 10px; margin-bottom: 10px; font-size: 12.5px; font-weight: 600; color: var(--text);
+      padding: 6px 10px; margin-bottom: 8px; font-size: 12.5px; font-weight: 600; color: var(--text);
     }
     .sb-ws-avatar { width: 22px; height: 22px; border-radius: 6px; background: var(--o20-primary-soft); color: var(--o20-primary); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; flex-shrink: 0; }
     .sb-env-toggle {
       display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #EFEFF4;
-      padding: 3px; border-radius: 9px; margin-bottom: 14px;
+      padding: 3px; border-radius: 9px; margin-bottom: 10px;
     }
     .sb-env-btn {
       border: none; background: transparent; padding: 5px 8px; border-radius: 7px;
@@ -68,10 +70,10 @@ PANEL_HTML = r"""<!DOCTYPE html>
     .sb-dot-prod { background: var(--o20-teal); }
     .sb-dot-beta { background: var(--warn); }
 
-    .sb-group-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 12px 10px 5px 10px; }
+    .sb-group-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 10px 10px 4px 10px; }
     .sb-item {
       width: 100%; background: transparent; border: none; border-radius: 8px;
-      padding: 8px 10px; margin-bottom: 2px; cursor: pointer;
+      padding: 7px 10px; margin-bottom: 1px; cursor: pointer;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       color: #4B5563; font-size: 13px; font-weight: 500; text-align: left; text-decoration: none;
       transition: background .14s, color .14s;
@@ -79,17 +81,21 @@ PANEL_HTML = r"""<!DOCTYPE html>
     .sb-item:hover { background: #EFEFF5; color: var(--text); }
     .sb-item.active { background: var(--o20-primary-soft); color: var(--o20-primary); font-weight: 600; }
     .sb-item-left { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
-    .sb-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .82; }
+    .sb-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .82; }
     .sb-item.active svg { opacity: 1; color: var(--o20-primary); }
 
-    .sb-bottom { padding: 12px; border-top: 1px solid var(--border); background: #FAFAFC; }
+    .sb-bottom { padding: 10px 12px; border-top: 1px solid var(--border); background: #FAFAFC; }
     .sb-upgrade-btn {
-      width: 100%; border: none; border-radius: 9px; padding: 10px 12px; cursor: pointer;
+      width: 100%; border: none; border-radius: 9px; padding: 9px 12px; cursor: pointer;
       background: linear-gradient(135deg, #241930 0%, #66598F 58%, #714B67 100%);
       color: #FFFFFF; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px;
-      margin-bottom: 8px; box-shadow: 0 3px 10px rgba(102,89,143,.22); transition: filter .15s;
+      margin-bottom: 6px; box-shadow: 0 3px 10px rgba(102,89,143,.22); transition: filter .15s;
     }
     .sb-upgrade-btn:hover { filter: brightness(1.08); }
+    .sub-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .sub-pill { background: #FFFFFF; border: 1px solid var(--border); color: #4B5563; padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+    .sub-pill:hover { background: #F4F1FB; color: var(--o20-primary); }
+    .sub-pill.active { background: var(--o20-primary); border-color: var(--o20-primary); color: #FFFFFF; }
 
     .console-right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
     .topbar {
@@ -314,15 +320,6 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <button class="sb-item tab" data-tab="documents" onclick="showTab('documents', this)">
           <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Documentos</span>
         </button>
-        <button class="sb-item tab" data-tab="summaries" onclick="showTab('summaries', this)">
-          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Resúmenes (RC/RA)</span>
-        </button>
-        <button class="sb-item tab" data-tab="contingencies" onclick="showTab('contingencies', this)">
-          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Contingencias</span>
-        </button>
-        <button class="sb-item tab" data-tab="observations" onclick="showTab('observations', this)">
-          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Observaciones</span>
-        </button>
 
         <div class="sb-group-lbl">Desarrollador</div>
         <button class="sb-item tab" data-tab="lookup" onclick="showTab('lookup', this)">
@@ -332,10 +329,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
           <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>API Keys</span>
         </button>
         <button class="sb-item tab" data-tab="logs" onclick="showTab('logs', this)">
-          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Logs API / MCP</span>
-        </button>
-        <button class="sb-item tab" data-tab="tester" onclick="showTab('tester', this)">
-          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Probador Rápido</span>
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Logs</span>
         </button>
 
         <div class="sb-group-lbl">Workspace</div>
@@ -349,12 +343,12 @@ PANEL_HTML = r"""<!DOCTYPE html>
       <button class="sb-upgrade-btn" onclick="openTab('billing')">
         <span>↑</span><span>Mejorar plan</span>
       </button>
-      <a href="/docs-portal" target="_blank" class="sb-item" style="margin-bottom:2px">
-        <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Documentación</span>
-      </a>
-      <a href="/consulta" target="_blank" class="sb-item">
-        <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Consulta Pública</span>
-      </a>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 4px 0 4px">
+        <a href="/docs-portal" target="_blank" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#4B5563;text-decoration:none;font-weight:500">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Documentación
+        </a>
+        <a href="/consulta" target="_blank" style="font-size:12px;color:var(--o20-teal);text-decoration:none;font-weight:600">Consulta CPE</a>
+      </div>
     </div>
   </aside>
 
@@ -450,6 +444,15 @@ PANEL_HTML = r"""<!DOCTYPE html>
           </div>
         </div>
       </div>
+
+    <!-- SUB-BARRA DE DOCUMENTOS (Agrupa Comprobantes, Resúmenes, Contingencias, Observaciones y Probador) -->
+    <div id="docsSubBar" class="sub-pills hidden">
+      <button class="sub-pill" data-sub="documents" onclick="openTab('documents')">Comprobantes</button>
+      <button class="sub-pill" data-sub="summaries" onclick="openTab('summaries')">Resúmenes (RC/RA)</button>
+      <button class="sub-pill" data-sub="contingencies" onclick="openTab('contingencies')">Contingencias</button>
+      <button class="sub-pill" data-sub="observations" onclick="openTab('observations')">Observaciones</button>
+      <button class="sub-pill" data-sub="tester" onclick="openTab('tester')">Probador Beta</button>
+    </div>
 
     <!-- TAB 2: DOCUMENTOS -->
     <div id="tab-documents" class="hidden">
@@ -982,14 +985,33 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeCmdModal();
 });
 
+const DOCS_GROUP = new Set(['documents', 'summaries', 'contingencies', 'observations', 'tester']);
+
 function showTab(name, btn) {
   ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const targetNav = btn || document.querySelector(`.tab[data-tab="${DOCS_GROUP.has(name) ? 'documents' : name}"]`);
+  if (targetNav) targetNav.classList.add('active');
+
+  const subBar = document.getElementById('docsSubBar');
+  if (subBar) {
+    subBar.classList.toggle('hidden', !DOCS_GROUP.has(name));
+    subBar.querySelectorAll('.sub-pill').forEach(p => p.classList.toggle('active', p.dataset.sub === name));
+  }
+
   const crumb = document.getElementById('topbarCrumb');
   if (crumb) crumb.textContent = TAB_LABELS[name] || name;
+
+  if (window.innerWidth <= 900) {
+    document.getElementById('consoleSidebar').classList.add('collapsed');
+  }
+}
+
+if (window.innerWidth <= 900) {
+  const _sb = document.getElementById('consoleSidebar');
+  if (_sb) _sb.classList.add('collapsed');
 }
 
 function openTab(name) {
