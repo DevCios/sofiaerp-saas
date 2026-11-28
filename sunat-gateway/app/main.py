@@ -34,6 +34,7 @@ async def lifespan(_app: FastAPI):
         await conn.execute(text("ALTER TABLE api_clients ADD COLUMN IF NOT EXISTS workspace_id VARCHAR(36)"))
         await conn.execute(text("ALTER TABLE api_request_logs ADD COLUMN IF NOT EXISTS workspace_id VARCHAR(36)"))
         await conn.execute(text("ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS source VARCHAR(24) NOT NULL DEFAULT 'external'"))
+        await conn.execute(text("ALTER TABLE workspaces ADD COLUMN IF NOT EXISTS billing_profile JSONB"))
         await conn.execute(text("ALTER TABLE gateway_users ADD COLUMN IF NOT EXISTS auth_provider VARCHAR(24) NOT NULL DEFAULT 'local'"))
     yield
     await async_engine.dispose()
@@ -59,7 +60,7 @@ app.add_middleware(
         "https://admin.sofiaerp.com",
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept", "X-API-Key", "X-Internal-Service-Key", "Mcp-Session-Id", "MCP-Protocol-Version"],
 )
 

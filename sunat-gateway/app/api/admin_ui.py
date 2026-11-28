@@ -99,6 +99,39 @@ PANEL_HTML = r"""<!DOCTYPE html>
     .role-card.active { border-color: var(--o20-primary); background: #FAF8FD; box-shadow: 0 0 0 3px rgba(113,75,103,.12); }
     .role-perm { font-size: 12px; margin: 5px 0; display: flex; align-items: center; gap: 6px; color: #374151; }
     .role-perm.denied { color: #9CA3AF; }
+
+    /* Tarjetas de Planes Premium Estilo Acanalado Odoo 20 */
+    .plan-card { background: #FFFFFF; border: 1px solid var(--border); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 10px rgba(15,23,42,.03); }
+    .plan-card.plan-current { border: 2px solid var(--o20-primary); }
+    .plan-head { border-radius: 12px; padding: 18px 16px 20px 16px; min-height: 126px; display: flex; flex-direction: column; justify-content: space-between; }
+    .plan-head-light { background: #F9FAFB; border: 1px solid #EEF0F4; color: var(--text); }
+    .plan-head-dark {
+      background-color: #16111F;
+      background-image:
+        linear-gradient(90deg, #16111F 0%, rgba(102,89,143,.45) 58%, rgba(113,75,103,.75) 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 2px, rgba(1,126,132,.08) 2px, rgba(0,0,0,.28) 16px);
+      color: #FFFFFF;
+    }
+    .plan-head-teal {
+      background-color: #121C22;
+      background-image:
+        linear-gradient(90deg, #121C22 0%, rgba(1,126,132,.50) 60%, rgba(113,75,103,.72) 100%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0px, rgba(255,255,255,.06) 2px, rgba(1,126,132,.10) 2px, rgba(0,0,0,.28) 16px);
+      color: #FFFFFF;
+    }
+    .plan-price { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    .plan-price small { font-size: 12.5px; font-weight: 500; opacity: .78; }
+    .plan-body { padding: 14px 8px 6px 8px; flex: 1; display: flex; flex-direction: column; }
+    .plan-feat { font-size: 12.5px; color: #4B5563; padding: 8px 0; border-bottom: 1px solid #F3F4F6; }
+    .plan-feat:last-child { border-bottom: none; }
+    .cycle-toggle { display: inline-flex; background: #EFEFF4; padding: 3px; border-radius: 9px; gap: 3px; }
+    .cycle-btn { border: none; background: transparent; padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; }
+    .cycle-btn.active { background: #FFFFFF; color: var(--text); box-shadow: 0 1px 2px rgba(16,24,40,.08); }
+
+    /* Formulario Datos de Facturación (2 columnas limpias) */
+    .bf-row { display: grid; grid-template-columns: 260px 1fr; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid #F1F3F6; }
+    .bf-row:last-child { border-bottom: none; }
+    @media (max-width: 780px) { .bf-row { grid-template-columns: 1fr; gap: 6px; } }
     .sb-item:hover { background: #EFEFF5; color: var(--text); }
     .sb-item.active { background: var(--o20-primary-soft); color: var(--o20-primary); font-weight: 600; }
     .sb-item-left { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
@@ -785,31 +818,126 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
       </div>
     </div>
 
-    <!-- TAB 10: FACTURACIÓN Y PLANES (MERCADO PAGO) -->
+    <!-- TAB 10: FACTURACIÓN Y PLANES (MERCADO PAGO + DATOS DE FACTURACIÓN) -->
     <div id="tab-billing" class="hidden">
       <div id="billingBanner" class="card hidden" style="background:#EBF8F6;border-color:#C4E8E2;color:#0F766E;font-weight:600"></div>
-      <div class="card">
-        <h3>Planes Mensuales &amp; Recarga de Cuota SUNAT</h3>
-        <p style="font-size:12.5px;color:var(--muted);margin-top:0">
-          Elige el plan ideal para tu Workspace. El pago con <strong>Mercado Pago (Yape, Plin, Tarjetas, PagoEfectivo)</strong> actualiza tu <code>monthly_quota</code> al instante.
-        </p>
-        <div id="plansGrid" class="grid4" style="margin-bottom:0"></div>
+
+      <div class="sub-pills">
+        <button id="billSubPlans" class="sub-pill active" onclick="switchBillingSub('plans')">Planes y Pagos</button>
+        <button id="billSubProfile" class="sub-pill" onclick="switchBillingSub('profile')">Datos de facturación</button>
       </div>
-      <div class="card">
-        <h3>Historial de Pagos y Upgrades</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Plan</th>
-              <th>Cuota Otorgada</th>
-              <th>Monto (PEN)</th>
-              <th>Estado</th>
-              <th>ID Pago MP</th>
-            </tr>
-          </thead>
-          <tbody id="ordersTable"></tbody>
-        </table>
+
+      <!-- SUB-VISTA 1: PLANES Y PAGOS -->
+      <div id="billingPlansPanel">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0;font-size:20px;font-weight:700">Planes</h2>
+            <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted)">
+              Todos los planes emiten directo en SUNAT. Pagos procesados con <strong>Mercado Pago (Yape, Plin, Tarjetas)</strong>.
+            </p>
+          </div>
+          <div class="cycle-toggle">
+            <button id="cycleBtnMonthly" class="cycle-btn active" onclick="setBillingCycle('monthly')">Mensual</button>
+            <button id="cycleBtnYearly" class="cycle-btn" onclick="setBillingCycle('yearly')">Anual · 2 meses gratis</button>
+          </div>
+        </div>
+
+        <div id="plansGrid" class="grid4" style="margin-bottom:22px"></div>
+
+        <div class="card">
+          <h3>Historial de Pagos y Upgrades (Mercado Pago)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Plan</th>
+                <th>Cuota Otorgada</th>
+                <th>Monto (PEN)</th>
+                <th>Estado</th>
+                <th>ID Pago MP</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB-VISTA 2: DATOS DE FACTURACIÓN (SUNAT AUTOCOMPLETE) -->
+      <div id="billingProfilePanel" class="hidden">
+        <div style="background:#EBF8F6;border:1px solid #C4E8E2;color:#0F766E;border-radius:10px;padding:11px 16px;font-size:12.5px;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+          <span>🛡</span>
+          <span>Guardaremos estos datos en <strong>API SUNAT</strong> para emitir automáticamente tu Boleta o Factura electrónica por tus pagos con <strong>Mercado Pago</strong>.</span>
+        </div>
+
+        <div class="card" style="padding:22px 26px">
+          <h3 style="margin:0 0 2px 0;font-size:16px">Datos de facturación</h3>
+          <p style="margin:0 0 12px 0;font-size:12.5px;color:var(--muted)">Aparecen en los comprobantes de tu suscripción.</p>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Tipo de comprobante <span style="color:var(--err)">*</span></strong></div>
+            <div>
+              <select id="bfDocType" onchange="onBillingDocTypeChange()">
+                <option value="01">Factura</option>
+                <option value="03">Boleta de Venta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bf-row">
+            <div>
+              <strong style="font-size:13px">Documento de identidad <span style="color:var(--err)">*</span></strong>
+              <div style="font-size:11.5px;color:var(--muted);margin-top:2px">Con RUC o DNI puedes completar los datos automáticamente desde SUNAT / RENIEC.</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <select id="bfIdType" style="width:110px;flex-shrink:0">
+                <option value="6">RUC</option>
+                <option value="1">DNI</option>
+              </select>
+              <input id="bfIdNum" placeholder="20600994345" maxlength="11" />
+              <button type="button" class="btn btn-sec btn-sm" style="white-space:nowrap;padding:0 14px" onclick="lookupBillingFiscalData()">SUNAT 🔍</button>
+            </div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Razón social / Nombre <span style="color:var(--err)">*</span></strong></div>
+            <div><input id="bfName" placeholder="Ej. Mi Empresa S.A.C." /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Dirección</strong></div>
+            <div><input id="bfAddr" placeholder="Línea 1 (Av. / Calle / Número)" /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Dirección 2</strong></div>
+            <div><input id="bfAddr2" placeholder="Departamento, oficina o interior" /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Ciudad</strong></div>
+            <div><input id="bfCity" placeholder="Ej. Lima / Huancayo" /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Departamento / Estado</strong></div>
+            <div><input id="bfDept" placeholder="Ej. Lima / Junín" /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Código postal</strong></div>
+            <div><input id="bfZip" placeholder="Ej. 15001" /></div>
+          </div>
+
+          <div class="bf-row">
+            <div><strong style="font-size:13px">Correo para comprobantes</strong></div>
+            <div><input id="bfEmail" type="email" placeholder="contabilidad@empresa.pe" /></div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:18px">
+            <span id="bfMsg" style="font-size:12.5px;color:var(--ok)"></span>
+            <button class="btn" onclick="saveBillingProfile()">Guardar datos de facturación</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1427,7 +1555,7 @@ async function refreshScopedData() {
 
 async function refreshAll() {
   refreshSunatHealth();
-  const [me, issuers, clients, billing, orders, workspaces, team] = await Promise.all([
+  const [me, issuers, clients, billing, orders, workspaces, team, billProfile] = await Promise.all([
     api('/auth/me'),
     api('/issuers'),
     api('/clients'),
@@ -1435,8 +1563,23 @@ async function refreshAll() {
     api('/billing/orders'),
     api('/workspaces'),
     api('/workspaces/team'),
+    api('/billing/profile'),
   ]);
   ISSUERS_CACHE = issuers;
+  BILLING_CACHE = billing;
+
+  if (billProfile) {
+    document.getElementById('bfDocType').value = billProfile.doc_type_receipt || '01';
+    document.getElementById('bfIdType').value = billProfile.identity_type || '6';
+    document.getElementById('bfIdNum').value = billProfile.identity_number || '';
+    document.getElementById('bfName').value = billProfile.business_name || '';
+    document.getElementById('bfAddr').value = billProfile.address || '';
+    document.getElementById('bfAddr2').value = billProfile.address2 || '';
+    document.getElementById('bfCity').value = billProfile.city || '';
+    document.getElementById('bfDept').value = billProfile.department || '';
+    document.getElementById('bfZip').value = billProfile.postal_code || '';
+    document.getElementById('bfEmail').value = billProfile.billing_email || '';
+  }
 
   if (team) {
     const roleLabel = r => r === 'owner' ? 'Propietario' : (r === 'admin' ? 'Administrador' : 'Miembro');
@@ -1520,28 +1663,7 @@ async function refreshAll() {
     }
   }
 
-  if (billing && billing.plans) {
-    document.getElementById('plansGrid').innerHTML = billing.plans.map(p => {
-      const isCurrent = billing.current_plan === p.code;
-      const btnHtml = p.price_pen <= 0
-        ? `<button class="btn btn-sm btn-sec" disabled style="width:100%;margin-top:12px">${isCurrent ? 'Plan Actual' : 'Plan Base'}</button>`
-        : `<button class="btn btn-sm ${isCurrent ? 'btn-sec' : 'btn-teal'}" style="width:100%;margin-top:12px" onclick="startPlanCheckout('${p.code}')">${isCurrent ? 'Renovar con Mercado Pago' : 'Pagar S/ ' + p.price_pen.toFixed(2) + ' con Mercado Pago'}</button>`;
-      return `
-        <div class="kpi" style="background:#FFFFFF;border:${isCurrent ? '2px solid var(--o20-primary)' : '1px solid var(--border)'};display:flex;flex-direction:column;justify-content:space-between">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span class="lbl" style="color:var(--o20-primary)">${p.name}</span>
-              ${isCurrent ? '<span class="badge b-ok">Activo</span>' : ''}
-            </div>
-            <div class="val" style="font-size:24px;margin-top:8px">S/ ${p.price_pen.toFixed(2)} <span style="font-size:12px;font-weight:500;color:var(--muted)">/ mes</span></div>
-            <div style="font-size:13px;font-weight:700;color:var(--o20-teal);margin-top:4px">${p.monthly_quota.toLocaleString()} comprobantes/mes</div>
-            <div class="sub" style="margin-top:8px;line-height:1.45">${p.description}</div>
-          </div>
-          ${btnHtml}
-        </div>
-      `;
-    }).join('');
-  }
+  renderPlansGrid();
 
   document.getElementById('ordersTable').innerHTML = (orders || []).map(o => `
     <tr>
@@ -1777,11 +1899,132 @@ async function runLookup(kind) {
   }
 }
 
+let BILLING_CACHE = null;
+let BILLING_CYCLE = 'monthly';
+
+function switchBillingSub(sub) {
+  document.getElementById('billingPlansPanel').classList.toggle('hidden', sub !== 'plans');
+  document.getElementById('billingProfilePanel').classList.toggle('hidden', sub !== 'profile');
+  document.getElementById('billSubPlans').classList.toggle('active', sub === 'plans');
+  document.getElementById('billSubProfile').classList.toggle('active', sub === 'profile');
+}
+
+function setBillingCycle(cycle) {
+  BILLING_CYCLE = cycle;
+  document.getElementById('cycleBtnMonthly').classList.toggle('active', cycle === 'monthly');
+  document.getElementById('cycleBtnYearly').classList.toggle('active', cycle === 'yearly');
+  renderPlansGrid();
+}
+
+function renderPlansGrid() {
+  if (!BILLING_CACHE || !BILLING_CACHE.plans) return;
+  const isYearly = BILLING_CYCLE === 'yearly';
+  document.getElementById('plansGrid').innerHTML = BILLING_CACHE.plans.map(p => {
+    const isCurrent = BILLING_CACHE.current_plan === p.code;
+    const isFree = p.code === 'FREE';
+    const isCustom = !!p.custom_contact;
+    const headCls = isFree ? 'plan-head-light' : (p.code === 'PRO' ? 'plan-head-teal' : 'plan-head-dark');
+    const priceVal = isYearly ? (p.annual_price_pen || p.price_pen * 10) : p.price_pen;
+    const periodTxt = isFree ? (p.period_label || '/ 30 días') : (isYearly ? '/año' : '/mes');
+    const priceHtml = isCustom
+      ? `<div class="plan-price" style="font-size:21px">Según<br/>volumen</div>`
+      : `<div class="plan-price">S/ ${Number(priceVal).toFixed(0)} <small>${periodTxt}</small></div>`;
+
+    let btnHtml = '';
+    if (isFree) {
+      btnHtml = `<button class="btn btn-sm btn-sec" disabled style="width:100%;margin:12px 0 8px 0">${isCurrent ? '✓ Plan actual' : 'Plan base'}</button>`;
+    } else if (isCustom) {
+      btnHtml = `<a href="mailto:ventas@sofiaerp.com?subject=Plan%20A%20Medida%20API%20SUNAT" class="btn btn-sm btn-sec" style="width:100%;margin:12px 0 8px 0;text-align:center;text-decoration:none;display:block">Contactar ventas</a>`;
+    } else {
+      btnHtml = `<button class="btn btn-sm ${p.code === 'PRO' ? 'btn-teal' : ''}" style="width:100%;margin:12px 0 8px 0" onclick="startPlanCheckout('${p.code}')">${isCurrent ? 'Renovar con Mercado Pago' : 'Mejorar'}</button>`;
+    }
+
+    const feats = (p.features || []).map(f => `<div class="plan-feat">${f}</div>`).join('');
+    return `
+      <div class="plan-card ${isCurrent ? 'plan-current' : ''}">
+        <div class="plan-head ${headCls}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:14px;font-weight:700">${p.name}</span>
+            ${isCurrent ? '<span class="badge b-ok">Actual</span>' : (p.code === 'PRO' ? '<span class="badge b-nav">Recomendado</span>' : '')}
+          </div>
+          ${priceHtml}
+        </div>
+        <div class="plan-body">
+          ${btnHtml}
+          <div style="font-size:12.5px;font-weight:700;color:var(--text);padding:6px 0 8px 0;border-bottom:1px solid #F3F4F6">${p.headline || ''}</div>
+          ${feats}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function onBillingDocTypeChange() {
+  const dt = document.getElementById('bfDocType').value;
+  document.getElementById('bfIdType').value = dt === '01' ? '6' : '1';
+  document.getElementById('bfIdNum').maxLength = dt === '01' ? 11 : 8;
+}
+
+async function lookupBillingFiscalData() {
+  const idType = document.getElementById('bfIdType').value;
+  const num = document.getElementById('bfIdNum').value.trim();
+  const msg = document.getElementById('bfMsg');
+  msg.style.color = 'var(--muted)';
+  msg.textContent = 'Consultando en SUNAT / RENIEC...';
+  try {
+    if (idType === '6') {
+      const d = await api('/lookup/ruc/' + encodeURIComponent(num));
+      if (d.business_name) document.getElementById('bfName').value = d.business_name;
+      if (d.address) document.getElementById('bfAddr').value = d.address;
+      if (d.province || d.district) document.getElementById('bfCity').value = d.province || d.district;
+      if (d.department) document.getElementById('bfDept').value = d.department;
+      msg.style.color = 'var(--ok)';
+      msg.textContent = `RUC encontrado (${d.source || 'SUNAT'}).`;
+    } else {
+      const d = await api('/lookup/dni/' + encodeURIComponent(num));
+      if (d.full_name) document.getElementById('bfName').value = d.full_name;
+      msg.style.color = 'var(--ok)';
+      msg.textContent = `DNI encontrado (${d.source || 'RENIEC'}).`;
+    }
+  } catch (e) {
+    msg.style.color = 'var(--err)';
+    msg.textContent = e.message;
+  }
+}
+
+async function saveBillingProfile() {
+  const msg = document.getElementById('bfMsg');
+  msg.style.color = 'var(--muted)';
+  msg.textContent = 'Guardando...';
+  try {
+    await api('/billing/profile', {
+      method: 'PUT',
+      body: JSON.stringify({
+        doc_type_receipt: document.getElementById('bfDocType').value,
+        identity_type: document.getElementById('bfIdType').value,
+        identity_number: document.getElementById('bfIdNum').value.trim(),
+        business_name: document.getElementById('bfName').value.trim(),
+        address: document.getElementById('bfAddr').value.trim(),
+        address2: document.getElementById('bfAddr2').value.trim(),
+        city: document.getElementById('bfCity').value.trim(),
+        department: document.getElementById('bfDept').value.trim(),
+        postal_code: document.getElementById('bfZip').value.trim(),
+        billing_email: document.getElementById('bfEmail').value.trim()
+      })
+    });
+    msg.style.color = 'var(--ok)';
+    msg.textContent = '✓ Datos de facturación guardados correctamente.';
+  } catch (e) {
+    msg.style.color = 'var(--err)';
+    msg.textContent = e.message;
+  }
+}
+
 async function startPlanCheckout(planCode) {
   try {
     const res = await api('/billing/checkout', {
       method: 'POST',
-      body: JSON.stringify({ plan_code: planCode })
+      body: JSON.stringify({ plan_code: planCode, billing_cycle: BILLING_CYCLE })
     });
     if (res.checkout_url) {
       window.location.href = res.checkout_url;

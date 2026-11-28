@@ -39,12 +39,21 @@ def test_workspace_user_jwt_vs_superadmin_jwt():
 
 
 def test_plans_catalog_and_slugify():
+    from app.api.billing import BillingCheckoutRequest, BillingProfileRequest
+
     assert set(PLANS_CATALOG.keys()) == {"FREE", "STARTER", "PRO", "ENTERPRISE"}
     assert PLANS_CATALOG["FREE"]["monthly_quota"] == 50
     assert PLANS_CATALOG["FREE"]["price_pen"] == 0.0
-    assert PLANS_CATALOG["STARTER"]["monthly_quota"] == 500
-    assert PLANS_CATALOG["PRO"]["monthly_quota"] == 3000
-    assert PLANS_CATALOG["ENTERPRISE"]["monthly_quota"] == 15000
+    assert PLANS_CATALOG["STARTER"]["monthly_quota"] == 5000
+    assert PLANS_CATALOG["STARTER"]["price_pen"] == 39.0
+    assert PLANS_CATALOG["STARTER"]["annual_price_pen"] == 390.0
+    assert PLANS_CATALOG["PRO"]["price_pen"] == 69.0
+    assert PLANS_CATALOG["PRO"]["annual_price_pen"] == 690.0
+
+    chk = BillingCheckoutRequest(plan_code="PRO", billing_cycle="yearly")
+    assert chk.billing_cycle == "yearly"
+    prof = BillingProfileRequest(doc_type_receipt="01", identity_type="6", identity_number="20600994345", business_name="EMPRESA DEMO S.A.C.")
+    assert prof.identity_number == "20600994345"
 
     slug = _slugify("Workspace de Luis S.A.C.")
     assert slug.startswith("workspace-de-luis-s-a-c-")

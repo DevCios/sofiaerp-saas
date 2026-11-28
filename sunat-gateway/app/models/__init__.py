@@ -55,6 +55,7 @@ class Workspace(Base):
     plan_name: Mapped[str] = mapped_column(String(40), default="FREE", nullable=False)
     monthly_quota: Mapped[int] = mapped_column(Integer, default=50, nullable=False)
     source: Mapped[str] = mapped_column(String(24), default="external", nullable=False)  # external | sofia_erp
+    billing_profile: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     plan_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

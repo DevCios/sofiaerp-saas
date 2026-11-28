@@ -36,31 +36,68 @@ MP_PAYMENT_API = "https://api.mercadopago.com/v1/payments/{payment_id}"
 PLANS_CATALOG: dict[str, dict] = {
     "FREE": {
         "code": "FREE",
-        "name": "Gratis (Sandbox / Inicio)",
+        "name": "Gratis",
         "monthly_quota": 50,
         "price_pen": 0.00,
+        "annual_price_pen": 0.00,
+        "period_label": "/ 30 días",
+        "headline": "50 operaciones durante 30 días",
+        "features": [
+            "1 RUC en producción",
+            "Facturas, boletas, notas y guías",
+            "Conector MCP para IA",
+            "Consultas RUC / DNI / Tipo de cambio",
+        ],
         "description": "50 comprobantes/mes · API REST + Remote MCP + SUNAT Beta y Prod.",
     },
     "STARTER": {
         "code": "STARTER",
-        "name": "Starter",
-        "monthly_quota": 500,
+        "name": "Básico",
+        "monthly_quota": 5000,
         "price_pen": 39.00,
-        "description": "500 comprobantes/mes · Multi-RUC + Webhooks HMAC + Cola anti-1033.",
+        "annual_price_pen": 390.00,
+        "period_label": "/mes",
+        "headline": "5,000 operaciones al mes",
+        "features": [
+            "1 RUC en producción",
+            "Facturas, boletas, notas y guías",
+            "Conector MCP para IA (Claude / ChatGPT)",
+            "Consultas RUC / DNI / TC + Webhooks",
+        ],
+        "description": "5,000 comprobantes/mes · 1 RUC + Webhooks HMAC + Cola anti-1033.",
     },
     "PRO": {
         "code": "PRO",
-        "name": "Pro",
-        "monthly_quota": 3000,
-        "price_pen": 99.00,
-        "description": "3,000 comprobantes/mes · OAuth 2.1 MCP + Prioridad en cola SUNAT.",
+        "name": "Profesional",
+        "monthly_quota": 100000,
+        "price_pen": 69.00,
+        "annual_price_pen": 690.00,
+        "period_label": "/mes",
+        "headline": "Operaciones ilimitadas",
+        "features": [
+            "RUCs ilimitados",
+            "Facturas, boletas, notas y guías",
+            "Conector MCP + OAuth 2.1 (1-clic)",
+            "Webhooks HMAC + Prioridad en cola",
+        ],
+        "description": "Operaciones y RUCs ilimitados · OAuth 2.1 MCP + Prioridad SUNAT.",
     },
     "ENTERPRISE": {
         "code": "ENTERPRISE",
-        "name": "Enterprise",
-        "monthly_quota": 15000,
+        "name": "A medida",
+        "monthly_quota": 500000,
         "price_pen": 249.00,
-        "description": "15,000 comprobantes/mes · Alto volumen + Soporte prioritario.",
+        "annual_price_pen": 2490.00,
+        "custom_contact": True,
+        "period_label": "",
+        "headline": "Volumen personalizado",
+        "features": [
+            "Varios RUC y multi-workspace",
+            "Integración asistida",
+            "Soporte prioritario WhatsApp",
+            "SLA empresarial dedicado",
+        ],
+        "description": "Volumen personalizado · Integración asistida + Soporte prioritario.",
     },
 }
 
@@ -798,8 +835,63 @@ async def list_billing_orders(actor: dict = Depends(get_gateway_admin), db: Asyn
     ]
 
 
+class BillingProfileRequest(BaseModel):
+    doc_type_receipt: str = Field(default="01", pattern="^(01|03)$")  # 01=Factura, 03=Boleta
+    identity_type: str = Field(default="6", pattern="^(6|1)$")        # 6=RUC, 1=DNI
+    identity_number: str = Field(default="", max_length=15)
+    business_name: str = Field(..., min_length=2, max_length=200)
+    address: str = Field(default="", max_length=250)
+    address2: str = Field(default="", max_length=150)
+    city: str = Field(default="", max_length=100)
+    department: str = Field(default="", max_length=100)
+    postal_code: str = Field(default="", max_length=20)
+    billing_email: str = Field(default="", max_length=200)
+
+
+@router.get("/billing/profile")
+async def get_billing_profile(actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    ws_id = get_actor_workspace_id(actor)
+    ws = await db.get(Workspace, ws_id) if ws_id else None
+    profile = (ws.billing_profile if ws and ws.billing_profile else {})
+    return {
+        "workspace_id": ws_id,
+        "doc_type_receipt": profile.get("doc_type_receipt", "01"),
+        "identity_type": profile.get("identity_type", "6"),
+        "identity_number": profile.get("identity_number", ""),
+        "business_name": profile.get("business_name", ws.name if ws else ""),
+        "address": profile.get("address", ""),
+        "address2": profile.get("address2", ""),
+        "city": profile.get("city", ""),
+        "department": profile.get("department", ""),
+        "postal_code": profile.get("postal_code", ""),
+        "billing_email": profile.get("billing_email", actor.get("sub") or ""),
+    }
+
+
+@router.put("/billing/profile")
+async def save_billing_profile(
+    body: BillingProfileRequest,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    _assert_can_manage_workspace(actor)
+    ws_id = get_actor_workspace_id(actor)
+    if not ws_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Selecciona o crea un Workspace primero desde el selector superior para guardar datos de facturación.",
+        )
+    ws = await db.get(Workspace, ws_id)
+    if not ws:
+        raise HTTPException(status_code=404, detail="Workspace no encontrado.")
+    ws.billing_profile = body.model_dump()
+    await db.commit()
+    return {"saved": True, "profile": ws.billing_profile}
+
+
 class BillingCheckoutRequest(BaseModel):
     plan_code: str = Field(..., pattern="^(STARTER|PRO|ENTERPRISE)$")
+    billing_cycle: str = Field(default="monthly", pattern="^(monthly|yearly)$")
 
 
 @router.post("/billing/checkout")
@@ -813,13 +905,17 @@ async def create_billing_checkout(
     if not ws_id:
         raise HTTPException(
             status_code=400,
-            detail="El Superadmin Global no requiere suscripción. Inicia sesión con una cuenta de Workspace para probar pagos.",
+            detail="El Superadmin Global no requiere suscripción. Crea o selecciona un Workspace para probar pagos.",
         )
     ws = await db.get(Workspace, ws_id)
     if not ws:
         raise HTTPException(status_code=404, detail="Workspace no encontrado.")
 
     plan = PLANS_CATALOG[body.plan_code]
+    is_annual = body.billing_cycle == "yearly"
+    amount = float(plan.get("annual_price_pen") if is_annual else plan["price_pen"])
+    cycle_label = "Anual (2 meses gratis)" if is_annual else "Mensual"
+
     access_token = _get_mp_access_token()
     if not access_token:
         raise HTTPException(
@@ -831,7 +927,7 @@ async def create_billing_checkout(
         workspace_id=ws.id,
         plan_code=plan["code"],
         quota_granted=plan["monthly_quota"],
-        amount_pen=plan["price_pen"],
+        amount_pen=amount,
         status="PENDING",
     )
     db.add(order)
@@ -839,18 +935,19 @@ async def create_billing_checkout(
     await db.refresh(order)
 
     base = settings.PUBLIC_BASE_URL.rstrip("/")
+    payer_email = (ws.billing_profile or {}).get("billing_email") or actor.get("sub") or "cliente@apisunat.pro"
     preference = {
         "items": [
             {
-                "id": plan["code"],
-                "title": f"{settings.APP_NAME} — Plan {plan['name']} ({plan['monthly_quota']} comprobantes/mes)",
+                "id": f"{plan['code']}_{body.billing_cycle}",
+                "title": f"{settings.APP_NAME} — Plan {plan['name']} {cycle_label}",
                 "quantity": 1,
                 "currency_id": "PEN",
-                "unit_price": float(plan["price_pen"]),
+                "unit_price": amount,
             }
         ],
         "external_reference": f"GW-PLAN-{order.id}",
-        "payer": {"email": actor.get("sub") or "cliente@apisunat.pro"},
+        "payer": {"email": payer_email},
         "back_urls": {
             "success": f"{base}/api/v1/billing/mp-callback?order_id={order.id}",
             "pending": f"{base}/api/v1/billing/mp-callback?order_id={order.id}",
