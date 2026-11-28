@@ -98,12 +98,20 @@ def create_admin_jwt(email: str) -> str:
     return jwt.encode(payload, settings.GATEWAY_JWT_SECRET, algorithm="HS256")
 
 
-def create_workspace_user_jwt(email: str, user_id: str, workspace_id: str, workspace_name: str, full_name: str) -> str:
+def create_workspace_user_jwt(
+    email: str,
+    user_id: str,
+    workspace_id: str,
+    workspace_name: str,
+    full_name: str,
+    ws_role: str = "owner",
+) -> str:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": email,
         "uid": user_id,
         "role": "workspace_owner",
+        "ws_role": ws_role,
         "workspace_id": workspace_id,
         "workspace_name": workspace_name,
         "full_name": full_name,

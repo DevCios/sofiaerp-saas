@@ -24,7 +24,7 @@ from app.api.deps import get_actor_workspace_id, get_gateway_admin, is_superadmi
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import create_workspace_user_jwt, hash_password
-from app.models import BillingOrder, GatewayUser, Issuer, Workspace, WorkspaceMember
+from app.models import BillingOrder, GatewayUser, Issuer, Workspace, WorkspaceInvitation, WorkspaceMember
 
 router = APIRouter(prefix="/api/v1", tags=["Workspaces & Billing"])
 settings = get_settings()
@@ -128,6 +128,7 @@ class RegisterWorkspaceRequest(BaseModel):
     workspace_name: Optional[str] = Field(default=None, max_length=160)
     email: str = Field(..., min_length=5, max_length=255)
     password: str = Field(..., min_length=8, max_length=128)
+    invite_token: Optional[str] = Field(default=None, max_length=120)
 
 
 @router.post("/auth/register", status_code=status.HTTP_201_CREATED)
@@ -139,15 +140,35 @@ async def register_workspace(body: RegisterWorkspaceRequest, db: AsyncSession = 
     if existing:
         raise HTTPException(status_code=409, detail="Ya existe una cuenta registrada con este correo.")
 
-    ws_name = (body.workspace_name or f"Workspace de {body.full_name.strip().split()[0]}").strip()
-    ws = Workspace(
-        name=ws_name,
-        slug=_slugify(ws_name),
-        plan_name="FREE",
-        monthly_quota=PLANS_CATALOG["FREE"]["monthly_quota"],
-    )
-    db.add(ws)
-    await db.flush()
+    # Si viene con token de invitación válido, unirlo al Workspace invitado
+    inv = None
+    if body.invite_token:
+        inv = (
+            await db.execute(
+                select(WorkspaceInvitation).where(
+                    WorkspaceInvitation.token == body.invite_token.strip(),
+                    WorkspaceInvitation.status == "PENDING",
+                )
+            )
+        ).scalar_one_or_none()
+        if inv and inv.expires_at < datetime.now(timezone.utc):
+            inv = None
+
+    if inv:
+        ws = await db.get(Workspace, inv.workspace_id)
+        ws_role = inv.role
+        inv.status = "ACCEPTED"
+    else:
+        ws_name = (body.workspace_name or f"Workspace de {body.full_name.strip().split()[0]}").strip()
+        ws = Workspace(
+            name=ws_name,
+            slug=_slugify(ws_name),
+            plan_name="FREE",
+            monthly_quota=PLANS_CATALOG["FREE"]["monthly_quota"],
+        )
+        db.add(ws)
+        await db.flush()
+        ws_role = "owner"
 
     user = GatewayUser(
         workspace_id=ws.id,
@@ -158,7 +179,7 @@ async def register_workspace(body: RegisterWorkspaceRequest, db: AsyncSession = 
     )
     db.add(user)
     await db.flush()
-    db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role="owner"))
+    db.add(WorkspaceMember(user_id=user.id, workspace_id=ws.id, role=ws_role))
     await db.commit()
 
     token = create_workspace_user_jwt(
@@ -167,6 +188,7 @@ async def register_workspace(body: RegisterWorkspaceRequest, db: AsyncSession = 
         workspace_id=ws.id,
         workspace_name=ws.name,
         full_name=user.full_name,
+        ws_role=ws_role,
     )
     return {
         "access_token": token,
@@ -500,14 +522,242 @@ async def switch_workspace(
 
     user.workspace_id = ws.id
     await db.commit()
+    mem = (
+        await db.execute(
+            select(WorkspaceMember).where(WorkspaceMember.user_id == user.id, WorkspaceMember.workspace_id == ws.id)
+        )
+    ).scalar_one_or_none()
+    ws_role = mem.role if mem else "owner"
     token = create_workspace_user_jwt(
         email=user.email,
         user_id=user.id,
         workspace_id=ws.id,
         workspace_name=ws.name,
         full_name=user.full_name,
+        ws_role=ws_role,
     )
     return {"access_token": token, "workspace": {"id": ws.id, "name": ws.name, "slug": ws.slug, "plan_name": ws.plan_name}}
+
+
+# ==============================================================================
+# 1D. Gestión de Equipo e Invitaciones por Workspace (Propietario / Admin / Miembro)
+# ==============================================================================
+def _assert_can_manage_workspace(actor: dict) -> None:
+    if is_superadmin(actor):
+        return
+    if (actor.get("ws_role") or "owner") not in ("owner", "admin"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo un Propietario o Administrador puede gestionar facturación o equipo.",
+        )
+
+
+@router.get("/workspaces/team")
+async def get_workspace_team(actor: dict = Depends(get_gateway_admin), db: AsyncSession = Depends(get_db)):
+    ws_id = get_actor_workspace_id(actor)
+    if not ws_id:
+        return {
+            "workspace_id": None,
+            "my_role": "owner",
+            "can_manage": True,
+            "members": [
+                {
+                    "id": "superadmin",
+                    "full_name": "Administrador Global",
+                    "email": actor.get("sub") or settings.GATEWAY_ADMIN_EMAIL,
+                    "role": "owner",
+                    "is_me": True,
+                    "joined_at": datetime.now(timezone.utc).isoformat(),
+                }
+            ],
+            "invitations": [],
+        }
+
+    uid = actor.get("uid")
+    if uid:
+        await _ensure_user_memberships(db, uid)
+
+    mem_rows = (
+        await db.execute(
+            select(WorkspaceMember, GatewayUser)
+            .join(GatewayUser, WorkspaceMember.user_id == GatewayUser.id)
+            .where(WorkspaceMember.workspace_id == ws_id, GatewayUser.is_active.is_(True))
+            .order_by(WorkspaceMember.created_at.asc())
+        )
+    ).all()
+
+    inv_rows = (
+        await db.execute(
+            select(WorkspaceInvitation)
+            .where(WorkspaceInvitation.workspace_id == ws_id, WorkspaceInvitation.status == "PENDING")
+            .order_by(desc(WorkspaceInvitation.created_at))
+        )
+    ).scalars().all()
+
+    base = settings.PUBLIC_BASE_URL.rstrip("/")
+    my_role = actor.get("ws_role") or "owner"
+    return {
+        "workspace_id": ws_id,
+        "my_role": my_role,
+        "can_manage": my_role in ("owner", "admin"),
+        "members": [
+            {
+                "id": m.id,
+                "user_id": u.id,
+                "full_name": u.full_name,
+                "email": u.email,
+                "role": m.role,
+                "is_me": (u.id == uid),
+                "joined_at": m.created_at.isoformat(),
+            }
+            for m, u in mem_rows
+        ],
+        "invitations": [
+            {
+                "id": inv.id,
+                "email": inv.email,
+                "role": inv.role,
+                "status": inv.status,
+                "invite_url": f"{base}/?invite={inv.token}",
+                "expires_at": inv.expires_at.isoformat(),
+                "created_at": inv.created_at.isoformat(),
+            }
+            for inv in inv_rows
+        ],
+    }
+
+
+class InviteMemberRequest(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
+    role: str = Field(default="member", pattern="^(member|admin)$")
+
+
+@router.post("/workspaces/team/invite", status_code=status.HTTP_201_CREATED)
+async def invite_workspace_member(
+    body: InviteMemberRequest,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    _assert_can_manage_workspace(actor)
+    ws_id = get_actor_workspace_id(actor)
+    if not ws_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Selecciona o crea un Workspace primero desde el selector superior para invitar miembros.",
+        )
+    email = body.email.strip().lower()
+    # Si el usuario ya tiene cuenta, verificar si ya es miembro
+    existing_user = (await db.execute(select(GatewayUser).where(GatewayUser.email == email))).scalar_one_or_none()
+    if existing_user:
+        already = (
+            await db.execute(
+                select(WorkspaceMember).where(
+                    WorkspaceMember.user_id == existing_user.id,
+                    WorkspaceMember.workspace_id == ws_id,
+                )
+            )
+        ).scalar_one_or_none()
+        if already:
+            raise HTTPException(status_code=409, detail="Este correo ya es miembro del workspace.")
+
+    token = secrets.token_urlsafe(24)
+    inv = WorkspaceInvitation(
+        workspace_id=ws_id,
+        email=email,
+        role=body.role,
+        token=token,
+        invited_by=actor.get("sub") or "admin",
+        status="PENDING",
+        expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+    )
+    db.add(inv)
+    await db.commit()
+    base = settings.PUBLIC_BASE_URL.rstrip("/")
+    return {
+        "id": inv.id,
+        "email": inv.email,
+        "role": inv.role,
+        "invite_url": f"{base}/?invite={inv.token}",
+    }
+
+
+@router.post("/workspaces/invitations/{token}/accept")
+async def accept_workspace_invitation(
+    token: str,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    inv = (
+        await db.execute(
+            select(WorkspaceInvitation).where(
+                WorkspaceInvitation.token == token.strip(),
+                WorkspaceInvitation.status == "PENDING",
+            )
+        )
+    ).scalar_one_or_none()
+    if not inv or inv.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=404, detail="Invitación inválida o expirada.")
+
+    uid = actor.get("uid")
+    user = await db.get(GatewayUser, uid) if uid else None
+    if not user:
+        raise HTTPException(status_code=400, detail="Inicia sesión con una cuenta de usuario para aceptar la invitación.")
+
+    exists = (
+        await db.execute(
+            select(WorkspaceMember).where(WorkspaceMember.user_id == user.id, WorkspaceMember.workspace_id == inv.workspace_id)
+        )
+    ).scalar_one_or_none()
+    if not exists:
+        db.add(WorkspaceMember(user_id=user.id, workspace_id=inv.workspace_id, role=inv.role))
+    inv.status = "ACCEPTED"
+    user.workspace_id = inv.workspace_id
+    ws = await db.get(Workspace, inv.workspace_id)
+    await db.commit()
+
+    new_token = create_workspace_user_jwt(
+        email=user.email,
+        user_id=user.id,
+        workspace_id=ws.id,
+        workspace_name=ws.name,
+        full_name=user.full_name,
+        ws_role=inv.role,
+    )
+    return {"access_token": new_token, "workspace": {"id": ws.id, "name": ws.name}}
+
+
+@router.delete("/workspaces/team/members/{member_id}")
+async def remove_workspace_member(
+    member_id: str,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    _assert_can_manage_workspace(actor)
+    ws_id = get_actor_workspace_id(actor)
+    mem = await db.get(WorkspaceMember, member_id)
+    if not mem or (ws_id and mem.workspace_id != ws_id):
+        raise HTTPException(status_code=404, detail="Miembro no encontrado.")
+    if mem.role == "owner":
+        raise HTTPException(status_code=400, detail="No puedes eliminar al Propietario del workspace.")
+    await db.delete(mem)
+    await db.commit()
+    return {"removed": True}
+
+
+@router.delete("/workspaces/team/invitations/{inv_id}")
+async def revoke_workspace_invitation(
+    inv_id: str,
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    _assert_can_manage_workspace(actor)
+    ws_id = get_actor_workspace_id(actor)
+    inv = await db.get(WorkspaceInvitation, inv_id)
+    if not inv or (ws_id and inv.workspace_id != ws_id):
+        raise HTTPException(status_code=404, detail="Invitación no encontrada.")
+    inv.status = "REVOKED"
+    await db.commit()
+    return {"revoked": True}
 
 
 # ==============================================================================
@@ -558,6 +808,7 @@ async def create_billing_checkout(
     actor: dict = Depends(get_gateway_admin),
     db: AsyncSession = Depends(get_db),
 ):
+    _assert_can_manage_workspace(actor)
     ws_id = get_actor_workspace_id(actor)
     if not ws_id:
         raise HTTPException(

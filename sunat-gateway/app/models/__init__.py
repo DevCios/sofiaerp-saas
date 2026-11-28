@@ -85,7 +85,22 @@ class WorkspaceMember(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id: Mapped[str] = mapped_column(String(36), ForeignKey("gateway_users.id"), index=True, nullable=False)
     workspace_id: Mapped[str] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=False)
-    role: Mapped[str] = mapped_column(String(32), default="owner", nullable=False)
+    role: Mapped[str] = mapped_column(String(32), default="owner", nullable=False)  # owner | admin | member
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
+
+
+class WorkspaceInvitation(Base):
+    """Invitación por correo / enlace seguro para sumarse a un Workspace con rol member o admin."""
+    __tablename__ = "workspace_invitations"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    workspace_id: Mapped[str] = mapped_column(String(36), ForeignKey("workspaces.id"), index=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
+    role: Mapped[str] = mapped_column(String(24), default="member", nullable=False)  # member | admin
+    token: Mapped[str] = mapped_column(String(96), unique=True, index=True, nullable=False)
+    invited_by: Mapped[str] = mapped_column(String(255), nullable=False)
+    status: Mapped[str] = mapped_column(String(24), default="PENDING", index=True, nullable=False)  # PENDING | ACCEPTED | REVOKED
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
 

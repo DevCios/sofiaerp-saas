@@ -84,14 +84,21 @@ PANEL_HTML = r"""<!DOCTYPE html>
     .sb-dot-prod { background: var(--o20-teal); }
     .sb-dot-beta { background: var(--warn); }
 
-    .sb-group-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 10px 10px 4px 10px; }
+    .sb-group-lbl { font-size: 11px; font-weight: 600; color: #9CA3AF; padding: 8px 10px 3px 10px; }
     .sb-item {
       width: 100%; background: transparent; border: none; border-radius: 8px;
-      padding: 7px 10px; margin-bottom: 1px; cursor: pointer;
+      padding: 6px 10px; margin-bottom: 1px; cursor: pointer;
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       color: #4B5563; font-size: 13px; font-weight: 500; text-align: left; text-decoration: none;
       transition: background .14s, color .14s;
     }
+    .role-card {
+      border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; cursor: pointer;
+      background: #FFFFFF; transition: border-color .15s, box-shadow .15s;
+    }
+    .role-card.active { border-color: var(--o20-primary); background: #FAF8FD; box-shadow: 0 0 0 3px rgba(113,75,103,.12); }
+    .role-perm { font-size: 12px; margin: 5px 0; display: flex; align-items: center; gap: 6px; color: #374151; }
+    .role-perm.denied { color: #9CA3AF; }
     .sb-item:hover { background: #EFEFF5; color: var(--text); }
     .sb-item.active { background: var(--o20-primary-soft); color: var(--o20-primary); font-weight: 600; }
     .sb-item-left { display: inline-flex; align-items: center; gap: 9px; min-width: 0; }
@@ -357,6 +364,9 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div class="sb-group-lbl">Workspace</div>
         <button class="sb-item tab" data-tab="billing" onclick="showTab('billing', this)">
           <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Facturación</span>
+        </button>
+        <button class="sb-item tab" data-tab="team" onclick="showTab('team', this)">
+          <span class="sb-item-left"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Equipo</span>
         </button>
       </nav>
     </div>
@@ -860,7 +870,99 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
         </table>
       </div>
     </div>
+
+    <!-- TAB 13: EQUIPO E INVITACIONES -->
+    <div id="tab-team" class="hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <h2 style="margin:0;font-size:21px;font-weight:700">Equipo</h2>
+          <p style="margin:4px 0 0 0;font-size:13px;color:var(--muted)">Invita y administra a las personas de tu workspace.</p>
+        </div>
+        <button id="btnOpenInvite" class="btn" onclick="openInviteModal()">+ Invitar miembro</button>
+      </div>
+
+      <div class="sub-pills">
+        <button id="teamSubMembers" class="sub-pill active" onclick="switchTeamSub('members')">Miembros <span id="teamMemCount" class="badge b-info" style="margin-left:4px">1</span></button>
+        <button id="teamSubInvites" class="sub-pill" onclick="switchTeamSub('invites')">Invitaciones <span id="teamInvCount" class="badge b-warn" style="margin-left:4px">0</span></button>
+      </div>
+
+      <div id="teamMembersPanel" class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>Miembro</th>
+              <th>Rol</th>
+              <th>Se unió</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="teamMembersTable"></tbody>
+        </table>
+      </div>
+
+      <div id="teamInvitesPanel" class="card hidden">
+        <table>
+          <thead>
+            <tr>
+              <th>Correo Invitado</th>
+              <th>Rol</th>
+              <th>Enlace de Invitación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="teamInvitesTable"></tbody>
+        </table>
+      </div>
+    </div>
     </main>
+  </div>
+</div>
+
+<!-- Modal Invita a un miembro del equipo (Estilo Odoo 20) -->
+<div id="inviteModal" class="cmd-backdrop hidden" onclick="if(event.target===this) closeInviteModal()">
+  <div class="cmd-box" style="max-width:520px;border-radius:16px">
+    <div style="height:86px;background-color:#16111F;background-image:linear-gradient(90deg,#16111F 0%,rgba(102,89,143,.5) 55%,rgba(113,75,103,.78) 100%),repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0px,rgba(255,255,255,.06) 2px,rgba(1,126,132,.08) 2px,rgba(0,0,0,.28) 16px);display:flex;align-items:center;justify-content:center">
+      <div style="width:44px;height:44px;border-radius:11px;background:#714B67;color:#FFFFFF;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.35)">A</div>
+    </div>
+    <div style="padding:22px 24px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <h3 style="margin:0;font-size:18px;font-weight:700">Invita a un miembro del equipo</h3>
+        <button class="tb-icon-btn" onclick="closeInviteModal()">✕</button>
+      </div>
+      <p style="margin:0 0 14px 0;font-size:12.5px;color:var(--muted)">Suma a alguien a tu workspace para trabajar con la API en conjunto.</p>
+      <input id="invEmail" type="email" placeholder="Correo electrónico (ej. dev@empresa.pe)" style="margin-bottom:14px" />
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div id="roleCardMember" class="role-card active" onclick="selectInviteRole('member')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+            <strong style="font-size:13.5px">Miembro</strong>
+            <input type="radio" name="invRole" value="member" checked style="width:auto;accent-color:#714B67" />
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">Construye con la API</div>
+          <div class="role-perm">✓ API keys y conectores</div>
+          <div class="role-perm">✓ Documentos, logs y uso</div>
+          <div class="role-perm denied">✕ Facturación</div>
+          <div class="role-perm denied">✕ Gestión del equipo</div>
+        </div>
+        <div id="roleCardAdmin" class="role-card" onclick="selectInviteRole('admin')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+            <strong style="font-size:13.5px">Administrador</strong>
+            <input type="radio" name="invRole" value="admin" style="width:auto;accent-color:#714B67" />
+          </div>
+          <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">Administra el workspace</div>
+          <div class="role-perm">✓ API keys y conectores</div>
+          <div class="role-perm">✓ Documentos, logs y uso</div>
+          <div class="role-perm">✓ Facturación</div>
+          <div class="role-perm">✓ Gestión del equipo</div>
+        </div>
+      </div>
+
+      <div id="invResultBox" class="hidden" style="background:#EBF8F6;border:1px solid #C4E8E2;color:#0F766E;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:12px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button class="btn btn-sec btn-sm" onclick="closeInviteModal()">Cancelar</button>
+        <button class="btn btn-sm" onclick="submitInviteMember()">Invitar</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -947,6 +1049,7 @@ async function doSofiaSso(directToken) {
 
 async function doRegister() {
   document.getElementById('loginErr').textContent = '';
+  const invToken = new URLSearchParams(window.location.search).get('invite') || null;
   try {
     const res = await fetch('/api/v1/auth/register', {
       method: 'POST',
@@ -955,7 +1058,8 @@ async function doRegister() {
         full_name: document.getElementById('regName').value.trim(),
         workspace_name: document.getElementById('regWs').value.trim() || null,
         email: document.getElementById('regEmail').value.trim(),
-        password: document.getElementById('regPass').value
+        password: document.getElementById('regPass').value,
+        invite_token: invToken
       })
     });
     const data = await res.json();
@@ -1008,9 +1112,59 @@ const TAB_LABELS = {
   lookup: 'Consultas RUC / DNI / TC',
   logs: 'Logs API / MCP',
   billing: 'Facturación y Planes',
+  team: 'Equipo',
   workspaces: 'Workspaces',
   tester: 'Probador Rápido'
 };
+
+let INVITE_ROLE = 'member';
+function switchTeamSub(sub) {
+  document.getElementById('teamMembersPanel').classList.toggle('hidden', sub !== 'members');
+  document.getElementById('teamInvitesPanel').classList.toggle('hidden', sub !== 'invites');
+  document.getElementById('teamSubMembers').classList.toggle('active', sub === 'members');
+  document.getElementById('teamSubInvites').classList.toggle('active', sub === 'invites');
+}
+function openInviteModal() {
+  document.getElementById('invEmail').value = '';
+  document.getElementById('invResultBox').classList.add('hidden');
+  selectInviteRole('member');
+  document.getElementById('inviteModal').classList.remove('hidden');
+  setTimeout(() => document.getElementById('invEmail').focus(), 20);
+}
+function closeInviteModal() { document.getElementById('inviteModal').classList.add('hidden'); }
+function selectInviteRole(role) {
+  INVITE_ROLE = role;
+  document.getElementById('roleCardMember').classList.toggle('active', role === 'member');
+  document.getElementById('roleCardAdmin').classList.toggle('active', role === 'admin');
+  const r = document.querySelector(`input[name="invRole"][value="${role}"]`);
+  if (r) r.checked = true;
+}
+async function submitInviteMember() {
+  const email = document.getElementById('invEmail').value.trim();
+  if (!email || !email.includes('@')) { alert('Ingresa un correo válido.'); return; }
+  try {
+    const res = await api('/workspaces/team/invite', {
+      method: 'POST',
+      body: JSON.stringify({ email, role: INVITE_ROLE })
+    });
+    const box = document.getElementById('invResultBox');
+    box.classList.remove('hidden');
+    box.innerHTML = `<strong>Invitación creada para ${res.email}.</strong> Comparte este enlace:<br><code style="word-break:break-all">${res.invite_url}</code> <button class="btn btn-sm btn-teal" style="margin-left:6px" onclick="copyText('${res.invite_url}', this)">Copiar</button>`;
+    refreshAll();
+  } catch (e) {
+    alert(e.message);
+  }
+}
+async function removeMember(id) {
+  if (!confirm('¿Quitar a este miembro del workspace?')) return;
+  await api('/workspaces/team/members/' + id, { method: 'DELETE' });
+  refreshAll();
+}
+async function revokeInvite(id) {
+  if (!confirm('¿Revocar esta invitación?')) return;
+  await api('/workspaces/team/invitations/' + id, { method: 'DELETE' });
+  refreshAll();
+}
 
 function toggleWsMenu() { document.getElementById('wsMenu').classList.toggle('hidden'); }
 function closeWsMenu() { document.getElementById('wsMenu').classList.add('hidden'); }
@@ -1092,7 +1246,7 @@ document.addEventListener('keydown', e => {
 const DOCS_GROUP = new Set(['documents', 'summaries', 'contingencies', 'observations', 'tester']);
 
 function showTab(name, btn) {
-  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'workspaces', 'tester'].forEach(t => {
+  ['desk', 'documents', 'summaries', 'contingencies', 'observations', 'issuers', 'clients', 'lookup', 'connectors', 'logs', 'billing', 'team', 'workspaces', 'tester'].forEach(t => {
     document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
   });
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -1273,15 +1427,55 @@ async function refreshScopedData() {
 
 async function refreshAll() {
   refreshSunatHealth();
-  const [me, issuers, clients, billing, orders, workspaces] = await Promise.all([
+  const [me, issuers, clients, billing, orders, workspaces, team] = await Promise.all([
     api('/auth/me'),
     api('/issuers'),
     api('/clients'),
     api('/billing/plans'),
     api('/billing/orders'),
     api('/workspaces'),
+    api('/workspaces/team'),
   ]);
   ISSUERS_CACHE = issuers;
+
+  if (team) {
+    const roleLabel = r => r === 'owner' ? 'Propietario' : (r === 'admin' ? 'Administrador' : 'Miembro');
+    document.getElementById('teamMemCount').textContent = (team.members || []).length;
+    document.getElementById('teamInvCount').textContent = (team.invitations || []).length;
+    document.getElementById('btnOpenInvite').classList.toggle('hidden', !team.can_manage);
+
+    document.getElementById('teamMembersTable').innerHTML = (team.members || []).map(m => {
+      const initials = (m.full_name || m.email || 'U').split(' ').map(s => s[0]).join('').slice(0, 2).toUpperCase();
+      return `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="tb-avatar" style="background:var(--o20-primary-soft);color:var(--o20-primary)">${initials}</span>
+              <div>
+                <strong>${m.full_name}</strong> ${m.is_me ? '<span class="badge b-info" style="margin-left:4px">Tú</span>' : ''}
+                <div style="font-size:11.5px;color:var(--muted)">${m.email}</div>
+              </div>
+            </div>
+          </td>
+          <td><strong>${roleLabel(m.role)}</strong></td>
+          <td style="font-size:12px;color:var(--muted)">${(m.joined_at || '').slice(0, 10)}</td>
+          <td>${(team.can_manage && m.role !== 'owner' && !m.is_me) ? `<button class="btn btn-sm btn-err" onclick="removeMember('${m.id}')">Quitar</button>` : '<span style="font-size:12px;color:var(--muted)">—</span>'}</td>
+        </tr>
+      `;
+    }).join('');
+
+    document.getElementById('teamInvitesTable').innerHTML = (team.invitations || []).map(inv => `
+      <tr>
+        <td><strong>${inv.email}</strong></td>
+        <td><span class="badge b-info">${roleLabel(inv.role)}</span></td>
+        <td><code style="font-size:11.5px">${inv.invite_url}</code></td>
+        <td class="row-actions">
+          <button class="btn btn-sm btn-sec" onclick="copyText('${inv.invite_url}', this)">Copiar enlace</button>
+          ${team.can_manage ? `<button class="btn btn-sm btn-err" onclick="revokeInvite('${inv.id}')">Revocar</button>` : ''}
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" style="color:var(--muted);text-align:center">Sin invitaciones pendientes.</td></tr>';
+  }
 
   if (Array.isArray(workspaces)) {
     document.getElementById('wsMenuList').innerHTML = workspaces.map(w => `
@@ -1615,11 +1809,24 @@ function bootApp() {
   refreshAll();
 }
 
-const _urlSofiaToken = new URLSearchParams(window.location.search).get('sofia_token');
+const _urlParams = new URLSearchParams(window.location.search);
+const _urlSofiaToken = _urlParams.get('sofia_token');
+const _urlInviteToken = _urlParams.get('invite');
 if (_urlSofiaToken) {
   doSofiaSso(_urlSofiaToken);
 } else if (TOKEN) {
-  bootApp();
+  if (_urlInviteToken) {
+    api('/workspaces/invitations/' + encodeURIComponent(_urlInviteToken) + '/accept', { method: 'POST' })
+      .then(res => {
+        if (res && res.access_token) { TOKEN = res.access_token; localStorage.setItem('sofia_gw_token', TOKEN); }
+        window.history.replaceState({}, document.title, window.location.pathname);
+        bootApp();
+      }).catch(() => bootApp());
+  } else {
+    bootApp();
+  }
+} else if (_urlInviteToken) {
+  setAuthMode('register');
 }
 </script>
 </body>

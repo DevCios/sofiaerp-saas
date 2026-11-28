@@ -86,8 +86,10 @@ def test_sofia_sso_rs256_jwks_verification():
 
 
 def test_workspace_member_model_and_create_request():
-    from app.api.billing import WorkspaceCreateRequest
-    from app.models import WorkspaceMember
+    from app.api.billing import InviteMemberRequest, WorkspaceCreateRequest, _assert_can_manage_workspace
+    from app.models import WorkspaceInvitation, WorkspaceMember
+    from fastapi import HTTPException
+    import pytest
 
     req = WorkspaceCreateRequest(name="Agencia Dev Lima S.A.C.")
     assert req.name == "Agencia Dev Lima S.A.C."
@@ -95,3 +97,15 @@ def test_workspace_member_model_and_create_request():
     assert mem.user_id == "usr-1"
     assert mem.workspace_id == "ws-2"
     assert mem.role == "owner"
+
+    inv_req = InviteMemberRequest(email="dev@empresa.pe", role="member")
+    assert inv_req.role == "member"
+    inv = WorkspaceInvitation(workspace_id="ws-2", email="dev@empresa.pe", role="admin", token="tok-123", invited_by="owner@empresa.pe")
+    assert inv.role == "admin"
+
+    # RBAC: owner y admin pueden gestionar; member recibe 403
+    _assert_can_manage_workspace({"role": "workspace_owner", "ws_role": "owner"})
+    _assert_can_manage_workspace({"role": "workspace_owner", "ws_role": "admin"})
+    with pytest.raises(HTTPException) as exc:
+        _assert_can_manage_workspace({"role": "workspace_owner", "ws_role": "member"})
+    assert exc.value.status_code == 403
