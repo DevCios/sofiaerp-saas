@@ -39,25 +39,41 @@
                 #wrap .oe_cart {
                     padding: 24px !important;
                 }
-                /* Quitar choque visual del boton morado nativo de Odoo: convertirlo en opcion secundaria limpia */
-                #wrap a[name="website_sale_main_button"],
-                #wrap a[href="/shop/checkout"],
-                #wrap a[href="/shop/checkout?express=1"] {
-                    background: #ffffff !important;
-                    background-color: #ffffff !important;
-                    border: 1.5px solid #cbd5e1 !important;
-                    color: #334155 !important;
-                    border-radius: 10px !important;
-                    font-weight: 600 !important;
-                    font-size: 0.9rem !important;
-                    box-shadow: none !important;
-                    transition: all 0.2s ease;
+                /* Ocultar el CTA nativo competidor de Odoo en el resumen para dejar un único botón de pago Mercado Pago */
+                #o_cart_summary a[name="website_sale_main_button"],
+                #o_cart_summary a[href="/shop/checkout"],
+                #o_cart_summary a[href="/shop/checkout?express=1"],
+                .o_total_card a[name="website_sale_main_button"],
+                .o_total_card a[href="/shop/checkout"],
+                .o_total_card a[href="/shop/checkout?express=1"] {
+                    display: none !important;
                 }
-                #wrap a[name="website_sale_main_button"]:hover,
-                #wrap a[href="/shop/checkout"]:hover {
-                    background-color: #f1f5f9 !important;
-                    border-color: #94a3b8 !important;
-                    color: #0f172a !important;
+                .mw-receipt-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 7px 14px;
+                    border-radius: 10px;
+                    border: 1.5px solid #cbd5e1;
+                    background: #ffffff;
+                    color: #334155;
+                    font-size: 0.84rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.18s ease;
+                    margin: 0;
+                }
+                .mw-receipt-pill input[type="radio"] {
+                    position: absolute;
+                    opacity: 0;
+                    pointer-events: none;
+                }
+                .mw-receipt-pill.mw-active,
+                .mw-receipt-pill:has(input:checked) {
+                    border-color: #2563eb;
+                    background: #f0f7ff;
+                    color: #1d4ed8;
+                    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
                 }
 
                 /* Tarjeta principal Checkout Express */
@@ -302,6 +318,25 @@
                                         </div>
                                     </div>
 
+                                    <div class="mb-3">
+                                        <div class="fw-bold mb-1" style="font-size: 0.83rem; color: #334155;">
+                                            3. Comprobante electrónico SUNAT
+                                        </div>
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <label class="mw-receipt-pill mw-active" data-receipt="boleta">
+                                                <input type="radio" name="receipt_type" value="boleta" checked="checked"/>
+                                                <span>Boleta (DNI)</span>
+                                            </label>
+                                            <label class="mw-receipt-pill" data-receipt="factura">
+                                                <input type="radio" name="receipt_type" value="factura"/>
+                                                <span>Factura (RUC)</span>
+                                            </label>
+                                            <input type="text" id="mw_receipt_doc_input" name="receipt_doc_number" class="form-control flex-grow-1"
+                                                   style="height: 38px; min-width: 180px; border-radius: 10px; border: 1.5px solid #cbd5e1; font-size: 0.86rem;"
+                                                   maxlength="11" inputmode="numeric" placeholder="DNI (8 dígitos, opcional)"/>
+                                        </div>
+                                    </div>
+
                                     <button type="submit" class="mw-btn-pay-mp">
                                         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                         <span>Pagar S/ <t t-out="'%.2f' % (mw_order.amount_total or 0.0)"/> con Mercado Pago</span>
@@ -400,6 +435,29 @@
                         });
                     });
 
+                    // Selector compacto de Comprobante SUNAT (Boleta DNI / Factura RUC)
+                    var receiptPills = document.querySelectorAll('#mw_express_checkout_form .mw-receipt-pill');
+                    var receiptInput = document.getElementById('mw_receipt_doc_input');
+                    receiptPills.forEach(function (pill) {
+                        pill.addEventListener('click', function () {
+                            receiptPills.forEach(function (p) { p.classList.remove('mw-active'); });
+                            pill.classList.add('mw-active');
+                            var r = pill.querySelector('input[type="radio"]');
+                            if (r) {
+                                r.checked = true;
+                                if (receiptInput) {
+                                    if (r.value === 'factura') {
+                                        receiptInput.placeholder = 'RUC (11 dígitos, obligatorio para Factura)';
+                                        receiptInput.required = true;
+                                    } else {
+                                        receiptInput.placeholder = 'DNI (8 dígitos, opcional)';
+                                        receiptInput.required = false;
+                                    }
+                                }
+                            }
+                        });
+                    });
+
                     // Alinear el bloque Checkout Express al mismo grid/ancho exacto que Resumen de la orden + Total
                     var wrapper = document.getElementById('mw_cart_express_wrapper');
                     var cartEl = document.querySelector('#wrap .oe_cart');
@@ -412,10 +470,14 @@
                         }
                     }
 
-                    // Renombrar el botón secundario nativo de Odoo para evitar confusión con el CTA principal
-                    var nativeBtn = document.querySelector('#wrap a[name="website_sale_main_button"], #wrap a[href="/shop/checkout"]');
-                    if (nativeBtn && nativeBtn.textContent.indexOf('Finalizar') !== -1) {
-                        nativeBtn.textContent = 'Checkout con dirección / factura';
+                    // Ocultar separador huérfano "o" en el resumen si el botón nativo fue ocultado
+                    var summaryCard = document.querySelector('#o_cart_summary, .o_total_card');
+                    if (summaryCard) {
+                        summaryCard.querySelectorAll('span, div').forEach(function (el) {
+                            if (el.children.length === 0 && (el.textContent || '').trim().toLowerCase() === 'o') {
+                                el.style.display = 'none';
+                            }
+                        });
                     }
                 }
                 if (document.readyState === 'loading') {

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     GATEWAY_ADMIN_EMAIL: str = "admin@sofiaerp.com"
     GATEWAY_ADMIN_PASSWORD: str = "SofiaGateway2026!"
     JWT_EXPIRE_MINUTES: int = 720
+    STRICT_SECRET_VALIDATION: bool = False
     SYNC_DISPATCH_TIMEOUT_SECONDS: int = 12
 
     # Almacenamiento persistente de XML firmados y CDRs (.zip)
@@ -59,6 +60,22 @@ class Settings(BaseSettings):
     APISPERU_TOKEN: str = ""
     RUC_CACHE_TTL_DAYS: int = 7
     DNI_CACHE_TTL_DAYS: int = 30
+
+    def get_insecure_secret_warnings(self) -> list[str]:
+        """Detecta secretos por defecto inseguros en entorno de producción."""
+        warnings: list[str] = []
+        checks = {
+            "SUNAT_VAULT_MASTER_KEY": self.SUNAT_VAULT_MASTER_KEY,
+            "GATEWAY_JWT_SECRET": self.GATEWAY_JWT_SECRET,
+            "INTERNAL_SERVICE_KEY": self.INTERNAL_SERVICE_KEY,
+            "GATEWAY_ADMIN_PASSWORD": self.GATEWAY_ADMIN_PASSWORD,
+        }
+        markers = ("change_me", "change_in_prod", "sofiaadmin2026", "sofiagateway2026", "changeme")
+        for key, val in checks.items():
+            low = (val or "").lower()
+            if not val or any(m in low for m in markers):
+                warnings.append(f"{key} usa un valor por defecto inseguro; sobrescríbelo en .env")
+        return warnings
 
 
 @lru_cache()

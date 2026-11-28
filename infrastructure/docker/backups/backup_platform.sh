@@ -31,6 +31,10 @@ done
 echo "  -> tar sofia_sunat_storage (XML + CDR)"
 docker exec sofia-sunat-gateway-api tar -czf - -C /var/lib/sofia-sunat storage > "${DAY_DIR}/sofia_sunat_storage.tar.gz"
 
+# 3B. Respaldo de Filestore Odoo 20 (imágenes de productos, logos y adjuntos de todos los tenants y Mercado Wanka)
+echo "  -> tar sofia_filestores (Odoo /var/lib/odoo, excluyendo sessions)"
+docker exec sofia-odoo-runtime-shared tar --exclude='./sessions' -czf - -C /var/lib/odoo . > "${DAY_DIR}/sofia_odoo_filestores.tar.gz"
+
 # 4. Sincronización opcional hacia Google Drive si rclone + service_account.json están presentes
 RCLONE_CONF="/opt/sofiaerp/infrastructure/docker/backups/rclone.conf"
 SA_JSON="/opt/sofiaerp/infrastructure/docker/backups/service_account.json"

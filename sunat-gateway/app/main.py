@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 import time
 from contextlib import asynccontextmanager
 
@@ -20,10 +21,17 @@ import app.models  # noqa: F401 - registra todos los modelos en Base.metadata
 from app.models import ApiRequestLog
 
 settings = get_settings()
+_logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    sec_warnings = settings.get_insecure_secret_warnings()
+    if sec_warnings and settings.ENVIRONMENT == "production":
+        for w in sec_warnings:
+            _logger.critical("[SECURITY-P0] %s", w)
+        if settings.STRICT_SECRET_VALIDATION:
+            raise RuntimeError("Arranque abortado por STRICT_SECRET_VALIDATION: " + "; ".join(sec_warnings))
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         # Migraciones idempotentes sin downtime para bases existentes

@@ -72,7 +72,12 @@ settings = get_settings()
 # ==============================================================================
 @router.get("/health", tags=["Health"])
 async def health():
-    return {"status": "ok", "service": settings.APP_NAME, "version": settings.APP_VERSION}
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "security_warnings_count": len(settings.get_insecure_secret_warnings()),
+    }
 
 
 @router.get("/health/sunat", tags=["Health"])
@@ -730,6 +735,44 @@ async def emit_document(
     issuer = iss_q.scalar_one_or_none()
     if not issuer:
         raise HTTPException(status_code=404, detail=f"Empresa emisora RUC {body.issuer_ruc} no registrada en el Gateway.")
+
+    # 2B. Control de Cuota Mensual en Producción (SUNAT Beta es ilimitado para pruebas)
+    if not issuer.is_beta:
+        now_lima = datetime.now(timezone.utc).astimezone(ZoneInfo(settings.LIMA_TZ))
+        month_start = now_lima.replace(day=1, hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+        if issuer.workspace_id:
+            ws_obj = await db.get(Workspace, issuer.workspace_id)
+            quota_limit = int(ws_obj.monthly_quota) if ws_obj else int(issuer.monthly_quota or 50)
+            plan_name = ws_obj.plan_name if ws_obj else (issuer.plan_name or "FREE")
+            ws_rucs_rows = await db.execute(select(Issuer.ruc).where(Issuer.workspace_id == issuer.workspace_id))
+            ws_rucs_list = [r[0] for r in ws_rucs_rows.all()] or [issuer.ruc]
+            used_month = (
+                await db.execute(
+                    select(func.count(Document.id)).where(
+                        Document.issuer_ruc.in_(ws_rucs_list),
+                        Document.created_at >= month_start,
+                    )
+                )
+            ).scalar() or 0
+        else:
+            quota_limit = int(issuer.monthly_quota or 500)
+            plan_name = issuer.plan_name or "STARTER"
+            used_month = (
+                await db.execute(
+                    select(func.count(Document.id)).where(
+                        Document.issuer_ruc == issuer.ruc,
+                        Document.created_at >= month_start,
+                    )
+                )
+            ).scalar() or 0
+        if quota_limit > 0 and used_month >= quota_limit:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=(
+                    f"Cuota mensual alcanzada ({used_month}/{quota_limit} comprobantes en plan {plan_name}). "
+                    f"Mejora tu plan en {settings.PUBLIC_BASE_URL} -> Facturación."
+                ),
+            )
 
     # 3. Pre-validación fiscal anti-rechazos
     try:

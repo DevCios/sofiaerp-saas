@@ -198,6 +198,8 @@ services:
       - PASSWORD=${POSTGRES_PASSWORD}
       - INTERNAL_SERVICE_KEY=${INTERNAL_SERVICE_KEY:-sofia_internal_mesh_key_change_in_prod}
       - SOFIA_GATEWAY_URL=http://sunat-gateway-api:8010
+      - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
+      - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
     volumes:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro

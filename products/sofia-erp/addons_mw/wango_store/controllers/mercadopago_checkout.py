@@ -82,15 +82,23 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
         return request.env['sale.order']
 
     @http.route('/shop/mercadopago/set_delivery', type='http', auth='public', website=True, methods=['POST'], csrf=False)
-    def set_delivery_preference(self, delivery_mode='home_delivery', delivery_notes='', **kwargs):
-        """Guarda la modalidad de entrega elegida por el comprador antes de pagar en Mercado Pago."""
+    def set_delivery_preference(self, delivery_mode='home_delivery', delivery_notes='', receipt_type='boleta', receipt_doc_number='', **kwargs):
+        """Guarda la modalidad de entrega y comprobante SUNAT elegidos por el comprador antes de pagar en Mercado Pago."""
         order = self._get_current_order()
         if order and order.exists():
             vals = {}
             if 'delivery_type' in order._fields and delivery_mode in ('store_pickup', 'home_delivery', 'agency_shipping'):
                 vals['delivery_type'] = delivery_mode
-            if delivery_notes:
-                vals['note'] = f"Entrega: {delivery_mode} | {delivery_notes.strip()[:300]}"
+            clean_receipt = 'factura' if receipt_type == 'factura' else 'boleta'
+            clean_doc = ''.join(ch for ch in (receipt_doc_number or '') if ch.isdigit())[:11]
+            note_parts = [f"Entrega: {delivery_mode}"]
+            if clean_doc:
+                note_parts.append(f"Comprobante SUNAT: {clean_receipt.upper()} ({clean_doc})")
+            else:
+                note_parts.append(f"Comprobante SUNAT: {clean_receipt.upper()}")
+            if delivery_notes and delivery_notes.strip():
+                note_parts.append(f"Ref: {delivery_notes.strip()[:300]}")
+            vals['note'] = " | ".join(note_parts)
             if vals:
                 order.sudo().write(vals)
         return request.redirect('/shop/mercadopago/pay')
