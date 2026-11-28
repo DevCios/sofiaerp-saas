@@ -658,7 +658,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
             <h3 style="margin:0 0 4px 0;color:var(--o20-primary)">OAuth 2.1 + PKCE (Conexión 1-clic en Claude.ai &amp; ChatGPT)</h3>
             <div style="font-size:12.5px;color:#4B5563">
               Habilitado <strong>Dynamic Client Registration (RFC 7591)</strong> + Discovery <strong>RFC 8414 / 9728</strong>.
-              Solo pega <code>https://gateway.sofiaerp.com/mcp</code> en Claude.ai o ChatGPT Connectors y autoriza con tu cuenta sin copiar API Keys.
+              Solo pega <code>https://apisunat.pro/mcp</code> en Claude.ai o ChatGPT Connectors y autoriza con tu cuenta sin copiar API Keys.
             </div>
           </div>
           <div class="row-actions">
@@ -672,7 +672,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div class="card">
           <h3>Claude Code / Claude Desktop</h3>
           <p style="font-size:12.5px;color:var(--muted);margin-top:0">Conecta mediante <strong>Remote MCP (Streamable HTTP)</strong> usando una API Key restringida al RUC deseado.</p>
-          <pre id="snippetClaude">claude mcp add --transport http sofia-sunat https://gateway.sofiaerp.com/mcp \
+          <pre id="snippetClaude">claude mcp add --transport http sofia-sunat https://apisunat.pro/mcp \
   --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>
           <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetClaude').textContent, this)">Copiar comando</button>
         </div>
@@ -680,8 +680,8 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div class="card">
           <h3>ChatGPT (Connectors / Custom GPT)</h3>
           <p style="font-size:12.5px;color:var(--muted);margin-top:0">Usa el endpoint MCP en <strong>ChatGPT Connectors</strong> o importa el esquema en <strong>Custom GPT Actions</strong> (Auth: Bearer).</p>
-          <pre id="snippetChatGpt">MCP URL:     https://gateway.sofiaerp.com/mcp
-OpenAPI AI:  https://gateway.sofiaerp.com/openapi-ai.json
+          <pre id="snippetChatGpt">MCP URL:     https://apisunat.pro/mcp
+OpenAPI AI:  https://apisunat.pro/openapi-ai.json
 Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
           <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetChatGpt').textContent, this)">Copiar configuración</button>
         </div>
@@ -692,7 +692,7 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
           <pre id="snippetCursor">{
   "mcpServers": {
     "sofia-sunat": {
-      "url": "https://gateway.sofiaerp.com/mcp",
+      "url": "https://apisunat.pro/mcp",
       "headers": {
         "Authorization": "Bearer sk_live_TU_API_KEY"
       }

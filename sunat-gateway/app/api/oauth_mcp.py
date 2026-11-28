@@ -159,7 +159,7 @@ def _render_consent_html(
 
       <button type="submit" class="btn">Autorizar y Conectar Asistente IA</button>
     </form>
-    <p class="hint">Puedes revocar o limitar el acceso en cualquier momento desde <strong>gateway.sofiaerp.com</strong>.</p>
+    <p class="hint">Puedes revocar o limitar el acceso en cualquier momento desde <strong>apisunat.pro</strong>.</p>
   </div>
 </body>
 </html>"""

@@ -221,8 +221,8 @@ services:
     restart: unless-stopped
     environment:
       - ENVIRONMENT=production
-      - APP_NAME=${SUNAT_GATEWAY_APP_NAME:-Sofia Gateway}
-      - PUBLIC_BASE_URL=${SUNAT_GATEWAY_PUBLIC_URL:-https://gateway.sofiaerp.com}
+      - APP_NAME=${SUNAT_GATEWAY_APP_NAME:-API SUNAT Pro}
+      - PUBLIC_BASE_URL=${SUNAT_GATEWAY_PUBLIC_URL:-https://apisunat.pro}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/3
@@ -262,7 +262,7 @@ services:
     command: celery -A app.tasks.celery_app worker --beat -Q sunat_realtime,sunat_retry,sunat_night_batch,sunat_webhooks --loglevel=info --concurrency=1
     environment:
       - ENVIRONMENT=production
-      - PUBLIC_BASE_URL=https://gateway.sofiaerp.com
+      - PUBLIC_BASE_URL=${SUNAT_GATEWAY_PUBLIC_URL:-https://apisunat.pro}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/3

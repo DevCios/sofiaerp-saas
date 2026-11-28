@@ -123,16 +123,16 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
       <section id="sec-examples" class="hidden">
         <div class="doc-card" id="mcp-claude">
           <h1>Conectar Claude, ChatGPT y Cursor (MCP)</h1>
-          <p>Sofia Gateway expone un servidor <strong>Remote MCP (Streamable HTTP)</strong> en <code>https://gateway.sofiaerp.com/mcp</code> con 6 herramientas fiscales.</p>
+          <p>Sofia Gateway expone un servidor <strong>Remote MCP (Streamable HTTP)</strong> en <code>https://apisunat.pro/mcp</code> con 6 herramientas fiscales.</p>
           <h2>1. Claude Code (1 comando)</h2>
-          <pre>claude mcp add --transport http sofia-sunat https://gateway.sofiaerp.com/mcp \
+          <pre>claude mcp add --transport http sofia-sunat https://apisunat.pro/mcp \
   --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>
           <h2 id="chatgpt">2. ChatGPT (Connectors OAuth 2.1 o Custom GPT Actions)</h2>
-          <pre>Remote MCP URL:   https://gateway.sofiaerp.com/mcp
-OAuth Discovery:  https://gateway.sofiaerp.com/.well-known/oauth-authorization-server
-OpenAPI AI URL:   https://gateway.sofiaerp.com/openapi-ai.json</pre>
+          <pre>Remote MCP URL:   https://apisunat.pro/mcp
+OAuth Discovery:  https://apisunat.pro/.well-known/oauth-authorization-server
+OpenAPI AI URL:   https://apisunat.pro/openapi-ai.json</pre>
           <h2 id="curl">3. Emitir Factura vía cURL</h2>
-          <pre>curl -X POST https://gateway.sofiaerp.com/api/v1/documents/emit \
+          <pre>curl -X POST https://apisunat.pro/api/v1/documents/emit \
   -H "Authorization: Bearer sk_live_TU_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

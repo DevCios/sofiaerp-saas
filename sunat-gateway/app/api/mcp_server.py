@@ -150,7 +150,7 @@ def explain_sunat_code_data(code: str) -> dict[str, Any]:
             info = {
                 "title": f"Código SUNAT {clean}",
                 "cause": "Consulta el detalle de sunat_message y sunat_notes del documento.",
-                "action": "Revisa la pestaña Observaciones o Logs en gateway.sofiaerp.com.",
+                "action": "Revisa la pestaña Observaciones o Logs en apisunat.pro.",
             }
     return {
         "sunat_code": clean,

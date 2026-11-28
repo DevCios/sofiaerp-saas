@@ -367,7 +367,7 @@ PORTAL_HTML = r"""<!DOCTYPE html>
 </main>
 
 <footer>
-  Portal de Verificación de Comprobantes Electrónicos · <strong>Sofia Gateway</strong> (`gateway.sofiaerp.com`) · Ecosistema SOFIA ERP
+  Portal de Verificación de Comprobantes Electrónicos · <strong>API SUNAT Pro</strong> (<code>apisunat.pro</code>) · Servicio tecnológico independiente, no afiliado ni operado por SUNAT.
 </footer>
 
 <script>

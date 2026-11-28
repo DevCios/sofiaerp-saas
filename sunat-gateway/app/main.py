@@ -49,7 +49,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.PUBLIC_BASE_URL, "https://sofiaerp.com", "https://admin.sofiaerp.com"],
+    allow_origins=[
+        settings.PUBLIC_BASE_URL,
+        "https://apisunat.pro",
+        "https://www.apisunat.pro",
+        "https://docs.apisunat.pro",
+        "https://gateway.sofiaerp.com",
+        "https://sofiaerp.com",
+        "https://admin.sofiaerp.com",
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept", "X-API-Key", "X-Internal-Service-Key", "Mcp-Session-Id", "MCP-Protocol-Version"],
