@@ -17,7 +17,10 @@ class WangoLegalController(http.Controller):
             parent_name = post.get('parent_name') or ''
             
             contracted_good = post.get('contracted_good', 'product')
-            claimed_amount = float(post.get('claimed_amount') or 0.0)
+            try:
+                claimed_amount = max(0.0, float(post.get('claimed_amount') or 0.0))
+            except (ValueError, TypeError):
+                claimed_amount = 0.0
             order_ref = post.get('order_ref') or ''
             good_description = post.get('good_description') or ''
 
@@ -52,7 +55,7 @@ class WangoLegalController(http.Controller):
 
             # Enviar constancia por correo electrónico al consumidor (Exigencia INDECOPI)
             try:
-                base_url = (request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://tienda.sofiaerp.com')
+                base_url = (request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://mercadowanka.com')
                 email_body = f"""
                 <div style="font-family:sans-serif;max-width:600px;margin:auto;border:1px solid #e0e0e0;border-radius:10px;padding:25px;">
                     <h2 style="color:#00a650;margin-top:0;">Mercado Wanka - Hoja de Reclamación</h2>
@@ -93,14 +96,14 @@ class WangoLegalController(http.Controller):
             'claim': claim
         })
 
-    @http.route(['/terminos-y-condiciones'], type='http', auth="public", website=True)
+    @http.route(['/terminos-y-condiciones', '/terminos', '/legal/terminos'], type='http', auth="public", website=True)
     def terminos_condiciones(self, **kw):
         return request.render("wango_marketplace.terms_conditions_template", {})
 
-    @http.route(['/politica-de-privacidad'], type='http', auth="public", website=True)
+    @http.route(['/politica-de-privacidad', '/privacidad'], type='http', auth="public", website=True)
     def politica_privacidad(self, **kw):
         return request.render("wango_marketplace.privacy_policy_template", {})
 
-    @http.route(['/politica-de-devoluciones'], type='http', auth="public", website=True)
+    @http.route(['/politica-de-devoluciones', '/devoluciones', '/ayuda'], type='http', auth="public", website=True)
     def politica_devoluciones(self, **kw):
         return request.render("wango_marketplace.return_policy_template", {})

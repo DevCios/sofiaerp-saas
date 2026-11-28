@@ -195,18 +195,18 @@
                         <div class="col-6 col-md-2">
                             <div class="wango-meli-col-title">Acerca de</div>
                             <ul class="wango-meli-links-list">
-                                <li><a href="/aboutus">Quiénes somos</a></li>
-                                <li><a href="/vender">Vender en WanGO</a></li>
-                                <li><a href="/terminos">Términos y condiciones</a></li>
-                                <li><a href="/privacidad">Cómo cuidamos tu privacidad</a></li>
-                                <li><a href="/contacto">Contacto</a></li>
+                                <li><a href="/contactus">Quiénes somos</a></li>
+                                <li><a href="/vende-con-nosotros">Vende en Mercado Wanka</a></li>
+                                <li><a href="/terminos-y-condiciones">Términos y condiciones</a></li>
+                                <li><a href="/politica-de-privacidad">Cómo cuidamos tu privacidad</a></li>
+                                <li><a href="/contactus">Contacto</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-md-2">
                             <div class="wango-meli-col-title">Mi cuenta</div>
                             <ul class="wango-meli-links-list">
-                                <li><a href="/my/home">Resumen de mi cuenta</a></li>
+                                <li><a href="/my/home?purchases=1">Resumen de mi cuenta</a></li>
                                 <li><a href="/my/orders">Mis compras</a></li>
                                 <li><a href="/shop/cart">Mi carrito</a></li>
                                 <li><a href="/my/invoices">Comprobantes de pago</a></li>
@@ -217,11 +217,11 @@
                         <div class="col-6 col-md-2">
                             <div class="wango-meli-col-title">Ayuda</div>
                             <ul class="wango-meli-links-list">
-                                <li><a href="/ayuda">Cómo comprar</a></li>
-                                <li><a href="/ayuda">Métodos de pago</a></li>
-                                <li><a href="/ayuda">Costos y zonas de envío</a></li>
-                                <li><a href="/ayuda">Cambios y devoluciones</a></li>
-                                <li><a href="/ayuda">Resolución de problemas</a></li>
+                                <li><a href="/terminos-y-condiciones">Cómo comprar</a></li>
+                                <li><a href="/terminos-y-condiciones">Métodos de pago</a></li>
+                                <li><a href="/politica-de-devoluciones">Cambios y devoluciones</a></li>
+                                <li><a href="/libro-de-reclamaciones">Libro de Reclamaciones</a></li>
+                                <li><a href="/contactus">Soporte y contacto</a></li>
                             </ul>
                         </div>
 
@@ -240,27 +240,16 @@
                             <div class="small text-muted mb-2" style="line-height: 1.8;">
                                 <div>
                                     <i class="fa fa-envelope me-2" style="color: #009EE3;"></i>
-                                    <span t-esc="res_company.email or 'contacto@mercadowanka.pe'"/>
+                                    <span t-out="res_company.email or 'contacto@mercadowanka.com'"/>
                                 </div>
                                 <div>
                                     <i class="fa fa-phone me-2" style="color: #017E84;"></i>
-                                    <span t-esc="res_company.phone or '+51 984 000 000'"/>
+                                    <span t-out="res_company.phone or 'Atención Nacional Perú'"/>
                                 </div>
                                 <div>
                                     <i class="fa fa-map-marker me-2" style="color: #DC2626;"></i>
                                     Valle del Mantaro, Junín, Perú
                                 </div>
-                            </div>
-                            <div class="d-flex gap-2 mt-3">
-                                <a href="https://facebook.com" target="_blank" rel="noopener" class="wango-social-btn" aria-label="Facebook">
-                                    <i class="fa fa-facebook"></i>
-                                </a>
-                                <a href="https://instagram.com" target="_blank" rel="noopener" class="wango-social-btn" aria-label="Instagram">
-                                    <i class="fa fa-instagram"></i>
-                                </a>
-                                <a href="https://wa.me/" target="_blank" rel="noopener" class="wango-social-btn" aria-label="WhatsApp">
-                                    <i class="fa fa-whatsapp"></i>
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -268,17 +257,17 @@
                     <!-- 4. LÍNEA LEGAL (MERCADO LIBRE STYLE) -->
                     <div class="wango-meli-bottom-legal">
                         <div class="wango-meli-bottom-links d-flex flex-wrap gap-2 gap-md-3 mb-2">
-                            <a href="/contacto">Trabaja con nosotros</a>
+                            <a href="/vende-con-nosotros">Vende con nosotros</a>
                             <span class="text-muted">·</span>
-                            <a href="/terminos">Términos y condiciones</a>
+                            <a href="/terminos-y-condiciones">Términos y condiciones</a>
                             <span class="text-muted">·</span>
-                            <a href="/privacidad">Cómo cuidamos tu privacidad</a>
+                            <a href="/politica-de-privacidad">Cómo cuidamos tu privacidad</a>
                             <span class="text-muted">·</span>
-                            <a href="/ayuda">Cambios y devoluciones</a>
+                            <a href="/politica-de-devoluciones">Cambios y devoluciones</a>
                             <span class="text-muted">·</span>
                             <a href="/libro-de-reclamaciones">Libro de Reclamaciones</a>
                             <span class="text-muted">·</span>
-                            <a href="/ayuda">Ayuda</a>
+                            <a href="/contactus">Ayuda</a>
                         </div>
                         
                         <div class="mb-1 text-muted">
@@ -286,10 +275,10 @@
                         </div>
 
                         <div class="text-muted small" style="font-size: 0.74rem;">
-                            Razón Social: <t t-esc="res_company.name or 'Mercado Wanka S.A.C.'"/> • 
-                            RUC: <t t-esc="res_company.vat or '20608558451'"/> • 
-                            <t t-if="res_company.street"><t t-esc="res_company.street"/>, </t>
-                            <t t-if="res_company.city"><t t-esc="res_company.city"/>, </t>
+                            Razón Social: <t t-out="res_company.name or 'Mercado Wanka S.A.C.'"/> • 
+                            RUC: <t t-out="res_company.vat or 'En actualización'"/> • 
+                            <t t-if="res_company.street"><t t-out="res_company.street"/>, </t>
+                            <t t-if="res_company.city"><t t-out="res_company.city"/>, </t>
                             Valle del Mantaro, Junín, Perú.
                         </div>
                     </div>

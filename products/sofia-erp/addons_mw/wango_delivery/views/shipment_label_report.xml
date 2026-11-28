@@ -84,7 +84,7 @@
 
                     <!-- Pie: QR de Rastreo -->
                     <div class="text-center" style="border-top: 1px dashed #b2bec3; padding-top: 6px;">
-                        <img t-att-src="'/report/barcode/?type=QR&amp;value=' + (doc.tracking_qr_url or ('http://45.79.217.28:8069/track/' + doc.name)) + '&amp;width=110&amp;height=110'" style="width: 90px; height: 90px;"/>
+                        <img t-att-src="'/report/barcode/?type=QR&amp;value=' + (doc.tracking_qr_url or ('https://mercadowanka.com/track/' + doc.name)) + '&amp;width=110&amp;height=110'" style="width: 90px; height: 90px;"/>
                         <div style="font-size: 9px; color: #636e72; margin-top: 2px;">
                             Escanea para rastrear el despacho en tiempo real
                         </div>

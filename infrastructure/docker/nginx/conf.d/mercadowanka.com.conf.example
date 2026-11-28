@@ -1,0 +1,84 @@
+# ==============================================================================
+# Plantilla Nginx SSL Producción para Mercado Wanka (mercadowanka.com)
+# ==============================================================================
+# Activación el día del corte DNS:
+#   1. Apuntar registros A de mercadowanka.com y www.mercadowanka.com al VPS.
+#   2. Emitir certificado:
+#        certbot certonly --webroot -w /var/www/certbot -d mercadowanka.com -d www.mercadowanka.com
+#   3. Copiar este archivo a infrastructure/docker/nginx/conf.d/mercadowanka.com.conf
+#      y retirar el bloque legacy tienda.sofiaerp.com de default.conf.
+#   4. Recargar Nginx: docker exec sofia-nginx-edge nginx -t && docker exec sofia-nginx-edge nginx -s reload
+# ==============================================================================
+
+# 1. Redirección 301 SEO: www.mercadowanka.com -> mercadowanka.com
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name www.mercadowanka.com;
+
+    ssl_certificate /etc/letsencrypt/live/mercadowanka.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mercadowanka.com/privkey.pem;
+    return 301 https://mercadowanka.com$request_uri;
+}
+
+# 2. Redirección 301 SEO: tienda.sofiaerp.com -> mercadowanka.com
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name tienda.sofiaerp.com;
+
+    ssl_certificate /etc/letsencrypt/live/sofiaerp.com-0001/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/sofiaerp.com-0001/privkey.pem;
+    return 301 https://mercadowanka.com$request_uri;
+}
+
+# 3. Sitio Principal Canónico: https://mercadowanka.com (DB: sofia_tenant_tienda)
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name mercadowanka.com;
+
+    ssl_certificate /etc/letsencrypt/live/mercadowanka.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/mercadowanka.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    client_max_body_size 25M;
+
+    location /websocket {
+        proxy_pass http://odoo_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host mercadowanka.com;
+        proxy_set_header X-Forwarded-Host mercadowanka.com;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Odoo-dbfilter ^sofia_tenant_tienda$;
+    }
+
+    location ~* /web/static/ {
+        proxy_pass http://odoo_backend;
+        proxy_set_header Host mercadowanka.com;
+        proxy_set_header X-Forwarded-Host mercadowanka.com;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Odoo-dbfilter ^sofia_tenant_tienda$;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        proxy_pass http://odoo_backend;
+        proxy_set_header Host mercadowanka.com;
+        proxy_set_header X-Forwarded-Host mercadowanka.com;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Odoo-dbfilter ^sofia_tenant_tienda$;
+        proxy_read_timeout 120s;
+    }
+}

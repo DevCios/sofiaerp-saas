@@ -19,10 +19,10 @@
 
     <record id="badge_security" model="wango.home.trust.badge">
         <field name="title">Seguridad, de principio a fin</field>
-        <field name="description">¿No te gusta? ¡Devuélvelo! En WanGO tus compras, pagos y envíos están 100% protegidos.</field>
+        <field name="description">¿No te gusta? ¡Devuélvelo! En Mercado Wanka tus compras, pagos y envíos están 100% protegidos.</field>
         <field name="icon_class">fa fa-shield</field>
         <field name="link_text">Cómo te protegemos</field>
-        <field name="link_url">/legal/terminos</field>
+        <field name="link_url">/terminos-y-condiciones</field>
         <field name="sequence">30</field>
     </record>
 

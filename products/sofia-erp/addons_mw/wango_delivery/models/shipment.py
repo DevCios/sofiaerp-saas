@@ -83,7 +83,7 @@ class WangoShipment(models.Model):
     delivery_date = fields.Datetime(string="Fecha de Entrega")
 
     def _compute_tracking_qr_url(self):
-        base_url = (self.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://tienda.sofiaerp.com')
+        base_url = (self.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://mercadowanka.com').rstrip('/')
         for rec in self:
             rec.tracking_qr_url = f"{base_url}/track/{rec.name}"
 

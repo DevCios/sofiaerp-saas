@@ -41,7 +41,7 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
 
     def _get_base_url(self):
         param = request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1)
-        return (param.value if param else 'https://tienda.sofiaerp.com').rstrip('/')
+        return (param.value if param else 'https://mercadowanka.com').rstrip('/')
 
     def _verify_mp_signature(self, data_id):
         """Verifica cabecera x-signature de Mercado Pago (HMAC-SHA256) fail-closed."""
@@ -137,7 +137,7 @@ class MercadoWankaMercadoPagoCheckout(http.Controller):
             "external_reference": f"MW-{order.id}-{order.name}",
             "payer": {
                 "name": order.partner_id.name or "Cliente Mercado Wanka",
-                "email": order.partner_id.email or "cliente@tienda.sofiaerp.com",
+                "email": order.partner_id.email or "cliente@mercadowanka.com",
             },
             "back_urls": {
                 "success": f"{base_url}/shop/mercadopago/callback?order_id={order.id}",

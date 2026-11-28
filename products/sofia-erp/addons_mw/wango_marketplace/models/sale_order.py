@@ -121,7 +121,7 @@ class SaleOrder(models.Model):
     def _send_seller_new_order_email(self):
         base_url = (
             self.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value
-            or 'https://tienda.sofiaerp.com'
+            or 'https://mercadowanka.com'
         ).rstrip('/')
         for order in self:
             seller = order.marketplace_seller_id

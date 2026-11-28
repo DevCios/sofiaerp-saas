@@ -4,7 +4,7 @@ from odoo.http import request
 
 class MarketplaceOnboarding(http.Controller):
 
-    @http.route('/vende-con-nosotros', type='http', auth="public", website=True)
+    @http.route(['/vende-con-nosotros', '/vender-en-wango', '/vender'], type='http', auth="public", website=True)
     def seller_onboarding_form(self, **kw):
         """ Renderiza el formulario público para nuevos vendedores """
         return request.render('wango_marketplace.seller_onboarding_form_template', {})

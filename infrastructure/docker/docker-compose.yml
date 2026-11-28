@@ -200,6 +200,8 @@ services:
       - SOFIA_GATEWAY_URL=http://sunat-gateway-api:8010
       - MP_ACCESS_TOKEN=${MP_ACCESS_TOKEN:-}
       - MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
+      - MARKETPLACE_HUB_URL=${MARKETPLACE_HUB_URL:-http://127.0.0.1:8069}
+      - MARKETPLACE_PUBLIC_HOST=${MARKETPLACE_PUBLIC_HOST:-tienda.sofiaerp.com}
     volumes:
       - sofia_filestores:/var/lib/odoo
       - ./odoo/odoo.conf:/etc/odoo/odoo.conf:ro

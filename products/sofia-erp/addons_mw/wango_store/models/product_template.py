@@ -54,8 +54,8 @@ class ProductTemplate(models.Model):
 
     sales_count_base = fields.Integer(
         string='Ventas Base / Social Proof',
-        default=48,
-        help='Unidades vendidas de partida para marketing o social proof.'
+        default=0,
+        help='Unidades vendidas de partida (mantener en 0 para métricas 100% reales).'
     )
     sales_count_real = fields.Integer(
         string='Ventas Reales',
@@ -74,14 +74,14 @@ class ProductTemplate(models.Model):
     )
     wango_rating_avg = fields.Float(
         string='Calificación Estrellas (1.0 - 5.0)',
-        default=4.9,
+        default=0.0,
         digits=(3, 1),
-        help='Calificación promedio del producto para mostrar estrellas.'
+        help='Calificación promedio real del producto.'
     )
     wango_rating_count = fields.Integer(
         string='Cantidad de Opiniones',
-        default=24,
-        help='Número de reseñas y opiniones mostradas.'
+        default=0,
+        help='Número real de reseñas y opiniones aprobadas.'
     )
     review_ids = fields.One2many(
         'wango.product.review',

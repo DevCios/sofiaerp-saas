@@ -816,7 +816,7 @@ class MarketplaceSellerPortal(CustomerPortal):
         return bool(order.marketplace_seller_id and order.marketplace_seller_id == partner)
 
     def _get_public_tracking_url(self, order):
-        base_url = (request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://tienda.sofiaerp.com').rstrip('/')
+        base_url = (request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value or 'https://mercadowanka.com').rstrip('/')
         token = order.sudo()._portal_ensure_token()
         return '%s/track/%s?access_token=%s' % (base_url, order.name, token)
 

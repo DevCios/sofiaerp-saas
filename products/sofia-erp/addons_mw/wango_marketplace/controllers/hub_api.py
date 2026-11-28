@@ -83,7 +83,7 @@ class MercadoWankaHubAPI(http.Controller):
 
         base_url = (
             request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value
-            or 'https://tienda.sofiaerp.com'
+            or 'https://mercadowanka.com'
         ).rstrip('/')
 
         return _json_response({
@@ -91,7 +91,7 @@ class MercadoWankaHubAPI(http.Controller):
             'seller_id': seller.id,
             'seller_token': seller.sofia_seller_token,
             'status': seller.marketplace_seller_status,
-            'store_url': f'{base_url}/shop?seller={seller.id}',
+            'store_url': f'{base_url}/shop?seller_id={seller.id}',
             'commission_policy': '5.0% del precio total + S/ 0.50 uso de plataforma',
         })
 
@@ -151,6 +151,7 @@ class MercadoWankaHubAPI(http.Controller):
             prod.write(vals)
         else:
             vals['type'] = 'consu'
+            vals['is_storable'] = True
             prod = Product.create(vals)
 
         # Actualizar stock disponible en almacén si viene qty_available
@@ -173,7 +174,7 @@ class MercadoWankaHubAPI(http.Controller):
 
         base_url = (
             request.env['ir.config_parameter'].sudo().search([('key', '=', 'web.base.url')], limit=1).value
-            or 'https://tienda.sofiaerp.com'
+            or 'https://mercadowanka.com'
         ).rstrip('/')
 
         return _json_response({
