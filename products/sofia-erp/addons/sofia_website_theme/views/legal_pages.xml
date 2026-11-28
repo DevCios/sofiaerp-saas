@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Términos del Servicio (/terminos) -->
+    <template id="terms_page" name="Términos del Servicio — SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white border-bottom">
+                    <div class="container" style="max-width: 860px;">
+                        <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #EAE6F8; color: #714B67; font-weight: 700;">Marco Legal • Perú</span>
+                        <h1 class="fw-bold text-dark mb-3">Términos y Condiciones del Servicio</h1>
+                        <p class="text-secondary mb-4">Última actualización: 2026 • Plataforma Cloud SOFIA ERP &amp; API SUNAT</p>
+
+                        <h5 class="fw-bold text-dark mt-4">1. Objeto del Servicio</h5>
+                        <p class="text-secondary">SOFIA ERP provee software de gestión empresarial en la nube (SaaS) bajo arquitectura de base de datos aislada por cliente (<em>database-per-tenant</em>), facturación electrónica SUNAT UBL 2.1, Guías de Remisión Electrónica y servicios complementarios de ecosistema.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">2. Propiedad de los Datos y Aislamiento</h5>
+                        <p class="text-secondary">Toda la información contable, comercial, comprobantes XML/CDR y archivos cargados pertenecen exclusivamente al cliente. Cada suscripción opera sobre su propia base de datos PostgreSQL y almacenamiento físico separado con respaldos diarios cifrados.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">3. Suscripciones, Renovación y Cancelación</h5>
+                        <p class="text-secondary">Los planes se facturan de forma mensual o anual según la modalidad elegida en el checkout, sin contratos de permanencia forzosa. En caso de falta de pago, el servicio otorga un periodo de gracia para regularización antes de la suspensión temporal del acceso, manteniendo intactos los datos del cliente.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">4. Responsabilidad Tributaria SUNAT</h5>
+                        <p class="text-secondary">El cliente es titular de su Clave SOL y Certificado Digital (<code>.pfx</code>) y es responsable de la veracidad de los datos fiscales emitidos. SOFIA ERP garantiza la integridad criptográfica de la firma y la transmisión hacia los servicios oficiales de SUNAT.</p>
+
+                        <div class="mt-5 pt-4 border-top d-flex flex-wrap gap-3">
+                            <a href="/precios" class="btn text-white fw-bold px-4" style="background: #714B67; border-radius: 10px;">Ver Planes y Precios</a>
+                            <a href="/privacidad" class="btn btn-outline-secondary fw-semibold px-4" style="border-radius: 10px;">Política de Privacidad</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- Política de Privacidad (/privacidad — Ley N° 29733 Perú) -->
+    <template id="privacy_page" name="Política de Privacidad — SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white border-bottom">
+                    <div class="container" style="max-width: 860px;">
+                        <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #D9F2EE; color: #017E84; font-weight: 700;">Ley N° 29733 • Protección de Datos Personales</span>
+                        <h1 class="fw-bold text-dark mb-3">Política de Privacidad y Protección de Datos</h1>
+                        <p class="text-secondary mb-4">En cumplimiento de la Ley N° 29733 y su Reglamento (D.S. N° 003-2013-JUS) en la República del Perú.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">1. Datos Recopilados</h5>
+                        <p class="text-secondary">Recopilamos únicamente los datos necesarios para el aprovisionamiento de su instancia ERP, facturación electrónica, soporte técnico y cumplimiento tributario: razón social, RUC/DNI, correo electrónico corporativo, teléfono y dirección fiscal.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">2. Seguridad y Cifrado</h5>
+                        <p class="text-secondary">Las contraseñas se almacenan mediante funciones hash seguras, las credenciales fiscales (.pfx y Clave SOL) se cifran en reposo con AES/Fernet y todas las comunicaciones operan bajo TLS/HTTPS. No vendemos ni cedemos datos personales a terceros.</p>
+
+                        <h5 class="fw-bold text-dark mt-4">3. Derechos ARCO</h5>
+                        <p class="text-secondary">Usted puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición escribiendo a <a href="mailto:soporte@sofiaerp.com" class="fw-bold" style="color: #714B67;">soporte@sofiaerp.com</a> o mediante nuestro <a href="/libro-de-reclamaciones" class="fw-bold" style="color: #017E84;">Libro de Reclamaciones</a>.</p>
+
+                        <div class="mt-5 pt-4 border-top d-flex flex-wrap gap-3">
+                            <a href="/precios" class="btn text-white fw-bold px-4" style="background: #714B67; border-radius: 10px;">Comenzar con SOFIA ERP</a>
+                            <a href="/terminos" class="btn btn-outline-secondary fw-semibold px-4" style="border-radius: 10px;">Términos del Servicio</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- Página Dinámica de Vertical / Aplicación (/verticales/<slug> y /aplicaciones/<slug>) -->
+    <template id="vertical_detail_page" name="Solución SOFIA ERP">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="py-5 bg-white border-bottom text-center">
+                    <div class="container" style="max-width: 820px;">
+                        <span class="badge rounded-pill px-3 py-2 mb-3" style="background: #EAE6F8; color: #714B67; font-weight: 700;">
+                            <t t-out="section_badge"/>
+                        </span>
+                        <h1 class="fw-bold text-dark mb-3" style="font-size: clamp(2rem, 4vw, 3rem);">
+                            SOFIA ERP para <span style="color: #714B67;"><t t-out="item_title"/></span>
+                        </h1>
+                        <p class="lead text-secondary mb-4">
+                            <t t-out="item_summary"/>
+                        </p>
+                        <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                            <a href="/checkout?plan=pyme-pro" class="btn text-white fw-bold px-4 py-2.5" style="background: #714B67; border-radius: 12px;">
+                                Comenzar ahora (Plan Pyme Pro) →
+                            </a>
+                            <a href="/precios" class="btn btn-outline-secondary fw-bold px-4 py-2.5" style="border-radius: 12px;">
+                                Comparar Planes
+                            </a>
+                        </div>
+
+                        <div class="row g-3 text-start">
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border h-100" style="background: #F6F7F9;">
+                                    <h6 class="fw-bold text-dark">Facturación SUNAT 100%</h6>
+                                    <p class="small text-secondary mb-0">Boletas, Facturas, Notas de Crédito/Débito y Guías GRE 09/31 en tiempo real con recuperación automática.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border h-100" style="background: #F6F7F9;">
+                                    <h6 class="fw-bold text-dark">Base de Datos Dedicada</h6>
+                                    <p class="small text-secondary mb-0">Tu empresa opera en una instancia aislada en la nube con respaldos automáticos diarios y acceso web/móvil.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border h-100" style="background: #F6F7F9;">
+                                    <h6 class="fw-bold text-dark">Escalable sin Migraciones</h6>
+                                    <p class="small text-secondary mb-0">Activa Punto de Venta, Inventario multi-almacén, SIRE SUNAT, API SUNAT o Mercado Wanka cuando lo necesites.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

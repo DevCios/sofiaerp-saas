@@ -293,11 +293,63 @@
                         color: #714B67 !important;
                     }
 
+                    /* Garantizar visibilidad del menú en desktop sobre cualquier CSS de Odoo */
+                    @media (min-width: 992px) {
+                        .odoo-nav-menu {
+                            display: flex !important;
+                            visibility: visible !important;
+                            opacity: 1 !important;
+                        }
+                        .odoo-nav-actions {
+                            display: flex !important;
+                            visibility: visible !important;
+                            opacity: 1 !important;
+                        }
+                        .sofia-mobile-toggle,
+                        .sofia-mobile-drawer {
+                            display: none !important;
+                        }
+                    }
+
+                    /* Botón hamburguesa y drawer móvil (hasta 991px) */
+                    .sofia-mobile-toggle {
+                        display: none;
+                        align-items: center;
+                        justify-content: center;
+                        width: 42px;
+                        height: 42px;
+                        border: 1.5px solid #E5E7EB;
+                        border-radius: 10px;
+                        background: #FFFFFF;
+                        color: #1F2937;
+                        cursor: pointer;
+                    }
+                    .sofia-mobile-drawer {
+                        display: none;
+                        background: #FFFFFF;
+                        border-top: 1px solid #E5E7EB;
+                        padding: 1rem 1.5rem 1.5rem;
+                        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+                    }
+                    .sofia-mobile-drawer.is-open {
+                        display: block !important;
+                    }
+                    .sofia-mobile-drawer a {
+                        display: block;
+                        padding: 0.65rem 0.5rem;
+                        color: #1F2937 !important;
+                        font-weight: 600;
+                        text-decoration: none !important;
+                        border-bottom: 1px solid #F3F4F6;
+                    }
+
                     /* Móvil */
                     @media (max-width: 991px) {
-                        .odoo-nav-menu { display: none; }
-                        .odoo-nav-actions { display: none; }
+                        .odoo-nav-container { padding: 0.75rem 1.25rem; }
+                        .odoo-nav-menu { display: none !important; }
+                        .odoo-nav-actions { display: none !important; }
                         .odoo-megamenu-panel { display: none !important; }
+                        .sofia-mobile-toggle { display: inline-flex !important; }
                     }
                 </style>
 
@@ -464,12 +516,42 @@
                         <li class="odoo-nav-item">
                             <a class="odoo-nav-link" href="/soporte">Ayuda</a>
                         </li>
+
+                        <!-- 5. Ecosistema: API SUNAT y Mercado Wanka -->
+                        <li class="odoo-nav-item">
+                            <a class="odoo-nav-link" href="https://apisunat.pro" target="_blank" rel="noopener">API SUNAT</a>
+                        </li>
+                        <li class="odoo-nav-item">
+                            <a class="odoo-nav-link" href="https://tienda.sofiaerp.com" target="_blank" rel="noopener">Mercado Wanka</a>
+                        </li>
                     </ul>
 
                     <!-- Botones Derecha -->
                     <div class="odoo-nav-actions">
                         <a href="/login" class="odoo-login-btn">Acceder</a>
                         <a href="/precios" class="odoo-trial-btn">Crear cuenta gratis</a>
+                    </div>
+
+                    <!-- Botón Móvil -->
+                    <button type="button" class="sofia-mobile-toggle" id="sofiaMobileToggle" aria-label="Abrir menú de navegación">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Drawer Móvil -->
+                <div class="sofia-mobile-drawer" id="sofiaMobileDrawer">
+                    <a href="/verticales">Verticales y Aplicaciones</a>
+                    <a href="/precios">Planes y Precios</a>
+                    <a href="https://apisunat.pro" target="_blank" rel="noopener">API SUNAT (Desarrolladores &amp; IA)</a>
+                    <a href="https://tienda.sofiaerp.com" target="_blank" rel="noopener">Mercado Wanka (Marketplace)</a>
+                    <a href="/soporte">Ayuda y Soporte</a>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="/login" class="btn btn-outline-secondary w-50 text-center" style="border-radius: 10px; border-bottom: 1px solid #cbd5e1;">Acceder</a>
+                        <a href="/precios" class="btn text-white w-50 text-center" style="background: #714B67; border-radius: 10px; border-bottom: none;">Crear cuenta</a>
                     </div>
                 </div>
 
@@ -551,6 +633,20 @@
                                 closeAllMenus();
                             }
                         });
+
+                        // Toggle del menú móvil
+                        const mobBtn = document.getElementById('sofiaMobileToggle');
+                        const mobDrawer = document.getElementById('sofiaMobileDrawer');
+                        if (mobBtn &amp;&amp; mobDrawer) {
+                            mobBtn.addEventListener('click', function () {
+                                mobDrawer.classList.toggle('is-open');
+                            });
+                        }
+
+                        // Normalizar sufijo de título si Odoo aún conserva "My Website"
+                        if (document.title &amp;&amp; document.title.indexOf('My Website') !== -1) {
+                            document.title = document.title.replace('My Website', 'SOFIA ERP');
+                        }
                     });
                 </script>
             </header>

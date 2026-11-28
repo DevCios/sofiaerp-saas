@@ -190,9 +190,17 @@
                                         <p class="small text-secondary mb-0"><strong>Horario:</strong> Lunes a Sábado de 8:00 AM a 8:00 PM</p>
                                     </div>
                                     <div class="mt-4">
-                                        <a href="https://wa.me/51999999999?text=Hola%20SOFIA%20ERP%2C%20necesito%20soporte%20t%C3%A9cnico" target="_blank" class="btn-support-whatsapp">
-                                            Iniciar Chat de WhatsApp →
-                                        </a>
+                                        <t t-set="wa_phone" t-value="''.join(c for c in (res_company.phone or '') if c.isdigit())"/>
+                                        <t t-if="wa_phone and len(wa_phone) >= 9">
+                                            <a t-attf-href="https://wa.me/#{wa_phone}?text=Hola%20SOFIA%20ERP%2C%20necesito%20soporte%20t%C3%A9cnico" target="_blank" rel="noopener" class="btn-support-whatsapp">
+                                                Iniciar Chat de WhatsApp →
+                                            </a>
+                                        </t>
+                                        <t t-else="">
+                                            <a href="mailto:soporte@sofiaerp.com?subject=Soporte%20SOFIA%20ERP" class="btn-support-whatsapp">
+                                                Solicitar Asesoría Directa →
+                                            </a>
+                                        </t>
                                     </div>
                                 </div>
                             </div>
@@ -224,8 +232,8 @@
                                         <p class="small text-secondary mb-0"><strong>Disponible:</strong> Acceso libre 24 horas al día</p>
                                     </div>
                                     <div class="mt-4">
-                                        <a href="/precios" class="btn-support-outline">
-                                            Explorar Tutoriales →
+                                        <a href="https://docs.apisunat.pro" target="_blank" rel="noopener" class="btn-support-outline">
+                                            Explorar Documentación API &amp; Guías →
                                         </a>
                                     </div>
                                 </div>

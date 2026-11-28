@@ -139,49 +139,48 @@
                     <div class="row g-4 mb-4">
                         <!-- Columna 1: Acerca de -->
                         <div class="col-6 col-md-2">
-                            <h6>Acerca de</h6>
+                            <h6>SOFIA ERP</h6>
                             <ul class="footer-col-links">
-                                <li><a href="/aboutus">Quiénes somos</a></li>
-                                <li><a href="/verticales/comercio-electronico">Vende con nosotros</a></li>
+                                <li><a href="/">Inicio</a></li>
+                                <li><a href="/precios">Planes y Precios</a></li>
+                                <li><a href="/verticales">Verticales de Negocio</a></li>
                                 <li><a href="/terminos">Términos del servicio</a></li>
-                                <li><a href="/privacidad">Políticas de privacidad</a></li>
-                                <li><a href="/soporte">Sustentabilidad y valores</a></li>
+                                <li><a href="/privacidad">Política de privacidad</a></li>
                             </ul>
                         </div>
 
                         <!-- Columna 2: Mi cuenta -->
                         <div class="col-6 col-md-2">
-                            <h6>Mi cuenta</h6>
+                            <h6>Plataforma</h6>
                             <ul class="footer-col-links">
-                                <li><a href="/my/home">Resumen de cuenta</a></li>
-                                <li><a href="/my/orders">Mis compras y pedidos</a></li>
-                                <li><a href="/shop/cart">Mi carrito</a></li>
-                                <li><a href="/my/invoices">Comprobantes y facturas</a></li>
-                                <li><a href="/web/login">Iniciar sesión</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Columna 3: Ayuda -->
-                        <div class="col-6 col-md-2">
-                            <h6>Ayuda</h6>
-                            <ul class="footer-col-links">
+                                <li><a href="/login">Iniciar sesión</a></li>
+                                <li><a href="/precios">Crear cuenta ERP</a></li>
                                 <li><a href="/soporte">Centro de ayuda</a></li>
-                                <li><a href="/soporte">Cómo comprar paso a paso</a></li>
-                                <li><a href="/soporte">Métodos de pago</a></li>
-                                <li><a href="/soporte">Envíos y tarifas</a></li>
-                                <li><a href="/soporte">Cambios y devoluciones</a></li>
+                                <li><a href="/libro-de-reclamaciones">Libro de Reclamaciones</a></li>
+                                <li><a href="https://api.sofiaerp.com/admin" target="_blank" rel="noopener">Admin Portal</a></li>
                             </ul>
                         </div>
 
-                        <!-- Columna 4: Catálogo y Ofertas -->
-                        <div class="col-6 col-md-3">
-                            <h6>Catálogo &amp; Ofertas</h6>
+                        <!-- Columna 3: Ecosistema -->
+                        <div class="col-6 col-md-2">
+                            <h6>Ecosistema</h6>
                             <ul class="footer-col-links">
-                                <li><a href="/shop">Catálogo general</a></li>
-                                <li><a href="/shop">Ofertas del día</a></li>
-                                <li><a href="/shop">Cyber Wow &amp; Campañas</a></li>
-                                <li><a href="/shop">Novedades y tendencias</a></li>
-                                <li><a href="/precios">Planes para vendedores</a></li>
+                                <li><a href="https://apisunat.pro" target="_blank" rel="noopener">API SUNAT (Facturación)</a></li>
+                                <li><a href="https://docs.apisunat.pro" target="_blank" rel="noopener">Documentación API &amp; MCP</a></li>
+                                <li><a href="https://tienda.sofiaerp.com" target="_blank" rel="noopener">Mercado Wanka</a></li>
+                                <li><a href="https://tienda.sofiaerp.com/vende-con-nosotros" target="_blank" rel="noopener">Vende en Mercado Wanka</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Columna 4: Verticales -->
+                        <div class="col-6 col-md-3">
+                            <h6>Soluciones Perú</h6>
+                            <ul class="footer-col-links">
+                                <li><a href="/verticales/bodegas">POS para Bodegas</a></li>
+                                <li><a href="/verticales/ferreterias">Ferreterías y Retail</a></li>
+                                <li><a href="/verticales/restaurante">Restaurantes y Cafés</a></li>
+                                <li><a href="/verticales/contabilidad">Contabilidad &amp; SIRE SUNAT</a></li>
+                                <li><a href="/verticales/manufactura">Manufactura y Costos</a></li>
                             </ul>
                         </div>
 
@@ -198,7 +197,7 @@
                                 <t t-else="">
                                     <div class="mb-1">
                                         <i class="fa fa-envelope me-2 text-primary"></i>
-                                        contacto@mercadowanka.pe
+                                        soporte@sofiaerp.com
                                     </div>
                                 </t>
                                 <t t-if="res_company.phone">
@@ -210,49 +209,42 @@
                                 <t t-else="">
                                     <div class="mb-2">
                                         <i class="fa fa-phone me-2 text-success"></i>
-                                        +51 984 000 000
+                                        Perú • Atención Nacional
                                     </div>
                                 </t>
                             </div>
                             <div class="d-flex gap-2 mt-3">
-                                <a href="https://facebook.com" target="_blank" rel="noopener" class="social-circle-btn" aria-label="Facebook">
-                                    <i class="fa fa-facebook"></i>
+                                <a href="/soporte" class="social-circle-btn" aria-label="Soporte Técnico">
+                                    <i class="fa fa-headphones"></i>
                                 </a>
-                                <a href="https://instagram.com" target="_blank" rel="noopener" class="social-circle-btn" aria-label="Instagram">
-                                    <i class="fa fa-instagram"></i>
-                                </a>
-                                <a href="https://wa.me/" target="_blank" rel="noopener" class="social-circle-btn" aria-label="WhatsApp">
-                                    <i class="fa fa-whatsapp"></i>
+                                <a href="mailto:soporte@sofiaerp.com" class="social-circle-btn" aria-label="Correo">
+                                    <i class="fa fa-envelope"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. LÍNEA LEGAL (MERCADO LIBRE STYLE) -->
+                    <!-- 4. LÍNEA LEGAL -->
                     <div class="border-top pt-3 mt-4" style="border-color: #E2E8F0 !important; font-size: 0.78rem; color: #64748B;">
                         <div class="legal-links-row d-flex flex-wrap gap-2 gap-md-3 mb-2">
-                            <a href="/soporte">Trabaja con nosotros</a>
+                            <a href="/terminos">Términos del servicio</a>
                             <span class="text-muted">·</span>
-                            <a href="/terminos">Términos y condiciones</a>
-                            <span class="text-muted">·</span>
-                            <a href="/privacidad">Cómo cuidamos tu privacidad</a>
-                            <span class="text-muted">·</span>
-                            <a href="/soporte">Cambios y devoluciones</a>
+                            <a href="/privacidad">Política de privacidad (Ley 29733)</a>
                             <span class="text-muted">·</span>
                             <a href="/libro-de-reclamaciones">Libro de Reclamaciones</a>
                             <span class="text-muted">·</span>
-                            <a href="/soporte">Ayuda</a>
+                            <a href="/soporte">Centro de ayuda</a>
                         </div>
                         
                         <div class="mb-1 text-muted">
-                            Copyright © 2026 <t t-esc="res_company.name or 'Mercado Wanka S.A.C.'"/>. Todos los derechos reservados.
+                            Copyright © 2026 <t t-out="res_company.name or 'SOFIA ERP S.A.C.'"/>. Todos los derechos reservados.
                         </div>
 
                         <div class="text-muted small" style="font-size: 0.73rem;">
-                            Razón Social: <t t-esc="res_company.name or 'Mercado Wanka S.A.C.'"/> • 
-                            RUC: <t t-esc="res_company.vat or '20600000000'"/> • 
-                            <t t-if="res_company.street"><t t-esc="res_company.street"/>, </t>
-                            <t t-if="res_company.city"><t t-esc="res_company.city"/>, </t>
+                            Razón Social: <t t-out="res_company.name or 'SOFIA ERP S.A.C.'"/> • 
+                            RUC: <t t-out="res_company.vat or '20600000000'"/> • 
+                            <t t-if="res_company.street"><t t-out="res_company.street"/>, </t>
+                            <t t-if="res_company.city"><t t-out="res_company.city"/>, </t>
                             Perú.
                         </div>
                     </div>

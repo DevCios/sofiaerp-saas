@@ -423,8 +423,8 @@
                                         <button type="button" class="btn-odoo-checkout" id="btnGoToStep2">
                                             Compra ahora
                                         </button>
-                                        <a href="/soporte" class="btn-odoo-quote">
-                                            Enviar o imprimir la cotización
+                                        <a href="javascript:window.print()" class="btn-odoo-quote">
+                                            Imprimir cotización
                                         </a>
 
                                         <div class="mt-4 text-center">
@@ -592,6 +592,24 @@
                                             <span class="fw-bold text-success" id="step2DiscountAmount">S/ -24.00</span>
                                         </div>
 
+                                        <!-- Ítem 3: Implementación (solo visible si > 0) -->
+                                        <div class="d-flex align-items-center justify-content-between mb-3" id="step2RowImpl" style="display: none !important;">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="cart-item-avatar" style="background: #017E84;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M12 20h9"></path>
+                                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                                    </svg>
+                                                    <span class="cart-item-badge">1</span>
+                                                </div>
+                                                <div>
+                                                    <h6 class="fw-bold mb-0 text-dark">Servicio de implementación</h6>
+                                                    <span class="text-muted small">pago único</span>
+                                                </div>
+                                            </div>
+                                            <span class="fw-bold text-dark" id="step2ImplAmount">S/ 0.00</span>
+                                        </div>
+
                                         <hr class="my-3 text-muted opacity-25"/>
 
                                         <!-- Subtotal e Impuestos -->
@@ -726,35 +744,56 @@
                                 if (summaryBillingSwitch) summaryBillingSwitch.classList.add('monthly');
                                 if (sumBtnMensual) sumBtnMensual.classList.add('active');
                                 if (sumBtnAnual) sumBtnAnual.classList.remove('active');
-                                if (rowAnnualDiscount) rowAnnualDiscount.style.display = 'none';
+                                if (rowAnnualDiscount) rowAnnualDiscount.style.setProperty('display', 'none', 'important');
                                 if (noteAnnualTotal) noteAnnualTotal.innerHTML = 'Facturado mensualmente: <strong class="text-dark">S/ ' + (baseTotalEffective + implCost).toFixed(2) + '</strong>';
                             } else {
                                 if (summaryBillingSwitch) summaryBillingSwitch.classList.remove('monthly');
                                 if (sumBtnAnual) sumBtnAnual.classList.add('active');
                                 if (sumBtnMensual) sumBtnMensual.classList.remove('active');
-                                if (rowAnnualDiscount) rowAnnualDiscount.style.display = 'flex';
+                                if (rowAnnualDiscount) rowAnnualDiscount.style.setProperty('display', 'flex', 'important');
                                 if (sumDiscountVal) sumDiscountVal.textContent = 'S/ -' + discountMonthly.toFixed(2);
                                 var annualBilled = (baseTotalEffective * 12) + implCost;
                                 if (noteAnnualTotal) noteAnnualTotal.innerHTML = '(*) Facturado anualmente: <strong class="text-dark">S/ ' + annualBilled.toFixed(2) + '</strong>';
                             }
 
+                            if (rowImplService) {
+                                if (implCost > 0) {
+                                    rowImplService.style.setProperty('display', 'flex', 'important');
+                                    if (sumImplCost) sumImplCost.textContent = 'S/ ' + implCost.toFixed(2);
+                                } else {
+                                    rowImplService.style.setProperty('display', 'none', 'important');
+                                }
+                            }
+
                             if (sumTotalMonthly) sumTotalMonthly.textContent = 'S/ ' + baseTotalEffective.toFixed(2);
 
-                            // Actualizar UI Paso 2 (Checkout Fiscal)
+                            // Actualizar UI Paso 2 (Checkout Fiscal — desglosando plan e implementación por separado)
                             if (badgeStep2Users) badgeStep2Users.textContent = usersCount;
                             if (step2PlanNameDisplay) step2PlanNameDisplay.textContent = 'Plan ' + planData.name.charAt(0) + planData.name.slice(1).toLowerCase();
                             if (step2CycleLabel) step2CycleLabel.textContent = isMonthly ? 'por mes' : 'por año (12 meses)';
 
-                            var netBeforeTax = isMonthly ? (baseTotalEffective + implCost) : ((baseTotalEffective * 12) + implCost);
-                            var grossBeforeDiscount = isMonthly ? (baseTotalRegular + implCost) : ((baseTotalRegular * 12) + implCost);
-                            var totalDiscount = grossBeforeDiscount - netBeforeTax;
+                            var planGross = isMonthly ? baseTotalRegular : (baseTotalRegular * 12);
+                            var planNet = isMonthly ? baseTotalEffective : (baseTotalEffective * 12);
+                            var totalDiscount = planGross - planNet;
+                            var netBeforeTax = planNet + implCost;
 
-                            if (step2PlanSubtotal) step2PlanSubtotal.textContent = 'S/ ' + grossBeforeDiscount.toFixed(2);
+                            if (step2PlanSubtotal) step2PlanSubtotal.textContent = 'S/ ' + planGross.toFixed(2);
                             if (isMonthly) {
-                                if (step2RowDiscount) step2RowDiscount.style.display = 'none';
+                                if (step2RowDiscount) step2RowDiscount.style.setProperty('display', 'none', 'important');
                             } else {
-                                if (step2RowDiscount) step2RowDiscount.style.display = 'flex';
+                                if (step2RowDiscount) step2RowDiscount.style.setProperty('display', 'flex', 'important');
                                 if (step2DiscountAmount) step2DiscountAmount.textContent = 'S/ -' + totalDiscount.toFixed(2);
+                            }
+
+                            var step2RowImpl = document.getElementById('step2RowImpl');
+                            var step2ImplAmount = document.getElementById('step2ImplAmount');
+                            if (step2RowImpl) {
+                                if (implCost > 0) {
+                                    step2RowImpl.style.setProperty('display', 'flex', 'important');
+                                    if (step2ImplAmount) step2ImplAmount.textContent = 'S/ ' + implCost.toFixed(2);
+                                } else {
+                                    step2RowImpl.style.setProperty('display', 'none', 'important');
+                                }
                             }
 
                             var igv = netBeforeTax * 0.18;

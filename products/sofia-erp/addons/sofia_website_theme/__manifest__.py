@@ -27,6 +27,7 @@ Módulo de Identidad Visual y Experiencia Web para SOFIA ERP (Odoo 20)
         'views/pricing_page.xml',
         'views/support_page.xml',
         'views/verticales_page.xml',
+        'views/legal_pages.xml',
         'views/libro_reclamaciones_page.xml',
         'views/checkout_page.xml',
         'views/account_portal_pages.xml',

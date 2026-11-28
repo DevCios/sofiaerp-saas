@@ -577,3 +577,45 @@ class SofiaCheckoutController(http.Controller):
         return request.render('sofia_website_theme.my_account_portal_page', {
             'tenant': (kwargs.get('tenant') or '').strip(),
         })
+
+    @http.route('/terminos', type='http', auth='public', website=True)
+    def terms_of_service(self, **kwargs):
+        return request.render('sofia_website_theme.terms_page', {})
+
+    @http.route('/privacidad', type='http', auth='public', website=True)
+    def privacy_policy(self, **kwargs):
+        return request.render('sofia_website_theme.privacy_page', {})
+
+    @http.route(['/verticales/<string:slug>', '/aplicaciones/<string:slug>'], type='http', auth='public', website=True)
+    def vertical_or_app_detail(self, slug, **kwargs):
+        catalog = {
+            'bodegas': ('Bodegas y Minimarkets', 'Punto de Venta ultra rápido con lector de códigos, Yape/Plin, control de stock y Boletas SUNAT al instante.'),
+            'ferreterias': ('Ferreterías y Materiales', 'Control multi-almacén, ventas por unidad/caja/metro, cotizaciones rápidas, Guías GRE y Facturación SUNAT.'),
+            'retail': ('Retail y Tiendas', 'Gestión de tiendas, POS omnicanal, listas de precios, inventario en tiempo real e integración con Mercado Wanka.'),
+            'comercio-electronico': ('Comercio Electrónico', 'Tienda online conectada a tu inventario y facturación SUNAT, con pagos Mercado Pago y envío a todo el Perú.'),
+            'boticas': ('Boticas y Farmacias', 'Control por lotes, fechas de vencimiento, ventas fraccionadas en mostrador y emisión SUNAT inmediata.'),
+            'odontologia': ('Clínicas y Odontología', 'Agenda de citas, historial comercial de pacientes, cobranzas y comprobantes electrónicos SUNAT.'),
+            'servicios': ('Empresas de Servicios', 'Proyectos, cotizaciones, contratos recurrentes, partes de horas y facturación automatizada.'),
+            'restaurante': ('Restaurantes y Cafés', 'Toma de pedidos en mesa, comandas a cocina, división de cuentas, caja rápida y Boletas/Facturas SUNAT.'),
+            'manufactura': ('Manufactura e Industria', 'Listas de materiales (BOM), órdenes de producción, control de calidad, costos y Kardex valorizado.'),
+            'gestion-de-flotas': ('Gestión de Flotas y Transporte', 'Control de vehículos, mantenimientos, combustible y Guías de Remisión Electrónica GRE 09/31.'),
+            'recursos-humanos': ('Recursos Humanos', 'Gestión de colaboradores, asistencias, contratos, vacaciones y control interno.'),
+            'contabilidad': ('Contabilidad & SIRE SUNAT', 'Plan Contable General Empresarial (PCGE), libros PLE, RVIE/RCE SIRE, detracciones SPOT y retenciones.'),
+            'facturacion-electronica': ('Facturación Electrónica SUNAT', 'Emisión UBL 2.1 ilimitada, recuperación automática anti-1033, ticket 80mm y envío por correo/WhatsApp.'),
+            'guias-remision': ('Guías de Remisión Electrónica (GRE)', 'Emisión oficial de Guías Remitente y Transportista conectada a tu inventario y despachos.'),
+            'inventario': ('Inventario y Kardex Valorizado', 'Multi-almacén, trazabilidad por lotes/series, transferencias y reportes PLE 12.1 / 13.1.'),
+            'ventas': ('CRM y Ventas', 'Embudo comercial, cotizaciones en 1 clic, seguimiento de clientes y facturación directa.'),
+            'compras': ('Compras y Proveedores', 'Órdenes de compra, control de recepción, cuentas por pagar y validación de RUC SUNAT.'),
+            'gastos': ('Gestión de Gastos', 'Rendición de gastos, caja chica, aprobación por jefatura y registro contable integrado.'),
+        }
+        clean_slug = (slug or '').strip().lower()
+        title, summary = catalog.get(
+            clean_slug,
+            (clean_slug.replace('-', ' ').title() or 'Empresas en Perú', 'Solución integral en la nube con Facturación Electrónica SUNAT, inventario y gestión financiera.'),
+        )
+        is_app = request.httprequest.path.startswith('/aplicaciones/')
+        return request.render('sofia_website_theme.vertical_detail_page', {
+            'section_badge': 'Aplicación SOFIA ERP' if is_app else 'Vertical de Negocio Perú',
+            'item_title': title,
+            'item_summary': summary,
+        })
