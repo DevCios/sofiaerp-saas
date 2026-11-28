@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import get_actor_workspace_id, get_gateway_admin
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.security import create_mcp_oauth_jwt, hash_api_key, verify_pkce_s256
@@ -329,3 +330,61 @@ async def oauth_token_exchange(
         "expires_in": 30 * 24 * 3600,
         "scope": "mcp:sunat",
     }
+
+
+# ==============================================================================
+# 5. Listado y Revocación de Conexiones de IA (Consola Conectores)
+# ==============================================================================
+@router.get("/api/v1/connectors/connections")
+async def list_ai_connections(
+    actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    ws_id = get_actor_workspace_id(actor)
+    items = []
+
+    # Clientes OAuth 2.1 registrados
+    oc_res = await db.execute(select(OAuthClient).order_by(OAuthClient.created_at.desc()).limit(30))
+    for oc in oc_res.scalars().all():
+        items.append(
+            {
+                "id": oc.id,
+                "kind": "oauth",
+                "app_name": oc.client_name,
+                "auth_type": "OAuth 2.1 PKCE",
+                "detail": oc.id[:18] + "...",
+                "connected_at": oc.created_at.isoformat(),
+            }
+        )
+
+    # API Keys activas del workspace
+    cli_stmt = select(ApiClient).where(ApiClient.is_active.is_(True)).order_by(ApiClient.created_at.desc()).limit(30)
+    if ws_id:
+        cli_stmt = cli_stmt.where(ApiClient.workspace_id == ws_id)
+    cli_res = await db.execute(cli_stmt)
+    for c in cli_res.scalars().all():
+        items.append(
+            {
+                "id": c.id,
+                "kind": "api_key",
+                "app_name": c.name,
+                "auth_type": "API Key (Bearer)",
+                "detail": c.key_prefix + "...",
+                "connected_at": c.created_at.isoformat(),
+            }
+        )
+    return items
+
+
+@router.delete("/api/v1/connectors/oauth/{client_id}")
+async def delete_oauth_connection(
+    client_id: str,
+    _actor: dict = Depends(get_gateway_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    oc = await db.get(OAuthClient, client_id)
+    if not oc:
+        raise HTTPException(status_code=404, detail="Conexión OAuth no encontrada.")
+    await db.delete(oc)
+    await db.commit()
+    return {"disconnected": True}

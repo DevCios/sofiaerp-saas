@@ -700,66 +700,81 @@ PANEL_HTML = r"""<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- TAB 8: CONECTORES IA (REMOTE MCP + OPENAPI AI) -->
+    <!-- TAB 8: CONECTORES IA (DISEÑO HÍBRIDO LIMPIO + DESARROLLADORES) -->
     <div id="tab-connectors" class="hidden">
-      <div class="card" style="background:linear-gradient(135deg, #66598F 0%, #714B67 55%, #017E84 100%);color:#FFFFFF;border:none;padding:24px">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
-          <div>
-            <span class="badge b-nav" style="margin-bottom:8px">ADR-010 · Remote MCP (Streamable HTTP) + OpenAPI 3.1</span>
-            <h2 style="margin:4px 0 6px 0;font-size:20px;color:#FFFFFF">Conecta Claude, ChatGPT, Cursor o n8n a API SUNAT</h2>
-            <p style="margin:0;font-size:13px;color:rgba(255,255,255,.88);max-width:680px">
-              Emite facturas y boletas, calcula IGV, consulta CDRs y explica errores SUNAT directamente desde tu asistente de IA usando API Keys aisladas por RUC.
-            </p>
-          </div>
-          <div class="row-actions">
-            <button class="btn btn-nav" onclick="copyText(window.location.origin + '/mcp', this)">Copiar URL MCP</button>
-            <button class="btn btn-nav" onclick="copyText(window.location.origin + '/openapi-ai.json', this)">Copiar OpenAPI AI</button>
-            <a href="/docs-portal" target="_blank" class="btn btn-nav" style="text-decoration:none">Ver Documentación</a>
-            <button class="btn" style="background:#FFFFFF;color:#714B67" onclick="openTab('clients')">Crear API Key para IA</button>
-          </div>
-        </div>
+      <div style="margin-bottom:20px">
+        <h2 style="margin:0;font-size:22px;font-weight:700;letter-spacing:-0.02em">Conecta <span style="color:var(--muted);font-weight:500">tus agentes</span></h2>
+        <p style="margin:4px 0 0 0;font-size:13.5px;color:var(--muted)">Conéctalo una vez y emite o consulta comprobantes SUNAT, RUC, DNI y Tipo de Cambio desde cualquier conversación.</p>
       </div>
 
-      <div class="card" style="background:#F4F1FB;border-color:#DED7F2">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-          <div>
-            <h3 style="margin:0 0 4px 0;color:var(--o20-primary)">OAuth 2.1 + PKCE (Conexión 1-clic en Claude.ai &amp; ChatGPT)</h3>
-            <div style="font-size:12.5px;color:#4B5563">
-              Habilitado <strong>Dynamic Client Registration (RFC 7591)</strong> + Discovery <strong>RFC 8414 / 9728</strong>.
-              Solo pega <code>https://apisunat.pro/mcp</code> en Claude.ai o ChatGPT Connectors y autoriza con tu cuenta sin copiar API Keys.
+      <!-- 2 Tarjetas Principales (Claude y ChatGPT) -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:16px">
+        <div class="card" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:42px;height:42px;border-radius:10px;background:#714B67;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">✦</div>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:var(--text)">Claude</div>
+              <div style="font-size:12.5px;color:var(--muted)">Funciona con Claude.ai, Desktop y Claude Code (OAuth 2.1 / MCP).</div>
             </div>
           </div>
-          <div class="row-actions">
-            <a href="/.well-known/oauth-authorization-server" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Discovery OAuth</a>
-            <a href="/.well-known/oauth-protected-resource" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Protected Resource</a>
+          <button class="btn btn-sec btn-sm" style="padding:7px 14px;white-space:nowrap" onclick="openConnectGuide('claude')">Conectar</button>
+        </div>
+
+        <div class="card" style="margin-bottom:0;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:42px;height:42px;border-radius:10px;background:#017E84;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">◎</div>
+            <div>
+              <div style="font-weight:700;font-size:15px;color:var(--text)">ChatGPT</div>
+              <div style="font-size:12.5px;color:var(--muted)">Conecta vía ChatGPT Connectors (MCP) o Custom GPT Actions.</div>
+            </div>
           </div>
+          <button class="btn btn-sec btn-sm" style="padding:7px 14px;white-space:nowrap" onclick="openConnectGuide('chatgpt')">Conectar</button>
         </div>
       </div>
 
-      <div class="grid3">
-        <div class="card">
-          <h3>Claude Code / Claude Desktop</h3>
-          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Conecta mediante <strong>Remote MCP (Streamable HTTP)</strong> usando una API Key restringida al RUC deseado.</p>
-          <pre id="snippetClaude">claude mcp add --transport http sofia-sunat https://apisunat.pro/mcp \
-  --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>
-          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetClaude').textContent, this)">Copiar comando</button>
-        </div>
+      <!-- Acordeón para Desarrolladores (Cursor, Claude Code, n8n, OpenAPI, Probador) -->
+      <div style="margin-bottom:24px">
+        <button type="button" class="btn btn-sec btn-sm" style="background:transparent;border:none;padding:6px 4px;color:var(--text);font-weight:600;display:inline-flex;align-items:center;gap:6px" onclick="toggleDevMcpBox()">
+          <span>Otro cliente MCP / Desarrolladores (Cursor, n8n, Probador)</span>
+          <span id="devMcpChevron">⌄</span>
+        </button>
 
-        <div class="card">
-          <h3>ChatGPT (Connectors / Custom GPT)</h3>
-          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Usa el endpoint MCP en <strong>ChatGPT Connectors</strong> o importa el esquema en <strong>Custom GPT Actions</strong> (Auth: Bearer).</p>
-          <pre id="snippetChatGpt">MCP URL:     https://apisunat.pro/mcp
+        <div id="devMcpBox" class="hidden" style="margin-top:12px">
+          <div class="card" style="background:#F4F1FB;border-color:#DED7F2">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <div>
+                <h3 style="margin:0 0 4px 0;color:var(--o20-primary)">Endpoints Remote MCP &amp; OAuth 2.1 PKCE</h3>
+                <div style="font-size:12.5px;color:#4B5563">
+                  MCP URL: <code>https://apisunat.pro/mcp</code> · OpenAPI AI: <code>https://apisunat.pro/openapi-ai.json</code>
+                </div>
+              </div>
+              <div class="row-actions">
+                <button class="btn btn-sm" onclick="copyText('https://apisunat.pro/mcp', this)">Copiar URL MCP</button>
+                <button class="btn btn-sm btn-sec" onclick="copyText('https://apisunat.pro/openapi-ai.json', this)">Copiar OpenAPI</button>
+                <a href="/.well-known/oauth-authorization-server" target="_blank" class="btn btn-sm btn-sec" style="text-decoration:none">Discovery OAuth</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="card">
+              <h3>Claude Code (Terminal)</h3>
+              <pre id="snippetClaude">claude mcp add --transport http api-sunat https://apisunat.pro/mcp \
+  --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>
+              <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetClaude').textContent, this)">Copiar comando</button>
+            </div>
+            <div class="card">
+              <h3>ChatGPT / n8n / Make</h3>
+              <pre id="snippetChatGpt">MCP URL:     https://apisunat.pro/mcp
 OpenAPI AI:  https://apisunat.pro/openapi-ai.json
 Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
-          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetChatGpt').textContent, this)">Copiar configuración</button>
-        </div>
-
-        <div class="card">
-          <h3>Cursor / VS Code / n8n</h3>
-          <p style="font-size:12.5px;color:var(--muted);margin-top:0">Agrega este bloque a <code>.cursor/mcp.json</code> o usa los endpoints REST <code>/api/v1/ai/*</code> en n8n/Make.</p>
-          <pre id="snippetCursor">{
+              <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetChatGpt').textContent, this)">Copiar configuración</button>
+            </div>
+            <div class="card">
+              <h3>Cursor / VS Code (.cursor/mcp.json)</h3>
+              <pre id="snippetCursor">{
   "mcpServers": {
-    "sofia-sunat": {
+    "api-sunat": {
       "url": "https://apisunat.pro/mcp",
       "headers": {
         "Authorization": "Bearer sk_live_TU_API_KEY"
@@ -767,22 +782,56 @@ Auth Header: Authorization: Bearer sk_live_TU_API_KEY</pre>
     }
   }
 }</pre>
-          <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetCursor').textContent, this)">Copiar mcp.json</button>
+              <button class="btn btn-sm btn-sec" onclick="copyText(document.getElementById('snippetCursor').textContent, this)">Copiar mcp.json</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Probador en Vivo de <code>POST /mcp</code> (9 herramientas activas)</h3>
+            <div class="row-actions" style="margin-bottom:12px">
+              <button class="btn btn-teal btn-sm" onclick="testMcp('tools/list', {})">Probar tools/list</button>
+              <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'calculate_totals_igv', arguments:{currency:'PEN', items:[{description:'Servicio Demo', quantity:1, unit_price_without_tax:100}]}})">Probar calculate_totals_igv</button>
+              <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'get_exchange_rate', arguments:{}})">Probar get_exchange_rate</button>
+              <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'explain_sunat_error', arguments:{sunat_code:'1033'}})">Probar explain_sunat_error</button>
+            </div>
+            <pre id="mcpTestOut" class="hidden"></pre>
+          </div>
         </div>
       </div>
 
+      <!-- Tabla: Conexiones de IA -->
+      <div style="margin-bottom:10px">
+        <h3 style="margin:0;font-size:16px;font-weight:700">Conexiones de IA</h3>
+        <p style="margin:3px 0 0 0;font-size:12.5px;color:var(--muted)">Asistentes OAuth 2.1 y llaves API conectadas a este workspace. Puedes revocar cualquier acceso al instante.</p>
+      </div>
       <div class="card">
-        <h3>Herramientas MCP Activas &amp; Probador en Vivo</h3>
-        <p style="font-size:12.5px;color:var(--muted);margin-top:0">
-          Verifica en tiempo real la respuesta JSON-RPC 2.0 de <code>POST /mcp</code> (seguro, sin emitir documentos reales).
-        </p>
-        <div class="row-actions" style="margin-bottom:12px">
-          <button class="btn btn-teal btn-sm" onclick="testMcp('tools/list', {})">Probar tools/list</button>
-          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'calculate_totals_igv', arguments:{currency:'PEN', items:[{description:'Suscripción SOFIA ERP', quantity:1, unit_price_without_tax:100}]}})">Probar calculate_totals_igv</button>
-          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'explain_sunat_error', arguments:{sunat_code:'1033'}})">Probar explain_sunat_error (1033)</button>
-          <button class="btn btn-sec btn-sm" onclick="testMcp('tools/call', {name:'list_issuers', arguments:{}})">Probar list_issuers</button>
+        <table>
+          <thead>
+            <tr>
+              <th>Aplicación</th>
+              <th>Método</th>
+              <th>Identificador</th>
+              <th>Conectada</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="aiConnectionsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Guiado Conectar Claude / ChatGPT -->
+    <div id="connectGuideModal" class="cmd-backdrop hidden" onclick="if(event.target===this) closeConnectGuide()">
+      <div class="cmd-box" style="max-width:480px;padding:22px 24px;border-radius:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 id="cgTitle" style="margin:0;font-size:17px">Conectar Claude</h3>
+          <button class="tb-icon-btn" onclick="closeConnectGuide()">✕</button>
         </div>
-        <pre id="mcpTestOut" class="hidden"></pre>
+        <div id="cgBody" style="font-size:13px;color:#374151;line-height:1.6"></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+          <button class="btn btn-sec btn-sm" onclick="closeConnectGuide()">Cerrar</button>
+          <a id="cgExternalLink" href="https://claude.ai" target="_blank" class="btn btn-sm" style="text-decoration:none">Abrir asistente ↗</a>
+        </div>
       </div>
     </div>
 
@@ -1555,7 +1604,7 @@ async function refreshScopedData() {
 
 async function refreshAll() {
   refreshSunatHealth();
-  const [me, issuers, clients, billing, orders, workspaces, team, billProfile] = await Promise.all([
+  const [me, issuers, clients, billing, orders, workspaces, team, billProfile, aiConns] = await Promise.all([
     api('/auth/me'),
     api('/issuers'),
     api('/clients'),
@@ -1564,9 +1613,22 @@ async function refreshAll() {
     api('/workspaces'),
     api('/workspaces/team'),
     api('/billing/profile'),
+    api('/connectors/connections'),
   ]);
   ISSUERS_CACHE = issuers;
   BILLING_CACHE = billing;
+
+  if (Array.isArray(aiConns)) {
+    document.getElementById('aiConnectionsTable').innerHTML = aiConns.map(c => `
+      <tr>
+        <td><strong>${c.app_name}</strong></td>
+        <td><span class="badge ${c.kind === 'oauth' ? 'b-info' : 'b-ok'}">${c.auth_type}</span></td>
+        <td><code>${c.detail}</code></td>
+        <td style="font-size:12px;color:var(--muted)">${(c.connected_at || '').slice(0, 10)}</td>
+        <td><button class="btn btn-sm btn-err" onclick="disconnectAiConnection('${c.kind}', '${c.id}')">Desconectar</button></td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">Aún no hay asistentes de IA conectados. Haz clic en <strong>Conectar</strong> arriba en Claude o ChatGPT.</td></tr>';
+  }
 
   if (billProfile) {
     document.getElementById('bfDocType').value = billProfile.doc_type_receipt || '01';
@@ -1857,6 +1919,67 @@ function copyText(txt, btn) {
       setTimeout(() => { btn.textContent = prev; }, 1400);
     }
   });
+}
+
+function toggleDevMcpBox() {
+  const box = document.getElementById('devMcpBox');
+  const ch = document.getElementById('devMcpChevron');
+  const hidden = box.classList.toggle('hidden');
+  if (ch) ch.textContent = hidden ? '⌄' : '⌃';
+}
+
+function openConnectGuide(provider) {
+  const title = document.getElementById('cgTitle');
+  const body = document.getElementById('cgBody');
+  const link = document.getElementById('cgExternalLink');
+  if (provider === 'claude') {
+    title.textContent = 'Conectar Claude a API SUNAT';
+    link.href = 'https://claude.ai/settings/connectors';
+    link.textContent = 'Abrir Claude Connectors ↗';
+    body.innerHTML = `
+      <ol style="padding-left:18px;margin:0">
+        <li>Abre <strong>Claude → Configuración → Conectores → Agregar conector personalizado</strong>.</li>
+        <li>Pega esta URL Remote MCP:<br>
+          <div style="display:flex;gap:8px;align-items:center;margin:8px 0">
+            <code style="flex:1;padding:6px 8px">https://apisunat.pro/mcp</code>
+            <button class="btn btn-sm" onclick="copyText('https://apisunat.pro/mcp', this)">Copiar</button>
+          </div>
+        </li>
+        <li>Claude abrirá la pantalla <strong>OAuth 2.1</strong> de API SUNAT: inicia sesión, elige tu RUC y haz clic en <strong>Autorizar</strong>.</li>
+      </ol>
+    `;
+  } else {
+    title.textContent = 'Conectar ChatGPT a API SUNAT';
+    link.href = 'https://chatgpt.com/gpts/editor';
+    link.textContent = 'Abrir ChatGPT ↗';
+    body.innerHTML = `
+      <p style="margin:0 0 8px 0"><strong>Opción 1 — ChatGPT Connectors (MCP OAuth 2.1):</strong></p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <code style="flex:1;padding:6px 8px">https://apisunat.pro/mcp</code>
+        <button class="btn btn-sm" onclick="copyText('https://apisunat.pro/mcp', this)">Copiar MCP</button>
+      </div>
+      <p style="margin:0 0 8px 0"><strong>Opción 2 — Custom GPT Actions (OpenAPI 3.1 + Bearer API Key):</strong></p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <code style="flex:1;padding:6px 8px">https://apisunat.pro/openapi-ai.json</code>
+        <button class="btn btn-sm btn-teal" onclick="copyText('https://apisunat.pro/openapi-ai.json', this)">Copiar OpenAPI</button>
+      </div>
+    `;
+  }
+  document.getElementById('connectGuideModal').classList.remove('hidden');
+}
+
+function closeConnectGuide() {
+  document.getElementById('connectGuideModal').classList.add('hidden');
+}
+
+async function disconnectAiConnection(kind, id) {
+  if (!confirm('¿Desconectar y revocar el acceso de este asistente IA?')) return;
+  if (kind === 'oauth') {
+    await api('/connectors/oauth/' + id, { method: 'DELETE' });
+  } else {
+    await api('/clients/' + id, { method: 'DELETE' });
+  }
+  refreshAll();
 }
 
 async function testMcp(method, params) {
