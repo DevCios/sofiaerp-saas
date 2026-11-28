@@ -77,7 +77,7 @@ class SofiaAuthController(http.Controller):
             internal_group = env.ref('base.group_user', raise_if_not_found=False)
 
             groups_to_assign = [internal_group.id] if internal_group else []
-            if "TENANT_ADMIN" in roles and admin_group:
+            if any(r in roles for r in ("TENANT_ADMIN", "SUPERADMIN_SUPPORT", "PLATFORM_SUPERADMIN")) and admin_group:
                 groups_to_assign.append(admin_group.id)
 
             if not user:

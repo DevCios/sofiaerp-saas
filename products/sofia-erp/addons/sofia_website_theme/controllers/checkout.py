@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 MP_PREFERENCE_API = "https://api.mercadopago.com/checkout/preferences"
 
 
-def trigger_control_plane_provisioning(subdomain, company_name, admin_email, plan_code="SOFIA-PLAN-PRO", billing_cycle="MONTHLY"):
+def trigger_control_plane_provisioning(subdomain, company_name, admin_email, plan_code="SOFIA-PLAN-PRO", billing_cycle="MONTHLY", users_count=1):
     """
     Invoca la API del Control Plane de SOFIA ERP (FastAPI) para aprovisionar
     de forma inmediata la base de datos PostgreSQL aislada y filestore del tenant.
@@ -30,6 +30,11 @@ def trigger_control_plane_provisioning(subdomain, company_name, admin_email, pla
     chars = string.ascii_letters + string.digits
     temp_password = "Sofia" + "".join(secrets.choice(chars) for _ in range(8)) + "#"
 
+    try:
+        safe_users = max(1, int(users_count or 1))
+    except (ValueError, TypeError):
+        safe_users = 1
+
     payload = {
         "name": company_name or f"Empresa {subdomain.capitalize()}",
         "slug": subdomain.lower().strip(),
@@ -38,6 +43,7 @@ def trigger_control_plane_provisioning(subdomain, company_name, admin_email, pla
         "admin_password": temp_password,
         "plan_code": plan_code or "SOFIA-PLAN-PRO",
         "billing_cycle": "ANNUAL" if str(billing_cycle).lower() in ("anual", "annual") else "MONTHLY",
+        "users_count": safe_users,
     }
 
     try:
@@ -515,6 +521,7 @@ class SofiaCheckoutController(http.Controller):
                     admin_email=email or f"admin@{subdomain}.sofiaerp.com",
                     plan_code=plan_code,
                     billing_cycle=billing,
+                    users_count=users,
                 )
         else:
             # Solo permitir modo demo si está explícitamente habilitado en parámetros del sistema

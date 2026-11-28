@@ -252,22 +252,26 @@ async def oauth_token(payload: TokenExchangeRequest):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/.well-known/jwks.json", summary="Claves públicas JWKS para validación offline")
+@router.get("/.well-known/jwks.json", summary="Claves públicas JWKS (RFC 7517) para validación offline")
 async def get_jwks():
+    import json
+    import jwt as pyjwt
+    from cryptography.hazmat.primitives.serialization import load_pem_public_key
+
     try:
-        with open(settings.JWT_PUBLIC_KEY_PATH, "r") as f:
-            pub_key_content = f.read()
-        return {
-            "keys": [
-                {
-                    "kty": "RSA",
-                    "use": "sig",
-                    "alg": settings.JWT_ALGORITHM,
-                    "kid": "sofia-auth-key-1",
-                    "public_key": pub_key_content,
-                }
-            ]
-        }
+        with open(settings.JWT_PUBLIC_KEY_PATH, "rb") as f:
+            pub_pem_bytes = f.read()
+        pub_key_obj = load_pem_public_key(pub_pem_bytes)
+        jwk_dict = json.loads(pyjwt.algorithms.RSAAlgorithm.to_jwk(pub_key_obj))
+        jwk_dict.update(
+            {
+                "use": "sig",
+                "alg": settings.JWT_ALGORITHM,
+                "kid": "sofia-auth-key-1",
+                "public_key": pub_pem_bytes.decode("utf-8"),
+            }
+        )
+        return {"keys": [jwk_dict]}
     except (FileNotFoundError, IOError):
         return {
             "status": "development_mode",

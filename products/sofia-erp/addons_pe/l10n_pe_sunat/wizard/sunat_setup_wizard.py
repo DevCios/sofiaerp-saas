@@ -635,9 +635,9 @@ class SofiaSunatSetupWizard(models.TransientModel):
 
     def _sync_issuer_to_sofia_gateway(self, company, clean_ruc, sol_user, sol_pass):
         """Sincroniza RUC, entorno y credenciales SOL/GRE con Sofia Gateway sin exportar el .pfx."""
-        icp = self.env['ir.config_parameter'].sudo()
+        url_rec = self.env['ir.config_parameter'].sudo().search([('key', '=', 'sofia_gateway.url')], limit=1)
         base_url = (
-            icp.get_param('sofia_gateway.url')
+            (url_rec.value if url_rec else '')
             or os.environ.get('SOFIA_GATEWAY_URL')
             or 'http://sunat-gateway-api:8010'
         ).rstrip('/')

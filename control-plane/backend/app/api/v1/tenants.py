@@ -137,13 +137,15 @@ async def create_tenant(
     # Crear suscripción vinculada en tabla subscriptions para Celery Beat y Entitlements
     plan_obj = (await db.execute(select(ProductPlan).where(ProductPlan.code == normalized_plan))).scalar_one_or_none()
     if plan_obj:
+        purchased_users = max(1, int(getattr(payload, "users_count", 1) or 1))
+        base_plan_users = int(getattr(plan_obj, "max_users", 1) or 1)
         db.add(Subscription(
             tenant_id=new_tenant.id,
             plan_id=plan_obj.id,
             status="ACTIVE",
             current_period_start=now,
             current_period_end=expires_at,
-            extra_users=0,
+            extra_users=max(0, purchased_users - base_plan_users),
             extra_storage_gb=0,
         ))
 
@@ -724,7 +726,7 @@ async def generate_support_token(
     await db.commit()
 
     return {
-        "support_url": f"https://{tenant.slug}.sofiaerp.com/web",
+        "support_url": f"https://{tenant.slug}.sofiaerp.com/sofia/auth/callback?token={token}",
         "access_token": token,
         "tenant_slug": tenant.slug,
         "expires_in": 1800,

@@ -19,8 +19,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_actor_workspace_id, get_gateway_admin
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.core.security import create_mcp_oauth_jwt, hash_api_key, verify_pkce_s256
-from app.models import ApiClient, Issuer, OAuthAuthCode, OAuthClient
+from app.core.security import create_mcp_oauth_jwt, hash_api_key, verify_password, verify_pkce_s256
+from app.models import ApiClient, GatewayUser, Issuer, OAuthAuthCode, OAuthClient, Workspace
 
 router = APIRouter(tags=["OAuth 2.1 MCP"])
 settings = get_settings()
@@ -226,13 +226,27 @@ async def oauth_authorize_submit(
             subject = ac.name
             allowed_rucs = list(ac.allowed_rucs) if ac.allowed_rucs else None
     elif email.strip() and password:
-        email_ok = hmac.compare_digest(email.strip().lower(), settings.GATEWAY_ADMIN_EMAIL.strip().lower())
+        clean_email = email.strip().lower()
+        email_ok = hmac.compare_digest(clean_email, settings.GATEWAY_ADMIN_EMAIL.strip().lower())
         pass_ok = hmac.compare_digest(password, settings.GATEWAY_ADMIN_PASSWORD)
         if email_ok and pass_ok:
             subject = settings.GATEWAY_ADMIN_EMAIL
+        else:
+            gw_user = (
+                await db.execute(
+                    select(GatewayUser).where(GatewayUser.email == clean_email, GatewayUser.is_active.is_(True))
+                )
+            ).scalar_one_or_none()
+            if gw_user and verify_password(password, gw_user.password_hash):
+                ws = await db.get(Workspace, gw_user.workspace_id)
+                if ws and ws.is_active:
+                    subject = gw_user.email
+                    ws_rows = await db.execute(
+                        select(Issuer.ruc).where(Issuer.workspace_id == ws.id, Issuer.is_active.is_(True))
+                    )
+                    allowed_rucs = [r[0] for r in ws_rows.all()]
 
     if not subject:
-        res = await db.execute(select(Issuer).where(Issuer.is_active.is_(True)))
         return HTMLResponse(
             _render_consent_html(
                 client_name=client.client_name,
@@ -241,8 +255,8 @@ async def oauth_authorize_submit(
                 state=state,
                 code_challenge=code_challenge,
                 code_challenge_method=code_challenge_method,
-                issuers=list(res.scalars().all()),
-                error_msg="Credenciales de administrador o API Key inválidas.",
+                issuers=[],
+                error_msg="Credenciales o API Key inválidas.",
             ),
             status_code=401,
         )

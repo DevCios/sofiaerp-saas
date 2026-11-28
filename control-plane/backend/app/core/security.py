@@ -65,7 +65,12 @@ def create_access_token(
     try:
         with open(settings.JWT_PRIVATE_KEY_PATH, "r") as f:
             private_key = f.read()
-        return jwt.encode(payload, private_key, algorithm=settings.JWT_ALGORITHM)
+        return jwt.encode(
+            payload,
+            private_key,
+            algorithm=settings.JWT_ALGORITHM,
+            headers={"kid": "sofia-auth-key-1"},
+        )
     except (FileNotFoundError, IOError):
         # Fallback de desarrollo seguro con HMAC-SHA256
         return jwt.encode(payload, settings.APP_SECRET_KEY, algorithm="HS256")

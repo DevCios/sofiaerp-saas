@@ -23,33 +23,33 @@ class ResPartner(models.Model):
 
     seller_rating_avg = fields.Float(
         string="Calificación de la Tienda (1.0 - 5.0)",
-        default=4.9,
+        default=0.0,
         digits=(3, 1),
         help="Calificación promedio de la tienda para mostrar estrellas."
     )
     seller_rating_count = fields.Integer(
         string="Opiniones / Compradores Satisfechos",
-        default=128,
+        default=0,
         help="Número total de compradores que calificaron la tienda."
     )
     seller_sales_completed = fields.Integer(
         string="Ventas Concretadas",
-        default=250,
+        default=0,
         help="Número total de ventas concretadas por este vendedor."
     )
     seller_is_official_store = fields.Boolean(
         string="Tienda Oficial / Mercado Wanka Líder",
-        default=True,
+        default=False,
         help="Muestra la medalla de Tienda Oficial con verificación."
     )
     seller_on_time_delivery_pct = fields.Integer(
         string="% Despacho a Tiempo",
-        default=99,
+        default=0,
         help="Porcentaje de envíos entregados a tiempo."
     )
     seller_good_service_pct = fields.Integer(
         string="% Buena Atención",
-        default=100,
+        default=0,
         help="Porcentaje de satisfacción en atención al cliente."
     )
 

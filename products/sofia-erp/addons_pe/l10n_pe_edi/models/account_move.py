@@ -546,14 +546,16 @@ class AccountMove(models.Model):
 
     @api.model
     def _l10n_pe_edi_get_sofia_gateway_config(self):
-        icp = self.env['ir.config_parameter'].sudo()
+        ICP = self.env['ir.config_parameter'].sudo()
+        url_rec = ICP.search([('key', '=', 'sofia_gateway.url')], limit=1)
+        key_rec = ICP.search([('key', '=', 'sofia_gateway.api_key')], limit=1)
         base_url = (
-            icp.get_param('sofia_gateway.url')
+            (url_rec.value if url_rec else '')
             or os.environ.get('SOFIA_GATEWAY_URL')
             or 'http://sunat-gateway-api:8010'
         ).rstrip('/')
         headers = {'Content-Type': 'application/json'}
-        api_key = icp.get_param('sofia_gateway.api_key')
+        api_key = key_rec.value if key_rec else ''
         internal_key = os.environ.get('INTERNAL_SERVICE_KEY')
         if api_key:
             headers['X-API-Key'] = api_key

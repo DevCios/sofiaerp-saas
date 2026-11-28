@@ -20,6 +20,7 @@ class TenantCreate(TenantBase):
     admin_password: str = Field(..., min_length=8, example="SuperSecret123#")
     plan_code: str = Field(..., example="SOFIA-ERP-PRO")
     billing_cycle: Optional[str] = Field("MONTHLY", example="MONTHLY")
+    users_count: int = Field(1, ge=1, le=500, example=5)
     payment_reference: Optional[str] = Field(None, example="MP-PREF-123456")
 
 

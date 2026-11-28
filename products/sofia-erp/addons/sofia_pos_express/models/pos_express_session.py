@@ -162,7 +162,7 @@ class PosExpressSession(models.Model):
             'fecha': issue_date,
             'total': f'{move.amount_total:.2f}',
         })
-        return f'https://gateway.sofiaerp.com/consulta?{params}'
+        return f'https://apisunat.pro/consulta?{params}'
 
     # -------------------------------------------------------------------------
     # API: get_pos_data (carga ultracompacta para el terminal /pos_express)

@@ -344,7 +344,7 @@ async function submitCheckout() {
       amount_paid: paid,
       change: Math.max(0, paid - tot),
       ticket_footer: 'Venta registrada en modo offline. Se enviará a SUNAT automáticamente al restablecer Internet.',
-      cpe_url: 'https://gateway.sofiaerp.com/consulta'
+      cpe_url: 'https://apisunat.pro/consulta'
     };
     CART = [];
     document.getElementById('paidInput').value = '';
