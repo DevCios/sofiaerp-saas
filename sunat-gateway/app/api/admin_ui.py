@@ -1924,11 +1924,12 @@ function renderPlansGrid() {
     const isFree = p.code === 'FREE';
     const isCustom = !!p.custom_contact;
     const headCls = isFree ? 'plan-head-light' : (p.code === 'PRO' ? 'plan-head-teal' : 'plan-head-dark');
-    const priceVal = isYearly ? (p.annual_price_pen || p.price_pen * 10) : p.price_pen;
+    const priceVal = Number(isYearly ? (p.annual_price_pen || p.price_pen * 10) : p.price_pen);
+    const priceFmt = priceVal === 0 ? '0' : (Number.isInteger(priceVal) ? priceVal.toFixed(0) : priceVal.toFixed(2));
     const periodTxt = isFree ? (p.period_label || '/ 30 días') : (isYearly ? '/año' : '/mes');
     const priceHtml = isCustom
       ? `<div class="plan-price" style="font-size:21px">Según<br/>volumen</div>`
-      : `<div class="plan-price">S/ ${Number(priceVal).toFixed(0)} <small>${periodTxt}</small></div>`;
+      : `<div class="plan-price">S/ ${priceFmt} <small>${periodTxt}</small></div>`;
 
     let btnHtml = '';
     if (isFree) {

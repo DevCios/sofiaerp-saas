@@ -45,10 +45,10 @@ def test_plans_catalog_and_slugify():
     assert PLANS_CATALOG["FREE"]["monthly_quota"] == 50
     assert PLANS_CATALOG["FREE"]["price_pen"] == 0.0
     assert PLANS_CATALOG["STARTER"]["monthly_quota"] == 5000
-    assert PLANS_CATALOG["STARTER"]["price_pen"] == 39.0
-    assert PLANS_CATALOG["STARTER"]["annual_price_pen"] == 390.0
-    assert PLANS_CATALOG["PRO"]["price_pen"] == 69.0
-    assert PLANS_CATALOG["PRO"]["annual_price_pen"] == 690.0
+    assert PLANS_CATALOG["STARTER"]["price_pen"] == 6.90
+    assert PLANS_CATALOG["STARTER"]["annual_price_pen"] == 69.00
+    assert PLANS_CATALOG["PRO"]["price_pen"] == 9.90
+    assert PLANS_CATALOG["PRO"]["annual_price_pen"] == 99.00
 
     chk = BillingCheckoutRequest(plan_code="PRO", billing_cycle="yearly")
     assert chk.billing_cycle == "yearly"

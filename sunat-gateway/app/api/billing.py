@@ -54,8 +54,8 @@ PLANS_CATALOG: dict[str, dict] = {
         "code": "STARTER",
         "name": "Básico",
         "monthly_quota": 5000,
-        "price_pen": 39.00,
-        "annual_price_pen": 390.00,
+        "price_pen": 6.90,
+        "annual_price_pen": 69.00,
         "period_label": "/mes",
         "headline": "5,000 operaciones al mes",
         "features": [
@@ -70,8 +70,8 @@ PLANS_CATALOG: dict[str, dict] = {
         "code": "PRO",
         "name": "Profesional",
         "monthly_quota": 100000,
-        "price_pen": 69.00,
-        "annual_price_pen": 690.00,
+        "price_pen": 9.90,
+        "annual_price_pen": 99.00,
         "period_label": "/mes",
         "headline": "Operaciones ilimitadas",
         "features": [
