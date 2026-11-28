@@ -13,7 +13,7 @@ class ProductTemplate(models.Model):
         string='Publicado en Mercado Wanka',
         default=False,
         copy=False,
-        help='Activa con 1 clic para publicar este producto en Mercado Wanka (tienda.sofiaerp.com).',
+        help='Activa con 1 clic para publicar este producto en Mercado Wanka (mercadowanka.com).',
     )
     mw_remote_id = fields.Integer(string='ID en Mercado Wanka', readonly=True, copy=False)
     mw_product_url = fields.Char(string='Enlace Mercado Wanka', readonly=True, copy=False)

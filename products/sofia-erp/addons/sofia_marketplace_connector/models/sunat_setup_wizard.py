@@ -9,7 +9,7 @@ class SofiaSunatSetupWizardMarketplace(models.TransientModel):
     _inherit = 'sofia.sunat.setup.wizard'
 
     enable_mercado_wanka = fields.Boolean(
-        string='Activar mi Tienda en Mercado Wanka (tienda.sofiaerp.com)',
+        string='Activar mi Tienda en Mercado Wanka (mercadowanka.com)',
         default=True,
         help='Habilitado automáticamente con cualquier plan pagado de SOFIA ERP. Comisión: 5% del valor total + S/ 0.50 por uso de plataforma.',
     )

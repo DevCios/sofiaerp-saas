@@ -522,7 +522,7 @@
                             <a class="odoo-nav-link" href="https://apisunat.pro" target="_blank" rel="noopener">API SUNAT</a>
                         </li>
                         <li class="odoo-nav-item">
-                            <a class="odoo-nav-link" href="https://tienda.sofiaerp.com" target="_blank" rel="noopener">Mercado Wanka</a>
+                            <a class="odoo-nav-link" href="https://mercadowanka.com" target="_blank" rel="noopener">Mercado Wanka</a>
                         </li>
                     </ul>
 
@@ -547,7 +547,7 @@
                     <a href="/verticales">Verticales y Aplicaciones</a>
                     <a href="/precios">Planes y Precios</a>
                     <a href="https://apisunat.pro" target="_blank" rel="noopener">API SUNAT (Desarrolladores &amp; IA)</a>
-                    <a href="https://tienda.sofiaerp.com" target="_blank" rel="noopener">Mercado Wanka (Marketplace)</a>
+                    <a href="https://mercadowanka.com" target="_blank" rel="noopener">Mercado Wanka (Marketplace)</a>
                     <a href="/soporte">Ayuda y Soporte</a>
                     <div class="d-flex gap-2 mt-3">
                         <a href="/login" class="btn btn-outline-secondary w-50 text-center" style="border-radius: 10px; border-bottom: 1px solid #cbd5e1;">Acceder</a>
