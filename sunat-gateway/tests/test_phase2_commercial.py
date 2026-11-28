@@ -43,4 +43,4 @@ async def test_oauth_well_known_discovery_and_docs_portal():
     resp = await docs_portal()
     assert resp.status_code == 200
     assert b"/openapi-ai.json" in resp.body
-    assert b"Sofia SUNAT Gateway" in resp.body
+    assert b"API SUNAT" in resp.body

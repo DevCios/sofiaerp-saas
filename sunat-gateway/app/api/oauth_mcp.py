@@ -116,7 +116,7 @@ def _render_consent_html(
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Autorizar Conector IA — Sofia SUNAT Gateway</title>
+  <title>Autorizar Conector IA — API SUNAT</title>
   <style>
     body {{ margin:0; font-family: Inter, system-ui, -apple-system, sans-serif; background: linear-gradient(180deg, #F4F1FB 0%, #F6F7F9 100%); color:#1F2937; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }}
     .box {{ max-width:440px; width:100%; background:#FFFFFF; border:1px solid #E2E5EC; border-radius:14px; padding:28px; box-shadow:0 12px 30px rgba(102,89,143,.12); }}
@@ -133,9 +133,9 @@ def _render_consent_html(
 </head>
 <body>
   <div class="box">
-    <div class="logo">S</div>
+    <div class="logo">A</div>
     <h2>Autorizar Conector IA</h2>
-    <p class="sub">Sofia SUNAT Gateway · OAuth 2.1 PKCE</p>
+    <p class="sub">API SUNAT · OAuth 2.1 PKCE</p>
     <div class="pill"><strong>{html.escape(client_name)}</strong> solicita acceso <code>mcp:sunat</code></div>
     {err_html}
     <form method="post" action="/oauth/authorize">

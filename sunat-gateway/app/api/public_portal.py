@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Portal Público de Consulta y Descarga de Comprobantes Electrónicos (Sofia Gateway).
+Portal Público de Consulta y Descarga de Comprobantes Electrónicos (API SUNAT).
 Sigue estrictamente el Sistema de Diseño Oficial SOFIA / Odoo 20 (docs/design-system-odoo20.md).
 """
 import time
@@ -191,7 +191,7 @@ PORTAL_HTML = r"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Consulta de Comprobantes Electrónicos — Sofia Gateway</title>
+  <title>Consulta de Comprobantes Electrónicos — API SUNAT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
@@ -276,7 +276,7 @@ PORTAL_HTML = r"""<!DOCTYPE html>
     <a href="/consulta" class="brand">
       <span class="brand-mark">S</span>
       <div>
-        <span>Sofia Gateway</span>
+        <span>API SUNAT</span>
         <span class="brand-sub">Consulta Pública de Comprobantes Electrónicos • SUNAT Perú</span>
       </div>
     </a>
@@ -290,7 +290,7 @@ PORTAL_HTML = r"""<!DOCTYPE html>
 <main>
   <div class="banner no-print">
     <h1>Consulta y Descarga tu Comprobante Electrónico</h1>
-    <p>Ingresa los datos exactos de tu Factura, Boleta o Nota emitida a través de <strong>SOFIA ERP / Sofia Gateway</strong> para verificar su estado ante SUNAT y descargar el archivo XML y la Constancia de Recepción (CDR).</p>
+    <p>Ingresa los datos exactos de tu Factura, Boleta o Nota emitida a través de <strong>SOFIA ERP / API SUNAT</strong> para verificar su estado ante SUNAT y descargar el archivo XML y la Constancia de Recepción (CDR).</p>
   </div>
 
   <div class="card no-print">
@@ -367,7 +367,7 @@ PORTAL_HTML = r"""<!DOCTYPE html>
 </main>
 
 <footer>
-  Portal de Verificación de Comprobantes Electrónicos · <strong>API SUNAT Pro</strong> (<code>apisunat.pro</code>) · Servicio tecnológico independiente, no afiliado ni operado por SUNAT.
+  Portal de Verificación de Comprobantes Electrónicos · <strong>API SUNAT</strong> (<code>apisunat.pro</code>) · Servicio tecnológico independiente, no afiliado ni operado por SUNAT.
 </footer>
 
 <script>
@@ -424,7 +424,7 @@ async function doConsult(e) {
     document.getElementById('rIgv').textContent = `${data.currency} ${Number(data.igv_amount).toFixed(2)}`;
     document.getElementById('rCustomer').textContent =
       [data.customer_doc_number, data.customer_name].filter(Boolean).join(' — ') || 'Cliente Varios';
-    document.getElementById('rSunatMsg').textContent = data.sunat_message || 'Registrado en Sofia Gateway.';
+    document.getElementById('rSunatMsg').textContent = data.sunat_message || 'Registrado en API SUNAT.';
     document.getElementById('rSunatCode').textContent = data.sunat_code || 'En proceso';
 
     const hashBox = document.getElementById('rHashBox');

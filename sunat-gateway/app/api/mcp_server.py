@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Servidor Remote MCP (Model Context Protocol - Streamable HTTP / JSON-RPC 2.0)
-y Esquema OpenAPI AI curado para Sofia SUNAT Gateway (ADR-010).
+y Esquema OpenAPI AI curado para API SUNAT (ADR-010).
 
 Compatible con:
 - Claude (claude.ai, Claude Desktop, Claude Code)
@@ -42,12 +42,12 @@ SUNAT_ERROR_CATALOG: dict[str, dict[str, str]] = {
     "0130": {
         "title": "Servicio SUNAT temporalmente saturado / mantenimiento",
         "cause": "El servidor SOAP de SUNAT no pudo procesar el envío en este momento.",
-        "action": "Sofia Gateway reintentará automáticamente en cola resiliente (no dupliques el comprobante).",
+        "action": "API SUNAT reintentará automáticamente en cola resiliente (no dupliques el comprobante).",
     },
     "1033": {
         "title": "Comprobante registrado previamente con otros datos",
         "cause": "SUNAT ya recibió antes este (RUC, tipo, serie, correlativo), normalmente por un timeout de red.",
-        "action": "No reenviar sendBill. Sofia Gateway ejecuta automáticamente getStatusCdr para recuperar el CDR oficial.",
+        "action": "No reenviar sendBill. API SUNAT ejecuta automáticamente getStatusCdr para recuperar el CDR oficial.",
     },
     "2017": {
         "title": "Número de RUC del receptor no existe o no está activo",
@@ -57,7 +57,7 @@ SUNAT_ERROR_CATALOG: dict[str, dict[str, str]] = {
     "2325": {
         "title": "Certificado digital vencido o firma XML inválida",
         "cause": "El certificado .pfx configurado venció o no corresponde al RUC emisor.",
-        "action": "Sube un nuevo certificado .pfx vigente en Empresas y Certificados de Sofia Gateway.",
+        "action": "Sube un nuevo certificado .pfx vigente en Empresas y Certificados de API SUNAT.",
     },
     "2335": {
         "title": "RUC del certificado no coincide con el RUC emisor",
@@ -138,7 +138,7 @@ def explain_sunat_code_data(code: str) -> dict[str, Any]:
             info = {
                 "title": f"Error transitorio SUNAT ({clean})",
                 "cause": "Incidencia temporal de red o servicio en SUNAT.",
-                "action": "Mantener en cola de reintentos automáticos de Sofia Gateway.",
+                "action": "Mantener en cola de reintentos automáticos de API SUNAT.",
             }
         elif classification == "REJECTED":
             info = {
@@ -211,12 +211,12 @@ MCP_TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "list_issuers",
-        "description": "Lista las empresas emisoras (RUCs) autorizadas para tu API Key en Sofia Gateway, indicando si operan en BETA o PRODUCCIÓN.",
+        "description": "Lista las empresas emisoras (RUCs) autorizadas para tu API Key en API SUNAT, indicando si operan en BETA o PRODUCCIÓN.",
         "inputSchema": {"type": "object", "properties": {}},
     },
     {
         "name": "list_documents",
-        "description": "Lista los comprobantes electrónicos recientes en Sofia Gateway (filtrables por RUC y estado).",
+        "description": "Lista los comprobantes electrónicos recientes en API SUNAT (filtrables por RUC y estado).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -278,7 +278,7 @@ MCP_TOOLS: list[dict[str, Any]] = [
     {
         "name": "emit_document",
         "description": (
-            "Emite una Factura (01) o Boleta (03) electrónica a SUNAT vía Sofia Gateway con idempotencia estricta por (RUC, tipo, serie, correlativo). "
+            "Emite una Factura (01) o Boleta (03) electrónica a SUNAT vía API SUNAT con idempotencia estricta por (RUC, tipo, serie, correlativo). "
             "IMPORTANTE: antes de invocar esta herramienta en producción, muestra el cálculo al usuario con calculate_totals_igv y pide confirmación."
         ),
         "inputSchema": {
@@ -490,7 +490,7 @@ def _jsonrpc_err(req_id: Any, code: int, message: str, data: Any = None) -> dict
 # ==============================================================================
 @router.get("/mcp", tags=["AI Connectors"])
 async def mcp_discovery():
-    """Metadatos de descubrimiento del servidor Remote MCP de Sofia SUNAT Gateway."""
+    """Metadatos de descubrimiento del servidor Remote MCP de API SUNAT."""
     return {
         "name": "sofia-sunat-gateway-mcp",
         "version": settings.APP_VERSION,
@@ -539,7 +539,7 @@ async def mcp_jsonrpc_endpoint(
                     "version": settings.APP_VERSION,
                 },
                 "instructions": (
-                    "Eres un asistente conectado a Sofia SUNAT Gateway (Perú). "
+                    "Eres un asistente conectado a API SUNAT (Perú). "
                     "Antes de emitir un comprobante con emit_document, calcula y muestra los totales con calculate_totals_igv "
                     "y confirma con el usuario el RUC, monto y entorno (BETA o PRODUCCIÓN)."
                 ),
@@ -661,7 +661,7 @@ async def openapi_ai_schema():
     return {
         "openapi": "3.1.0",
         "info": {
-            "title": "Sofia SUNAT Gateway — AI Actions API",
+            "title": "API SUNAT — AI Actions API",
             "version": settings.APP_VERSION,
             "description": (
                 "API oficial de facturación electrónica SUNAT (Perú) para asistentes de IA (ChatGPT Actions, n8n, Make). "

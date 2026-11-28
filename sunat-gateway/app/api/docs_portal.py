@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Portal de Documentación Interactiva estilo heyo-docs para Sofia SUNAT Gateway (/docs-portal).
+Portal de Documentación Interactiva estilo heyo-docs para API SUNAT (/docs-portal).
 Sigue el Design System oficial SOFIA / Odoo 20 y carga dinámicamente /openapi-ai.json.
 """
 from fastapi import APIRouter
@@ -13,7 +13,7 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Documentación — Sofia SUNAT Gateway API &amp; MCP</title>
+  <title>Documentación — API SUNAT API &amp; MCP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
@@ -64,8 +64,8 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
   <header>
     <div class="nav">
       <a class="brand" href="/docs-portal">
-        <span class="brand-mark">S</span>
-        <span>Sofia SUNAT Gateway <span style="opacity:.75;font-weight:400">· Docs</span></span>
+        <span class="brand-mark">A</span>
+        <span>API SUNAT <span style="opacity:.75;font-weight:400">· Docs</span></span>
       </a>
       <div class="nav-tabs">
         <button class="nav-tab active" onclick="switchDocTab('guide', this)">Guía</button>
@@ -82,7 +82,7 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
   <div class="layout">
     <aside class="sidebar">
       <div class="side-group">Primeros pasos</div>
-      <a class="side-link" href="#intro" onclick="switchDocTab('guide')">Qué es Sofia Gateway</a>
+      <a class="side-link" href="#intro" onclick="switchDocTab('guide')">Qué es API SUNAT</a>
       <a class="side-link" href="#auth" onclick="switchDocTab('guide')">Autenticación (API Key &amp; OAuth 2.1)</a>
       <a class="side-link" href="#conventions" onclick="switchDocTab('guide')">Convenciones SUNAT</a>
       <div class="side-group">Asistentes de IA</div>
@@ -98,9 +98,9 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
       <section id="sec-guide">
         <div class="doc-card" id="intro">
           <span class="badge b-post" style="margin-bottom:10px">UBL 2.1 · XMLDSig · Anti-1033 · Remote MCP</span>
-          <h1>Documentación de Sofia SUNAT Gateway</h1>
+          <h1>Documentación de API SUNAT</h1>
           <p>
-            <strong>Sofia SUNAT Gateway</strong> es una pasarela resiliente de facturación electrónica para Perú (SUNAT).
+            <strong>API SUNAT</strong> es una pasarela resiliente de facturación electrónica para Perú (SUNAT).
             Recibe JSON limpio, valida reglas fiscales antes del envío, genera XML UBL 2.1, firma digitalmente con certificado <code>.pfx</code> en Bóveda Fernet
             y gestiona colas de reintentos automáticos y recuperación de CDR ante errores <code>1033</code>.
           </p>
@@ -123,7 +123,7 @@ DOCS_PORTAL_HTML = r"""<!DOCTYPE html>
       <section id="sec-examples" class="hidden">
         <div class="doc-card" id="mcp-claude">
           <h1>Conectar Claude, ChatGPT y Cursor (MCP)</h1>
-          <p>Sofia Gateway expone un servidor <strong>Remote MCP (Streamable HTTP)</strong> en <code>https://apisunat.pro/mcp</code> con 6 herramientas fiscales.</p>
+          <p>API SUNAT expone un servidor <strong>Remote MCP (Streamable HTTP)</strong> en <code>https://apisunat.pro/mcp</code> con 6 herramientas fiscales.</p>
           <h2>1. Claude Code (1 comando)</h2>
           <pre>claude mcp add --transport http sofia-sunat https://apisunat.pro/mcp \
   --header "Authorization: Bearer sk_live_TU_API_KEY"</pre>

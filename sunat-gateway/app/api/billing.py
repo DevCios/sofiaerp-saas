@@ -462,7 +462,7 @@ async def create_billing_checkout(
         },
         "auto_return": "approved",
         "notification_url": f"{base}/api/v1/billing/mp-webhook",
-        "statement_descriptor": "API SUNAT PRO",
+        "statement_descriptor": "API SUNAT",
     }
 
     async with httpx.AsyncClient(timeout=15.0) as client:

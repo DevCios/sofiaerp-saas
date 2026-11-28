@@ -9,7 +9,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sofia Gateway — Pasarela Resiliente SUNAT</title>
+  <title>API SUNAT — Pasarela Resiliente SUNAT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
@@ -210,8 +210,8 @@ PANEL_HTML = r"""<!DOCTYPE html>
 
 <div id="loginView" class="login-wrap">
   <div class="login-box">
-    <div class="login-logo">S</div>
-    <h2 style="margin:0 0 4px 0;text-align:center;color:var(--text)">Sofia Gateway</h2>
+    <div class="login-logo">A</div>
+    <h2 style="margin:0 0 4px 0;text-align:center;color:var(--text)">API SUNAT</h2>
     <p style="color:var(--muted);font-size:12.5px;text-align:center;margin:0 0 18px 0">API &amp; Pasarela Resiliente SUNAT · Remote MCP</p>
     <div style="display:flex;gap:6px;background:#F3F4F6;padding:4px;border-radius:8px;margin-bottom:16px">
       <button id="btnModeLogin" class="btn btn-sm" style="flex:1" onclick="setAuthMode('login')">Iniciar Sesión</button>
@@ -283,8 +283,8 @@ PANEL_HTML = r"""<!DOCTYPE html>
   <aside id="consoleSidebar" class="sidebar">
     <div class="sb-top">
       <div class="sb-brand">
-        <span class="sb-brand-mark">S</span>
-        <span>Sofia Gateway</span>
+        <span class="sb-brand-mark">A</span>
+        <span>API SUNAT</span>
       </div>
 
       <div class="sb-ws-box">
@@ -403,7 +403,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
           </div>
           <div class="ai-hero-row">
             <div>
-              <h2>Conecta Claude o ChatGPT<br/>a Sofia Gateway</h2>
+              <h2>Conecta Claude o ChatGPT<br/>a API SUNAT</h2>
               <p>Emite facturas, boletas y guías, calcula IGV y consulta su estado en SUNAT directamente desde tu asistente de IA favorito.</p>
             </div>
             <div class="ai-hero-cta">
@@ -557,7 +557,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
             <label>Modo de Firma Digital</label>
             <select id="issSigningMode">
               <option value="tenant_local">Híbrido SOFIA ERP (firma local en Tenant Odoo)</option>
-              <option value="gateway_vault">Bóveda Sofia Gateway (subir .pfx o Demo Beta)</option>
+              <option value="gateway_vault">Bóveda API SUNAT (subir .pfx o Demo Beta)</option>
             </select>
           </div>
           <div><label>Usuario SOL (opcional en Beta)</label><input id="issSolUser" placeholder="MODDATOS o RUC+USER" /></div>
@@ -638,7 +638,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
           <div>
             <span class="badge b-nav" style="margin-bottom:8px">ADR-010 · Remote MCP (Streamable HTTP) + OpenAPI 3.1</span>
-            <h2 style="margin:4px 0 6px 0;font-size:20px;color:#FFFFFF">Conecta Claude, ChatGPT, Cursor o n8n a Sofia SUNAT Gateway</h2>
+            <h2 style="margin:4px 0 6px 0;font-size:20px;color:#FFFFFF">Conecta Claude, ChatGPT, Cursor o n8n a API SUNAT</h2>
             <p style="margin:0;font-size:13px;color:rgba(255,255,255,.88);max-width:680px">
               Emite facturas y boletas, calcula IGV, consulta CDRs y explica errores SUNAT directamente desde tu asistente de IA usando API Keys aisladas por RUC.
             </p>
@@ -1367,7 +1367,7 @@ async function emitTestDoc() {
         },
         items: [{
           code: 'DEMO01',
-          description: 'Servicio de Prueba Sofia Gateway',
+          description: 'Servicio de Prueba API SUNAT',
           unit_code: 'NIU',
           quantity: 1,
           unit_price_without_tax: parseFloat(document.getElementById('tAmount').value || '100'),
@@ -1418,7 +1418,7 @@ async function runLookup(kind) {
   const outId = kind === 'ruc' ? 'lkRucOut' : (kind === 'dni' ? 'lkDniOut' : 'lkTcOut');
   const out = document.getElementById(outId);
   out.classList.remove('hidden');
-  out.textContent = 'Consultando Sofia Gateway...';
+  out.textContent = 'Consultando API SUNAT...';
   try {
     let path = '/lookup/exchange-rate';
     if (kind === 'ruc') path = '/lookup/ruc/' + encodeURIComponent(document.getElementById('lkRuc').value.trim());

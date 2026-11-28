@@ -221,7 +221,7 @@ services:
     restart: unless-stopped
     environment:
       - ENVIRONMENT=production
-      - APP_NAME=${SUNAT_GATEWAY_APP_NAME:-API SUNAT Pro}
+      - APP_NAME=${SUNAT_GATEWAY_APP_NAME:-API SUNAT}
       - PUBLIC_BASE_URL=${SUNAT_GATEWAY_PUBLIC_URL:-https://apisunat.pro}
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db
       - SYNC_DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/sofia_sunat_gateway_db

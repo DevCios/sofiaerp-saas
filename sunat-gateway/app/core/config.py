@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    APP_NAME: str = "API SUNAT Pro"
+    APP_NAME: str = "API SUNAT"
     APP_VERSION: str = "2.0.0"
     ENVIRONMENT: str = "production"
     PUBLIC_BASE_URL: str = "https://apisunat.pro"
